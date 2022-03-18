@@ -27,3 +27,11 @@ head(df)
 ```{r}
 fit <- edge_model(event ~ dyad(node_1, node_2), data=df, data_type="binary", mc_cores=4, verbose=TRUE)
 ```
+
+```{r}
+print.edge_model(fit)
+```
+
+```{r}
+plot.edge_model(fit)
+```
