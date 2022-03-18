@@ -1,0 +1,29 @@
+---
+title: "edge_models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{edge_models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(bisonR)
+```
+
+```{r}
+data("binary_ex1")
+df <- binary_ex1
+head(df)
+```
+
+```{r}
+fit <- edge_model(event ~ dyad(node_1, node_2), data=df, data_type="binary", mc_cores=4, verbose=TRUE)
+```
