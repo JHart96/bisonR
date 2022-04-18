@@ -3,7 +3,7 @@ require(igraph)
 require(bridgesampling)
 require(dplyr)
 
-#' Title
+#' Fit an edge model to data
 #'
 #' @param formula
 #' @param data
@@ -13,9 +13,8 @@ require(dplyr)
 #' @param verbose
 #'
 #' @return
-#' @export
 #'
-#' @examples
+#' @export
 edge_model <- function(formula, data, data_type=c("binary", "count", "duration"), directed=FALSE, method=c("mcmc", "vb", "inla"), verbose=FALSE, mc_cores=1) {
   # If verbose, print out MCMC chains.
   if (verbose) {
@@ -105,7 +104,7 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
   obj
 }
 
-#' Print edge model object
+#' Print an edge model object
 #'
 #' @param obj
 #'
@@ -119,15 +118,13 @@ print.edge_model <- function(obj) {
   ))
 }
 
-#' Title
+#' Plot an edge model object
 #'
 #' @param obj
 #' @param ...
 #'
 #' @return
 #' @export
-#'
-#' @examples
 plot.edge_model <- function(obj, ...) {
   rstan::traceplot(obj$fit, ...)
 }

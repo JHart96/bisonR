@@ -185,7 +185,7 @@ public:
             current_statement_begin__ = 17;
             lp_accum__.add(bernoulli_log(y, inv_logit(lprobs)));
             current_statement_begin__ = 20;
-            lp_accum__.add(normal_log(beta_fixed, 0, 10));
+            lp_accum__.add(normal_log(beta_fixed, 0, 1));
             }
         } catch (const std::exception& e) {
             stan::lang::rethrow_located(e, current_statement_begin__, prog_reader__());
