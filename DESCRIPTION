@@ -5,6 +5,7 @@ Authors@R:
     person("Jordan", "Hart", , "jordan.da.hart@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4636-0760"))
 Description: bisonR is an R package implementing the BISoN framework for conducting Bayesian analysis of social networks. BISoN estimates uncertainty over edge weights in social networks from empirical data (such as observations) and builds networks with uncertainty. The networks can then be visualised *with* uncertainty, and can also be analysed with a fully Bayesian methodology using standard tools such as regression.
+URL: https://github.com/JHart96/bisonR, https://jhart96.github.io/bisonR/
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

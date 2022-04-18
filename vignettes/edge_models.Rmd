@@ -1,5 +1,5 @@
 ---
-title: "edge_models"
+title: "Fitting an Edge Model"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{edge_models}
