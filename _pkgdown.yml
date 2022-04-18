@@ -1,7 +1,12 @@
 url: ~
+home:
+  title: BISoN R Package
 template:
   bootstrap: 5
   bootswatch: minty
 navbar:
   bg: light
   type: light
+authors:
+  Jordan Hart:
+    href: https://jordanhart.co.uk/
