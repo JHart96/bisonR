@@ -1,4 +1,4 @@
-# bisonR - An R package for Bayesian Inference of Social Networks <img src="man/figures/logo.png" align="right" />
+# bisonR - An R package for Bayesian Inference of Social Networks <img src="man/figures/logo.png" width=128 align="right" />
 
 :warning: **Do not use this package! (yet): This package is still in very early stages of development and not ready for real use. If you're looking to use BISoN for social network analysis check out the examples repository in Stan and INLA here: [github.com/JHart96/bison_examples](https://github.com/JHart96/bison_examples). **
 
