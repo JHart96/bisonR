@@ -4,6 +4,7 @@ data {
   int<lower=0> K_random; // Number of random effect parameters
   int<lower=0> R; // Number of random effect groups
   int y[N]; // Outcome for each data point (presence/absence)
+  int duration000[N]; // Duration of each observation
   matrix[N, K_fixed] X; // Design matrix for fixed effects
   matrix[N, K_random] Z; // Design matrix for random effects.
   int<lower=0, upper=R> G[K_random]; // Index for groupings for random effects
@@ -21,13 +22,13 @@ model {
   lprobs = X * beta_fixed + Z * beta_random;
 
   // Main model
-  target += bernoulli_lpmf(y | inv_logit(lprobs));
+  target += binomial_lpmf(y | duration000, inv_logit(lprobs));
 
   // Priors
-  target += normal_lpdf(beta_fixed | 0, 10);
+  target += normal_lpdf(beta_fixed | 0, 1.0);
   target += normal_lpdf(beta_random | H_mu[G], H_sigma[G]);
 
   // Hyperpriors
-  target += normal_lpdf(H_mu | 0, 10);
+  target += normal_lpdf(H_mu | 0, 1);
   target += exponential_lpdf(H_sigma | 1);
 }

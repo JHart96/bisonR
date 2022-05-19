@@ -4,6 +4,7 @@ data {
   int<lower=0> K_random; // Number of random effect parameters
   int<lower=0> R; // Number of random effect groups
   int y[N]; // Outcome for each data point (presence/absence)
+  vector[N] duration000; // Duration of each observation
   matrix[N, K_fixed] X; // Design matrix for fixed effects
   matrix[N, K_random] Z; // Design matrix for random effects.
   int<lower=0, upper=R> G[K_random]; // Index for groupings for random effects
@@ -21,7 +22,7 @@ model {
   lprobs = X * beta_fixed + Z * beta_random;
 
   // Main model
-  target += poisson_lpmf(y | exp(lprobs));
+  target += poisson_lpmf(y | exp(lprobs) .* duration000);
 
   // Priors
   target += normal_lpdf(beta_fixed | 0, 2.5);

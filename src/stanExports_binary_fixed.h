@@ -19,7 +19,7 @@ static int current_statement_begin__;
 stan::io::program_reader prog_reader__() {
     stan::io::program_reader reader;
     reader.add_event(0, 0, "start", "model_binary_fixed");
-    reader.add_event(23, 21, "end", "model_binary_fixed");
+    reader.add_event(24, 22, "end", "model_binary_fixed");
     return reader;
 }
 #include <stan_meta_header.hpp>
@@ -29,6 +29,7 @@ private:
         int N;
         int K_fixed;
         std::vector<int> y;
+        std::vector<int> duration000;
         matrix_d X;
 public:
     model_binary_fixed(stan::io::var_context& context__,
@@ -85,6 +86,16 @@ public:
                 y[k_0__] = vals_i__[pos__++];
             }
             current_statement_begin__ = 5;
+            validate_non_negative_index("duration000", "N", N);
+            context__.validate_dims("data initialization", "duration000", "int", context__.to_vec(N));
+            duration000 = std::vector<int>(N, int(0));
+            vals_i__ = context__.vals_i("duration000");
+            pos__ = 0;
+            size_t duration000_k_0_max__ = N;
+            for (size_t k_0__ = 0; k_0__ < duration000_k_0_max__; ++k_0__) {
+                duration000[k_0__] = vals_i__[pos__++];
+            }
+            current_statement_begin__ = 6;
             validate_non_negative_index("X", "N", N);
             validate_non_negative_index("X", "K_fixed", K_fixed);
             context__.validate_dims("data initialization", "X", "matrix_d", context__.to_vec(N,K_fixed));
@@ -104,7 +115,7 @@ public:
             // validate, set parameter ranges
             num_params_r__ = 0U;
             param_ranges_i__.clear();
-            current_statement_begin__ = 9;
+            current_statement_begin__ = 10;
             validate_non_negative_index("beta_fixed", "K_fixed", K_fixed);
             num_params_r__ += K_fixed;
         } catch (const std::exception& e) {
@@ -124,7 +135,7 @@ public:
         (void) pos__; // dummy call to supress warning
         std::vector<double> vals_r__;
         std::vector<int> vals_i__;
-        current_statement_begin__ = 9;
+        current_statement_begin__ = 10;
         if (!(context__.contains_r("beta_fixed")))
             stan::lang::rethrow_located(std::runtime_error(std::string("Variable beta_fixed missing")), current_statement_begin__, prog_reader__());
         vals_r__ = context__.vals_r("beta_fixed");
@@ -166,7 +177,7 @@ public:
         try {
             stan::io::reader<local_scalar_t__> in__(params_r__, params_i__);
             // model parameters
-            current_statement_begin__ = 9;
+            current_statement_begin__ = 10;
             Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> beta_fixed;
             (void) beta_fixed;  // dummy to suppress unused var warning
             if (jacobian__)
@@ -175,17 +186,17 @@ public:
                 beta_fixed = in__.vector_constrain(K_fixed);
             // model body
             {
-            current_statement_begin__ = 13;
+            current_statement_begin__ = 14;
             validate_non_negative_index("lprobs", "N", N);
             Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> lprobs(N);
             stan::math::initialize(lprobs, DUMMY_VAR__);
             stan::math::fill(lprobs, DUMMY_VAR__);
-            current_statement_begin__ = 14;
+            current_statement_begin__ = 15;
             stan::math::assign(lprobs, multiply(X, beta_fixed));
-            current_statement_begin__ = 17;
-            lp_accum__.add(bernoulli_log(y, inv_logit(lprobs)));
-            current_statement_begin__ = 20;
-            lp_accum__.add(normal_log(beta_fixed, 0, 1));
+            current_statement_begin__ = 18;
+            lp_accum__.add(binomial_log(y, duration000, inv_logit(lprobs)));
+            current_statement_begin__ = 21;
+            lp_accum__.add(normal_log(beta_fixed, 0, 1.0));
             }
         } catch (const std::exception& e) {
             stan::lang::rethrow_located(e, current_statement_begin__, prog_reader__());

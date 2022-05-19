@@ -16,7 +16,7 @@ require(dplyr)
 #' @return
 #'
 #' @export
-edge_model <- function(formula, data, data_type=c("binary", "count", "duration"), directed=FALSE, method=c("mcmc", "vb", "inla"), verbose=FALSE, mc_cores=1) {
+edge_model <- function(formula, data, data_type=c("binary", "count", "duration"), directed=FALSE, durations=1, method=c("mcmc", "vb", "inla"), verbose=FALSE, mc_cores=1) {
   # If verbose, print out MCMC chains.
   if (verbose) {
     refresh <- 200
@@ -54,8 +54,14 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
 
   # Set up model and model data depending on data type.
   if (method %in% c("mcmc", "vb")) {
+    # If durations is a single value, convert it to a list.
+    if (length(durations) == 1) {
+      durations <- rep(durations, nrow(obs))
+    }
+
     if (data_type == "binary") {
       model_data <- prepare_data(formula, data, directed, node_to_idx, node_list, data_type)
+      model_data$duration000 <- durations
       if (dim(model_data$Z)[2] > 0) {
         # Mixed effects model
         model <- stanmodels$binary_mixed
@@ -66,6 +72,7 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
     }
     if (data_type == "count") {
       model_data <- prepare_data(formula, data, directed, node_to_idx, node_list, data_type)
+      model_data$duration000 <- durations
       if (dim(model_data$Z)[2] > 0) {
         # Mixed effects model
         model <- stanmodels$count_mixed
@@ -102,14 +109,20 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
     prior.random <- list(prec=list(prior="normal", param=c(0, 1)))
     model = NULL
     # Fit the INLA model
+    if (length(durations) == 1) {
+      durations <- rep(durations, nrow(model_data_inla$df))
+    }
     if (data_type == "binary") {
       fit <- INLA::inla(model_data_inla$formula,
                        family="binomial",
                        data=model_data_inla$df,
+                       Ntrials=durations,
                        control.fixed=prior.fixed,
                        control.compute=list(config = TRUE)
       )
     } else if (data_type == "count") {
+      model_data$df$duration000 <- durations
+      inla_formula <- reformulate(termlabels = c(labels(terms(formula)), "offset(log(duration000))"), response=all.vars(formula)[1])
       fit <- INLA::inla(model_data$formula, # Add offset(log(duration)) to this and Stan model. Figure out syntax for formula.
                   family="poisson",
                   data=model_data$df,
@@ -181,7 +194,7 @@ print.edge_model <- function(obj, ci=0.90) {
   colnames(edge_list)[2] <- paste0(as.character(lb * 100), "%")
   colnames(edge_list)[3] <- paste0(as.character(ub * 100), "%")
   rownames(edge_list) <- dyad_names
-  edge_list
+  print(edge_list)
 }
 
 #' Diagnostic plot for an edge model object
@@ -328,7 +341,6 @@ prepare_data <- function(formula, observations, directed, node_to_idx, node_list
     node_2_name <- colnames(obs)[3]
     observations_agg$dyad_id <- dyad_id[cbind(node_to_idx[dplyr::pull(observations_agg[, node_1_name])], node_to_idx[dplyr::pull(observations_agg[, node_2_name])])]
     observations_agg <- observations_agg[order(observations_agg$dyad_id), ]
-    print(observations_agg)
     data$k <- observations_agg$k
     data$d <- observations_agg$d
     data$observations_agg <- observations_agg

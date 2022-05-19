@@ -19,7 +19,7 @@ static int current_statement_begin__;
 stan::io::program_reader prog_reader__() {
     stan::io::program_reader reader;
     reader.add_event(0, 0, "start", "model_binary_mixed");
-    reader.add_event(35, 33, "end", "model_binary_mixed");
+    reader.add_event(36, 34, "end", "model_binary_mixed");
     return reader;
 }
 #include <stan_meta_header.hpp>
@@ -31,6 +31,7 @@ private:
         int K_random;
         int R;
         std::vector<int> y;
+        std::vector<int> duration000;
         matrix_d X;
         matrix_d Z;
         std::vector<int> G;
@@ -103,6 +104,16 @@ public:
                 y[k_0__] = vals_i__[pos__++];
             }
             current_statement_begin__ = 7;
+            validate_non_negative_index("duration000", "N", N);
+            context__.validate_dims("data initialization", "duration000", "int", context__.to_vec(N));
+            duration000 = std::vector<int>(N, int(0));
+            vals_i__ = context__.vals_i("duration000");
+            pos__ = 0;
+            size_t duration000_k_0_max__ = N;
+            for (size_t k_0__ = 0; k_0__ < duration000_k_0_max__; ++k_0__) {
+                duration000[k_0__] = vals_i__[pos__++];
+            }
+            current_statement_begin__ = 8;
             validate_non_negative_index("X", "N", N);
             validate_non_negative_index("X", "K_fixed", K_fixed);
             context__.validate_dims("data initialization", "X", "matrix_d", context__.to_vec(N,K_fixed));
@@ -116,7 +127,7 @@ public:
                     X(j_1__, j_2__) = vals_r__[pos__++];
                 }
             }
-            current_statement_begin__ = 8;
+            current_statement_begin__ = 9;
             validate_non_negative_index("Z", "N", N);
             validate_non_negative_index("Z", "K_random", K_random);
             context__.validate_dims("data initialization", "Z", "matrix_d", context__.to_vec(N,K_random));
@@ -130,7 +141,7 @@ public:
                     Z(j_1__, j_2__) = vals_r__[pos__++];
                 }
             }
-            current_statement_begin__ = 9;
+            current_statement_begin__ = 10;
             validate_non_negative_index("G", "K_random", K_random);
             context__.validate_dims("data initialization", "G", "int", context__.to_vec(K_random));
             G = std::vector<int>(K_random, int(0));
@@ -151,16 +162,16 @@ public:
             // validate, set parameter ranges
             num_params_r__ = 0U;
             param_ranges_i__.clear();
-            current_statement_begin__ = 13;
+            current_statement_begin__ = 14;
             validate_non_negative_index("beta_fixed", "K_fixed", K_fixed);
             num_params_r__ += K_fixed;
-            current_statement_begin__ = 14;
+            current_statement_begin__ = 15;
             validate_non_negative_index("beta_random", "K_random", K_random);
             num_params_r__ += K_random;
-            current_statement_begin__ = 15;
+            current_statement_begin__ = 16;
             validate_non_negative_index("H_mu", "R", R);
             num_params_r__ += R;
-            current_statement_begin__ = 16;
+            current_statement_begin__ = 17;
             validate_non_negative_index("H_sigma", "R", R);
             num_params_r__ += R;
         } catch (const std::exception& e) {
@@ -180,7 +191,7 @@ public:
         (void) pos__; // dummy call to supress warning
         std::vector<double> vals_r__;
         std::vector<int> vals_i__;
-        current_statement_begin__ = 13;
+        current_statement_begin__ = 14;
         if (!(context__.contains_r("beta_fixed")))
             stan::lang::rethrow_located(std::runtime_error(std::string("Variable beta_fixed missing")), current_statement_begin__, prog_reader__());
         vals_r__ = context__.vals_r("beta_fixed");
@@ -197,7 +208,7 @@ public:
         } catch (const std::exception& e) {
             stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable beta_fixed: ") + e.what()), current_statement_begin__, prog_reader__());
         }
-        current_statement_begin__ = 14;
+        current_statement_begin__ = 15;
         if (!(context__.contains_r("beta_random")))
             stan::lang::rethrow_located(std::runtime_error(std::string("Variable beta_random missing")), current_statement_begin__, prog_reader__());
         vals_r__ = context__.vals_r("beta_random");
@@ -214,7 +225,7 @@ public:
         } catch (const std::exception& e) {
             stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable beta_random: ") + e.what()), current_statement_begin__, prog_reader__());
         }
-        current_statement_begin__ = 15;
+        current_statement_begin__ = 16;
         if (!(context__.contains_r("H_mu")))
             stan::lang::rethrow_located(std::runtime_error(std::string("Variable H_mu missing")), current_statement_begin__, prog_reader__());
         vals_r__ = context__.vals_r("H_mu");
@@ -231,7 +242,7 @@ public:
         } catch (const std::exception& e) {
             stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable H_mu: ") + e.what()), current_statement_begin__, prog_reader__());
         }
-        current_statement_begin__ = 16;
+        current_statement_begin__ = 17;
         if (!(context__.contains_r("H_sigma")))
             stan::lang::rethrow_located(std::runtime_error(std::string("Variable H_sigma missing")), current_statement_begin__, prog_reader__());
         vals_r__ = context__.vals_r("H_sigma");
@@ -273,28 +284,28 @@ public:
         try {
             stan::io::reader<local_scalar_t__> in__(params_r__, params_i__);
             // model parameters
-            current_statement_begin__ = 13;
+            current_statement_begin__ = 14;
             Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> beta_fixed;
             (void) beta_fixed;  // dummy to suppress unused var warning
             if (jacobian__)
                 beta_fixed = in__.vector_constrain(K_fixed, lp__);
             else
                 beta_fixed = in__.vector_constrain(K_fixed);
-            current_statement_begin__ = 14;
+            current_statement_begin__ = 15;
             Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> beta_random;
             (void) beta_random;  // dummy to suppress unused var warning
             if (jacobian__)
                 beta_random = in__.vector_constrain(K_random, lp__);
             else
                 beta_random = in__.vector_constrain(K_random);
-            current_statement_begin__ = 15;
+            current_statement_begin__ = 16;
             Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> H_mu;
             (void) H_mu;  // dummy to suppress unused var warning
             if (jacobian__)
                 H_mu = in__.vector_constrain(R, lp__);
             else
                 H_mu = in__.vector_constrain(R);
-            current_statement_begin__ = 16;
+            current_statement_begin__ = 17;
             Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> H_sigma;
             (void) H_sigma;  // dummy to suppress unused var warning
             if (jacobian__)
@@ -303,22 +314,22 @@ public:
                 H_sigma = in__.vector_lb_constrain(0, R);
             // model body
             {
-            current_statement_begin__ = 20;
+            current_statement_begin__ = 21;
             validate_non_negative_index("lprobs", "N", N);
             Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1> lprobs(N);
             stan::math::initialize(lprobs, DUMMY_VAR__);
             stan::math::fill(lprobs, DUMMY_VAR__);
-            current_statement_begin__ = 21;
+            current_statement_begin__ = 22;
             stan::math::assign(lprobs, add(multiply(X, beta_fixed), multiply(Z, beta_random)));
-            current_statement_begin__ = 24;
-            lp_accum__.add(bernoulli_log(y, inv_logit(lprobs)));
-            current_statement_begin__ = 27;
-            lp_accum__.add(normal_log(beta_fixed, 0, 10));
+            current_statement_begin__ = 25;
+            lp_accum__.add(binomial_log(y, duration000, inv_logit(lprobs)));
             current_statement_begin__ = 28;
+            lp_accum__.add(normal_log(beta_fixed, 0, 1.0));
+            current_statement_begin__ = 29;
             lp_accum__.add(normal_log(beta_random, stan::model::rvalue(H_mu, stan::model::cons_list(stan::model::index_multi(G), stan::model::nil_index_list()), "H_mu"), stan::model::rvalue(H_sigma, stan::model::cons_list(stan::model::index_multi(G), stan::model::nil_index_list()), "H_sigma")));
-            current_statement_begin__ = 31;
-            lp_accum__.add(normal_log(H_mu, 0, 10));
             current_statement_begin__ = 32;
+            lp_accum__.add(normal_log(H_mu, 0, 1));
+            current_statement_begin__ = 33;
             lp_accum__.add(exponential_log(H_sigma, 1));
             }
         } catch (const std::exception& e) {

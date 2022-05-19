@@ -9,6 +9,7 @@ edge_model(
   data,
   data_type = c("binary", "count", "duration"),
   directed = FALSE,
+  durations = 1,
   method = c("mcmc", "vb", "inla"),
   verbose = FALSE,
   mc_cores = 1
