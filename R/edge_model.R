@@ -1,4 +1,5 @@
 require(rstan)
+require(INLA)
 require(igraph)
 require(bridgesampling)
 require(dplyr)
@@ -43,55 +44,98 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
   }
   node_to_idx <- sapply(node_list, function(x) which(node_list == x))
 
+  model_data <- prepare_data(formula, data, directed, node_to_idx, node_list, data_type)
+  dyad_mapping <- model_data$dyad_id
+  num_dyads <- max(dyad_mapping)
+  dyad_names <- sapply(
+    1:num_dyads,
+    function(x) paste0(names(node_to_idx)[which(dyad_mapping == x, arr.ind=TRUE)[1, 2:1]], collapse=" <-> ")
+  )
+
   # Set up model and model data depending on data type.
-  if (data_type == "binary") {
-    model_data <- prepare_data(formula, data, directed, node_to_idx, node_list, data_type)
-    if (dim(model_data$Z)[2] > 0) {
-      # Mixed effects model
-      model <- stanmodels$binary_mixed
-    } else {
-      # Fixed effects model
-      model <- stanmodels$binary_fixed
+  if (method %in% c("mcmc", "vb")) {
+    if (data_type == "binary") {
+      model_data <- prepare_data(formula, data, directed, node_to_idx, node_list, data_type)
+      if (dim(model_data$Z)[2] > 0) {
+        # Mixed effects model
+        model <- stanmodels$binary_mixed
+      } else {
+        # Fixed effects model
+        model <- stanmodels$binary_fixed
+      }
     }
-  }
-  if (data_type == "count") {
-    model_data <- prepare_data(formula, data, directed, node_to_idx, node_list, data_type)
-    if (dim(model_data$Z)[2] > 0) {
-      # Mixed effects model
-      model <- stanmodels$count_mixed
-    } else {
-      # Fixed effects model
-      model <- stanmodels$count_fixed
+    if (data_type == "count") {
+      model_data <- prepare_data(formula, data, directed, node_to_idx, node_list, data_type)
+      if (dim(model_data$Z)[2] > 0) {
+        # Mixed effects model
+        model <- stanmodels$count_mixed
+      } else {
+        # Fixed effects model
+        model <- stanmodels$count_fixed
+      }
     }
-  }
-  if (data_type == "duration") {
-    model_data <- prepare_data(formula, list(obs=data, obs_agg=data_agg), directed, node_to_idx, node_list, data_type)
-    if (dim(model_data$Z)[2] > 0) {
-      # Mixed effects model
-      model <- stanmodels$duration_mixed
-    } else {
-      # Fixed effects model
-      model <- stanmodels$duration_fixed
+    if (data_type == "duration") {
+      model_data <- prepare_data(formula, list(obs=data, obs_agg=data_agg), directed, node_to_idx, node_list, data_type)
+      if (dim(model_data$Z)[2] > 0) {
+        # Mixed effects model
+        model <- stanmodels$duration_mixed
+      } else {
+        # Fixed effects model
+        model <- stanmodels$duration_fixed
+      }
     }
-  }
+    # Fit model
+    if (method == "mcmc"){
+      fit <- rstan::sampling(model, data=model_data, refresh=refresh, cores=mc_cores)
+    }
+    if (method == "vb") {
+      fit <- rstan::vb(model, data=model_data, output_samples=2000, iter=1e5, tol_rel_obj=1e-3, importance_resampling=TRUE)
+    }
 
-  # Fit model
-  if (method == "mcmc"){
-    fit <- rstan::sampling(model, data=model_data, refresh=refresh, cores=mc_cores)
-  }
-  if (method == "vb") {
-    fit <- rstan::vb(model, data=model_data, output_samples=2000, iter=1e5, tol_rel_obj=1e-3, importance_resampling=TRUE)
-  }
+    # Extract edge weights from fitted edge model.
+    chain <- rstan::extract(fit)$beta_fixed
+    colnames(chain) <- colnames(data$X)
 
-  # Extract edge weights from fitted edge model.
-  chain <- rstan::extract(fit)$beta_fixed
-  colnames(chain) <- colnames(data$X)
+  } else if (method == "inla") {
+    model_data_inla <- prepare_data_inla(formula, data, directed, node_to_idx, node_list, data_type)
+    prior.fixed <- list(mean=0, prec=1)
+    prior.random <- list(prec=list(prior="normal", param=c(0, 1)))
+    model = NULL
+    # Fit the INLA model
+    if (data_type == "binary") {
+      fit <- INLA::inla(model_data_inla$formula,
+                       family="binomial",
+                       data=model_data_inla$df,
+                       control.fixed=prior.fixed,
+                       control.compute=list(config = TRUE)
+      )
+    } else if (data_type == "count") {
+      fit <- INLA::inla(model_data$formula, # Add offset(log(duration)) to this and Stan model. Figure out syntax for formula.
+                  family="poisson",
+                  data=model_data$df,
+                  control.fixed=prior.fixed,
+                  control.compute=list(config = TRUE)
+      )
+    } else if (data_type == "duration") {
+      message("This model type is not supported by INLA")
+    }
+
+    # Extract edge weights from fitted edge model.
+    num_samples <- 1000
+    inla_samples <- inla.posterior.sample(num_samples, fit)
+    chain <- matrix(0, length(inla_samples), num_dyads)
+    for (i in 1:length(inla_samples)) {
+      chain[i, ] <- tail(inla_samples[[i]]$latent, num_dyads)
+    }
+  }
 
   # Prepare output object.
   obj <- list()
   obj$chain <- chain
   obj$num_nodes <- model_data$num_nodes
-  obj$dyad_mapping <- model_data$dyad_id
+  obj$num_dyads <- model_data$num_dyads
+  obj$dyad_mapping <- dyad_mapping
+  obj$dyad_names <- dyad_names
   obj$directed <- directed
   obj$fit <- fit
   obj$formula <- formula
@@ -99,7 +143,9 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
   obj$data_type <- data_type
   obj$model_data <- model_data
   obj$data = data
+  obj$node_to_idx <- node_to_idx
   obj$stan_model = model
+  obj$fit_method = method
   class(obj) <- "edge_model"
   obj
 }
@@ -109,24 +155,52 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
 #' @param obj
 #'
 #' @export
-print.edge_model <- function(obj) {
+print.edge_model <- function(obj, ci=0.90) {
   cat(paste0(
-    "### Fitted BISoN edge model ###",
+    "=== Fitted BISoN edge model ===",
     "\nData type: ", obj$data_type,
     "\nFormula: ", format(obj$formula),
-    "\nNumber of nodes: ", obj$num_nodes
+    "\nNumber of nodes: ", obj$num_nodes,
+    "\nEdge list summary:\n"
   ))
+
+  dyad_names <- sapply(
+    1:max(obj$dyad_mapping),
+    function(x) paste0(names(obj$node_to_idx)[which(obj$dyad_mapping == x, arr.ind=TRUE)[1, 2:1]], collapse=" <-> ")
+  )
+  lb <- 0.5 * (1 - ci)
+  ub <- 1 - lb
+  edge_lower <- apply(obj$chain, 2, function(x) quantile(x, probs=lb))
+  edge_upper <- apply(obj$chain, 2, function(x) quantile(x, probs=ub))
+  edge_median <- apply(obj$chain, 2, function(x) quantile(x, probs=0.5))
+  edge_list <- cbind(
+    "median"=round(edge_median, 3),
+    "lb"=round(edge_lower, 3),
+    "ub"=round(edge_upper, 3)
+  )
+  colnames(edge_list)[2] <- paste0(as.character(lb * 100), "%")
+  colnames(edge_list)[3] <- paste0(as.character(ub * 100), "%")
+  rownames(edge_list) <- dyad_names
+  edge_list
 }
 
-#' Plot an edge model object
+#' Diagnostic plot for an edge model object
 #'
 #' @param obj
 #' @param ...
 #'
 #' @return
 #' @export
-plot.edge_model <- function(obj, ...) {
-  rstan::traceplot(obj$fit, ...)
+diagnostic_plot <- function(obj, ...) {
+  if (class(obj) == "edge_model") {
+    if (obj$fit_method %in% c("mcmc", "vb")) {
+      rstan::traceplot(obj$fit, ...)
+    } else {
+      message("diagnostic_plot function not yet available for this fitting method")
+    }
+  } else if (class(obj) == "nodal_regression") {
+    message("diagnostic_plot function not yet available for this model type")
+  }
 }
 
 prepare_data <- function(formula, observations, directed, node_to_idx, node_list, data_type) {
@@ -261,4 +335,75 @@ prepare_data <- function(formula, observations, directed, node_to_idx, node_list
   }
 
   data
+}
+
+prepare_data_inla <- function (formula, observations, directed, node_to_idx, node_list, data_type) {
+  obs <- get_all_vars(formula, observations)
+
+  # If nodes are in factors, convert to idx.
+  obs[, 2] <- as.integer(obs[, 2])
+  obs[, 3] <- as.integer(obs[, 3])
+
+  # Get number of nodes
+  n <- length(node_to_idx)
+
+  dyad_id <- matrix(0, n, n)
+  if (directed == FALSE) {
+    dyad_id[upper.tri(dyad_id)] <- 1:(0.5 * n * (n - 1))
+    dyad_id <- dyad_id + t(dyad_id)
+  } else {
+    dyad_id[upper.tri(dyad_id)] <- 1:(0.5 * n * (n - 1))
+    dyad_id[lower.tri(dyad_id)] <- (0.5 * n * (n - 1) + 1):n
+  }
+
+  # Calculate SRI for future reference
+  obs_temp <- data.frame(
+    association=obs[, 1],
+    id_1=obs[, 2],
+    id_2=obs[, 3]
+  )
+  sri <- matrix(0, n, n)
+  for (i in 1:n) {
+    for (j in 1:n) {
+      if (i < j) {
+        sri[i, j] <- mean(subset(obs_temp, (id_1 == i & id_2 == j) | (id_1 == j & id_2 == i))$association)
+      }
+    }
+  }
+
+  obs <- get_all_vars(formula, df)
+  obs$dyad_id <- fit_edge$dyad_mapping[cbind(obs[, 2], obs[, 3])]
+  obs$dyad_id <- factor(obs$dyad_id)
+
+
+  term_labels <- c('0', 'dyad_id')
+
+  if (length(labels(terms(formula))) > 1) {
+    additional_effects <- labels(terms(formula))
+    additional_effects <- additional_effects[2:length(additional_effects)]
+    for (i in 1:length(additional_effects)) {
+      if (any(grep("\\|", additional_effects[i]))) {
+        # Random effect
+        term_vars <- sapply(colnames(obs), function(x) grepl(x, additional_effects[i]))
+        term_var <- term_vars[term_vars == TRUE][1]
+
+        term_name <- names(term_var)
+        term_labels <- c(term_labels, paste0("f(", term_name, ", model='iid', hyper=prior.random)"))
+
+      } else {
+        # Fixed effect
+        term_vars <- sapply(colnames(obs), function(x) grepl(x, additional_effects[i]))
+        term_var <- term_vars[term_vars == TRUE][1]
+
+        term_name <- names(term_var)
+        term_labels <- c(term_labels, term_name)
+      }
+    }
+  }
+
+  formula_inla <- reformulate(termlabels = term_labels, response = all.vars(formula)[[1]])
+  data <- list(
+    formula = formula_inla,
+    df = obs
+  )
 }

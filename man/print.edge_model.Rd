@@ -4,7 +4,7 @@
 \alias{print.edge_model}
 \title{Print an edge model object}
 \usage{
-\method{print}{edge_model}(obj)
+\method{print}{edge_model}(obj, ci = 0.9)
 }
 \arguments{
 \item{obj}{}
