@@ -146,7 +146,7 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
   obj <- list()
   obj$chain <- chain
   obj$num_nodes <- model_data$num_nodes
-  obj$num_dyads <- model_data$num_dyads
+  obj$num_dyads <- num_dyads
   obj$dyad_mapping <- dyad_mapping
   obj$dyad_names <- dyad_names
   obj$directed <- directed
@@ -163,6 +163,18 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
   obj
 }
 
+#' Title
+#'
+#' @param obj
+#'
+#' @return
+#' @export
+#'
+#' @examples
+summary.edge_model <- function(obj) {
+  print(obj)
+}
+
 #' Print an edge model object
 #'
 #' @param obj
@@ -174,27 +186,46 @@ print.edge_model <- function(obj, ci=0.90) {
     "\nData type: ", obj$data_type,
     "\nFormula: ", format(obj$formula),
     "\nNumber of nodes: ", obj$num_nodes,
-    "\nEdge list summary:\n"
+    "\nNumber of dyads: ", obj$num_dyads,
+    "\nDirected: ", obj$directed,
+    "\n=== Edge list summary ===\n"
   ))
 
-  dyad_names <- sapply(
+  edgelist <- get_edgelist(obj, ci=ci)
+  dyad_names <- do.call(paste, c(get_edgelist(fit_edge)[, 1:2], sep=" <-> "))
+  summary_matrix <- as.matrix(edgelist[, 3:5])
+  rownames(summary_matrix) <- dyad_names
+  print(summary_matrix)
+}
+
+#' Title
+#'
+#' @param obj
+#'
+#' @return
+#' @export
+#'
+#' @examples
+get_edgelist <- function (obj, ci=0.9) {
+  node_names <- sapply(
     1:max(obj$dyad_mapping),
-    function(x) paste0(names(obj$node_to_idx)[which(obj$dyad_mapping == x, arr.ind=TRUE)[1, 2:1]], collapse=" <-> ")
+    function(x) names(obj$node_to_idx)[which(obj$dyad_mapping == x, arr.ind=TRUE)[1, 2:1]]
   )
   lb <- 0.5 * (1 - ci)
   ub <- 1 - lb
   edge_lower <- apply(obj$chain, 2, function(x) quantile(x, probs=lb))
   edge_upper <- apply(obj$chain, 2, function(x) quantile(x, probs=ub))
   edge_median <- apply(obj$chain, 2, function(x) quantile(x, probs=0.5))
-  edge_list <- cbind(
-    "median"=round(edge_median, 3),
-    "lb"=round(edge_lower, 3),
-    "ub"=round(edge_upper, 3)
+  edgelist <- data.frame(
+    node_1 = node_names[1, ],
+    node_2 = node_names[2, ],
+    median = round(edge_median, 3),
+    lb = round(edge_lower, 3),
+    ub = round(edge_upper, 3)
   )
-  colnames(edge_list)[2] <- paste0(as.character(lb * 100), "%")
-  colnames(edge_list)[3] <- paste0(as.character(ub * 100), "%")
-  rownames(edge_list) <- dyad_names
-  print(edge_list)
+  colnames(edgelist)[4] <- paste0(as.character(lb * 100), "%")
+  colnames(edgelist)[5] <- paste0(as.character(ub * 100), "%")
+  edgelist
 }
 
 #' Diagnostic plot for an edge model object
@@ -204,7 +235,7 @@ print.edge_model <- function(obj, ci=0.90) {
 #'
 #' @return
 #' @export
-diagnostic_plot <- function(obj, ...) {
+plot_trace <- function(obj, ...) {
   if (class(obj) == "edge_model") {
     if (obj$fit_method %in% c("mcmc", "vb")) {
       rstan::traceplot(obj$fit, ...)
@@ -214,6 +245,26 @@ diagnostic_plot <- function(obj, ...) {
   } else if (class(obj) == "nodal_regression") {
     message("diagnostic_plot function not yet available for this model type")
   }
+}
+
+#' Title
+#'
+#' @param obj
+#'
+#' @return
+#' @export
+#'
+#' @examples
+plot_network <- function(obj, ci=0.9, lwd=1, ciwd=10) {
+  edgelist <- get_edgelist(obj, ci=ci)
+  net <- igraph::graph_from_edgelist(as.matrix(edgelist[, 1:2]), directed=FALSE)
+  edge_weights <- plogis(edgelist[, 3])
+  weights <- (edge_weights - min(edge_weights))/(max(edge_weights) - min(edge_weights))
+  coords <- igraph::layout_nicely(net)
+  igraph::plot.igraph(net, edge.width=weights * lwd, layout=coords)
+  ci_widths <- plogis(edgelist[, 5]) - plogis(edgelist[, 4])
+  weights <- (ci_widths - min(edge_weights))/(max(edge_weights) - min(edge_weights))
+  igraph::plot.igraph(net, edge.width=weights * lwd * ciwd, layout=coords, edge.color=rgb(0, 0, 0, 0.25), add=TRUE)
 }
 
 prepare_data <- function(formula, observations, directed, node_to_idx, node_list, data_type) {

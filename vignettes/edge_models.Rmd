@@ -29,9 +29,13 @@ fit_edge <- edge_model(event ~ dyad(node_1, node_2), data=df, data_type="binary"
 ```
 
 ```{r}
-fit_edge
+plot_trace(fit_edge)
 ```
 
 ```{r}
-diagnostic_plot(fit_edge)
+summary(fit_edge)
+```
+
+```{r}
+plot_network(fit_edge, lwd=2)
 ```
