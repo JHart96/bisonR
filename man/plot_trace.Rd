@@ -2,7 +2,7 @@
 % Please edit documentation in R/edge_model.R
 \name{plot_trace}
 \alias{plot_trace}
-\title{Diagnostic plot for an edge model object}
+\title{Trace plot for a fitted edge model object}
 \usage{
 plot_trace(obj, ...)
 }
@@ -13,5 +13,5 @@ plot_trace(obj, ...)
 
 }
 \description{
-Diagnostic plot for an edge model object
+Trace plot for a fitted edge model object
 }

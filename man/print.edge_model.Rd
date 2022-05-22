@@ -2,7 +2,7 @@
 % Please edit documentation in R/edge_model.R
 \name{print.edge_model}
 \alias{print.edge_model}
-\title{Print an edge model object}
+\title{Prints out details of a fitted edge model object}
 \usage{
 \method{print}{edge_model}(obj, ci = 0.9)
 }
@@ -10,5 +10,5 @@
 \item{obj}{}
 }
 \description{
-Print an edge model object
+Prints out details of a fitted edge model object
 }

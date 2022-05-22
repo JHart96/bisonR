@@ -2,7 +2,7 @@
 % Please edit documentation in R/edge_model.R
 \name{plot_network}
 \alias{plot_network}
-\title{Title}
+\title{Sociogram plot with uncertainty of a fitted edge weight model object}
 \usage{
 plot_network(obj, ci = 0.9, lwd = 1, ciwd = 10)
 }
@@ -13,5 +13,5 @@ plot_network(obj, ci = 0.9, lwd = 1, ciwd = 10)
 
 }
 \description{
-Title
+Sociogram plot with uncertainty of a fitted edge weight model object
 }

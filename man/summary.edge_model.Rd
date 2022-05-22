@@ -2,7 +2,7 @@
 % Please edit documentation in R/edge_model.R
 \name{summary.edge_model}
 \alias{summary.edge_model}
-\title{Title}
+\title{Summarises a fitted edge model object}
 \usage{
 \method{summary}{edge_model}(obj)
 }
@@ -13,5 +13,5 @@
 
 }
 \description{
-Title
+Summarises a fitted edge model object
 }

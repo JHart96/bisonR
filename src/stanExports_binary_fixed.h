@@ -196,7 +196,7 @@ public:
             current_statement_begin__ = 18;
             lp_accum__.add(binomial_log(y, duration000, inv_logit(lprobs)));
             current_statement_begin__ = 21;
-            lp_accum__.add(normal_log(beta_fixed, 0, 1.0));
+            lp_accum__.add(normal_log(beta_fixed, 0, 1));
             }
         } catch (const std::exception& e) {
             stan::lang::rethrow_located(e, current_statement_begin__, prog_reader__());

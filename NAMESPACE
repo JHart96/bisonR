@@ -2,6 +2,7 @@
 
 S3method(print,edge_model)
 S3method(summary,edge_model)
+export(dyadic_regression)
 export(edge_model)
 export(get_edgelist)
 export(plot_network)

@@ -163,7 +163,7 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
   obj
 }
 
-#' Title
+#' Summarises a fitted edge model object
 #'
 #' @param obj
 #'
@@ -175,7 +175,7 @@ summary.edge_model <- function(obj) {
   print(obj)
 }
 
-#' Print an edge model object
+#' Prints out details of a fitted edge model object
 #'
 #' @param obj
 #'
@@ -198,7 +198,7 @@ print.edge_model <- function(obj, ci=0.90) {
   print(summary_matrix)
 }
 
-#' Title
+#' Retrieves an edgelist with uncertainty for a fitted edge weight model object
 #'
 #' @param obj
 #'
@@ -228,7 +228,7 @@ get_edgelist <- function (obj, ci=0.9) {
   edgelist
 }
 
-#' Diagnostic plot for an edge model object
+#' Trace plot for a fitted edge model object
 #'
 #' @param obj
 #' @param ...
@@ -247,7 +247,7 @@ plot_trace <- function(obj, ...) {
   }
 }
 
-#' Title
+#' Sociogram plot with uncertainty of a fitted edge weight model object
 #'
 #' @param obj
 #'

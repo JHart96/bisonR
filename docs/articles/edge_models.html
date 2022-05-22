@@ -48,6 +48,7 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/dyadic_regression.html">Running a dyadic regression</a>
     <a class="dropdown-item" href="../articles/edge_models.html">Fitting an Edge Model</a>
   </div>
 </li>
@@ -101,46 +102,52 @@
 <span class="co">#&gt; 5    Rey   Leia Lifeform Lifeform     1        B</span>
 <span class="co">#&gt; 6    Rey   Leia Lifeform Lifeform     1        B</span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fit_edge</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edge_model.html">edge_model</a></span><span class="op">(</span><span class="va">event</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1</span>, <span class="va">node_2</span><span class="op">)</span>, data<span class="op">=</span><span class="va">df</span>, data_type<span class="op">=</span><span class="st">"binary"</span>, method<span class="op">=</span><span class="st">"vb"</span>, mc_cores<span class="op">=</span><span class="fl">4</span>, verbose<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; Chain 1: ------------------------------------------------------------</span>
-<span class="co">#&gt; Chain 1: EXPERIMENTAL ALGORITHM:</span>
-<span class="co">#&gt; Chain 1:   This procedure has not been thoroughly tested and may be unstable</span>
-<span class="co">#&gt; Chain 1:   or buggy. The interface is subject to change.</span>
-<span class="co">#&gt; Chain 1: ------------------------------------------------------------</span>
-<span class="co">#&gt; Chain 1: </span>
-<span class="co">#&gt; Chain 1: </span>
-<span class="co">#&gt; Chain 1: </span>
-<span class="co">#&gt; Chain 1: Gradient evaluation took 0.003187 seconds</span>
-<span class="co">#&gt; Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 31.87 seconds.</span>
-<span class="co">#&gt; Chain 1: Adjust your expectations accordingly!</span>
-<span class="co">#&gt; Chain 1: </span>
-<span class="co">#&gt; Chain 1: </span>
-<span class="co">#&gt; Chain 1: Begin eta adaptation.</span>
-<span class="co">#&gt; Chain 1: Iteration:   1 / 250 [  0%]  (Adaptation)</span>
-<span class="co">#&gt; Chain 1: Iteration:  50 / 250 [ 20%]  (Adaptation)</span>
-<span class="co">#&gt; Chain 1: Iteration: 100 / 250 [ 40%]  (Adaptation)</span>
-<span class="co">#&gt; Chain 1: Iteration: 150 / 250 [ 60%]  (Adaptation)</span>
-<span class="co">#&gt; Chain 1: Iteration: 200 / 250 [ 80%]  (Adaptation)</span>
-<span class="co">#&gt; Chain 1: Success! Found best value [eta = 1] earlier than expected.</span>
-<span class="co">#&gt; Chain 1: </span>
-<span class="co">#&gt; Chain 1: Begin stochastic gradient ascent.</span>
-<span class="co">#&gt; Chain 1:   iter             ELBO   delta_ELBO_mean   delta_ELBO_med   notes </span>
-<span class="co">#&gt; Chain 1:    100         -390.321             1.000            1.000</span>
-<span class="co">#&gt; Chain 1:    200         -390.162             0.500            1.000</span>
-<span class="co">#&gt; Chain 1:    300         -390.289             0.334            0.000   MEDIAN ELBO CONVERGED</span>
-<span class="co">#&gt; Chain 1: </span>
-<span class="co">#&gt; Chain 1: Drawing a sample of size 2000 from the approximate posterior... </span>
-<span class="co">#&gt; Chain 1: COMPLETED.</span></code></pre></div>
+<code class="sourceCode R"><span class="va">fit_edge</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edge_model.html">edge_model</a></span><span class="op">(</span><span class="va">event</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1</span>, <span class="va">node_2</span><span class="op">)</span>, data<span class="op">=</span><span class="va">df</span>, data_type<span class="op">=</span><span class="st">"binary"</span>, method<span class="op">=</span><span class="st">"mcmc"</span>, mc_cores<span class="op">=</span><span class="fl">4</span>, verbose<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit_edge</span><span class="op">)</span>
-<span class="co">#&gt; ### Fitted BISoN edge model ###</span>
+<code class="sourceCode R"><span class="fu"><a href="../reference/plot_trace.html">plot_trace</a></span><span class="op">(</span><span class="va">fit_edge</span><span class="op">)</span>
+<span class="co">#&gt; 'pars' not specified. Showing first 10 parameters by default.</span></code></pre></div>
+<p><img src="edge_models_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_edge</span><span class="op">)</span>
+<span class="co">#&gt; === Fitted BISoN edge model ===</span>
 <span class="co">#&gt; Data type: binary</span>
 <span class="co">#&gt; Formula: event ~ dyad(node_1, node_2)</span>
-<span class="co">#&gt; Number of nodes: 8</span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit_edge</span><span class="op">)</span>
-<span class="co">#&gt; 'pars' not specified. Showing first 10 parameters by default.</span></code></pre></div>
-<p><img src="edge_models_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
+<span class="co">#&gt; Number of nodes: 8</span>
+<span class="co">#&gt; Number of dyads: 28</span>
+<span class="co">#&gt; Directed: FALSE</span>
+<span class="co">#&gt; === Edge list summary ===</span>
+<span class="co">#&gt;                   median     5%    95%</span>
+<span class="co">#&gt; Rey &lt;-&gt; Leia       0.803 -0.032  1.717</span>
+<span class="co">#&gt; Rey &lt;-&gt; Obi-Wan    1.851  1.199  2.609</span>
+<span class="co">#&gt; Leia &lt;-&gt; Obi-Wan   2.099  1.379  2.910</span>
+<span class="co">#&gt; Rey &lt;-&gt; Luke       1.291  0.314  2.357</span>
+<span class="co">#&gt; Leia &lt;-&gt; Luke      1.057  0.411  1.752</span>
+<span class="co">#&gt; Obi-Wan &lt;-&gt; Luke   0.698 -0.151  1.636</span>
+<span class="co">#&gt; Rey &lt;-&gt; C-3PO     -2.354 -3.356 -1.502</span>
+<span class="co">#&gt; Leia &lt;-&gt; C-3PO    -2.263 -3.172 -1.476</span>
+<span class="co">#&gt; Obi-Wan &lt;-&gt; C-3PO -1.209 -1.878 -0.600</span>
+<span class="co">#&gt; Luke &lt;-&gt; C-3PO    -1.597 -2.278 -0.966</span>
+<span class="co">#&gt; Rey &lt;-&gt; BB-8      -0.836 -1.371 -0.330</span>
+<span class="co">#&gt; Leia &lt;-&gt; BB-8     -1.682 -2.811 -0.656</span>
+<span class="co">#&gt; Obi-Wan &lt;-&gt; BB-8  -0.778 -1.375 -0.210</span>
+<span class="co">#&gt; Luke &lt;-&gt; BB-8     -1.524 -2.262 -0.873</span>
+<span class="co">#&gt; C-3PO &lt;-&gt; BB-8    -1.195 -1.803 -0.621</span>
+<span class="co">#&gt; Rey &lt;-&gt; R2-D2     -1.176 -2.148 -0.328</span>
+<span class="co">#&gt; Leia &lt;-&gt; R2-D2    -1.318 -1.898 -0.792</span>
+<span class="co">#&gt; Obi-Wan &lt;-&gt; R2-D2 -1.751 -2.574 -1.055</span>
+<span class="co">#&gt; Luke &lt;-&gt; R2-D2    -1.158 -1.728 -0.644</span>
+<span class="co">#&gt; C-3PO &lt;-&gt; R2-D2   -1.315 -2.233 -0.456</span>
+<span class="co">#&gt; BB-8 &lt;-&gt; R2-D2    -1.475 -2.044 -0.965</span>
+<span class="co">#&gt; Rey &lt;-&gt; D-O       -1.436 -2.099 -0.865</span>
+<span class="co">#&gt; Leia &lt;-&gt; D-O      -1.365 -2.265 -0.530</span>
+<span class="co">#&gt; Obi-Wan &lt;-&gt; D-O   -1.723 -2.445 -1.089</span>
+<span class="co">#&gt; Luke &lt;-&gt; D-O      -1.325 -1.999 -0.704</span>
+<span class="co">#&gt; C-3PO &lt;-&gt; D-O     -1.629 -2.616 -0.748</span>
+<span class="co">#&gt; BB-8 &lt;-&gt; D-O      -2.192 -3.268 -1.264</span>
+<span class="co">#&gt; R2-D2 &lt;-&gt; D-O     -0.568 -1.324  0.161</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/plot_network.html">plot_network</a></span><span class="op">(</span><span class="va">fit_edge</span>, lwd<span class="op">=</span><span class="fl">2</span><span class="op">)</span></code></pre></div>
+<p><img src="edge_models_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
   </main>
 </div>
 

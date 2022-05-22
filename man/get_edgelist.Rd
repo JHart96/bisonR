@@ -2,7 +2,7 @@
 % Please edit documentation in R/edge_model.R
 \name{get_edgelist}
 \alias{get_edgelist}
-\title{Title}
+\title{Retrieves an edgelist with uncertainty for a fitted edge weight model object}
 \usage{
 get_edgelist(obj, ci = 0.9)
 }
@@ -13,5 +13,5 @@ get_edgelist(obj, ci = 0.9)
 
 }
 \description{
-Title
+Retrieves an edgelist with uncertainty for a fitted edge weight model object
 }
