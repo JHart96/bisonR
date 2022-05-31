@@ -4,7 +4,7 @@
 \alias{dyadic_regression}
 \title{Fit dyadic regression model}
 \usage{
-dyadic_regression(formula, edgemodel, df, mc_cores = 4)
+dyadic_regression(formula, edgemodel, df, mc_cores = 4, mm = TRUE)
 }
 \arguments{
 \item{mc_cores}{}

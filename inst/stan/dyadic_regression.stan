@@ -38,3 +38,8 @@ model {
     sigma_mm ~ normal(0, 1);
   }
 }
+
+generated quantities {
+  vector[N] edge_pred;
+  edge_pred = multi_normal_rng(predictor, edge_cov + diag_matrix(rep_vector(sigma, N)));
+}

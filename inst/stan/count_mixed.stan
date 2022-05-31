@@ -4,7 +4,7 @@ data {
   int<lower=0> K_random; // Number of random effect parameters
   int<lower=0> R; // Number of random effect groups
   int y[N]; // Outcome for each data point (presence/absence)
-  vector[N] duration000; // Duration of each observation
+  vector[N] divisor; // Duration of each observation
   matrix[N, K_fixed] X; // Design matrix for fixed effects
   matrix[N, K_random] Z; // Design matrix for random effects.
   int<lower=0, upper=R> G[K_random]; // Index for groupings for random effects
@@ -17,12 +17,14 @@ parameters {
   vector<lower=0>[R] H_sigma; // Hyperpriors for random effects (std. dev.).
 }
 
-model {
+transformed parameters {
   vector[N] lprobs;
   lprobs = X * beta_fixed + Z * beta_random;
+}
 
+model {
   // Main model
-  target += poisson_lpmf(y | exp(lprobs) .* duration000);
+  target += poisson_lpmf(y | exp(lprobs) .* divisor);
 
   // Priors
   target += normal_lpdf(beta_fixed | 0, 2.5);
@@ -31,4 +33,9 @@ model {
   // Hyperpriors
   target += normal_lpdf(H_mu | 0, 2.5);
   target += exponential_lpdf(H_sigma | 1);
+}
+
+generated quantities {
+  int y_pred[N];
+  y_pred = poisson_rng(exp(lprobs) .* divisor);
 }

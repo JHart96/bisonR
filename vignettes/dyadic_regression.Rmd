@@ -36,9 +36,15 @@ df_reg
 ```
 ```{r}
 fit_dyad <- dyadic_regression(dyad(node_1, node_2) ~ dyad_type, fit_edge, df_reg, mm=FALSE)
-fit_dyad
 ```
 
 ```{r}
 summary(fit_dyad)
+```
+```{r}
+plot_trace(fit_dyad)
+```
+
+```{r}
+plot_predictions(fit_dyad, num_draws=20)
 ```

@@ -16,7 +16,7 @@ require(dplyr)
 #' @return
 #'
 #' @export
-edge_model <- function(formula, data, data_type=c("binary", "count", "duration"), directed=FALSE, durations=1, method=c("mcmc", "vb", "inla"), verbose=FALSE, mc_cores=1) {
+edge_model <- function(formula, data, data_type=c("binary", "count", "duration"), directed=FALSE, method=c("mcmc", "vb", "inla"), verbose=FALSE, mc_cores=1) {
   # If verbose, print out MCMC chains.
   if (verbose) {
     refresh <- 200
@@ -28,6 +28,7 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
   if (length(method) > 1) {
     method = "mcmc"
   }
+
 
   # If using duration data, require data to be in list with aggregated data as well as raw observations.
   if (data_type == "duration") {
@@ -52,16 +53,26 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
     function(x) paste0(names(node_to_idx)[which(dyad_mapping == x, arr.ind=TRUE)[1, 2:1]], collapse=" <-> ")
   )
 
+  # Get divisor from formula
+  lhs <- as.character(formula.tools::lhs(formula))[2]
+  lhs_components <- stringr::str_split(stringr::str_replace_all(lhs, " ", ""), "\\|")[[1]]
+
+  if (suppressWarnings(any(!is.na(as.numeric(lhs_components[2]))))) {
+    divisor <- rep(as.numeric(lhs_components[2]), nrow(obs))
+  } else {
+    divisor <- data[, lhs_components[2]]
+  }
+
   # Set up model and model data depending on data type.
   if (method %in% c("mcmc", "vb")) {
-    # If durations is a single value, convert it to a list.
-    if (length(durations) == 1) {
-      durations <- rep(durations, nrow(obs))
+    # If divisor is a single value, convert it to a list.
+    if (length(divisor) == 1) {
+      divisor <- rep(divisor, nrow(obs))
     }
 
     if (data_type == "binary") {
       model_data <- prepare_data(formula, data, directed, node_to_idx, node_list, data_type)
-      model_data$duration000 <- durations
+      model_data$divisor <- divisor
       if (dim(model_data$Z)[2] > 0) {
         # Mixed effects model
         model <- stanmodels$binary_mixed
@@ -72,7 +83,7 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
     }
     if (data_type == "count") {
       model_data <- prepare_data(formula, data, directed, node_to_idx, node_list, data_type)
-      model_data$duration000 <- durations
+      model_data$divisor <- divisor
       if (dim(model_data$Z)[2] > 0) {
         # Mixed effects model
         model <- stanmodels$count_mixed
@@ -109,20 +120,20 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
     prior.random <- list(prec=list(prior="normal", param=c(0, 1)))
     model = NULL
     # Fit the INLA model
-    if (length(durations) == 1) {
-      durations <- rep(durations, nrow(model_data_inla$df))
+    if (length(divisor) == 1) {
+      divisor <- rep(divisor, nrow(model_data_inla$df))
     }
     if (data_type == "binary") {
       fit <- INLA::inla(model_data_inla$formula,
                        family="binomial",
                        data=model_data_inla$df,
-                       Ntrials=durations,
+                       Ntrials=divisor,
                        control.fixed=prior.fixed,
                        control.compute=list(config = TRUE)
       )
     } else if (data_type == "count") {
-      model_data$df$duration000 <- durations
-      inla_formula <- reformulate(termlabels = c(labels(terms(formula)), "offset(log(duration000))"), response=all.vars(formula)[1])
+      model_data$df$divisor <- divisor
+      inla_formula <- reformulate(termlabels = c(labels(terms(formula)), "offset(log(divisor))"), response=all.vars(formula)[1])
       fit <- INLA::inla(model_data$formula, # Add offset(log(duration)) to this and Stan model. Figure out syntax for formula.
                   family="poisson",
                   data=model_data$df,
@@ -139,6 +150,24 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
     chain <- matrix(0, length(inla_samples), num_dyads)
     for (i in 1:length(inla_samples)) {
       chain[i, ] <- tail(inla_samples[[i]]$latent, num_dyads)
+    }
+  } else if (method == "conjugate") {
+    fit <- NA
+    model <- NA
+    num_samples <- 1000
+    if (length(labels(terms(fit_edge$formula))) == 1) {
+      chain <- matrix(0, num_samples, num_dyads)
+      if (data_type == "binary") {
+        for (i in 1:num_dyads) {
+          chain[, i] <- qlogis(rbeta(num_samples, 1 + data[i, lhs_components[1]], 1 + divisor[i]))
+        }
+      } else if (data_type == "count") {
+        for (i in 1:num_dyads) {
+          chain[, i] <- log(rgamma(num_samples, 0.001 + data[i, lhs_components[1]], 0.001 + 1)/divisor[i])
+        }
+      }
+    } else {
+      message("Additional effects cannot be fitted using the conjugate method")
     }
   }
 
@@ -228,22 +257,24 @@ get_edgelist <- function (obj, ci=0.9) {
   edgelist
 }
 
-#' Trace plot for a fitted edge model object
-#'
-#' @param obj
-#' @param ...
-#'
-#' @return
-#' @export
-plot_trace <- function(obj, ...) {
-  if (class(obj) == "edge_model") {
-    if (obj$fit_method %in% c("mcmc", "vb")) {
-      rstan::traceplot(obj$fit, ...)
-    } else {
-      message("diagnostic_plot function not yet available for this fitting method")
-    }
-  } else if (class(obj) == "nodal_regression") {
-    message("diagnostic_plot function not yet available for this model type")
+plot_predictions.edge_model <- function(obj, num_draws=20) {
+  y_preds <- rstan::extract(obj$fit)$y_pred
+  df_draw <- data.frame(y=obj$model_data$y, dyad_ids=obj$model_data$dyad_ids)
+  df_summed <- aggregate(y ~ as.factor(dyad_ids), df_draw, sum)
+  pred_density <- density(df_summed$y)
+  plot(pred_density, main="Observed vs predicted social events", xlab="Social events", ylim=c(0, max(pred_density$y) * 1.1), lwd=2)
+  for (i in 1:num_draws) {
+    df_draw$y <- y_preds[i, ]
+    df_summed <- aggregate(y ~ as.factor(dyad_ids), df_draw, sum)
+    lines(density(df_summed$y), col=rgb(0, 0, 1, 0.5))
+  }
+}
+
+plot_trace.edge_model <- function(obj, ...) {
+  if (obj$fit_method %in% c("mcmc", "vb")) {
+    rstan::traceplot(obj$fit, ...)
+  } else {
+    message("plot_trace function not applicable to this fitting method")
   }
 }
 
