@@ -257,6 +257,28 @@ get_edgelist <- function (obj, ci=0.9) {
   edgelist
 }
 
+#' Draw samples from edgelist posterior
+#'
+#' @param obj
+#' @param num_draws
+#'
+#' @return
+#' @export
+#'
+#' @examples
+draw_edgelist_samples <- function (obj, num_draws) {
+  node_names <- sapply(
+    1:max(obj$dyad_mapping),
+    function(x) names(obj$node_to_idx)[which(obj$dyad_mapping == x, arr.ind=TRUE)[1, 2:1]]
+  )
+  edgelist_samples <- data.frame(
+    node_1 = factor(node_names[1, ], levels=names(obj$node_to_idx)),
+    node_2 = factor(node_names[2, ], levels=names(obj$node_to_idx)),
+    draw = t(obj$chain[sample(1:dim(obj$chain)[1], size=num_draws, replace=TRUE), ])
+  )
+  edgelist_samples
+}
+
 plot_predictions.edge_model <- function(obj, num_draws=20) {
   y_preds <- rstan::extract(obj$fit)$y_pred
   df_draw <- data.frame(y=obj$model_data$y, dyad_ids=obj$model_data$dyad_ids)

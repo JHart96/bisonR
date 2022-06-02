@@ -4,7 +4,7 @@
 \alias{plot_predictions}
 \title{Posterior predictive checks}
 \usage{
-plot_predictions(obj)
+plot_predictions(obj, ...)
 }
 \arguments{
 \item{obj}{}

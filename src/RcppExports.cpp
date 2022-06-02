@@ -19,6 +19,7 @@ RcppExport SEXP _rcpp_module_boot_stan_fit4count_mixed_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4duration_fixed_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4duration_null_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4dyadic_regression_mod();
+RcppExport SEXP _rcpp_module_boot_stan_fit4nodal_regression_mod();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rcpp_module_boot_stan_fit4binary_fixed_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4binary_fixed_mod, 0},
@@ -28,6 +29,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rcpp_module_boot_stan_fit4duration_fixed_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4duration_fixed_mod, 0},
     {"_rcpp_module_boot_stan_fit4duration_null_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4duration_null_mod, 0},
     {"_rcpp_module_boot_stan_fit4dyadic_regression_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4dyadic_regression_mod, 0},
+    {"_rcpp_module_boot_stan_fit4nodal_regression_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4nodal_regression_mod, 0},
     {NULL, NULL, 0}
 };
 
