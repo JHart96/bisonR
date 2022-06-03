@@ -39,8 +39,9 @@ summary(fit_edge_0)
 ```
 
 ```{r}
-formula <- (event | duration) ~ dyad(sender, node_2) + age + sex + (1 | location) + (1 | group)
-get_edge_model_spec(formula)
+formula <- (event | duration) ~ dyad(node_1, node_2) + age + sex + (1 | location) + (1 | group)
+model_spec <- get_edge_model_spec(formula)
+!is.null(model_spec$node_1_name)
 ```
 
 ```{r}

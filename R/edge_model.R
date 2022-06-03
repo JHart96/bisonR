@@ -126,7 +126,7 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
   obj$directed <- directed
   obj$fit <- fit
   obj$formula <- formula
-  obj$sri <- model_data$sri
+  # obj$sri <- model_data$sri
   obj$data_type <- data_type
   obj$model_data <- model_data
   obj$data = data
@@ -187,9 +187,15 @@ get_edgelist <- function (obj, ci=0.9) {
   )
   lb <- 0.5 * (1 - ci)
   ub <- 1 - lb
-  edge_lower <- apply(obj$chain, 2, function(x) quantile(x, probs=lb))
-  edge_upper <- apply(obj$chain, 2, function(x) quantile(x, probs=ub))
-  edge_median <- apply(obj$chain, 2, function(x) quantile(x, probs=0.5))
+  dyad_start <- 1
+  model_spec <- get_edge_model_spec(obj$formula)
+  if(model_spec$intercept) {
+    dyad_start <- 2
+  }
+  dyad_samples <- obj$chain[, dyad_start:(obj$num_dyads + dyad_start - 1)]
+  edge_lower <- apply(dyad_samples, 2, function(x) quantile(x, probs=lb))
+  edge_upper <- apply(dyad_samples, 2, function(x) quantile(x, probs=ub))
+  edge_median <- apply(dyad_samples, 2, function(x) quantile(x, probs=0.5))
   edgelist <- data.frame(
     node_1 = node_names[1, ],
     node_2 = node_names[2, ],
@@ -271,15 +277,12 @@ prepare_data <- function(formula, observations, directed, node_to_idx, node_list
     observations <- observations$obs
   }
 
-  obs <- get_all_vars(formula, observations)
-
-  # If nodes are in factors, convert to idx.
-  obs[, 2] <- as.integer(obs[, 2])
-  obs[, 3] <- as.integer(obs[, 3])
+  model_spec <- get_edge_model_spec(formula)
 
   # Get number of nodes
   n <- length(node_to_idx)
 
+  # Build matrix of dyad IDs
   dyad_id <- matrix(0, n, n)
   if (directed == FALSE) {
     dyad_id[upper.tri(dyad_id)] <- 1:(0.5 * n * (n - 1))
@@ -289,81 +292,62 @@ prepare_data <- function(formula, observations, directed, node_to_idx, node_list
     dyad_id[lower.tri(dyad_id)] <- (0.5 * n * (n - 1) + 1):n
   }
 
-  # Calculate SRI for future reference
-  obs_temp <- data.frame(
-    association=obs[, 1],
-    id_1=obs[, 2],
-    id_2=obs[, 3]
-  )
-  sri <- matrix(0, n, n)
-  for (i in 1:n) {
-    for (j in 1:n) {
-      if (i < j) {
-        sri[i, j] <- mean(subset(obs_temp, (id_1 == i & id_2 == j) | (id_1 == j & id_2 == i))$association)
+  # Get responses
+  y <- observations[, model_spec$event_var_name]
+
+  # Create empty design matrices for fixed (X) and random (Z) effects
+  X <- data.frame(empty_col = rep(0, nrow(observations)))
+  Z <- data.frame(empty_col = rep(0, nrow(observations)))
+
+  # Add intercept term if needed
+  if (model_spec$intercept) {
+    X[, "intercept"] <- 1
+  }
+
+  # If using dyad-level weights, populate design matrix
+  if (!is.null(model_spec$node_1_name)) {
+    # Get dyad IDs in the correct order
+    dyad_ids=as.factor(dyad_id[cbind(node_to_idx[observations[, model_spec$node_1_name]], node_to_idx[observations[, model_spec$node_2_name]])])
+
+    # Populate design matrix
+    term_levels <- levels(dyad_ids)
+    for (i in 1:length(term_levels)) {
+      term_level <- term_levels[i]
+      new_term_name <-  paste0("dyad_", term_level)
+      X[, new_term_name] <- 1 * (dyad_ids == term_level)
+    }
+  }
+
+  # Variable grouping for random effects
+  G <- c()
+
+  # Get additional fixed effects
+  if (!is.null(model_spec$fixed)) {
+    for (term_name in model_spec$fixed) {
+      # If it's a factor, create a column for each level.
+      if (is.factor(observations[, term_name])) {
+        var_group <- paste0("fixed_", term_name)
+        term_levels <- levels(observations[, term_name])
+        for (term_level in term_levels) {
+          new_term_name <-  paste0("fixed_", term_name, term_level)
+          X[, new_term_name] <- 1 * (observations[, term_name] == term_level)
+        }
+      } else {
+        # Otherwise, create a single column:
+        new_term_name <- paste0(c("fixed_", term_name), collapse="")
+        X[, new_term_name] <- observations[, term_name]
       }
     }
   }
 
-  y <- obs[, 1]
-
-  dyad_ids=as.factor(dyad_id[cbind(node_to_idx[obs[, 2]], node_to_idx[obs[, 3]])])
-
-  term_levels <- levels(dyad_ids)
-
-  X <- data.frame(empty_col = rep(0, nrow(obs)))
-  Z <- data.frame(empty_col = rep(0, nrow(obs)))
-
-  for (i in 1:length(term_levels)) {
-    term_level <- term_levels[i]
-    new_term_name <-  paste0("dyad_", term_level)
-    X[, new_term_name] <- 1 * (dyad_ids == term_level)
-  }
-
-  K_fixed <- length(term_levels) # Number of fixed effects
-  K_random <- 0 # Number of random effects
-  G <- c() # Variable grouping for random effects
-
-  # Get additional effects.
-  if (length(labels(terms(formula))) > 1) {
-    additional_effects <- labels(terms(formula))
-    additional_effects <- additional_effects[2:length(additional_effects)]
-    for (i in 1:length(additional_effects)) {
-      if (any(grep("\\|", additional_effects[i]))) {
-        # Random effect
-        term_vars <- sapply(colnames(obs), function(x) grepl(x, additional_effects[i]))
-        term_var <- term_vars[term_vars == TRUE][1]
-
-        term_name <- names(term_var)
-
-        var_group <- paste0("random_", term_name)
-        term_levels <- levels(as.factor(obs[, term_name]))
-        for (term_level in term_levels) {
-          new_term_name <-  paste0("random_", term_name, term_level)
-          Z[, new_term_name] <- 1 * (as.factor(obs[, term_name]) == term_level)
-          G[length(G) + 1] <- var_group
-        }
-
-      } else {
-        # Fixed effect
-        term_vars <- sapply(colnames(obs), function(x) grepl(x, additional_effects[i]))
-        term_var <- term_vars[term_vars == TRUE][1]
-
-        term_name <- names(term_var)
-
-        # If it's a factor, create a column for each level.
-        if (is.factor(obs[, term_name])) {
-          var_group <- paste0("fixed_", term_name)
-          term_levels <- levels(obs[, term_name])
-          for (term_level in term_levels) {
-            new_term_name <-  paste0("fixed_", term_name, term_level)
-            X[, new_term_name] <- 1 * (obs[, term_name] == term_level)
-          }
-        } else {
-          # Otherwise, create a single column:
-          new_term_name <- paste0(c("fixed_", term_name), collapse="")
-          X[, new_term_name] <- obs[, term_name]
-        }
-      }
+  # Get additional random effects
+  if (!is.null(model_spec$random)) {
+    var_group <- paste0("random_", term_name)
+    term_levels <- levels(as.factor(observations[, term_name]))
+    for (term_level in term_levels) {
+      new_term_name <-  paste0("random_", term_name, term_level)
+      Z[, new_term_name] <- 1 * (as.factor(observations[, term_name]) == term_level)
+      G[length(G) + 1] <- var_group
     }
   }
 
@@ -381,13 +365,13 @@ prepare_data <- function(formula, observations, directed, node_to_idx, node_list
     dyad_id=dyad_id,
     dyad_ids=as.integer(dyad_ids),
     node_names=node_list,
-    num_nodes=n,
-    sri=sri
+    num_nodes=n
+    # sri=sri
   )
 
   if (data_type == "duration") {
-    node_1_name <- colnames(obs)[2]
-    node_2_name <- colnames(obs)[3]
+    node_1_name <- colnames(observations)[2]
+    node_2_name <- colnames(observations)[3]
     observations_agg$dyad_id <- dyad_id[cbind(node_to_idx[dplyr::pull(observations_agg[, node_1_name])], node_to_idx[dplyr::pull(observations_agg[, node_2_name])])]
     observations_agg <- observations_agg[order(observations_agg$dyad_id), ]
     data$k <- observations_agg$k
