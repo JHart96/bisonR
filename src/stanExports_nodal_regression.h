@@ -19,7 +19,7 @@ static int current_statement_begin__;
 stan::io::program_reader prog_reader__() {
     stan::io::program_reader reader;
     reader.add_event(0, 0, "start", "model_nodal_regression");
-    reader.add_event(25, 23, "end", "model_nodal_regression");
+    reader.add_event(30, 28, "end", "model_nodal_regression");
     return reader;
 }
 #include <stan_meta_header.hpp>
@@ -259,6 +259,7 @@ public:
         names__.push_back("beta_fixed");
         names__.push_back("sigma");
         names__.push_back("predictor");
+        names__.push_back("centrality_pred");
     }
     void get_dims(std::vector<std::vector<size_t> >& dimss__) const {
         dimss__.resize(0);
@@ -267,6 +268,9 @@ public:
         dims__.push_back(num_fixed);
         dimss__.push_back(dims__);
         dims__.resize(0);
+        dimss__.push_back(dims__);
+        dims__.resize(0);
+        dims__.push_back(num_nodes);
         dimss__.push_back(dims__);
         dims__.resize(0);
         dims__.push_back(num_nodes);
@@ -321,6 +325,21 @@ public:
                 }
             }
             if (!include_gqs__) return;
+            // declare and define generated quantities
+            current_statement_begin__ = 26;
+            validate_non_negative_index("centrality_pred", "num_nodes", num_nodes);
+            Eigen::Matrix<double, Eigen::Dynamic, 1> centrality_pred(num_nodes);
+            stan::math::initialize(centrality_pred, DUMMY_VAR__);
+            stan::math::fill(centrality_pred, DUMMY_VAR__);
+            // generated quantities statements
+            current_statement_begin__ = 27;
+            stan::math::assign(centrality_pred, multi_normal_rng(predictor, add(centrality_cov, diag_matrix(rep_vector(sigma, num_nodes))), base_rng__));
+            // validate, write generated quantities
+            current_statement_begin__ = 26;
+            size_t centrality_pred_j_1_max__ = num_nodes;
+            for (size_t j_1__ = 0; j_1__ < centrality_pred_j_1_max__; ++j_1__) {
+                vars__.push_back(centrality_pred(j_1__));
+            }
         } catch (const std::exception& e) {
             stan::lang::rethrow_located(e, current_statement_begin__, prog_reader__());
             // Next line prevents compiler griping about no return
@@ -370,6 +389,12 @@ public:
             }
         }
         if (!include_gqs__) return;
+        size_t centrality_pred_j_1_max__ = num_nodes;
+        for (size_t j_1__ = 0; j_1__ < centrality_pred_j_1_max__; ++j_1__) {
+            param_name_stream__.str(std::string());
+            param_name_stream__ << "centrality_pred" << '.' << j_1__ + 1;
+            param_names__.push_back(param_name_stream__.str());
+        }
     }
     void unconstrained_param_names(std::vector<std::string>& param_names__,
                                    bool include_tparams__ = true,
@@ -394,6 +419,12 @@ public:
             }
         }
         if (!include_gqs__) return;
+        size_t centrality_pred_j_1_max__ = num_nodes;
+        for (size_t j_1__ = 0; j_1__ < centrality_pred_j_1_max__; ++j_1__) {
+            param_name_stream__.str(std::string());
+            param_name_stream__ << "centrality_pred" << '.' << j_1__ + 1;
+            param_names__.push_back(param_name_stream__.str());
+        }
     }
 }; // model
 }  // namespace

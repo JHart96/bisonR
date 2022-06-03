@@ -2,7 +2,7 @@
 % Please edit documentation in R/dyadic_regression.R
 \name{print.dyadic_model}
 \alias{print.dyadic_model}
-\title{Prints out details of a fitted dyadic regression model}
+\title{Print information about a fitted dyadic regression model}
 \usage{
 \method{print}{dyadic_model}(obj)
 }
@@ -13,5 +13,5 @@
 
 }
 \description{
-Prints out details of a fitted dyadic regression model
+Print information about a fitted dyadic regression model
 }

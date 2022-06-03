@@ -1,5 +1,5 @@
 ---
-title: "Running a dyadic regression"
+title: "Running a nodal regression"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{dyadic_regression}
@@ -34,21 +34,17 @@ df_reg
 ```
 
 ```{r}
-draw_node_metric_samples(fit_edge, "strength", 100)
-```
-
-```{r}
 fit_node <- nodal_regression(strength(node_names) ~ node_type, fit_edge, df_reg)
 ```
 
 ```{r}
-quantile(rstan::extract(fit_node$fit)$beta_fixed[, 3] - rstan::extract(fit_node$fit)$beta_fixed[, 2])
+summary(fit_node)
 ```
 
 ```{r}
-plot_trace(fit_dyad)
+plot_trace(fit_node)
 ```
 
 ```{r}
-plot_predictions(fit_dyad, num_draws=20)
+plot_predictions(fit_node, num_draws=10)
 ```

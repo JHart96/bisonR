@@ -50,7 +50,7 @@ dyadic_regression <- function(formula, edgemodel, df, mc_cores=4, mm=TRUE) {
   obj
 }
 
-#' Prints out details of a fitted dyadic regression model
+#' Print information about a fitted dyadic regression model
 #'
 #' @param obj
 #'

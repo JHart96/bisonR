@@ -12,6 +12,8 @@ plot_trace <- function(obj, ...) {
     plot_trace.edge_model(obj, ...)
   } else if (class(obj) == "dyadic_model") {
     plot_trace.dyadic_model(obj, ...)
+  } else if (class(obj) == "nodal_model") {
+    plot_trace.nodal_model(obj, ...)
   }
 }
 
@@ -28,5 +30,7 @@ plot_predictions <- function(obj, ...) {
     plot_predictions.edge_model(obj, ...)
   } else if (class(obj) == "dyadic_model") {
     plot_predictions.dyadic_model(obj, ...)
+  } else if (class(obj) == "nodal_model") {
+    plot_predictions.nodal_model(obj, ...)
   }
 }

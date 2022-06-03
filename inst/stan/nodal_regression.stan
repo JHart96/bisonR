@@ -21,3 +21,8 @@ model {
   beta_fixed ~ normal(0, 1);
   sigma ~ normal(0, 1);
 }
+
+generated quantities {
+  vector[num_nodes] centrality_pred;
+  centrality_pred = multi_normal_rng(predictor, centrality_cov + diag_matrix(rep_vector(sigma, num_nodes)));
+}
