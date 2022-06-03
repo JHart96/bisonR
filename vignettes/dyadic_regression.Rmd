@@ -48,3 +48,6 @@ plot_trace(fit_dyad)
 ```{r}
 plot_predictions(fit_dyad, num_draws=20)
 ```
+```{r}
+get_contrasts(fit_dyad, "fixed_dyad_typeLifeform-Lifeform", "fixed_dyad_typeDroid-Droid")
+```
