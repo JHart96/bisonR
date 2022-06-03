@@ -1,5 +1,5 @@
 ---
-title: "Testing for non-random edge weights"
+title: "Running a nodal regression"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{dyadic_regression}
@@ -26,19 +26,21 @@ head(df)
 ```
 
 ```{r}
-df_reg <- data.frame(
-  node = as.factor(c("Rey", "Leia", "Obi-Wan", "Luke", "C-3PO", "BB-8", "R2-D2", "D-O")),
-  node_type = as.factor(c("Lifeform", "Lifeform", "Lifeform", "Lifeform", "Droid", "Droid", "Droid", "Droid"))
-)
-df_reg
+fit_edge_1 <- edge_model((event | 1) ~ dyad(node_1, node_2), data=df, data_type="binary", method="mcmc", mc_cores=4, verbose=TRUE)
 ```
 
 ```{r}
-fit_node <- nodal_regression(strength(node_names) ~ node_type, fit_edge, df_reg)
+summary(fit_edge_1)
 ```
 
 ```{r}
-summary(fit_node)
+fit_edge_0 <- edge_model((event | 1) ~ 1, data=df, data_type="binary", method="mcmc", mc_cores=4, verbose=TRUE)
+summary(fit_edge_0)
+```
+
+```{r}
+formula <- (event | duration) ~ dyad(sender, node_2) + age + sex + (1 | location) + (1 | group)
+get_edge_model_spec(formula)
 ```
 
 ```{r}

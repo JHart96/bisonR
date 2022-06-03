@@ -226,3 +226,8 @@ build_design_matrix <- function(formula, data) {
 
   return(list(lpar=lpar, X=as.matrix(X[, -1]), Z=as.matrix(Z[, -1])))
 }
+
+# Processes formula and returns information about the model configuration
+read_formula <- function(formula) {
+
+}

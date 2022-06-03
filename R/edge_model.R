@@ -114,61 +114,6 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
     chain <- rstan::extract(fit)$beta_fixed
     colnames(chain) <- colnames(data$X)
 
-  } else if (method == "inla") {
-    model_data_inla <- prepare_data_inla(formula, data, directed, node_to_idx, node_list, data_type)
-    prior.fixed <- list(mean=0, prec=1)
-    prior.random <- list(prec=list(prior="normal", param=c(0, 1)))
-    model = NULL
-    # Fit the INLA model
-    if (length(divisor) == 1) {
-      divisor <- rep(divisor, nrow(model_data_inla$df))
-    }
-    if (data_type == "binary") {
-      fit <- INLA::inla(model_data_inla$formula,
-                       family="binomial",
-                       data=model_data_inla$df,
-                       Ntrials=divisor,
-                       control.fixed=prior.fixed,
-                       control.compute=list(config = TRUE)
-      )
-    } else if (data_type == "count") {
-      model_data$df$divisor <- divisor
-      inla_formula <- reformulate(termlabels = c(labels(terms(formula)), "offset(log(divisor))"), response=all.vars(formula)[1])
-      fit <- INLA::inla(model_data$formula, # Add offset(log(duration)) to this and Stan model. Figure out syntax for formula.
-                  family="poisson",
-                  data=model_data$df,
-                  control.fixed=prior.fixed,
-                  control.compute=list(config = TRUE)
-      )
-    } else if (data_type == "duration") {
-      message("This model type is not supported by INLA")
-    }
-
-    # Extract edge weights from fitted edge model.
-    num_samples <- 1000
-    inla_samples <- inla.posterior.sample(num_samples, fit)
-    chain <- matrix(0, length(inla_samples), num_dyads)
-    for (i in 1:length(inla_samples)) {
-      chain[i, ] <- tail(inla_samples[[i]]$latent, num_dyads)
-    }
-  } else if (method == "conjugate") {
-    fit <- NA
-    model <- NA
-    num_samples <- 1000
-    if (length(labels(terms(fit_edge$formula))) == 1) {
-      chain <- matrix(0, num_samples, num_dyads)
-      if (data_type == "binary") {
-        for (i in 1:num_dyads) {
-          chain[, i] <- qlogis(rbeta(num_samples, 1 + data[i, lhs_components[1]], 1 + divisor[i]))
-        }
-      } else if (data_type == "count") {
-        for (i in 1:num_dyads) {
-          chain[, i] <- log(rgamma(num_samples, 0.001 + data[i, lhs_components[1]], 0.001 + 1)/divisor[i])
-        }
-      }
-    } else {
-      message("Additional effects cannot be fitted using the conjugate method")
-    }
   }
 
   # Prepare output object.
@@ -453,73 +398,189 @@ prepare_data <- function(formula, observations, directed, node_to_idx, node_list
   data
 }
 
-prepare_data_inla <- function (formula, observations, directed, node_to_idx, node_list, data_type) {
-  obs <- get_all_vars(formula, observations)
+get_edge_model_spec <- function(formula) {
+  model_spec <- list()
 
-  # If nodes are in factors, convert to idx.
-  obs[, 2] <- as.integer(obs[, 2])
-  obs[, 3] <- as.integer(obs[, 3])
+  x <- str_split(deparse1(formula), "~")[[1]]
+  lhs <- x[1]
+  rhs <- x[2]
 
-  # Get number of nodes
-  n <- length(node_to_idx)
+  # Process left hand side
+  lhs_split <- str_split(lhs, "\\|")[[1]]
+  event_var_name <- lhs_split[1]
+  event_var_name <- str_replace_all(event_var_name, "\\(", "")
+  event_var_name <- str_replace_all(event_var_name, " ", "")
+  model_spec$event_var_name <- event_var_name
 
-  dyad_id <- matrix(0, n, n)
-  if (directed == FALSE) {
-    dyad_id[upper.tri(dyad_id)] <- 1:(0.5 * n * (n - 1))
-    dyad_id <- dyad_id + t(dyad_id)
-  } else {
-    dyad_id[upper.tri(dyad_id)] <- 1:(0.5 * n * (n - 1))
-    dyad_id[lower.tri(dyad_id)] <- (0.5 * n * (n - 1) + 1):n
-  }
+  divisor_var_name <- lhs_split[2]
+  divisor_var_name <- str_replace_all(divisor_var_name, "\\)", "")
+  divisor_var_name <- str_replace_all(divisor_var_name, " ", "")
+  model_spec$divisor_var_name <- divisor_var_name
 
-  # Calculate SRI for future reference
-  obs_temp <- data.frame(
-    association=obs[, 1],
-    id_1=obs[, 2],
-    id_2=obs[, 3]
-  )
-  sri <- matrix(0, n, n)
-  for (i in 1:n) {
-    for (j in 1:n) {
-      if (i < j) {
-        sri[i, j] <- mean(subset(obs_temp, (id_1 == i & id_2 == j) | (id_1 == j & id_2 == i))$association)
-      }
-    }
-  }
+  # Set intercept to false by default
+  model_spec$intercept <- FALSE
 
-  obs <- get_all_vars(formula, df)
-  obs$dyad_id <- fit_edge$dyad_mapping[cbind(obs[, 2], obs[, 3])]
-  obs$dyad_id <- factor(obs$dyad_id)
+  model_spec$fixed <- c()
+  model_spec$random <- c()
 
-
-  term_labels <- c('0', 'dyad_id')
-
-  if (length(labels(terms(formula))) > 1) {
-    additional_effects <- labels(terms(formula))
-    additional_effects <- additional_effects[2:length(additional_effects)]
-    for (i in 1:length(additional_effects)) {
-      if (any(grep("\\|", additional_effects[i]))) {
-        # Random effect
-        term_vars <- sapply(colnames(obs), function(x) grepl(x, additional_effects[i]))
-        term_var <- term_vars[term_vars == TRUE][1]
-
-        term_name <- names(term_var)
-        term_labels <- c(term_labels, paste0("f(", term_name, ", model='iid', hyper=prior.random)"))
-
+  rhs_split <- str_split(rhs, "\\+")[[1]]
+  for (term in rhs_split) {
+    term <- str_replace_all(term, " ", "")
+    # Is it an intercept, a dyad, a fixed effect, or a random effect?
+    if (!is.na(str_match(term, "^0|1$"))) {
+      # Intercept (or lack thereof)
+      if (term == "0") {
+        model_spec$intercept <- FALSE
       } else {
-        # Fixed effect
-        term_vars <- sapply(colnames(obs), function(x) grepl(x, additional_effects[i]))
-        term_var <- term_vars[term_vars == TRUE][1]
-
-        term_name <- names(term_var)
-        term_labels <- c(term_labels, term_name)
+        model_spec$intercept <- TRUE
       }
+    } else if (!is.na(str_match(term, "^dyad\\(.*,.*\\)$")[[1]])) {
+      # dyad(,) term
+      node_names <- str_split(term, "\\(|\\)")[[1]][2]
+      node_names <- str_replace_all(node_names, " ", "")
+      node_names_split <- str_split(node_names, ",")[[1]]
+      model_spec$node_1_name <- node_names_split[1]
+      model_spec$node_2_name <- node_names_split[2]
+    } else if (is.na(str_match(term, "[^a-zA-Z0-9]"))) {
+      # No non-alphanumeric characters, and it can't be an intercept, so it's a fixed effect
+      model_spec$fixed[length(model_spec$fixed) + 1] <- term
+    } else if (!is.na(str_match(term, "^\\(1\\|.*\\)$"))) {
+      # Contains a (1 | *) structure, so it's a basic random effect
+      term_name <- str_split(term, "\\(|\\||\\)")[[1]][3]
+      model_spec$random[length(model_spec$random) + 1] <- term_name
+    } else {
+      warning(paste0("Formula term \"", term, "\" not supported by bisonR. Check the formula is correctly specified."))
     }
   }
 
-  formula_inla <- reformulate(termlabels = term_labels, response = all.vars(formula)[[1]])
-  data <- list(
-    formula = formula_inla,
-    df = obs
-  )
+  model_spec
 }
+
+# Code for INLA and conjugate fitting. Not in use for now.
+# prepare_data_inla <- function (formula, observations, directed, node_to_idx, node_list, data_type) {
+#   obs <- get_all_vars(formula, observations)
+#
+#   # If nodes are in factors, convert to idx.
+#   obs[, 2] <- as.integer(obs[, 2])
+#   obs[, 3] <- as.integer(obs[, 3])
+#
+#   # Get number of nodes
+#   n <- length(node_to_idx)
+#
+#   dyad_id <- matrix(0, n, n)
+#   if (directed == FALSE) {
+#     dyad_id[upper.tri(dyad_id)] <- 1:(0.5 * n * (n - 1))
+#     dyad_id <- dyad_id + t(dyad_id)
+#   } else {
+#     dyad_id[upper.tri(dyad_id)] <- 1:(0.5 * n * (n - 1))
+#     dyad_id[lower.tri(dyad_id)] <- (0.5 * n * (n - 1) + 1):n
+#   }
+#
+#   # Calculate SRI for future reference
+#   obs_temp <- data.frame(
+#     association=obs[, 1],
+#     id_1=obs[, 2],
+#     id_2=obs[, 3]
+#   )
+#   sri <- matrix(0, n, n)
+#   for (i in 1:n) {
+#     for (j in 1:n) {
+#       if (i < j) {
+#         sri[i, j] <- mean(subset(obs_temp, (id_1 == i & id_2 == j) | (id_1 == j & id_2 == i))$association)
+#       }
+#     }
+#   }
+#
+#   obs <- get_all_vars(formula, df)
+#   obs$dyad_id <- fit_edge$dyad_mapping[cbind(obs[, 2], obs[, 3])]
+#   obs$dyad_id <- factor(obs$dyad_id)
+#
+#
+#   term_labels <- c('0', 'dyad_id')
+#
+#   if (length(labels(terms(formula))) > 1) {
+#     additional_effects <- labels(terms(formula))
+#     additional_effects <- additional_effects[2:length(additional_effects)]
+#     for (i in 1:length(additional_effects)) {
+#       if (any(grep("\\|", additional_effects[i]))) {
+#         # Random effect
+#         term_vars <- sapply(colnames(obs), function(x) grepl(x, additional_effects[i]))
+#         term_var <- term_vars[term_vars == TRUE][1]
+#
+#         term_name <- names(term_var)
+#         term_labels <- c(term_labels, paste0("f(", term_name, ", model='iid', hyper=prior.random)"))
+#
+#       } else {
+#         # Fixed effect
+#         term_vars <- sapply(colnames(obs), function(x) grepl(x, additional_effects[i]))
+#         term_var <- term_vars[term_vars == TRUE][1]
+#
+#         term_name <- names(term_var)
+#         term_labels <- c(term_labels, term_name)
+#       }
+#     }
+#   }
+#
+#   formula_inla <- reformulate(termlabels = term_labels, response = all.vars(formula)[[1]])
+#   data <- list(
+#     formula = formula_inla,
+#     df = obs
+#   )
+# }
+# EDGE MODEL ADDITION
+# else if (method == "inla") {
+#   model_data_inla <- prepare_data_inla(formula, data, directed, node_to_idx, node_list, data_type)
+#   prior.fixed <- list(mean=0, prec=1)
+#   prior.random <- list(prec=list(prior="normal", param=c(0, 1)))
+#   model = NULL
+#   # Fit the INLA model
+#   if (length(divisor) == 1) {
+#     divisor <- rep(divisor, nrow(model_data_inla$df))
+#   }
+#   if (data_type == "binary") {
+#     fit <- INLA::inla(model_data_inla$formula,
+#                       family="binomial",
+#                       data=model_data_inla$df,
+#                       Ntrials=divisor,
+#                       control.fixed=prior.fixed,
+#                       control.compute=list(config = TRUE)
+#     )
+#   } else if (data_type == "count") {
+#     model_data$df$divisor <- divisor
+#     inla_formula <- reformulate(termlabels = c(labels(terms(formula)), "offset(log(divisor))"), response=all.vars(formula)[1])
+#     fit <- INLA::inla(model_data$formula, # Add offset(log(duration)) to this and Stan model. Figure out syntax for formula.
+#                       family="poisson",
+#                       data=model_data$df,
+#                       control.fixed=prior.fixed,
+#                       control.compute=list(config = TRUE)
+#     )
+#   } else if (data_type == "duration") {
+#     message("This model type is not supported by INLA")
+#   }
+#
+#   # Extract edge weights from fitted edge model.
+#   num_samples <- 1000
+#   inla_samples <- inla.posterior.sample(num_samples, fit)
+#   chain <- matrix(0, length(inla_samples), num_dyads)
+#   for (i in 1:length(inla_samples)) {
+#     chain[i, ] <- tail(inla_samples[[i]]$latent, num_dyads)
+#   }
+# } else if (method == "conjugate") {
+#   fit <- NA
+#   model <- NA
+#   num_samples <- 1000
+#   if (length(labels(terms(fit_edge$formula))) == 1) {
+#     chain <- matrix(0, num_samples, num_dyads)
+#     if (data_type == "binary") {
+#       for (i in 1:num_dyads) {
+#         chain[, i] <- qlogis(rbeta(num_samples, 1 + data[i, lhs_components[1]], 1 + divisor[i]))
+#       }
+#     } else if (data_type == "count") {
+#       for (i in 1:num_dyads) {
+#         chain[, i] <- log(rgamma(num_samples, 0.001 + data[i, lhs_components[1]], 0.001 + 1)/divisor[i])
+#       }
+#     }
+#   } else {
+#     message("Additional effects cannot be fitted using the conjugate method")
+#   }
+# }
