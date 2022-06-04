@@ -13,8 +13,7 @@ RoxygenNote: 7.1.2
 Biarch: true
 Depends: 
     R (>= 4.0.0)
-Imports: 
-    cmdstanr
+Remotes: stan-dev/cmdstanr
 Suggests: 
     knitr,
     rmarkdown,
