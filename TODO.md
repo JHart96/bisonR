@@ -3,10 +3,10 @@
 ## Before initial release
 
 * Use improved formula parser for all models
+* Convert to cmdstanR
 * Custom priors
 * Short examples of main use cases
 * Model comparison
-* Convert to cmdstanR
 * Better simulations for datasets
 * Unit tests for model fit
 * Document all functions
