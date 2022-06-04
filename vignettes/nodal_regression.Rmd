@@ -1,8 +1,8 @@
 ---
-title: "Testing for non-random edge weights"
+title: "Running a nodal regression"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{dyadic_regression}
+  %\VignetteIndexEntry{nodal_regression}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -23,6 +23,10 @@ library(tidyverse)
 data("binary_ex1")
 df <- binary_ex1
 head(df)
+```
+
+```{r}
+fit_edge <- edge_model((event | 1) ~ dyad(node_1, node_2), data=df, data_type="binary", mc_cores=4, verbose=TRUE)
 ```
 
 ```{r}

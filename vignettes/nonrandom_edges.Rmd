@@ -1,8 +1,8 @@
 ---
-title: "Running a nodal regression"
+title: "Testing for non-random edge weights"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{dyadic_regression}
+  %\VignetteIndexEntry{nonrandom_edges}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -26,32 +26,6 @@ head(df)
 ```
 
 ```{r}
-fit_edge_1 <- edge_model((event | 1) ~ dyad(node_1, node_2), data=df, data_type="binary", method="mcmc", mc_cores=4, verbose=TRUE)
-```
-
-```{r}
-summary(fit_edge_1)
-```
-
-```{r}
-fit_edge_0 <- edge_model((event | 1) ~ 1, data=df, data_type="binary", method="mcmc", mc_cores=4, verbose=TRUE)
-summary(fit_edge_0)
-```
-
-```{r}
-formula <- (event | duration) ~ dyad(node_1, node_2) + age + sex + (1 | location) + (1 | group)
-model_spec <- get_edge_model_spec(formula)
-!is.null(model_spec$node_1_name)
-```
-
-```{r}
-plot_trace(fit_node)
-```
-
-```{r}
-plot_predictions(fit_node, num_draws=20)
-```
-
-```{r}
-get_contrasts(fit_node, "fixed_node_typeLifeform", "fixed_node_typeDroid")
+# fit_edge_1 <- edge_model((event | 1) ~ dyad(node_1, node_2), data=df, data_type="binary",mc_cores=4, verbose=TRUE)
+# fit_edge_0 <- edge_model((event | 1) ~ 1, data=df, data_type="binary", mc_cores=4, verbose=TRUE)
 ```

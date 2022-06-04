@@ -25,7 +25,7 @@ head(df)
 ```
 
 ```{r}
-fit_edge <- edge_model((event | 1) ~ dyad(node_1, node_2), data=df, data_type="binary", method="mcmc", mc_cores=4, verbose=TRUE)
+fit_edge <- edge_model((event | 1) ~ dyad(node_1, node_2), data=df, data_type="binary", mc_cores=4, verbose=TRUE)
 ```
 
 ```{r}

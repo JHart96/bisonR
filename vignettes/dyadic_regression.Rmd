@@ -26,6 +26,10 @@ head(df)
 ```
 
 ```{r}
+fit_edge <- edge_model((event | 1) ~ dyad(node_1, node_2), data=df, data_type="binary", mc_cores=4, verbose=TRUE)
+```
+
+```{r}
 df_reg <- df %>%
   mutate(dyad_type=as.factor(paste(type_1, type_2, sep="-"))) %>%
   distinct(node_1, node_2, dyad_type)

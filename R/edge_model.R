@@ -1,8 +1,7 @@
-require(rstan)
-require(INLA)
 require(igraph)
 require(bridgesampling)
 require(dplyr)
+require(stringr)
 
 #' Fit an edge model to data
 #'
@@ -19,7 +18,7 @@ require(dplyr)
 edge_model <- function(formula, data, data_type=c("binary", "count", "duration"), directed=FALSE, method=c("mcmc", "vb", "inla"), verbose=FALSE, mc_cores=1) {
   # If verbose, print out MCMC chains.
   if (verbose) {
-    refresh <- 200
+    refresh <- 500
   } else {
     refresh <- 0
   }
@@ -75,10 +74,10 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
       model_data$divisor <- divisor
       if (dim(model_data$Z)[2] > 0) {
         # Mixed effects model
-        model <- stanmodels$binary_mixed
+        model <- build_stan_model(stan_model_binary_mixed_code)
       } else {
         # Fixed effects model
-        model <- stanmodels$binary_fixed
+        model <- build_stan_model(stan_model_binary_fixed_code)
       }
     }
     if (data_type == "count") {
@@ -86,32 +85,30 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
       model_data$divisor <- divisor
       if (dim(model_data$Z)[2] > 0) {
         # Mixed effects model
-        model <- stanmodels$count_mixed
+        model <- build_stan_model(stan_model_count_mixed_code)
       } else {
         # Fixed effects model
-        model <- stanmodels$count_fixed
+        model <- build_stan_model(stan_model_count_fixed_code)
+
       }
     }
     if (data_type == "duration") {
       model_data <- prepare_data(formula, list(obs=data, obs_agg=data_agg), directed, node_to_idx, node_list, data_type)
       if (dim(model_data$Z)[2] > 0) {
         # Mixed effects model
-        model <- stanmodels$duration_mixed
+        stop("Not yet supported")
       } else {
         # Fixed effects model
-        model <- stanmodels$duration_fixed
+        model <- build_stan_model(stan_model_duration_fixed_code)
       }
     }
     # Fit model
     if (method == "mcmc"){
-      fit <- rstan::sampling(model, data=model_data, refresh=refresh, cores=mc_cores)
-    }
-    if (method == "vb") {
-      fit <- rstan::vb(model, data=model_data, output_samples=2000, iter=1e5, tol_rel_obj=1e-3, importance_resampling=TRUE)
+      fit <- model$sample(data=model_data, refresh=refresh, chains=4, parallel_chains=mc_cores)
     }
 
     # Extract edge weights from fitted edge model.
-    chain <- rstan::extract(fit)$beta_fixed
+    chain <- fit$draws("beta_fixed", format="matrix")
     colnames(chain) <- colnames(data$X)
 
   }
@@ -169,7 +166,7 @@ print.edge_model <- function(obj, ci=0.90) {
   dyad_names <- do.call(paste, c(get_edgelist(fit_edge)[, 1:2], sep=" <-> "))
   summary_matrix <- as.matrix(edgelist[, 3:5])
   rownames(summary_matrix) <- dyad_names
-  print(summary_matrix)
+  cat(summary_matrix)
 }
 
 #' Retrieves an edgelist with uncertainty for a fitted edge weight model object
@@ -231,21 +228,24 @@ draw_edgelist_samples <- function (obj, num_draws) {
 }
 
 plot_predictions.edge_model <- function(obj, num_draws=20) {
-  y_preds <- rstan::extract(obj$fit)$y_pred
+  y_preds <- obj$fit$draws("y_pred", format="matrix")
   df_draw <- data.frame(y=obj$model_data$y, dyad_ids=obj$model_data$dyad_ids)
   df_summed <- aggregate(y ~ as.factor(dyad_ids), df_draw, sum)
   pred_density <- density(df_summed$y)
-  plot(pred_density, main="Observed vs predicted social events", xlab="Social events", ylim=c(0, max(pred_density$y) * 1.1), lwd=2)
+  plot(pred_density, main="Observed vs predicted social events", xlab="Social events", ylim=c(0, max(pred_density$y) * 1.1))
   for (i in 1:num_draws) {
-    df_draw$y <- y_preds[i, ]
+    df_draw$y <- as.vector(y_preds[i, ])
     df_summed <- aggregate(y ~ as.factor(dyad_ids), df_draw, sum)
     lines(density(df_summed$y), col=rgb(0, 0, 1, 0.5))
   }
 }
 
-plot_trace.edge_model <- function(obj, ...) {
-  if (obj$fit_method %in% c("mcmc", "vb")) {
-    rstan::traceplot(obj$fit, ...)
+plot_trace.edge_model <- function(obj, par_ids=1:12, ...) {
+  if (obj$fit_method %in% c("mcmc")) {
+    if (dim(fit_edge$chain)[2] < 12) {
+      par_ids <- 1:dim(fit_edge$chain[2])
+    }
+    bayesplot::mcmc_trace(fit_edge$fit$draws("beta_fixed")[,,par_ids])
   } else {
     message("plot_trace function not applicable to this fitting method")
   }
@@ -364,7 +364,6 @@ prepare_data <- function(formula, observations, directed, node_to_idx, node_list
     node_to_idx=node_to_idx,
     dyad_id=dyad_id,
     dyad_ids=as.integer(dyad_ids),
-    node_names=node_list,
     num_nodes=n
     # sri=sri
   )
@@ -385,20 +384,20 @@ prepare_data <- function(formula, observations, directed, node_to_idx, node_list
 get_edge_model_spec <- function(formula) {
   model_spec <- list()
 
-  x <- str_split(deparse1(formula), "~")[[1]]
+  x <- stringr::str_split(deparse1(formula), "~")[[1]]
   lhs <- x[1]
   rhs <- x[2]
 
   # Process left hand side
-  lhs_split <- str_split(lhs, "\\|")[[1]]
+  lhs_split <- stringr::str_split(lhs, "\\|")[[1]]
   event_var_name <- lhs_split[1]
-  event_var_name <- str_replace_all(event_var_name, "\\(", "")
-  event_var_name <- str_replace_all(event_var_name, " ", "")
+  event_var_name <- stringr::str_replace_all(event_var_name, "\\(", "")
+  event_var_name <- stringr::str_replace_all(event_var_name, " ", "")
   model_spec$event_var_name <- event_var_name
 
   divisor_var_name <- lhs_split[2]
-  divisor_var_name <- str_replace_all(divisor_var_name, "\\)", "")
-  divisor_var_name <- str_replace_all(divisor_var_name, " ", "")
+  divisor_var_name <- stringr::str_replace_all(divisor_var_name, "\\)", "")
+  divisor_var_name <- stringr::str_replace_all(divisor_var_name, " ", "")
   model_spec$divisor_var_name <- divisor_var_name
 
   # Set intercept to false by default
@@ -407,30 +406,30 @@ get_edge_model_spec <- function(formula) {
   model_spec$fixed <- c()
   model_spec$random <- c()
 
-  rhs_split <- str_split(rhs, "\\+")[[1]]
+  rhs_split <- stringr::str_split(rhs, "\\+")[[1]]
   for (term in rhs_split) {
-    term <- str_replace_all(term, " ", "")
+    term <- stringr::str_replace_all(term, " ", "")
     # Is it an intercept, a dyad, a fixed effect, or a random effect?
-    if (!is.na(str_match(term, "^0|1$"))) {
+    if (!is.na(stringr::str_match(term, "^0|1$"))) {
       # Intercept (or lack thereof)
       if (term == "0") {
         model_spec$intercept <- FALSE
       } else {
         model_spec$intercept <- TRUE
       }
-    } else if (!is.na(str_match(term, "^dyad\\(.*,.*\\)$")[[1]])) {
+    } else if (!is.na(stringr::str_match(term, "^dyad\\(.*,.*\\)$")[[1]])) {
       # dyad(,) term
-      node_names <- str_split(term, "\\(|\\)")[[1]][2]
-      node_names <- str_replace_all(node_names, " ", "")
-      node_names_split <- str_split(node_names, ",")[[1]]
+      node_names <- stringr::str_split(term, "\\(|\\)")[[1]][2]
+      node_names <- stringr::str_replace_all(node_names, " ", "")
+      node_names_split <- stringr::str_split(node_names, ",")[[1]]
       model_spec$node_1_name <- node_names_split[1]
       model_spec$node_2_name <- node_names_split[2]
     } else if (is.na(str_match(term, "[^a-zA-Z0-9]"))) {
       # No non-alphanumeric characters, and it can't be an intercept, so it's a fixed effect
       model_spec$fixed[length(model_spec$fixed) + 1] <- term
-    } else if (!is.na(str_match(term, "^\\(1\\|.*\\)$"))) {
+    } else if (!is.na(stringr::str_match(term, "^\\(1\\|.*\\)$"))) {
       # Contains a (1 | *) structure, so it's a basic random effect
-      term_name <- str_split(term, "\\(|\\||\\)")[[1]][3]
+      term_name <- stringr::str_split(term, "\\(|\\||\\)")[[1]][3]
       model_spec$random[length(model_spec$random) + 1] <- term_name
     } else {
       warning(paste0("Formula term \"", term, "\" not supported by bisonR. Check the formula is correctly specified."))
