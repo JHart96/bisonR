@@ -1,5 +1,4 @@
 require(bayesplot)
-
 #' Fit a nodel regression model
 #'
 #' @param formula
@@ -78,10 +77,10 @@ summary.nodal_model <- function(obj) {
 }
 
 plot_trace.nodal_model <- function (obj, par_ids=1:12, ...) {
-  if (dim(fit_edge$chain)[2] < 12) {
-    par_ids <- 1:dim(fit_edge$chain[2])
+  if (dim(obj$chain)[2] < 12) {
+    par_ids <- 1:dim(obj$chain)[2]
   }
-  bayesplot::mcmc_trace(fit_edge$fit$draws("beta_fixed")[,,par_ids])
+  bayesplot::mcmc_trace(obj$fit$draws("beta_fixed")[,,par_ids])
 }
 
 plot_predictions.nodal_model <- function(obj, num_draws=20) {

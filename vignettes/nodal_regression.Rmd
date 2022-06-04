@@ -20,7 +20,7 @@ cmdstanr::install_cmdstan(cores = 4)
 
 ```{r}
 library(bisonR)
-library(tidyverse)
+library(dplyr)
 ```
 
 ```{r}

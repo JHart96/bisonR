@@ -14,9 +14,12 @@ Biarch: true
 Depends: 
     R (>= 4.0.0),
     cmdstanr,
-    igraph
+    igraph,
+    methods
 Imports:
-    formula.tools
+    formula.tools,
+    stats,
+    stringr
 Remotes: 
     stan-dev/cmdstanr
 Suggests: 
@@ -25,7 +28,8 @@ Suggests:
     dplyr,
     knitr,
     rmarkdown,
-    testthat
+    testthat,
+    covr
 VignetteBuilder: knitr
 LazyData: true
 Config/testthat/edition: 3

@@ -2,12 +2,14 @@ require(bayesplot)
 
 #' Fit dyadic regression model
 #'
-#' @param formula
-#' @param edgemodel
-#' @param df
-#' @param mc_cores
+#' @param formula Formula of the model
+#' @param edgemodel Fitted edge weight model
+#' @param df Dataframe for regression
+#' @param mc_cores Number of cores to use for the MCMC sampler
+#' @param refresh Frequency of print-outs from MCMC sampler
+#' @param mm TRUE/FALSE indicating whether to include multi-membership effects in the regression
 #'
-#' @return
+#' @return Fitted dyadic regression model object
 #' @export
 #'
 #' @examples
@@ -87,10 +89,10 @@ summary.dyadic_model <- function(obj) {
 }
 
 plot_trace.dyadic_model <- function (obj, par_ids=1:12, ...) {
-  if (dim(fit_edge$chain)[2] < 12) {
-    par_ids <- 1:dim(fit_edge$chain[2])
+  if (dim(obj$chain)[2] < 12) {
+    par_ids <- 1:dim(obj$chain)[2]
   }
-  bayesplot::mcmc_trace(fit_edge$fit$draws("beta_fixed")[,,par_ids])
+  bayesplot::mcmc_trace(obj$fit$draws("beta_fixed")[,,par_ids])
 }
 
 plot_predictions.dyadic_model <- function(obj, num_draws=20) {

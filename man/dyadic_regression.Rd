@@ -14,10 +14,20 @@ dyadic_regression(
 )
 }
 \arguments{
-\item{mc_cores}{}
+\item{formula}{Formula of the model}
+
+\item{edgemodel}{Fitted edge weight model}
+
+\item{df}{Dataframe for regression}
+
+\item{mc_cores}{Number of cores to use for the MCMC sampler}
+
+\item{refresh}{Frequency of print-outs from MCMC sampler}
+
+\item{mm}{TRUE/FALSE indicating whether to include multi-membership effects in the regression}
 }
 \value{
-
+Fitted dyadic regression model object
 }
 \description{
 Fit dyadic regression model

@@ -4,6 +4,7 @@
 [![R-CMD-check](https://github.com/JHart96/bisonR/workflows/R-CMD-check/badge.svg)](https://github.com/JHart96/bisonR/actions)
 [![test-coverage](https://github.com/JHart96/bisonR/workflows/test-coverage/badge.svg)](https://github.com/JHart96/bisonR/actions)
 [![pkgdown](https://github.com/JHart96/bisonR/workflows/pkgdown/badge.svg)](https://github.com/JHart96/bisonR/actions)
+[![Codecov test coverage](https://codecov.io/gh/JHart96/bisonR/branch/main/graph/badge.svg)](https://app.codecov.io/gh/JHart96/bisonR?branch=main)
 <!-- badges: end -->
 
 :warning: **Do not use this package! (yet): This package is still in very early stages of development and not ready for real use. If you're looking to use BISoN for social network analysis check out the examples repository in Stan and INLA here: [github.com/JHart96/bison_examples](https://github.com/JHart96/bison_examples). **

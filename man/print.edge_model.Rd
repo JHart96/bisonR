@@ -7,7 +7,7 @@
 \method{print}{edge_model}(obj, ci = 0.9)
 }
 \arguments{
-\item{obj}{}
+\item{ci}{}
 }
 \description{
 Prints out details of a fitted edge model object

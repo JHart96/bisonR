@@ -55,7 +55,7 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
 
   # Get divisor from formula
   lhs <- as.character(formula.tools::lhs(formula))[2]
-  lhs_components <- stringr::str_split(stringr::str_replace_all(lhs, " ", ""), "\\|")[[1]]
+  lhs_components <- str_split(str_replace_all(lhs, " ", ""), "\\|")[[1]]
 
   if (suppressWarnings(any(!is.na(as.numeric(lhs_components[2]))))) {
     divisor <- rep(as.numeric(lhs_components[2]), nrow(obs))
@@ -150,6 +150,7 @@ summary.edge_model <- function(obj) {
 #' Prints out details of a fitted edge model object
 #'
 #' @param obj
+#' @param ci
 #'
 #' @export
 print.edge_model <- function(obj, ci=0.90) {
@@ -243,10 +244,10 @@ plot_predictions.edge_model <- function(obj, num_draws=20) {
 
 plot_trace.edge_model <- function(obj, par_ids=1:12, ...) {
   if (obj$fit_method %in% c("mcmc")) {
-    if (dim(fit_edge$chain)[2] < 12) {
-      par_ids <- 1:dim(fit_edge$chain[2])
+    if (dim(obj$chain)[2] < 12) {
+      par_ids <- 1:dim(obj$chain[2])
     }
-    bayesplot::mcmc_trace(fit_edge$fit$draws("beta_fixed")[,,par_ids])
+    bayesplot::mcmc_trace(obj$fit$draws("beta_fixed")[,,par_ids])
   } else {
     message("plot_trace function not applicable to this fitting method")
   }
@@ -385,20 +386,20 @@ prepare_data <- function(formula, observations, directed, node_to_idx, node_list
 get_edge_model_spec <- function(formula) {
   model_spec <- list()
 
-  x <- stringr::str_split(deparse1(formula), "~")[[1]]
+  x <- str_split(deparse1(formula), "~")[[1]]
   lhs <- x[1]
   rhs <- x[2]
 
   # Process left hand side
-  lhs_split <- stringr::str_split(lhs, "\\|")[[1]]
+  lhs_split <- str_split(lhs, "\\|")[[1]]
   event_var_name <- lhs_split[1]
-  event_var_name <- stringr::str_replace_all(event_var_name, "\\(", "")
-  event_var_name <- stringr::str_replace_all(event_var_name, " ", "")
+  event_var_name <- str_replace_all(event_var_name, "\\(", "")
+  event_var_name <- str_replace_all(event_var_name, " ", "")
   model_spec$event_var_name <- event_var_name
 
   divisor_var_name <- lhs_split[2]
-  divisor_var_name <- stringr::str_replace_all(divisor_var_name, "\\)", "")
-  divisor_var_name <- stringr::str_replace_all(divisor_var_name, " ", "")
+  divisor_var_name <- str_replace_all(divisor_var_name, "\\)", "")
+  divisor_var_name <- str_replace_all(divisor_var_name, " ", "")
   model_spec$divisor_var_name <- divisor_var_name
 
   # Set intercept to false by default
@@ -407,30 +408,30 @@ get_edge_model_spec <- function(formula) {
   model_spec$fixed <- c()
   model_spec$random <- c()
 
-  rhs_split <- stringr::str_split(rhs, "\\+")[[1]]
+  rhs_split <- str_split(rhs, "\\+")[[1]]
   for (term in rhs_split) {
-    term <- stringr::str_replace_all(term, " ", "")
+    term <- str_replace_all(term, " ", "")
     # Is it an intercept, a dyad, a fixed effect, or a random effect?
-    if (!is.na(stringr::str_match(term, "^0|1$"))) {
+    if (!is.na(str_match(term, "^0|1$"))) {
       # Intercept (or lack thereof)
       if (term == "0") {
         model_spec$intercept <- FALSE
       } else {
         model_spec$intercept <- TRUE
       }
-    } else if (!is.na(stringr::str_match(term, "^dyad\\(.*,.*\\)$")[[1]])) {
+    } else if (!is.na(str_match(term, "^dyad\\(.*,.*\\)$")[[1]])) {
       # dyad(,) term
-      node_names <- stringr::str_split(term, "\\(|\\)")[[1]][2]
-      node_names <- stringr::str_replace_all(node_names, " ", "")
-      node_names_split <- stringr::str_split(node_names, ",")[[1]]
+      node_names <- str_split(term, "\\(|\\)")[[1]][2]
+      node_names <- str_replace_all(node_names, " ", "")
+      node_names_split <- str_split(node_names, ",")[[1]]
       model_spec$node_1_name <- node_names_split[1]
       model_spec$node_2_name <- node_names_split[2]
     } else if (is.na(str_match(term, "[^a-zA-Z0-9]"))) {
       # No non-alphanumeric characters, and it can't be an intercept, so it's a fixed effect
       model_spec$fixed[length(model_spec$fixed) + 1] <- term
-    } else if (!is.na(stringr::str_match(term, "^\\(1\\|.*\\)$"))) {
+    } else if (!is.na(str_match(term, "^\\(1\\|.*\\)$"))) {
       # Contains a (1 | *) structure, so it's a basic random effect
-      term_name <- stringr::str_split(term, "\\(|\\||\\)")[[1]][3]
+      term_name <- str_split(term, "\\(|\\||\\)")[[1]][3]
       model_spec$random[length(model_spec$random) + 1] <- term_name
     } else {
       warning(paste0("Formula term \"", term, "\" not supported by bisonR. Check the formula is correctly specified."))
