@@ -15,6 +15,10 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
+install_cmdstan(cores = 4)
+```
+
+```{r setup}
 library(bisonR)
 ```
 
