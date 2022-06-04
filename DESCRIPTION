@@ -13,6 +13,7 @@ RoxygenNote: 7.1.2
 Biarch: true
 Depends: 
     R (>= 4.0.0)
+    cmdstanr
 Imports:
     formula.tools (>= 1.7.1)
 Remotes: 
