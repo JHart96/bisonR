@@ -1,3 +1,5 @@
+require(bayesplot)
+
 #' Fit a nodel regression model
 #'
 #' @param formula

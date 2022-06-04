@@ -13,12 +13,13 @@ RoxygenNote: 7.1.2
 Biarch: true
 Depends: 
     R (>= 4.0.0),
-    cmdstanr
+    cmdstanr (>= 0.5.2)
 Imports:
     formula.tools (>= 1.7.1)
 Remotes: 
     stan-dev/cmdstanr
 Suggests: 
+    bayesplot (>= 1.9.0),
     tidyverse (>= 1.3.1),
     dplyr (>= 1.0.8),
     knitr (>= 1.37),

@@ -1,3 +1,5 @@
+require(bayesplot)
+
 #' Fit dyadic regression model
 #'
 #' @param formula

@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 cmdstanr::install_cmdstan(cores = 4)
 ```
 
-```{r setup}
+```{r}
 library(bisonR)
 library(tidyverse)
 ```

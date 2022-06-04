@@ -2,6 +2,7 @@ require(igraph)
 require(bridgesampling)
 require(dplyr)
 require(stringr)
+require(bayesplot)
 
 #' Fit an edge model to data
 #'
