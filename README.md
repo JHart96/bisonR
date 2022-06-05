@@ -2,7 +2,6 @@
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/JHart96/bisonR/workflows/R-CMD-check/badge.svg)](https://github.com/JHart96/bisonR/actions)
-[![test-coverage](https://github.com/JHart96/bisonR/workflows/test-coverage/badge.svg)](https://github.com/JHart96/bisonR/actions)
 [![pkgdown](https://github.com/JHart96/bisonR/workflows/pkgdown/badge.svg)](https://github.com/JHart96/bisonR/actions)
 [![Codecov test coverage](https://codecov.io/gh/JHart96/bisonR/branch/main/graph/badge.svg)](https://app.codecov.io/gh/JHart96/bisonR?branch=main)
 <!-- badges: end -->
@@ -13,8 +12,8 @@ bisonR is an R package implementing the BISoN framework for conducting Bayesian 
 
 ## Installation
 
-bisonR isn't currently on CRAN, but it can be installed from GitHub. To do this, make sure you have the `devtools` package installed. Then run the following command:
+bisonR isn't currently on CRAN, but it can be installed from GitHub. To do this, make sure you have the `remotes` package installed. Then run the following command:
 
 ```
-devtools::install_github("JHart96/bisonR")
+remotes::install_github("JHart96/bisonR")
 ```
