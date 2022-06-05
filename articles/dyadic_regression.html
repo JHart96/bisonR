@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">bisonR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -174,10 +174,11 @@
 <span class="co"><span style="color: #BB0000;">#&gt; </span>tbb_root="../tbb_2020.3" CXX="g++" CC="gcc" LDFLAGS='-Wl,-L,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb" -Wl,-rpath,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb"  ' 'make' -C "stan/lib/stan_math/lib/tbb" -r -f "/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb_2020.3/build/Makefile.tbbmalloc" compiler=gcc cfg=release stdver=c++1y malloc CXXFLAGS="-Wno-unknown-warning-option -Wno-deprecated-copy -Wno-missing-attributes -Wno-class-memaccess -Wno-sized-deallocation  "</span>
 <span class="co">#&gt; make[1]: Entering directory '/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb'</span>
 <span class="co">#&gt; g++ -c -MMD -O2 -g -DDO_ITT_NOTIFY -DUSE_PTHREAD -pthread -m64 -mrtm   -Wno-unknown-warning-option -Wno-deprecated-copy -Wno-missing-attributes -Wno-class-memaccess -Wno-sized-deallocation   -DTBB_SUPPRESS_DEPRECATED_MESSAGES=1 -fno-rtti -fno-exceptions -D__TBBMALLOC_BUILD=1 -Wno-parentheses -Wno-sized-deallocation -fPIC -flifetime-dse=1 -I../tbb_2020.3/src -I../tbb_2020.3/src/rml/include -I../tbb_2020.3/include -I../tbb_2020.3/src/tbbmalloc -I../tbb_2020.3/src/tbbmalloc ../tbb_2020.3/src/tbbmalloc/backend.cpp</span>
+<span class="co">#&gt; g++ -std=c++1y -pthread -D_REENTRANT -Wno-sign-compare -Wno-ignored-attributes      -I stan/lib/stan_math/lib/tbb_2020.3/include    -O3 -I src -I stan/src -I lib/rapidjson_1.1.0/ -I lib/CLI11-1.9.1/ -I stan/lib/stan_math/ -I stan/lib/stan_math/lib/eigen_3.3.9 -I stan/lib/stan_math/lib/boost_1.75.0 -I stan/lib/stan_math/lib/sundials_6.0.0/include -I stan/lib/stan_math/lib/sundials_6.0.0/src/sundials    -DBOOST_DISABLE_ASSERTS                -Wl,-L,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb" -Wl,-rpath,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb"      bin/cmdstan/stansummary.o        -Wl,-L,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb" -Wl,-rpath,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb"   -o bin/stansummary</span>
+<span class="co">#&gt; g++ -std=c++1y -pthread -D_REENTRANT -Wno-sign-compare -Wno-ignored-attributes      -I stan/lib/stan_math/lib/tbb_2020.3/include    -O3 -I src -I stan/src -I lib/rapidjson_1.1.0/ -I lib/CLI11-1.9.1/ -I stan/lib/stan_math/ -I stan/lib/stan_math/lib/eigen_3.3.9 -I stan/lib/stan_math/lib/boost_1.75.0 -I stan/lib/stan_math/lib/sundials_6.0.0/include -I stan/lib/stan_math/lib/sundials_6.0.0/src/sundials    -DBOOST_DISABLE_ASSERTS                -Wl,-L,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb" -Wl,-rpath,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb"      bin/cmdstan/print.o        -Wl,-L,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb" -Wl,-rpath,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb"   -o bin/print</span>
 <span class="co">#&gt; g++ -c -MMD -O2 -g -DDO_ITT_NOTIFY -DUSE_PTHREAD -pthread -m64 -mrtm   -Wno-unknown-warning-option -Wno-deprecated-copy -Wno-missing-attributes -Wno-class-memaccess -Wno-sized-deallocation   -DTBB_SUPPRESS_DEPRECATED_MESSAGES=1 -fno-rtti -fno-exceptions -D__TBBMALLOC_BUILD=1 -Wno-parentheses -Wno-sized-deallocation -fPIC -flifetime-dse=1 -I../tbb_2020.3/src -I../tbb_2020.3/src/rml/include -I../tbb_2020.3/include -I../tbb_2020.3/src/tbbmalloc -I../tbb_2020.3/src/tbbmalloc ../tbb_2020.3/src/tbbmalloc/large_objects.cpp</span>
 <span class="co">#&gt; g++ -c -MMD -O2 -g -DDO_ITT_NOTIFY -DUSE_PTHREAD -pthread -m64 -mrtm   -Wno-unknown-warning-option -Wno-deprecated-copy -Wno-missing-attributes -Wno-class-memaccess -Wno-sized-deallocation   -DTBB_SUPPRESS_DEPRECATED_MESSAGES=1 -fno-rtti -fno-exceptions -D__TBBMALLOC_BUILD=1 -Wno-parentheses -Wno-sized-deallocation -fPIC -flifetime-dse=1 -I../tbb_2020.3/src -I../tbb_2020.3/src/rml/include -I../tbb_2020.3/include -I../tbb_2020.3/src/tbbmalloc -I../tbb_2020.3/src/tbbmalloc ../tbb_2020.3/src/tbbmalloc/backref.cpp</span>
 <span class="co">#&gt; g++ -c -MMD -O2 -g -DDO_ITT_NOTIFY -DUSE_PTHREAD -pthread -m64 -mrtm   -Wno-unknown-warning-option -Wno-deprecated-copy -Wno-missing-attributes -Wno-class-memaccess -Wno-sized-deallocation   -DTBB_SUPPRESS_DEPRECATED_MESSAGES=1 -fno-rtti -fno-exceptions -D__TBBMALLOC_BUILD=1 -Wno-parentheses -Wno-sized-deallocation -fPIC -flifetime-dse=1 -I../tbb_2020.3/src -I../tbb_2020.3/src/rml/include -I../tbb_2020.3/include -I../tbb_2020.3/src/tbbmalloc -I../tbb_2020.3/src/tbbmalloc ../tbb_2020.3/src/tbbmalloc/tbbmalloc.cpp</span>
-<span class="co">#&gt; g++ -std=c++1y -pthread -D_REENTRANT -Wno-sign-compare -Wno-ignored-attributes      -I stan/lib/stan_math/lib/tbb_2020.3/include    -O3 -I src -I stan/src -I lib/rapidjson_1.1.0/ -I lib/CLI11-1.9.1/ -I stan/lib/stan_math/ -I stan/lib/stan_math/lib/eigen_3.3.9 -I stan/lib/stan_math/lib/boost_1.75.0 -I stan/lib/stan_math/lib/sundials_6.0.0/include -I stan/lib/stan_math/lib/sundials_6.0.0/src/sundials    -DBOOST_DISABLE_ASSERTS                -Wl,-L,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb" -Wl,-rpath,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb"      bin/cmdstan/print.o        -Wl,-L,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb" -Wl,-rpath,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb"   -o bin/print</span>
 <span class="co">#&gt; g++ -c -MMD -O2 -g -DDO_ITT_NOTIFY -DUSE_PTHREAD -pthread -m64 -mrtm   -Wno-unknown-warning-option -Wno-deprecated-copy -Wno-missing-attributes -Wno-class-memaccess -Wno-sized-deallocation   -DTBB_SUPPRESS_DEPRECATED_MESSAGES=1 -fno-rtti -fno-exceptions -D__TBBMALLOC_BUILD=1 -Wno-parentheses -Wno-sized-deallocation -fPIC -flifetime-dse=1 -o itt_notify_malloc.o -I../tbb_2020.3/src -I../tbb_2020.3/src/rml/include -I../tbb_2020.3/include ../tbb_2020.3/src/tbb/itt_notify.cpp</span>
 <span class="co">#&gt; sh ../tbb_2020.3/build/version_info_linux.sh g++ -O2 -g -DDO_ITT_NOTIFY -DUSE_PTHREAD -pthread -m64 -mrtm  -Wall -Wextra -Wno-unknown-warning-option -Wno-deprecated-copy -Wno-missing-attributes -Wno-class-memaccess -Wno-sized-deallocation   -DTBB_SUPPRESS_DEPRECATED_MESSAGES=1  -std=c++1y -I../tbb_2020.3/src -I../tbb_2020.3/src/rml/include -I../tbb_2020.3/include &gt;version_string.ver</span>
 <span class="co">#&gt; echo "INPUT (libtbbmalloc.so.2)" &gt; libtbbmalloc.so</span>
@@ -187,7 +188,6 @@
 <span class="co">#&gt; echo "INPUT (libtbbmalloc_proxy.so.2)" &gt; libtbbmalloc_proxy.so</span>
 <span class="co">#&gt; g++ -E -x c++ ../tbb_2020.3/src/tbbmalloc/lin64-proxy-export.def -O2 -g -DDO_ITT_NOTIFY -DUSE_PTHREAD -pthread -m64 -mrtm  -Wall -Wextra -Wno-unknown-warning-option -Wno-deprecated-copy -Wno-missing-attributes -Wno-class-memaccess -Wno-sized-deallocation   -DTBB_SUPPRESS_DEPRECATED_MESSAGES=1  -Wno-parentheses -Wno-sized-deallocation -I../tbb_2020.3/src -I../tbb_2020.3/src/rml/include -I../tbb_2020.3/include &gt; tbbmallocproxy.def</span>
 <span class="co">#&gt; g++ -c -MMD -O2 -g -DDO_ITT_NOTIFY -DUSE_PTHREAD -pthread -m64 -mrtm   -Wno-unknown-warning-option -Wno-deprecated-copy -Wno-missing-attributes -Wno-class-memaccess -Wno-sized-deallocation   -DTBB_SUPPRESS_DEPRECATED_MESSAGES=1 -fno-rtti -fno-exceptions -D__TBBMALLOC_BUILD=1 -Wno-parentheses -Wno-sized-deallocation -fPIC -flifetime-dse=1 -I../tbb_2020.3/src -I../tbb_2020.3/src/rml/include -I../tbb_2020.3/include -I../tbb_2020.3/src/tbbmalloc -I../tbb_2020.3/src/tbbmalloc -I. ../tbb_2020.3/src/tbbmalloc/frontend.cpp</span>
-<span class="co">#&gt; g++ -std=c++1y -pthread -D_REENTRANT -Wno-sign-compare -Wno-ignored-attributes      -I stan/lib/stan_math/lib/tbb_2020.3/include    -O3 -I src -I stan/src -I lib/rapidjson_1.1.0/ -I lib/CLI11-1.9.1/ -I stan/lib/stan_math/ -I stan/lib/stan_math/lib/eigen_3.3.9 -I stan/lib/stan_math/lib/boost_1.75.0 -I stan/lib/stan_math/lib/sundials_6.0.0/include -I stan/lib/stan_math/lib/sundials_6.0.0/src/sundials    -DBOOST_DISABLE_ASSERTS                -Wl,-L,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb" -Wl,-rpath,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb"      bin/cmdstan/stansummary.o        -Wl,-L,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb" -Wl,-rpath,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb"   -o bin/stansummary</span>
 <span class="co">#&gt; gcc -fPIC -o libtbbmalloc.so.2 backend.o large_objects.o backref.o  tbbmalloc.o  itt_notify_malloc.o frontend.o  -ldl -lrt -shared -Wl,-soname=libtbbmalloc.so.2 -pthread -m64 -Wl,-L,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb" -Wl,-rpath,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb"   -Wl,--version-script,tbbmalloc.def</span>
 <span class="co">#&gt; g++ -fPIC -o libtbbmalloc_proxy.so.2 proxy.o tbb_function_replacement.o  -ldl -lrt libtbbmalloc.so -shared -Wl,-soname=libtbbmalloc_proxy.so.2 -pthread -m64 -Wl,-L,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb" -Wl,-rpath,"/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb"   -Wl,--version-script,tbbmallocproxy.def</span>
 <span class="co">#&gt; make[1]: Leaving directory '/home/runner/.cmdstan/cmdstan-2.29.2/stan/lib/stan_math/lib/tbb'</span>
@@ -293,17 +293,17 @@
 <span class="co">#&gt; 6    Rey   Leia Lifeform Lifeform     1        B</span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_edge</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edge_model.html">edge_model</a></span><span class="op">(</span><span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="fl">1</span><span class="op">)</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1</span>, <span class="va">node_2</span><span class="op">)</span>, data<span class="op">=</span><span class="va">df</span>, data_type<span class="op">=</span><span class="st">"binary"</span>, mc_cores<span class="op">=</span><span class="fl">4</span>, verbose<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; Warning in '/tmp/RtmpyIjS4Q/model-358044e4404.stan', line 5, column 2: Declaration</span>
+<span class="co">#&gt; Warning in '/tmp/RtmpULk7hB/model-35bf35cf97a2.stan', line 5, column 2: Declaration</span>
 <span class="co">#&gt;     of arrays by placing brackets after a variable name is deprecated and</span>
 <span class="co">#&gt;     will be removed in Stan 2.32.0. Instead use the array keyword before the</span>
 <span class="co">#&gt;     type. This can be changed automatically using the auto-format flag to</span>
 <span class="co">#&gt;     stanc</span>
-<span class="co">#&gt; Warning in '/tmp/RtmpyIjS4Q/model-358044e4404.stan', line 6, column 2: Declaration</span>
+<span class="co">#&gt; Warning in '/tmp/RtmpULk7hB/model-35bf35cf97a2.stan', line 6, column 2: Declaration</span>
 <span class="co">#&gt;     of arrays by placing brackets after a variable name is deprecated and</span>
 <span class="co">#&gt;     will be removed in Stan 2.32.0. Instead use the array keyword before the</span>
 <span class="co">#&gt;     type. This can be changed automatically using the auto-format flag to</span>
 <span class="co">#&gt;     stanc</span>
-<span class="co">#&gt; Warning in '/tmp/RtmpyIjS4Q/model-358044e4404.stan', line 28, column 2: Declaration</span>
+<span class="co">#&gt; Warning in '/tmp/RtmpULk7hB/model-35bf35cf97a2.stan', line 28, column 2: Declaration</span>
 <span class="co">#&gt;     of arrays by placing brackets after a variable name is deprecated and</span>
 <span class="co">#&gt;     will be removed in Stan 2.32.0. Instead use the array keyword before the</span>
 <span class="co">#&gt;     type. This can be changed automatically using the auto-format flag to</span>
@@ -323,19 +323,19 @@
 <span class="co">#&gt; Chain 2 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
 <span class="co">#&gt; Chain 2 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 3 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
+<span class="co">#&gt; Chain 3 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 4 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
 <span class="co">#&gt; Chain 4 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
-<span class="co">#&gt; Chain 3 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 1 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 2 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 3 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 4 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
 <span class="co">#&gt; Chain 2 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 1 finished in 3.0 seconds.</span>
-<span class="co">#&gt; Chain 2 finished in 3.0 seconds.</span>
 <span class="co">#&gt; Chain 3 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
 <span class="co">#&gt; Chain 4 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
+<span class="co">#&gt; Chain 1 finished in 3.0 seconds.</span>
+<span class="co">#&gt; Chain 2 finished in 3.0 seconds.</span>
 <span class="co">#&gt; Chain 3 finished in 3.0 seconds.</span>
 <span class="co">#&gt; Chain 4 finished in 3.0 seconds.</span>
 <span class="co">#&gt; </span>
@@ -380,90 +380,85 @@
 <span class="va">df_reg</span><span class="op">$</span><span class="va">relatedness</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/model-method-sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="fl">28</span>, replace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="va">df_reg</span>
 <span class="co">#&gt;     node_1  node_2         dyad_type relatedness</span>
-<span class="co">#&gt; 1      Rey    Leia Lifeform-Lifeform           1</span>
-<span class="co">#&gt; 2      Rey Obi-Wan Lifeform-Lifeform           2</span>
-<span class="co">#&gt; 3      Rey    Luke Lifeform-Lifeform           2</span>
-<span class="co">#&gt; 4      Rey   C-3PO    Lifeform-Droid           3</span>
-<span class="co">#&gt; 5      Rey    BB-8    Lifeform-Droid           1</span>
+<span class="co">#&gt; 1      Rey    Leia Lifeform-Lifeform           3</span>
+<span class="co">#&gt; 2      Rey Obi-Wan Lifeform-Lifeform           1</span>
+<span class="co">#&gt; 3      Rey    Luke Lifeform-Lifeform           1</span>
+<span class="co">#&gt; 4      Rey   C-3PO    Lifeform-Droid           2</span>
+<span class="co">#&gt; 5      Rey    BB-8    Lifeform-Droid           2</span>
 <span class="co">#&gt; 6      Rey   R2-D2    Lifeform-Droid           1</span>
-<span class="co">#&gt; 7      Rey     D-O    Lifeform-Droid           2</span>
-<span class="co">#&gt; 8     Leia Obi-Wan Lifeform-Lifeform           1</span>
+<span class="co">#&gt; 7      Rey     D-O    Lifeform-Droid           3</span>
+<span class="co">#&gt; 8     Leia Obi-Wan Lifeform-Lifeform           3</span>
 <span class="co">#&gt; 9     Leia    Luke Lifeform-Lifeform           2</span>
-<span class="co">#&gt; 10    Leia   C-3PO    Lifeform-Droid           2</span>
-<span class="co">#&gt; 11    Leia    BB-8    Lifeform-Droid           2</span>
-<span class="co">#&gt; 12    Leia   R2-D2    Lifeform-Droid           1</span>
-<span class="co">#&gt; 13    Leia     D-O    Lifeform-Droid           1</span>
+<span class="co">#&gt; 10    Leia   C-3PO    Lifeform-Droid           3</span>
+<span class="co">#&gt; 11    Leia    BB-8    Lifeform-Droid           1</span>
+<span class="co">#&gt; 12    Leia   R2-D2    Lifeform-Droid           3</span>
+<span class="co">#&gt; 13    Leia     D-O    Lifeform-Droid           2</span>
 <span class="co">#&gt; 14 Obi-Wan    Luke Lifeform-Lifeform           3</span>
 <span class="co">#&gt; 15 Obi-Wan   C-3PO    Lifeform-Droid           2</span>
 <span class="co">#&gt; 16 Obi-Wan    BB-8    Lifeform-Droid           1</span>
-<span class="co">#&gt; 17 Obi-Wan   R2-D2    Lifeform-Droid           2</span>
-<span class="co">#&gt; 18 Obi-Wan     D-O    Lifeform-Droid           1</span>
-<span class="co">#&gt; 19    Luke   C-3PO    Lifeform-Droid           1</span>
-<span class="co">#&gt; 20    Luke    BB-8    Lifeform-Droid           2</span>
-<span class="co">#&gt; 21    Luke   R2-D2    Lifeform-Droid           2</span>
-<span class="co">#&gt; 22    Luke     D-O    Lifeform-Droid           1</span>
-<span class="co">#&gt; 23   C-3PO    BB-8       Droid-Droid           2</span>
+<span class="co">#&gt; 17 Obi-Wan   R2-D2    Lifeform-Droid           1</span>
+<span class="co">#&gt; 18 Obi-Wan     D-O    Lifeform-Droid           2</span>
+<span class="co">#&gt; 19    Luke   C-3PO    Lifeform-Droid           3</span>
+<span class="co">#&gt; 20    Luke    BB-8    Lifeform-Droid           3</span>
+<span class="co">#&gt; 21    Luke   R2-D2    Lifeform-Droid           3</span>
+<span class="co">#&gt; 22    Luke     D-O    Lifeform-Droid           2</span>
+<span class="co">#&gt; 23   C-3PO    BB-8       Droid-Droid           1</span>
 <span class="co">#&gt; 24   C-3PO   R2-D2       Droid-Droid           3</span>
-<span class="co">#&gt; 25   C-3PO     D-O       Droid-Droid           3</span>
-<span class="co">#&gt; 26    BB-8   R2-D2       Droid-Droid           2</span>
-<span class="co">#&gt; 27    BB-8     D-O       Droid-Droid           2</span>
-<span class="co">#&gt; 28   R2-D2     D-O       Droid-Droid           1</span></code></pre></div>
+<span class="co">#&gt; 25   C-3PO     D-O       Droid-Droid           1</span>
+<span class="co">#&gt; 26    BB-8   R2-D2       Droid-Droid           3</span>
+<span class="co">#&gt; 27    BB-8     D-O       Droid-Droid           1</span>
+<span class="co">#&gt; 28   R2-D2     D-O       Droid-Droid           2</span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_dyad</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dyadic_regression.html">dyadic_regression</a></span><span class="op">(</span><span class="fu">dyad</span><span class="op">(</span><span class="va">node_1</span>, <span class="va">node_2</span><span class="op">)</span> <span class="op">~</span> <span class="va">dyad_type</span>, <span class="va">fit_edge</span>, <span class="va">df_reg</span>, mm<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
-<span class="co">#&gt; Warning in '/tmp/RtmpyIjS4Q/model-35807d663697.stan', line 9, column 2: Declaration</span>
+<span class="co">#&gt; Warning in '/tmp/RtmpULk7hB/model-35bf29f1b7ec.stan', line 9, column 2: Declaration</span>
 <span class="co">#&gt;     of arrays by placing brackets after a variable name is deprecated and</span>
 <span class="co">#&gt;     will be removed in Stan 2.32.0. Instead use the array keyword before the</span>
 <span class="co">#&gt;     type. This can be changed automatically using the auto-format flag to</span>
 <span class="co">#&gt;     stanc</span>
-<span class="co">#&gt; Warning in '/tmp/RtmpyIjS4Q/model-35807d663697.stan', line 10, column 2: Declaration</span>
+<span class="co">#&gt; Warning in '/tmp/RtmpULk7hB/model-35bf29f1b7ec.stan', line 10, column 2: Declaration</span>
 <span class="co">#&gt;     of arrays by placing brackets after a variable name is deprecated and</span>
 <span class="co">#&gt;     will be removed in Stan 2.32.0. Instead use the array keyword before the</span>
 <span class="co">#&gt;     type. This can be changed automatically using the auto-format flag to</span>
 <span class="co">#&gt;     stanc</span>
-<span class="co">#&gt; Warning in '/tmp/RtmpyIjS4Q/model-35807d663697.stan', line 18, column 2: Declaration</span>
+<span class="co">#&gt; Warning in '/tmp/RtmpULk7hB/model-35bf29f1b7ec.stan', line 18, column 2: Declaration</span>
 <span class="co">#&gt;     of arrays by placing brackets after a variable name is deprecated and</span>
 <span class="co">#&gt;     will be removed in Stan 2.32.0. Instead use the array keyword before the</span>
 <span class="co">#&gt;     type. This can be changed automatically using the auto-format flag to</span>
 <span class="co">#&gt;     stanc</span>
 <span class="co">#&gt; Running MCMC with 4 parallel chains...</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Chain 1 Iteration:    1 / 2000 [  0%]  (Warmup)</span>
-<span class="co">#&gt; Chain 1 Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:</span>
-<span class="co">#&gt; Chain 1 Exception: multi_normal_lpdf: LDLT_Factor of covariance parameter is not positive definite.  last conditional variance is -nan. (in '/tmp/RtmpyIjS4Q/model-35807d663697.stan', line 31, column 2 to column 82)</span>
-<span class="co">#&gt; Chain 1 If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,</span>
-<span class="co">#&gt; Chain 1 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.</span>
-<span class="co">#&gt; Chain 1</span>
+<span class="co">#&gt; Chain 1 Iteration:    1 / 2000 [  0%]  (Warmup) </span>
 <span class="co">#&gt; Chain 2 Iteration:    1 / 2000 [  0%]  (Warmup) </span>
 <span class="co">#&gt; Chain 3 Iteration:    1 / 2000 [  0%]  (Warmup) </span>
 <span class="co">#&gt; Chain 4 Iteration:    1 / 2000 [  0%]  (Warmup) </span>
-<span class="co">#&gt; Chain 2 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
 <span class="co">#&gt; Chain 3 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
-<span class="co">#&gt; Chain 4 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
 <span class="co">#&gt; Chain 1 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
-<span class="co">#&gt; Chain 2 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
-<span class="co">#&gt; Chain 2 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
+<span class="co">#&gt; Chain 2 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
+<span class="co">#&gt; Chain 4 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
 <span class="co">#&gt; Chain 3 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
 <span class="co">#&gt; Chain 3 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
-<span class="co">#&gt; Chain 4 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
-<span class="co">#&gt; Chain 4 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 1 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
 <span class="co">#&gt; Chain 1 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
-<span class="co">#&gt; Chain 4 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
+<span class="co">#&gt; Chain 2 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
+<span class="co">#&gt; Chain 2 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
+<span class="co">#&gt; Chain 4 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
+<span class="co">#&gt; Chain 4 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 2 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
-<span class="co">#&gt; Chain 3 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 1 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
-<span class="co">#&gt; Chain 4 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 4 finished in 2.6 seconds.</span>
-<span class="co">#&gt; Chain 3 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 3 finished in 2.7 seconds.</span>
-<span class="co">#&gt; Chain 2 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 2 finished in 2.8 seconds.</span>
+<span class="co">#&gt; Chain 3 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
+<span class="co">#&gt; Chain 4 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 1 finished in 2.9 seconds.</span>
+<span class="co">#&gt; Chain 2 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
+<span class="co">#&gt; Chain 1 finished in 3.0 seconds.</span>
+<span class="co">#&gt; Chain 2 finished in 3.0 seconds.</span>
+<span class="co">#&gt; Chain 3 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
+<span class="co">#&gt; Chain 3 finished in 3.1 seconds.</span>
+<span class="co">#&gt; Chain 4 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
+<span class="co">#&gt; Chain 4 finished in 3.2 seconds.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; All 4 chains finished successfully.</span>
-<span class="co">#&gt; Mean chain execution time: 2.7 seconds.</span>
-<span class="co">#&gt; Total execution time: 3.0 seconds.</span></code></pre></div>
+<span class="co">#&gt; Mean chain execution time: 3.1 seconds.</span>
+<span class="co">#&gt; Total execution time: 3.3 seconds.</span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/fit-method-summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_dyad</span><span class="op">)</span>
 <span class="co">#&gt; === Fitted dyadic regression model ===</span>
@@ -471,10 +466,10 @@
 <span class="co">#&gt; Number of dyads: 28</span>
 <span class="co">#&gt; === Coefficient summary ===                                  </span>
 <span class="co">#&gt; variable                              50%     5%    95%</span>
-<span class="co">#&gt;   intercept                        -0.378 -1.194  0.487</span>
-<span class="co">#&gt;   fixed_dyad_typeDroid-Droid       -0.934 -1.839 -0.077</span>
-<span class="co">#&gt;   fixed_dyad_typeLifeform-Droid    -1.020 -1.895 -0.186</span>
-<span class="co">#&gt;   fixed_dyad_typeLifeform-Lifeform  1.671  0.785  2.557</span></code></pre></div>
+<span class="co">#&gt;   intercept                        -0.349 -1.175  0.519</span>
+<span class="co">#&gt;   fixed_dyad_typeDroid-Droid       -0.930 -1.828 -0.065</span>
+<span class="co">#&gt;   fixed_dyad_typeLifeform-Droid    -1.035 -1.907 -0.175</span>
+<span class="co">#&gt;   fixed_dyad_typeLifeform-Lifeform  1.617  0.716  2.474</span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_trace.html">plot_trace</a></span><span class="op">(</span><span class="va">fit_dyad</span><span class="op">)</span></code></pre></div>
 <p><img src="dyadic_regression_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
@@ -484,7 +479,7 @@
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/get_contrasts.html">get_contrasts</a></span><span class="op">(</span><span class="va">fit_dyad</span>, <span class="st">"fixed_dyad_typeLifeform-Lifeform"</span>, <span class="st">"fixed_dyad_typeDroid-Droid"</span><span class="op">)</span>
 <span class="co">#&gt;   50%    5%   95% </span>
-<span class="co">#&gt; 2.615 2.108 3.099</span></code></pre></div>
+<span class="co">#&gt; 2.539 2.062 3.044</span></code></pre></div>
   </main>
 </div>
 

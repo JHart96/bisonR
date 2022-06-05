@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">bisonR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -138,17 +138,17 @@
 <span class="co">#&gt; 6    Rey   Leia Lifeform Lifeform     1        B</span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_edge</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edge_model.html">edge_model</a></span><span class="op">(</span><span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="fl">1</span><span class="op">)</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1</span>, <span class="va">node_2</span><span class="op">)</span>, data<span class="op">=</span><span class="va">df</span>, data_type<span class="op">=</span><span class="st">"binary"</span>, mc_cores<span class="op">=</span><span class="fl">4</span>, verbose<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; Warning in '/tmp/RtmpulvZPY/model-3a0e435ae931.stan', line 5, column 2: Declaration</span>
+<span class="co">#&gt; Warning in '/tmp/RtmpUaw6ff/model-3a532d5ce5c2.stan', line 5, column 2: Declaration</span>
 <span class="co">#&gt;     of arrays by placing brackets after a variable name is deprecated and</span>
 <span class="co">#&gt;     will be removed in Stan 2.32.0. Instead use the array keyword before the</span>
 <span class="co">#&gt;     type. This can be changed automatically using the auto-format flag to</span>
 <span class="co">#&gt;     stanc</span>
-<span class="co">#&gt; Warning in '/tmp/RtmpulvZPY/model-3a0e435ae931.stan', line 6, column 2: Declaration</span>
+<span class="co">#&gt; Warning in '/tmp/RtmpUaw6ff/model-3a532d5ce5c2.stan', line 6, column 2: Declaration</span>
 <span class="co">#&gt;     of arrays by placing brackets after a variable name is deprecated and</span>
 <span class="co">#&gt;     will be removed in Stan 2.32.0. Instead use the array keyword before the</span>
 <span class="co">#&gt;     type. This can be changed automatically using the auto-format flag to</span>
 <span class="co">#&gt;     stanc</span>
-<span class="co">#&gt; Warning in '/tmp/RtmpulvZPY/model-3a0e435ae931.stan', line 28, column 2: Declaration</span>
+<span class="co">#&gt; Warning in '/tmp/RtmpUaw6ff/model-3a532d5ce5c2.stan', line 28, column 2: Declaration</span>
 <span class="co">#&gt;     of arrays by placing brackets after a variable name is deprecated and</span>
 <span class="co">#&gt;     will be removed in Stan 2.32.0. Instead use the array keyword before the</span>
 <span class="co">#&gt;     type. This can be changed automatically using the auto-format flag to</span>
@@ -179,7 +179,7 @@
 <span class="co">#&gt; Chain 2 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
 <span class="co">#&gt; Chain 3 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
 <span class="co">#&gt; Chain 4 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 1 finished in 3.1 seconds.</span>
+<span class="co">#&gt; Chain 1 finished in 3.0 seconds.</span>
 <span class="co">#&gt; Chain 2 finished in 3.0 seconds.</span>
 <span class="co">#&gt; Chain 3 finished in 3.0 seconds.</span>
 <span class="co">#&gt; Chain 4 finished in 3.0 seconds.</span>
@@ -213,12 +213,7 @@
 <span class="co">#&gt; Chain 3 Iteration:    1 / 2000 [  0%]  (Warmup) </span>
 <span class="co">#&gt; Chain 3 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
 <span class="co">#&gt; Chain 4 Iteration:    1 / 2000 [  0%]  (Warmup) </span>
-<span class="co">#&gt; Chain 4 Iteration:  500 / 2000 [ 25%]  (Warmup)</span>
-<span class="co">#&gt; Chain 4 Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:</span>
-<span class="co">#&gt; Chain 4 Exception: multi_normal_lpdf: LDLT_Factor of covariance parameter is not positive definite.  last conditional variance is -nan. (in '/tmp/RtmpulvZPY/model-3a0e1b771ef6.stan', line 21, column 2 to column 102)</span>
-<span class="co">#&gt; Chain 4 If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,</span>
-<span class="co">#&gt; Chain 4 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.</span>
-<span class="co">#&gt; Chain 4</span>
+<span class="co">#&gt; Chain 4 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
 <span class="co">#&gt; Chain 1 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
 <span class="co">#&gt; Chain 1 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 1 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
@@ -236,13 +231,13 @@
 <span class="co">#&gt; Chain 2 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
 <span class="co">#&gt; Chain 3 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
 <span class="co">#&gt; Chain 4 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 2 finished in 0.4 seconds.</span>
-<span class="co">#&gt; Chain 3 finished in 0.5 seconds.</span>
+<span class="co">#&gt; Chain 2 finished in 0.5 seconds.</span>
+<span class="co">#&gt; Chain 3 finished in 0.4 seconds.</span>
 <span class="co">#&gt; Chain 4 finished in 0.4 seconds.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; All 4 chains finished successfully.</span>
 <span class="co">#&gt; Mean chain execution time: 0.4 seconds.</span>
-<span class="co">#&gt; Total execution time: 0.6 seconds.</span></code></pre></div>
+<span class="co">#&gt; Total execution time: 0.5 seconds.</span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/fit-method-summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_node</span><span class="op">)</span>
 <span class="co">#&gt; === Fitted nodal regression model ===</span>
@@ -250,9 +245,9 @@
 <span class="co">#&gt; Number of nodes: 8</span>
 <span class="co">#&gt; === Coefficient summary ===                         </span>
 <span class="co">#&gt; variable                     50%     5%   95%</span>
-<span class="co">#&gt;   intercept                1.468  0.501 2.491</span>
-<span class="co">#&gt;   fixed_node_typeDroid    -0.029 -1.044 0.945</span>
-<span class="co">#&gt;   fixed_node_typeLifeform  1.600  0.578 2.549</span></code></pre></div>
+<span class="co">#&gt;   intercept                1.510  0.579 2.407</span>
+<span class="co">#&gt;   fixed_node_typeDroid    -0.072 -1.001 0.856</span>
+<span class="co">#&gt;   fixed_node_typeLifeform  1.550  0.634 2.506</span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_trace.html">plot_trace</a></span><span class="op">(</span><span class="va">fit_node</span><span class="op">)</span></code></pre></div>
 <p><img src="nodal_regression_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
@@ -262,7 +257,7 @@
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/get_contrasts.html">get_contrasts</a></span><span class="op">(</span><span class="va">fit_node</span>, <span class="st">"fixed_node_typeLifeform"</span>, <span class="st">"fixed_node_typeDroid"</span><span class="op">)</span>
 <span class="co">#&gt;   50%    5%   95% </span>
-<span class="co">#&gt; 1.625 1.252 1.958</span></code></pre></div>
+<span class="co">#&gt; 1.636 1.256 1.971</span></code></pre></div>
   </main>
 </div>
 

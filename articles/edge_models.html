@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">bisonR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -126,17 +126,17 @@
 <span class="co">#&gt; 6    Rey   Leia Lifeform Lifeform     1        B</span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_edge</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edge_model.html">edge_model</a></span><span class="op">(</span><span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="fl">1</span><span class="op">)</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1</span>, <span class="va">node_2</span><span class="op">)</span>, data<span class="op">=</span><span class="va">df</span>, data_type<span class="op">=</span><span class="st">"binary"</span>, mc_cores<span class="op">=</span><span class="fl">4</span>, verbose<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; Warning in '/tmp/Rtmp8f9755/model-39631fd8faf7.stan', line 5, column 2: Declaration</span>
+<span class="co">#&gt; Warning in '/tmp/RtmpfD3xIs/model-39aa3e453377.stan', line 5, column 2: Declaration</span>
 <span class="co">#&gt;     of arrays by placing brackets after a variable name is deprecated and</span>
 <span class="co">#&gt;     will be removed in Stan 2.32.0. Instead use the array keyword before the</span>
 <span class="co">#&gt;     type. This can be changed automatically using the auto-format flag to</span>
 <span class="co">#&gt;     stanc</span>
-<span class="co">#&gt; Warning in '/tmp/Rtmp8f9755/model-39631fd8faf7.stan', line 6, column 2: Declaration</span>
+<span class="co">#&gt; Warning in '/tmp/RtmpfD3xIs/model-39aa3e453377.stan', line 6, column 2: Declaration</span>
 <span class="co">#&gt;     of arrays by placing brackets after a variable name is deprecated and</span>
 <span class="co">#&gt;     will be removed in Stan 2.32.0. Instead use the array keyword before the</span>
 <span class="co">#&gt;     type. This can be changed automatically using the auto-format flag to</span>
 <span class="co">#&gt;     stanc</span>
-<span class="co">#&gt; Warning in '/tmp/Rtmp8f9755/model-39631fd8faf7.stan', line 28, column 2: Declaration</span>
+<span class="co">#&gt; Warning in '/tmp/RtmpfD3xIs/model-39aa3e453377.stan', line 28, column 2: Declaration</span>
 <span class="co">#&gt;     of arrays by placing brackets after a variable name is deprecated and</span>
 <span class="co">#&gt;     will be removed in Stan 2.32.0. Instead use the array keyword before the</span>
 <span class="co">#&gt;     type. This can be changed automatically using the auto-format flag to</span>
@@ -146,31 +146,31 @@
 <span class="co">#&gt; Chain 1 Iteration:    1 / 2000 [  0%]  (Warmup) </span>
 <span class="co">#&gt; Chain 2 Iteration:    1 / 2000 [  0%]  (Warmup) </span>
 <span class="co">#&gt; Chain 3 Iteration:    1 / 2000 [  0%]  (Warmup) </span>
+<span class="co">#&gt; Chain 3 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
 <span class="co">#&gt; Chain 4 Iteration:    1 / 2000 [  0%]  (Warmup) </span>
 <span class="co">#&gt; Chain 1 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
 <span class="co">#&gt; Chain 2 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
-<span class="co">#&gt; Chain 3 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
 <span class="co">#&gt; Chain 4 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
 <span class="co">#&gt; Chain 1 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
 <span class="co">#&gt; Chain 1 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
+<span class="co">#&gt; Chain 2 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
+<span class="co">#&gt; Chain 2 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 3 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
 <span class="co">#&gt; Chain 3 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 4 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
-<span class="co">#&gt; Chain 2 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
-<span class="co">#&gt; Chain 2 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 4 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 1 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
-<span class="co">#&gt; Chain 2 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 3 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
+<span class="co">#&gt; Chain 2 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 4 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 1 finished in 2.9 seconds.</span>
+<span class="co">#&gt; Chain 1 finished in 3.0 seconds.</span>
+<span class="co">#&gt; Chain 2 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
 <span class="co">#&gt; Chain 3 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
 <span class="co">#&gt; Chain 4 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
+<span class="co">#&gt; Chain 2 finished in 3.1 seconds.</span>
 <span class="co">#&gt; Chain 3 finished in 3.0 seconds.</span>
 <span class="co">#&gt; Chain 4 finished in 3.0 seconds.</span>
-<span class="co">#&gt; Chain 2 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 2 finished in 3.1 seconds.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; All 4 chains finished successfully.</span>
 <span class="co">#&gt; Mean chain execution time: 3.0 seconds.</span>
@@ -187,7 +187,7 @@
 <span class="co">#&gt; Number of dyads: 28</span>
 <span class="co">#&gt; Directed: FALSE</span>
 <span class="co">#&gt; === Edge list summary ===</span>
-<span class="co">#&gt; 0.802 1.848 2.087 1.278 1.056 0.702 -2.353 -2.248 -1.222 -1.582 -0.836 -1.701 -0.774 -1.541 -1.2 -1.167 -1.319 -1.753 -1.154 -1.32 -1.476 -1.432 -1.366 -1.736 -1.313 -1.616 -2.185 -0.576 -0.06 1.223 1.355 0.354 0.412 -0.162 -3.365 -3.187 -1.892 -2.272 -1.37 -2.905 -1.378 -2.29 -1.81 -2.092 -1.901 -2.58 -1.728 -2.268 -2.057 -2.065 -2.288 -2.482 -1.99 -2.633 -3.211 -1.351 1.726 2.561 2.929 2.301 1.781 1.629 -1.498 -1.459 -0.608 -0.972 -0.336 -0.625 -0.21 -0.844 -0.65 -0.328 -0.79 -1.02 -0.633 -0.472 -0.938 -0.849 -0.569 -1.093 -0.729 -0.694 -1.282 0.132</span></code></pre></div>
+<span class="co">#&gt; 0.79 1.865 2.072 1.275 1.065 0.71 -2.348 -2.252 -1.216 -1.596 -0.829 -1.688 -0.789 -1.53 -1.202 -1.173 -1.306 -1.754 -1.164 -1.315 -1.479 -1.434 -1.381 -1.745 -1.32 -1.618 -2.195 -0.566 -0.068 1.211 1.371 0.32 0.408 -0.16 -3.418 -3.161 -1.936 -2.294 -1.374 -2.814 -1.385 -2.278 -1.8 -2.146 -1.899 -2.525 -1.728 -2.217 -2.07 -2.074 -2.264 -2.487 -1.999 -2.656 -3.244 -1.328 1.735 2.594 2.936 2.398 1.786 1.656 -1.475 -1.48 -0.582 -0.963 -0.318 -0.677 -0.22 -0.884 -0.634 -0.318 -0.807 -1.058 -0.643 -0.506 -0.936 -0.873 -0.57 -1.085 -0.723 -0.725 -1.252 0.156</span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_network.html">plot_network</a></span><span class="op">(</span><span class="va">fit_edge</span>, lwd<span class="op">=</span><span class="fl">2</span><span class="op">)</span></code></pre></div>
 <p><img src="edge_models_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
