@@ -42,8 +42,14 @@ df_reg
 df_reg$relatedness <- as.factor(sample(1:3, 28, replace=TRUE))
 df_reg
 ```
+
 ```{r}
 fit_dyad <- dyadic_regression(dyad(node_1, node_2) ~ dyad_type, fit_edge, df_reg, mm=FALSE)
+```
+
+```{r}
+formula <- dyad(node_1, node_2) ~ dyad_type + (1 | lineage)
+# get_dyadic_regression_spec(formula)
 ```
 
 ```{r}

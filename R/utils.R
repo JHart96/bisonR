@@ -50,3 +50,8 @@ get_contrasts <- function(obj, parameter_1, parameter_2, ci=0.90) {
   beta_quant <- quantile(beta_diff, probs=c(0.5, 0.5 * (1 - ci), ci + 0.5 * (1 - ci)))
   return(round(beta_quant, 3))
 }
+
+build_stan_model <- function(model_name) {
+  model_filepath <- system.file("stan", paste0(model_name, ".stan"), package="bisonR")
+  model <- cmdstanr::cmdstan_model(model_filepath)
+}

@@ -39,7 +39,7 @@ dyadic_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, m
     node_ids_2=node_ids_2,
     include_multimembership=as.integer(mm)
   )
-  model <- build_stan_model(stan_model_dyadic_regression_code)
+  model <- build_stan_model("dyadic_regression")
   fit <- model$sample(data=model_data, chains=4, parallel_chains=mc_cores, refresh=refresh)
   chain <- fit$draws("beta_fixed", format="matrix")
   obj <- list()
@@ -235,7 +235,60 @@ build_design_matrix <- function(formula, data) {
   return(list(lpar=lpar, X=as.matrix(X[, -1]), Z=as.matrix(Z[, -1])))
 }
 
-# Processes formula and returns information about the model configuration
-read_formula <- function(formula) {
+get_dyadic_regression_spec <- function(formula) {
+  model_spec <- list()
 
+  x <- str_split(deparse1(formula), "~")[[1]]
+  lhs <- x[1]
+  rhs <- x[2]
+
+  # Process left hand side
+  lhs_split <- str_split(lhs, "\\|")[[1]]
+  event_var_name <- lhs_split[1]
+  event_var_name <- str_replace_all(event_var_name, "\\(", "")
+  event_var_name <- str_replace_all(event_var_name, " ", "")
+  model_spec$event_var_name <- event_var_name
+
+  divisor_var_name <- lhs_split[2]
+  divisor_var_name <- str_replace_all(divisor_var_name, "\\)", "")
+  divisor_var_name <- str_replace_all(divisor_var_name, " ", "")
+  model_spec$divisor_var_name <- divisor_var_name
+
+  # Set intercept to false by default
+  model_spec$intercept <- FALSE
+
+  model_spec$fixed <- c()
+  model_spec$random <- c()
+
+  rhs_split <- str_split(rhs, "\\+")[[1]]
+  for (term in rhs_split) {
+    term <- str_replace_all(term, " ", "")
+    # Is it an intercept, a dyad, a fixed effect, or a random effect?
+    if (!is.na(str_match(term, "^0|1$"))) {
+      # Intercept (or lack thereof)
+      if (term == "0") {
+        model_spec$intercept <- FALSE
+      } else {
+        model_spec$intercept <- TRUE
+      }
+    } else if (!is.na(str_match(term, "^dyad\\(.*,.*\\)$")[[1]])) {
+      # dyad(,) term
+      node_names <- str_split(term, "\\(|\\)")[[1]][2]
+      node_names <- str_replace_all(node_names, " ", "")
+      node_names_split <- str_split(node_names, ",")[[1]]
+      model_spec$node_1_name <- node_names_split[1]
+      model_spec$node_2_name <- node_names_split[2]
+    } else if (is.na(str_match(term, "[^a-zA-Z0-9]"))) {
+      # No non-alphanumeric characters, and it can't be an intercept, so it's a fixed effect
+      model_spec$fixed[length(model_spec$fixed) + 1] <- term
+    } else if (!is.na(str_match(term, "^\\(1\\|.*\\)$"))) {
+      # Contains a (1 | *) structure, so it's a basic random effect
+      term_name <- str_split(term, "\\(|\\||\\)")[[1]][3]
+      model_spec$random[length(model_spec$random) + 1] <- term_name
+    } else {
+      warning(paste0("Formula term \"", term, "\" not supported by bisonR. Check the formula is correctly specified."))
+    }
+  }
+
+  model_spec
 }

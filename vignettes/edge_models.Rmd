@@ -29,7 +29,13 @@ head(df)
 ```
 
 ```{r}
-fit_edge <- edge_model((event | 1) ~ dyad(node_1, node_2), data=df, data_type="binary", mc_cores=4, verbose=TRUE)
+priors <- list(
+  ""
+)
+```
+
+```{r}
+fit_edge <- edge_model((event | 1) ~ dyad(node_1, node_2), data=df, data_type="binary")
 ```
 
 ```{r}
@@ -37,7 +43,7 @@ plot_trace(fit_edge)
 ```
 
 ```{r}
-summary(fit_edge)
+summary(fit_edge) # 0.810 -0.051  1.740 
 ```
 
 ```{r}

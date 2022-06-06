@@ -16,7 +16,7 @@ require(bayesplot)
 #' @return
 #'
 #' @export
-edge_model <- function(formula, data, data_type=c("binary", "count", "duration"), directed=FALSE, method=c("mcmc", "vb", "inla"), verbose=FALSE, mc_cores=1) {
+edge_model <- function(formula, data, data_type=c("binary", "count", "duration"), directed=FALSE, method="mcmc", verbose=FALSE, mc_cores=4) {
   # If verbose, print out MCMC chains.
   if (verbose) {
     refresh <- 500
@@ -53,66 +53,22 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
     function(x) paste0(names(node_to_idx)[which(dyad_mapping == x, arr.ind=TRUE)[1, 2:1]], collapse=" <-> ")
   )
 
-  # Get divisor from formula
-  lhs <- as.character(formula.tools::lhs(formula))[2]
-  lhs_components <- str_split(str_replace_all(lhs, " ", ""), "\\|")[[1]]
-
-  if (suppressWarnings(any(!is.na(as.numeric(lhs_components[2]))))) {
-    divisor <- rep(as.numeric(lhs_components[2]), nrow(obs))
-  } else {
-    divisor <- data[, lhs_components[2]]
+  # Set up model data depending on data type.
+  if (data_type %in% c("binary", "count")) {
+    model_data <- prepare_data(formula, data, directed, node_to_idx, node_list, data_type)
+  } else if (data_type == "duration") {
+    model_data <- prepare_data(formula, list(obs=data, obs_agg=data_agg), directed, node_to_idx, node_list, data_type)
   }
 
-  # Set up model and model data depending on data type.
-  if (method %in% c("mcmc", "vb")) {
-    # If divisor is a single value, convert it to a list.
-    if (length(divisor) == 1) {
-      divisor <- rep(divisor, nrow(obs))
-    }
+  # Build model
+  model <- build_stan_model(data_type)
 
-    if (data_type == "binary") {
-      model_data <- prepare_data(formula, data, directed, node_to_idx, node_list, data_type)
-      model_data$divisor <- divisor
-      if (dim(model_data$Z)[2] > 0) {
-        # Mixed effects model
-        model <- build_stan_model(stan_model_binary_mixed_code)
-      } else {
-        # Fixed effects model
-        model <- build_stan_model(stan_model_binary_fixed_code)
-      }
-    }
-    if (data_type == "count") {
-      model_data <- prepare_data(formula, data, directed, node_to_idx, node_list, data_type)
-      model_data$divisor <- divisor
-      if (dim(model_data$Z)[2] > 0) {
-        # Mixed effects model
-        model <- build_stan_model(stan_model_count_mixed_code)
-      } else {
-        # Fixed effects model
-        model <- build_stan_model(stan_model_count_fixed_code)
+  # Fit model
+  fit <- model$sample(data=model_data, refresh=refresh, chains=4, parallel_chains=mc_cores)
 
-      }
-    }
-    if (data_type == "duration") {
-      model_data <- prepare_data(formula, list(obs=data, obs_agg=data_agg), directed, node_to_idx, node_list, data_type)
-      if (dim(model_data$Z)[2] > 0) {
-        # Mixed effects model
-        stop("Not yet supported")
-      } else {
-        # Fixed effects model
-        model <- build_stan_model(stan_model_duration_fixed_code)
-      }
-    }
-    # Fit model
-    if (method == "mcmc"){
-      fit <- model$sample(data=model_data, refresh=refresh, chains=4, parallel_chains=mc_cores)
-    }
-
-    # Extract edge weights from fitted edge model.
-    chain <- fit$draws("beta_fixed", format="matrix")
-    colnames(chain) <- colnames(data$X)
-
-  }
+  # Extract edge weights from fitted edge model.
+  chain <- fit$draws("beta_fixed", format="matrix")
+  colnames(chain) <- colnames(data$X)
 
   # Prepare output object.
   obj <- list()
@@ -168,7 +124,7 @@ print.edge_model <- function(obj, ci=0.90) {
   dyad_names <- do.call(paste, c(get_edgelist(fit_edge)[, 1:2], sep=" <-> "))
   summary_matrix <- as.matrix(edgelist[, 3:5])
   rownames(summary_matrix) <- dyad_names
-  cat(summary_matrix)
+  print(summary_matrix)
 }
 
 #' Retrieves an edgelist with uncertainty for a fitted edge weight model object
@@ -344,13 +300,27 @@ prepare_data <- function(formula, observations, directed, node_to_idx, node_list
 
   # Get additional random effects
   if (!is.null(model_spec$random)) {
-    var_group <- paste0("random_", term_name)
-    term_levels <- levels(as.factor(observations[, term_name]))
-    for (term_level in term_levels) {
-      new_term_name <-  paste0("random_", term_name, term_level)
-      Z[, new_term_name] <- 1 * (as.factor(observations[, term_name]) == term_level)
-      G[length(G) + 1] <- var_group
+    for (term_name in model_spec$random) {
+      var_group <- paste0("random_", term_name)
+      term_levels <- levels(as.factor(observations[, term_name]))
+      for (term_level in term_levels) {
+        new_term_name <-  paste0("random_", term_name, term_level)
+        Z[, new_term_name] <- 1 * (as.factor(observations[, term_name]) == term_level)
+        G[length(G) + 1] <- var_group
+      }
     }
+  }
+
+  # Check if divisor is a real
+  if (!is.na(str_match(model_spec$divisor_var_name, "\\d+"))) {
+    divisor <- rep(as.numeric(model_spec$divisor_var_name), nrow(observations))
+  } else {
+    divisor <- observations[, model_spec$divisor_var_name]
+  }
+
+  # If divisor is a single value, convert it to a list.
+  if (length(divisor) == 1) {
+    divisor <- rep(divisor, nrow(obs))
   }
 
   data <- list(
@@ -366,7 +336,8 @@ prepare_data <- function(formula, observations, directed, node_to_idx, node_list
     node_to_idx=node_to_idx,
     dyad_id=dyad_id,
     dyad_ids=as.integer(dyad_ids),
-    num_nodes=n
+    num_nodes=n,
+    divisor=divisor
     # sri=sri
   )
 
