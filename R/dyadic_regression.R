@@ -19,6 +19,8 @@ dyadic_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, m
   num_nodes <- edgemodel$num_nodes
   N <- edgemodel$num_dyads
   K_fixed <- ncol(design_matrices$X)
+  K_random <- ncol(design_matrices$Z)
+  R <- length(unique(design_matrices$G))
 
   node_ids_1 <- edgemodel$node_to_idx[as.vector(df[all.vars(formula)[1]][, 1])]
   node_ids_2 <- edgemodel$node_to_idx[as.vector(df[all.vars(formula)[2]][, 1])]
@@ -32,9 +34,13 @@ dyadic_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, m
     N=N,
     num_nodes=num_nodes,
     K_fixed=K_fixed,
+    K_random=K_random,
     edge_mu=edge_mu,
     edge_cov=edge_cov,
     X=design_matrices$X,
+    Z=design_matrices$Z,
+    R=R,
+    G=design_matrices$G,
     node_ids_1=node_ids_1,
     node_ids_2=node_ids_2,
     include_multimembership=as.integer(mm)
@@ -152,87 +158,54 @@ build_design_matrix <- function(formula, data) {
   lpar <- list()
   hyper <- c() # Vector of hyperparameters.
 
+  # Get model specification
+  model_spec <- get_dyadic_regression_spec(formula)
+
   # If there is an intercept
-  if (attr(terms(formula), "intercept") == 1) {
-    lpar$intercept = 0
+  if (model_spec$intercept) {
     X[, "intercept"] <- 1
   }
 
-  #
-
-  model_terms <- labels(terms(formula))
-
   # print(model_terms)
 
-  if (length(model_terms) > 0) {
-    for (i in 1:length(model_terms)) {
-      if (any(grep("dyad\\(.*,.*\\)", model_terms[i]))) {
-        # Node multimembership effect
-        var_group <- "node"
-        lpar[[var_group]] <- c()
+  # Variable grouping for random effects
+  G <- c()
 
-        # Get ID names in a different way. Can't rely on them being first in model terms.
-        id_vars <- sapply(colnames(data), function(x) grepl(x, model_terms[i]))
-        id_names <- names(id_vars[id_vars == TRUE])
-        term_levels <- levels(as.factor(unique(c(data[, id_names[1]], data[, id_names[2]]))))
-
+  # Get additional fixed effects
+  if (!is.null(model_spec$fixed)) {
+    for (term_name in model_spec$fixed) {
+      # If it's a factor, create a column for each level.
+      if (is.factor(data[, term_name])) {
+        var_group <- paste0("fixed_", term_name)
+        term_levels <- levels(data[, term_name])
         for (term_level in term_levels) {
-          new_term_name <-  paste0("node_", term_level)
-          Z[, new_term_name] <- 1 * (as.factor(data[, id_names[1]]) == term_level)
-          Z[, new_term_name] <- Z[, new_term_name] + 1 * (as.factor(data[, id_names[2]]) == term_level)
-
-          lpar[[var_group]][[new_term_name]] <- 0
-          hyper[paste0(var_group, "_mu")] <- 0
-          hyper[paste0(var_group, "_sigma")] <- 0 # Will get exp.
-        }
-
-      } else if (any(grep("\\l", model_terms[i]))) {
-        # Random effect
-
-        # Extract term name
-        term_vars <- sapply(colnames(data), function(x) grepl(x, model_terms[i]))
-        term_var <- term_vars[term_vars == TRUE][1]
-        term_name <- names(term_var)
-
-        # Create variable grouping
-        var_group <- paste0("random_", term_name)
-        lpar[[var_group]] <- c()
-        term_levels <- levels(as.factor(data[, term_name]))
-        for (term_level in term_levels) {
-          new_term_name <-  paste0("random_", term_name, term_level)
-          Z[, new_term_name] <- 1 * (as.factor(data[, term_name]) == term_level)
-          lpar[[var_group]][[new_term_name]] <- 0
-          hyper[paste0(var_group, "_mu")] <- 0
-          hyper[paste0(var_group, "_sigma")] <- 0 # Will get exp.
+          new_term_name <-  paste0("fixed_", term_name, term_level)
+          X[, new_term_name] <- 1 * (data[, term_name] == term_level)
         }
       } else {
-        # Fixed effect
-        term_vars <- sapply(colnames(data), function(x) grepl(model_terms[i], x)) ## Change how this gets processed
-        term_var <- term_vars[term_vars == TRUE][1]
-        term_name <- names(term_var)
-        # If it's a factor, create a column for each level.
-        if (is.factor(data[, term_name])) {
-          var_group <- paste0("fixed_", term_name)
-          lpar[[var_group]] <- c()
-          term_levels <- levels(data[, term_name])
-          for (term_level in term_levels) {
-            new_term_name <-  paste0("fixed_", term_name, term_level)
-            X[, new_term_name] <- 1 * (data[, term_name] == term_level)
-            lpar[[var_group]][[new_term_name]] <- 0
-          }
-        } else {
-          # Otherwise, create a single column:
-          new_term_name <- paste0(c("fixed_", term_name), collapse="")
-          X[, new_term_name] <- data[, term_name]
-          lpar[[new_term_name]] <- 0
-        }
+        # Otherwise, create a single column:
+        new_term_name <- paste0(c("fixed_", term_name), collapse="")
+        X[, new_term_name] <- data[, term_name]
+      }
+    }
+  }
+
+  # Get additional random effects
+  if (!is.null(model_spec$random)) {
+    for (term_name in model_spec$random) {
+      var_group <- paste0("random_", term_name)
+      term_levels <- levels(as.factor(data[, term_name]))
+      for (term_level in term_levels) {
+        new_term_name <-  paste0("random_", term_name, term_level)
+        Z[, new_term_name] <- 1 * (as.factor(data[, term_name]) == term_level)
+        G[length(G) + 1] <- var_group
       }
     }
   }
 
   lpar$hyper <- hyper
 
-  return(list(lpar=lpar, X=as.matrix(X[, -1]), Z=as.matrix(Z[, -1])))
+  return(list(X=as.matrix(X[, -1]), Z=as.matrix(Z[, -1]), G=G))
 }
 
 get_dyadic_regression_spec <- function(formula) {
@@ -242,20 +215,23 @@ get_dyadic_regression_spec <- function(formula) {
   lhs <- x[1]
   rhs <- x[2]
 
-  # Process left hand side
-  lhs_split <- str_split(lhs, "\\|")[[1]]
-  event_var_name <- lhs_split[1]
-  event_var_name <- str_replace_all(event_var_name, "\\(", "")
-  event_var_name <- str_replace_all(event_var_name, " ", "")
-  model_spec$event_var_name <- event_var_name
+  # Remove whitespace
+  lhs <- stringr::str_replace_all(lhs, " ", "")
+  rhs <- stringr::str_replace_all(rhs, " ", "")
 
-  divisor_var_name <- lhs_split[2]
-  divisor_var_name <- str_replace_all(divisor_var_name, "\\)", "")
-  divisor_var_name <- str_replace_all(divisor_var_name, " ", "")
-  model_spec$divisor_var_name <- divisor_var_name
+  # If lhs is a dyad term
+  if (!is.na(str_match(lhs, "^dyad\\(.*,.*\\)$")[[1]])) {
+    # dyad(,) term
+    model_spec$dyad_side <- "lhs"
+    node_names <- str_split(lhs, "\\(|\\)")[[1]][2]
+    node_names <- str_replace_all(node_names, " ", "")
+    node_names_split <- str_split(node_names, ",")[[1]]
+    model_spec$node_1_name <- node_names_split[1]
+    model_spec$node_2_name <- node_names_split[2]
+  }
 
-  # Set intercept to false by default
-  model_spec$intercept <- FALSE
+  # Set intercept to true by default
+  model_spec$intercept <- TRUE
 
   model_spec$fixed <- c()
   model_spec$random <- c()
@@ -273,12 +249,13 @@ get_dyadic_regression_spec <- function(formula) {
       }
     } else if (!is.na(str_match(term, "^dyad\\(.*,.*\\)$")[[1]])) {
       # dyad(,) term
+      model_spec$dyad_side <- "rhs"
       node_names <- str_split(term, "\\(|\\)")[[1]][2]
       node_names <- str_replace_all(node_names, " ", "")
       node_names_split <- str_split(node_names, ",")[[1]]
       model_spec$node_1_name <- node_names_split[1]
       model_spec$node_2_name <- node_names_split[2]
-    } else if (is.na(str_match(term, "[^a-zA-Z0-9]"))) {
+    } else if (is.na(str_match(term, "[^a-zA-Z0-9_]"))) {
       # No non-alphanumeric characters, and it can't be an intercept, so it's a fixed effect
       model_spec$fixed[length(model_spec$fixed) + 1] <- term
     } else if (!is.na(str_match(term, "^\\(1\\|.*\\)$"))) {

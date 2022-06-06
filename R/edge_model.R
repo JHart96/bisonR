@@ -397,7 +397,7 @@ get_edge_model_spec <- function(formula) {
       node_names_split <- str_split(node_names, ",")[[1]]
       model_spec$node_1_name <- node_names_split[1]
       model_spec$node_2_name <- node_names_split[2]
-    } else if (is.na(str_match(term, "[^a-zA-Z0-9]"))) {
+    } else if (is.na(str_match(term, "[^a-zA-Z0-9_]"))) {
       # No non-alphanumeric characters, and it can't be an intercept, so it's a fixed effect
       model_spec$fixed[length(model_spec$fixed) + 1] <- term
     } else if (!is.na(str_match(term, "^\\(1\\|.*\\)$"))) {

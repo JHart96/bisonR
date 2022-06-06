@@ -9,9 +9,9 @@ edge_model(
   data,
   data_type = c("binary", "count", "duration"),
   directed = FALSE,
-  method = c("mcmc", "vb", "inla"),
+  method = "mcmc",
   verbose = FALSE,
-  mc_cores = 1
+  mc_cores = 4
 )
 }
 \arguments{
