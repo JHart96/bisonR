@@ -65,7 +65,7 @@ jobs:
         run: |
           version <- Sys.getenv("CMDSTAN_VERSION")
           url <- sprintf("https://github.com/stan-dev/cmdstan/releases/download/v%s/cmdstan-%s.tar.gz", version, version)
-          cmdstanr::install_cmdstan(cores = 4, release_url = url)
+          cmdstanr::install_cmdstan()
         shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v1

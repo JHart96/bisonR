@@ -19,17 +19,6 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v1
 
-      - name: Platform-independent cmdstan path
-        run: |
-          path <- normalizePath(file.path("~", ".cmdstanr"), mustWork = FALSE)
-          print(path)
-          writeLines(path, ".github/cmdstan_path")
-        shell: Rscript {0}
-
-      - name: cmdstan env vars
-        run: echo "CMDSTAN_PATH=$(cat .github/cmdstan_path)" >> $GITHUB_ENV
-        shell: bash
-
       - uses: r-lib/actions/setup-r@v1
         with:
           use-public-rspm: true
@@ -39,17 +28,9 @@ jobs:
           extra-packages: pkgdown
           needs: website
 
-      - name: Cache cmdstan
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.CMDSTAN_PATH }}
-          key: ${{ runner.os }}-cmdstan-2-${{ env.CMDSTAN_VERSION }}
-
       - name: Install cmdstan
         run: |
-          version <- Sys.getenv("CMDSTAN_VERSION")
-          url <- sprintf("https://github.com/stan-dev/cmdstan/releases/download/v%s/cmdstan-%s.tar.gz", version, version)
-          cmdstanr::install_cmdstan(cores = 4, release_url = url)
+          cmdstanr::install_cmdstan()
         shell: Rscript {0}
 
       - name: Deploy package
