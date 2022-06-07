@@ -145,32 +145,32 @@
 <span class="co">#&gt; Chain 3 Iteration:    1 / 2000 [  0%]  (Warmup) </span>
 <span class="co">#&gt; Chain 4 Iteration:    1 / 2000 [  0%]  (Warmup) </span>
 <span class="co">#&gt; Chain 1 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
-<span class="co">#&gt; Chain 2 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
 <span class="co">#&gt; Chain 3 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
+<span class="co">#&gt; Chain 2 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
 <span class="co">#&gt; Chain 4 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
+<span class="co">#&gt; Chain 3 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
+<span class="co">#&gt; Chain 3 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 1 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
 <span class="co">#&gt; Chain 1 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 2 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
 <span class="co">#&gt; Chain 2 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
-<span class="co">#&gt; Chain 3 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
-<span class="co">#&gt; Chain 3 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 4 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
 <span class="co">#&gt; Chain 4 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
-<span class="co">#&gt; Chain 1 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 3 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
-<span class="co">#&gt; Chain 2 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
+<span class="co">#&gt; Chain 1 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 4 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
+<span class="co">#&gt; Chain 2 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
+<span class="co">#&gt; Chain 3 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
+<span class="co">#&gt; Chain 3 finished in 2.5 seconds.</span>
+<span class="co">#&gt; Chain 4 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
+<span class="co">#&gt; Chain 4 finished in 2.6 seconds.</span>
 <span class="co">#&gt; Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
 <span class="co">#&gt; Chain 2 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 3 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
 <span class="co">#&gt; Chain 1 finished in 2.7 seconds.</span>
-<span class="co">#&gt; Chain 2 finished in 2.7 seconds.</span>
-<span class="co">#&gt; Chain 3 finished in 2.6 seconds.</span>
-<span class="co">#&gt; Chain 4 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 4 finished in 2.7 seconds.</span>
+<span class="co">#&gt; Chain 2 finished in 2.8 seconds.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; All 4 chains finished successfully.</span>
-<span class="co">#&gt; Mean chain execution time: 2.6 seconds.</span>
+<span class="co">#&gt; Mean chain execution time: 2.7 seconds.</span>
 <span class="co">#&gt; Total execution time: 2.9 seconds.</span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df_reg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>
@@ -188,7 +188,21 @@
 <span class="co">#&gt; 7   R2-D2     Droid</span>
 <span class="co">#&gt; 8     D-O     Droid</span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fit_node</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nodal_regression.html">nodal_regression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/strength.html" class="external-link">strength</a></span><span class="op">(</span><span class="va">node_names</span><span class="op">)</span> <span class="op">~</span> <span class="va">node_type</span>, <span class="va">fit_edge</span>, <span class="va">df_reg</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_default_priors.html">get_default_priors</a></span><span class="op">(</span><span class="st">"nodal_regression"</span><span class="op">)</span>
+<span class="va">priors</span>
+<span class="co">#&gt; $fixed</span>
+<span class="co">#&gt; [1] "normal(0, 1)"</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $random_mean</span>
+<span class="co">#&gt; [1] "normal(0, 1)"</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $random_std</span>
+<span class="co">#&gt; [1] "half-normal(1)"</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $error</span>
+<span class="co">#&gt; [1] "half-normal(1)"</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">fit_node</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nodal_regression.html">nodal_regression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/igraph/man/strength.html" class="external-link">strength</a></span><span class="op">(</span><span class="va">node_names</span><span class="op">)</span> <span class="op">~</span> <span class="va">node_type</span>, <span class="va">fit_edge</span>, <span class="va">df_reg</span>, priors<span class="op">=</span><span class="va">priors</span><span class="op">)</span>
 <span class="co">#&gt; Running MCMC with 4 parallel chains...</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Chain 1 Iteration:    1 / 2000 [  0%]  (Warmup) </span>
@@ -209,40 +223,40 @@
 <span class="co">#&gt; Chain 4 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 1 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 2 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
-<span class="co">#&gt; Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 2 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
 <span class="co">#&gt; Chain 3 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 4 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
+<span class="co">#&gt; Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
+<span class="co">#&gt; Chain 2 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
+<span class="co">#&gt; Chain 3 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
 <span class="co">#&gt; Chain 4 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
 <span class="co">#&gt; Chain 1 finished in 0.4 seconds.</span>
-<span class="co">#&gt; Chain 2 finished in 0.5 seconds.</span>
+<span class="co">#&gt; Chain 2 finished in 0.4 seconds.</span>
+<span class="co">#&gt; Chain 3 finished in 0.4 seconds.</span>
 <span class="co">#&gt; Chain 4 finished in 0.4 seconds.</span>
-<span class="co">#&gt; Chain 3 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 3 finished in 0.5 seconds.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; All 4 chains finished successfully.</span>
-<span class="co">#&gt; Mean chain execution time: 0.5 seconds.</span>
-<span class="co">#&gt; Total execution time: 0.6 seconds.</span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<span class="co">#&gt; Mean chain execution time: 0.4 seconds.</span>
+<span class="co">#&gt; Total execution time: 0.5 seconds.</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/fit-method-summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_node</span><span class="op">)</span>
 <span class="co">#&gt; === Fitted nodal regression model ===</span>
 <span class="co">#&gt; Formula: strength(node_names) ~ node_type</span>
 <span class="co">#&gt; Number of nodes: 8</span>
 <span class="co">#&gt; === Coefficient summary ===                         </span>
 <span class="co">#&gt; variable                     50%     5%   95%</span>
-<span class="co">#&gt;   intercept                1.535  0.569 2.564</span>
-<span class="co">#&gt;   fixed_node_typeDroid    -0.084 -1.122 0.895</span>
-<span class="co">#&gt;   fixed_node_typeLifeform  1.533  0.500 2.526</span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_trace.html">plot_trace</a></span><span class="op">(</span><span class="va">fit_node</span><span class="op">)</span></code></pre></div>
-<p><img src="nodal_regression_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<span class="co">#&gt;   intercept                1.497  0.479 2.482</span>
+<span class="co">#&gt;   fixed_node_typeDroid    -0.064 -1.047 0.977</span>
+<span class="co">#&gt;   fixed_node_typeLifeform  1.567  0.553 2.568</span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_predictions.html">plot_predictions</a></span><span class="op">(</span><span class="va">fit_node</span>, num_draws<span class="op">=</span><span class="fl">20</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="../reference/plot_trace.html">plot_trace</a></span><span class="op">(</span><span class="va">fit_node</span><span class="op">)</span></code></pre></div>
 <p><img src="nodal_regression_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/plot_predictions.html">plot_predictions</a></span><span class="op">(</span><span class="va">fit_node</span>, num_draws<span class="op">=</span><span class="fl">20</span><span class="op">)</span></code></pre></div>
+<p><img src="nodal_regression_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/get_contrasts.html">get_contrasts</a></span><span class="op">(</span><span class="va">fit_node</span>, <span class="st">"fixed_node_typeLifeform"</span>, <span class="st">"fixed_node_typeDroid"</span><span class="op">)</span>
 <span class="co">#&gt;   50%    5%   95% </span>
-<span class="co">#&gt; 1.618 1.245 1.956</span></code></pre></div>
+<span class="co">#&gt; 1.631 1.265 1.967</span></code></pre></div>
   </main>
 </div>
 
