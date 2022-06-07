@@ -90,14 +90,6 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">cmdstanr</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">install_cmdstan</a></span><span class="op">(</span>cores <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>
-<span class="co">#&gt; The C++ toolchain required for CmdStan is setup properly!</span>
-<span class="co">#&gt; * Latest CmdStan release is v2.29.2</span>
-<span class="co">#&gt; * Installing CmdStan v2.29.2 in /home/runner/.cmdstan/cmdstan-2.29.2</span>
-<span class="co">#&gt; * Downloading cmdstan-2.29.2.tar.gz from GitHub...</span>
-<span class="co">#&gt; Warning: An installation already exists at /home/runner/.cmdstan/cmdstan-2.29.2.</span>
-<span class="co">#&gt; Please remove or rename the installation folder or set overwrite=TRUE.</span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JHart96/bisonR" class="external-link">bisonR</a></span><span class="op">)</span>
 <span class="co">#&gt; Loading required package: cmdstanr</span>
 <span class="co">#&gt; This is cmdstanr version 0.5.2</span>
@@ -125,7 +117,7 @@
 <span class="co">#&gt; The following objects are masked from 'package:base':</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     intersect, setdiff, setequal, union</span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"binary_ex1"</span><span class="op">)</span>
 <span class="va">df</span> <span class="op">&lt;-</span> <span class="va">binary_ex1</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span>
@@ -136,7 +128,7 @@
 <span class="co">#&gt; 4    Rey   Leia Lifeform Lifeform     1        C</span>
 <span class="co">#&gt; 5    Rey   Leia Lifeform Lifeform     1        B</span>
 <span class="co">#&gt; 6    Rey   Leia Lifeform Lifeform     1        B</span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_edge</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edge_model.html">edge_model</a></span><span class="op">(</span><span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="fl">1</span><span class="op">)</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1</span>, <span class="va">node_2</span><span class="op">)</span>, data<span class="op">=</span><span class="va">df</span>, data_type<span class="op">=</span><span class="st">"binary"</span>, mc_cores<span class="op">=</span><span class="fl">4</span>, verbose<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; Running MCMC with 4 parallel chains...</span>
 <span class="co">#&gt; </span>
@@ -145,34 +137,34 @@
 <span class="co">#&gt; Chain 3 Iteration:    1 / 2000 [  0%]  (Warmup) </span>
 <span class="co">#&gt; Chain 4 Iteration:    1 / 2000 [  0%]  (Warmup) </span>
 <span class="co">#&gt; Chain 1 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
+<span class="co">#&gt; Chain 4 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
 <span class="co">#&gt; Chain 2 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
 <span class="co">#&gt; Chain 3 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
-<span class="co">#&gt; Chain 4 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
 <span class="co">#&gt; Chain 1 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
 <span class="co">#&gt; Chain 1 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
+<span class="co">#&gt; Chain 4 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
+<span class="co">#&gt; Chain 4 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 2 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
 <span class="co">#&gt; Chain 2 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 3 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
 <span class="co">#&gt; Chain 3 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
-<span class="co">#&gt; Chain 4 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
-<span class="co">#&gt; Chain 4 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 1 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
+<span class="co">#&gt; Chain 3 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 4 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 2 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
-<span class="co">#&gt; Chain 3 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 1 finished in 2.5 seconds.</span>
-<span class="co">#&gt; Chain 4 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 4 finished in 2.6 seconds.</span>
 <span class="co">#&gt; Chain 2 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
 <span class="co">#&gt; Chain 3 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 2 finished in 2.8 seconds.</span>
-<span class="co">#&gt; Chain 3 finished in 2.7 seconds.</span>
+<span class="co">#&gt; Chain 4 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
+<span class="co">#&gt; Chain 1 finished in 3.4 seconds.</span>
+<span class="co">#&gt; Chain 2 finished in 3.5 seconds.</span>
+<span class="co">#&gt; Chain 3 finished in 3.5 seconds.</span>
+<span class="co">#&gt; Chain 4 finished in 3.4 seconds.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; All 4 chains finished successfully.</span>
-<span class="co">#&gt; Mean chain execution time: 2.7 seconds.</span>
-<span class="co">#&gt; Total execution time: 2.9 seconds.</span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<span class="co">#&gt; Mean chain execution time: 3.4 seconds.</span>
+<span class="co">#&gt; Total execution time: 3.6 seconds.</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df_reg</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>dyad_type<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">type_1</span>, <span class="va">type_2</span>, sep<span class="op">=</span><span class="st">"-"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">node_1</span>, <span class="va">node_2</span>, <span class="va">dyad_type</span><span class="op">)</span>
@@ -210,38 +202,38 @@
 <span class="va">df_reg</span><span class="op">$</span><span class="va">relatedness</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/model-method-sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="fl">28</span>, replace<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="va">df_reg</span>
 <span class="co">#&gt;     node_1  node_2         dyad_type relatedness</span>
-<span class="co">#&gt; 1      Rey    Leia Lifeform-Lifeform           2</span>
-<span class="co">#&gt; 2      Rey Obi-Wan Lifeform-Lifeform           2</span>
-<span class="co">#&gt; 3      Rey    Luke Lifeform-Lifeform           1</span>
-<span class="co">#&gt; 4      Rey   C-3PO    Lifeform-Droid           2</span>
+<span class="co">#&gt; 1      Rey    Leia Lifeform-Lifeform           1</span>
+<span class="co">#&gt; 2      Rey Obi-Wan Lifeform-Lifeform           1</span>
+<span class="co">#&gt; 3      Rey    Luke Lifeform-Lifeform           3</span>
+<span class="co">#&gt; 4      Rey   C-3PO    Lifeform-Droid           1</span>
 <span class="co">#&gt; 5      Rey    BB-8    Lifeform-Droid           2</span>
 <span class="co">#&gt; 6      Rey   R2-D2    Lifeform-Droid           1</span>
 <span class="co">#&gt; 7      Rey     D-O    Lifeform-Droid           1</span>
-<span class="co">#&gt; 8     Leia Obi-Wan Lifeform-Lifeform           2</span>
-<span class="co">#&gt; 9     Leia    Luke Lifeform-Lifeform           2</span>
-<span class="co">#&gt; 10    Leia   C-3PO    Lifeform-Droid           1</span>
-<span class="co">#&gt; 11    Leia    BB-8    Lifeform-Droid           3</span>
-<span class="co">#&gt; 12    Leia   R2-D2    Lifeform-Droid           3</span>
-<span class="co">#&gt; 13    Leia     D-O    Lifeform-Droid           1</span>
+<span class="co">#&gt; 8     Leia Obi-Wan Lifeform-Lifeform           3</span>
+<span class="co">#&gt; 9     Leia    Luke Lifeform-Lifeform           3</span>
+<span class="co">#&gt; 10    Leia   C-3PO    Lifeform-Droid           3</span>
+<span class="co">#&gt; 11    Leia    BB-8    Lifeform-Droid           2</span>
+<span class="co">#&gt; 12    Leia   R2-D2    Lifeform-Droid           1</span>
+<span class="co">#&gt; 13    Leia     D-O    Lifeform-Droid           2</span>
 <span class="co">#&gt; 14 Obi-Wan    Luke Lifeform-Lifeform           2</span>
-<span class="co">#&gt; 15 Obi-Wan   C-3PO    Lifeform-Droid           2</span>
+<span class="co">#&gt; 15 Obi-Wan   C-3PO    Lifeform-Droid           1</span>
 <span class="co">#&gt; 16 Obi-Wan    BB-8    Lifeform-Droid           2</span>
 <span class="co">#&gt; 17 Obi-Wan   R2-D2    Lifeform-Droid           1</span>
-<span class="co">#&gt; 18 Obi-Wan     D-O    Lifeform-Droid           1</span>
-<span class="co">#&gt; 19    Luke   C-3PO    Lifeform-Droid           2</span>
+<span class="co">#&gt; 18 Obi-Wan     D-O    Lifeform-Droid           2</span>
+<span class="co">#&gt; 19    Luke   C-3PO    Lifeform-Droid           3</span>
 <span class="co">#&gt; 20    Luke    BB-8    Lifeform-Droid           1</span>
-<span class="co">#&gt; 21    Luke   R2-D2    Lifeform-Droid           1</span>
-<span class="co">#&gt; 22    Luke     D-O    Lifeform-Droid           2</span>
-<span class="co">#&gt; 23   C-3PO    BB-8       Droid-Droid           3</span>
-<span class="co">#&gt; 24   C-3PO   R2-D2       Droid-Droid           3</span>
-<span class="co">#&gt; 25   C-3PO     D-O       Droid-Droid           3</span>
+<span class="co">#&gt; 21    Luke   R2-D2    Lifeform-Droid           3</span>
+<span class="co">#&gt; 22    Luke     D-O    Lifeform-Droid           1</span>
+<span class="co">#&gt; 23   C-3PO    BB-8       Droid-Droid           1</span>
+<span class="co">#&gt; 24   C-3PO   R2-D2       Droid-Droid           2</span>
+<span class="co">#&gt; 25   C-3PO     D-O       Droid-Droid           2</span>
 <span class="co">#&gt; 26    BB-8   R2-D2       Droid-Droid           1</span>
 <span class="co">#&gt; 27    BB-8     D-O       Droid-Droid           3</span>
-<span class="co">#&gt; 28   R2-D2     D-O       Droid-Droid           2</span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<span class="co">#&gt; 28   R2-D2     D-O       Droid-Droid           3</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_default_priors.html">get_default_priors</a></span><span class="op">(</span><span class="st">"dyadic_regression"</span><span class="op">)</span>
 <span class="va">priors</span><span class="op">$</span><span class="va">error</span> <span class="op">&lt;-</span> <span class="st">"half-normal(2.5)"</span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_dyad</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dyadic_regression.html">dyadic_regression</a></span><span class="op">(</span><span class="fu">dyad</span><span class="op">(</span><span class="va">node_1</span>, <span class="va">node_2</span><span class="op">)</span> <span class="op">~</span> <span class="va">dyad_type</span>, <span class="va">fit_edge</span>, <span class="va">df_reg</span>, mm<span class="op">=</span><span class="cn">FALSE</span>, priors<span class="op">=</span><span class="va">priors</span><span class="op">)</span>
 <span class="co">#&gt; Running MCMC with 4 parallel chains...</span>
 <span class="co">#&gt; </span>
@@ -251,33 +243,33 @@
 <span class="co">#&gt; Chain 4 Iteration:    1 / 2000 [  0%]  (Warmup) </span>
 <span class="co">#&gt; Chain 1 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
 <span class="co">#&gt; Chain 2 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
-<span class="co">#&gt; Chain 3 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
 <span class="co">#&gt; Chain 4 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
+<span class="co">#&gt; Chain 3 Iteration:  500 / 2000 [ 25%]  (Warmup) </span>
 <span class="co">#&gt; Chain 1 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
 <span class="co">#&gt; Chain 1 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
+<span class="co">#&gt; Chain 4 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
+<span class="co">#&gt; Chain 4 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 2 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
 <span class="co">#&gt; Chain 2 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
 <span class="co">#&gt; Chain 3 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
 <span class="co">#&gt; Chain 3 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
-<span class="co">#&gt; Chain 4 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span>
-<span class="co">#&gt; Chain 4 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span>
+<span class="co">#&gt; Chain 1 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 2 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 3 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
-<span class="co">#&gt; Chain 1 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
 <span class="co">#&gt; Chain 4 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span>
-<span class="co">#&gt; Chain 2 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 2 finished in 2.4 seconds.</span>
-<span class="co">#&gt; Chain 3 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 3 finished in 2.6 seconds.</span>
 <span class="co">#&gt; Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
+<span class="co">#&gt; Chain 1 finished in 3.2 seconds.</span>
+<span class="co">#&gt; Chain 2 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
+<span class="co">#&gt; Chain 2 finished in 3.4 seconds.</span>
+<span class="co">#&gt; Chain 3 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
+<span class="co">#&gt; Chain 3 finished in 3.5 seconds.</span>
 <span class="co">#&gt; Chain 4 Iteration: 2000 / 2000 [100%]  (Sampling) </span>
-<span class="co">#&gt; Chain 1 finished in 2.7 seconds.</span>
-<span class="co">#&gt; Chain 4 finished in 2.7 seconds.</span>
+<span class="co">#&gt; Chain 4 finished in 3.5 seconds.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; All 4 chains finished successfully.</span>
-<span class="co">#&gt; Mean chain execution time: 2.6 seconds.</span>
-<span class="co">#&gt; Total execution time: 2.8 seconds.</span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<span class="co">#&gt; Mean chain execution time: 3.4 seconds.</span>
+<span class="co">#&gt; Total execution time: 3.7 seconds.</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/fit-method-summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_dyad</span><span class="op">)</span>
 <span class="co">#&gt; === Fitted dyadic regression model ===</span>
 <span class="co">#&gt; Formula: ~</span>
@@ -290,20 +282,20 @@
 <span class="co">#&gt; Number of dyads: 28</span>
 <span class="co">#&gt; === Coefficient summary ===                                  </span>
 <span class="co">#&gt; variable                              50%     5%    95%</span>
-<span class="co">#&gt;   intercept                        -0.355 -1.153  0.455</span>
-<span class="co">#&gt;   fixed_dyad_typeDroid-Droid       -0.929 -1.793 -0.072</span>
-<span class="co">#&gt;   fixed_dyad_typeLifeform-Droid    -1.037 -1.856 -0.206</span>
-<span class="co">#&gt;   fixed_dyad_typeLifeform-Lifeform  1.593  0.747  2.430</span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<span class="co">#&gt;   intercept                        -0.371 -1.183  0.442</span>
+<span class="co">#&gt;   fixed_dyad_typeDroid-Droid       -0.899 -1.773 -0.061</span>
+<span class="co">#&gt;   fixed_dyad_typeLifeform-Droid    -1.024 -1.844 -0.202</span>
+<span class="co">#&gt;   fixed_dyad_typeLifeform-Lifeform  1.655  0.780  2.479</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_trace.html">plot_trace</a></span><span class="op">(</span><span class="va">fit_dyad</span><span class="op">)</span></code></pre></div>
 <p><img src="dyadic_regression_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_predictions.html">plot_predictions</a></span><span class="op">(</span><span class="va">fit_dyad</span>, num_draws<span class="op">=</span><span class="fl">20</span><span class="op">)</span></code></pre></div>
 <p><img src="dyadic_regression_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/get_contrasts.html">get_contrasts</a></span><span class="op">(</span><span class="va">fit_dyad</span>, <span class="st">"fixed_dyad_typeLifeform-Lifeform"</span>, <span class="st">"fixed_dyad_typeDroid-Droid"</span><span class="op">)</span>
 <span class="co">#&gt;   50%    5%   95% </span>
-<span class="co">#&gt; 2.524 1.997 3.045</span></code></pre></div>
+<span class="co">#&gt; 2.564 2.043 3.064</span></code></pre></div>
   </main>
 </div>
 

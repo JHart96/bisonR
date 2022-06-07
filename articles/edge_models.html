@@ -90,14 +90,6 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">cmdstanr</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">install_cmdstan</a></span><span class="op">(</span>cores <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>
-<span class="co">#&gt; The C++ toolchain required for CmdStan is setup properly!</span>
-<span class="co">#&gt; * Latest CmdStan release is v2.29.2</span>
-<span class="co">#&gt; * Installing CmdStan v2.29.2 in /home/runner/.cmdstan/cmdstan-2.29.2</span>
-<span class="co">#&gt; * Downloading cmdstan-2.29.2.tar.gz from GitHub...</span>
-<span class="co">#&gt; Warning: An installation already exists at /home/runner/.cmdstan/cmdstan-2.29.2.</span>
-<span class="co">#&gt; Please remove or rename the installation folder or set overwrite=TRUE.</span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JHart96/bisonR" class="external-link">bisonR</a></span><span class="op">)</span>
 <span class="co">#&gt; Loading required package: cmdstanr</span>
 <span class="co">#&gt; This is cmdstanr version 0.5.2</span>
@@ -113,7 +105,7 @@
 <span class="co">#&gt; The following object is masked from 'package:base':</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     union</span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"binary_ex1"</span><span class="op">)</span>
 <span class="va">df</span> <span class="op">&lt;-</span> <span class="va">binary_ex1</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span>
@@ -124,7 +116,7 @@
 <span class="co">#&gt; 4    Rey   Leia Lifeform Lifeform     1        C</span>
 <span class="co">#&gt; 5    Rey   Leia Lifeform Lifeform     1        B</span>
 <span class="co">#&gt; 6    Rey   Leia Lifeform Lifeform     1        B</span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_default_priors.html">get_default_priors</a></span><span class="op">(</span><span class="st">"binary"</span><span class="op">)</span>
 <span class="va">priors</span>
 <span class="co">#&gt; $fixed</span>
@@ -135,7 +127,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $random_std</span>
 <span class="co">#&gt; [1] "half-normal(1)"</span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">priors</span><span class="op">$</span><span class="va">fixed</span> <span class="op">&lt;-</span> <span class="st">"normal(0, 1)"</span>
 <span class="va">priors</span>
 <span class="co">#&gt; $fixed</span>
@@ -146,22 +138,22 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $random_std</span>
 <span class="co">#&gt; [1] "half-normal(1)"</span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fit_edge</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/edge_model.html">edge_model</a></span><span class="op">(</span><span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="fl">1</span><span class="op">)</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1</span>, <span class="va">node_2</span><span class="op">)</span>, data<span class="op">=</span><span class="va">df</span>, data_type<span class="op">=</span><span class="st">"binary"</span>, priors<span class="op">=</span><span class="va">priors</span><span class="op">)</span>
 <span class="co">#&gt; Running MCMC with 4 parallel chains...</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Chain 1 finished in 2.9 seconds.</span>
-<span class="co">#&gt; Chain 2 finished in 2.9 seconds.</span>
-<span class="co">#&gt; Chain 3 finished in 2.9 seconds.</span>
-<span class="co">#&gt; Chain 4 finished in 2.9 seconds.</span>
+<span class="co">#&gt; Chain 1 finished in 3.3 seconds.</span>
+<span class="co">#&gt; Chain 2 finished in 3.5 seconds.</span>
+<span class="co">#&gt; Chain 3 finished in 3.5 seconds.</span>
+<span class="co">#&gt; Chain 4 finished in 3.4 seconds.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; All 4 chains finished successfully.</span>
-<span class="co">#&gt; Mean chain execution time: 2.9 seconds.</span>
-<span class="co">#&gt; Total execution time: 3.2 seconds.</span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<span class="co">#&gt; Mean chain execution time: 3.4 seconds.</span>
+<span class="co">#&gt; Total execution time: 3.6 seconds.</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_trace.html">plot_trace</a></span><span class="op">(</span><span class="va">fit_edge</span><span class="op">)</span></code></pre></div>
 <p><img src="edge_models_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/fit-method-summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_edge</span><span class="op">)</span> <span class="co"># 0.810 -0.051  1.740 </span>
 <span class="co">#&gt; === Fitted BISoN edge model ===</span>
 <span class="co">#&gt; Data type: binary</span>
@@ -171,38 +163,38 @@
 <span class="co">#&gt; Directed: FALSE</span>
 <span class="co">#&gt; === Edge list summary ===</span>
 <span class="co">#&gt;                   median     5%    95%</span>
-<span class="co">#&gt; Rey &lt;-&gt; Leia       0.808 -0.033  1.679</span>
-<span class="co">#&gt; Rey &lt;-&gt; Obi-Wan    1.861  1.208  2.624</span>
-<span class="co">#&gt; Leia &lt;-&gt; Obi-Wan   2.082  1.372  2.902</span>
-<span class="co">#&gt; Rey &lt;-&gt; Luke       1.275  0.308  2.354</span>
-<span class="co">#&gt; Leia &lt;-&gt; Luke      1.065  0.436  1.768</span>
-<span class="co">#&gt; Obi-Wan &lt;-&gt; Luke   0.704 -0.204  1.650</span>
-<span class="co">#&gt; Rey &lt;-&gt; C-3PO     -2.343 -3.373 -1.492</span>
-<span class="co">#&gt; Leia &lt;-&gt; C-3PO    -2.254 -3.210 -1.452</span>
-<span class="co">#&gt; Obi-Wan &lt;-&gt; C-3PO -1.223 -1.877 -0.629</span>
-<span class="co">#&gt; Luke &lt;-&gt; C-3PO    -1.601 -2.296 -0.988</span>
-<span class="co">#&gt; Rey &lt;-&gt; BB-8      -0.830 -1.390 -0.312</span>
-<span class="co">#&gt; Leia &lt;-&gt; BB-8     -1.702 -2.840 -0.641</span>
-<span class="co">#&gt; Obi-Wan &lt;-&gt; BB-8  -0.783 -1.393 -0.207</span>
-<span class="co">#&gt; Luke &lt;-&gt; BB-8     -1.544 -2.284 -0.848</span>
-<span class="co">#&gt; C-3PO &lt;-&gt; BB-8    -1.191 -1.824 -0.621</span>
-<span class="co">#&gt; Rey &lt;-&gt; R2-D2     -1.183 -2.152 -0.297</span>
-<span class="co">#&gt; Leia &lt;-&gt; R2-D2    -1.319 -1.927 -0.767</span>
-<span class="co">#&gt; Obi-Wan &lt;-&gt; R2-D2 -1.749 -2.561 -1.066</span>
-<span class="co">#&gt; Luke &lt;-&gt; R2-D2    -1.153 -1.739 -0.637</span>
-<span class="co">#&gt; C-3PO &lt;-&gt; R2-D2   -1.310 -2.288 -0.469</span>
-<span class="co">#&gt; BB-8 &lt;-&gt; R2-D2    -1.475 -2.081 -0.940</span>
-<span class="co">#&gt; Rey &lt;-&gt; D-O       -1.443 -2.045 -0.876</span>
-<span class="co">#&gt; Leia &lt;-&gt; D-O      -1.372 -2.301 -0.552</span>
-<span class="co">#&gt; Obi-Wan &lt;-&gt; D-O   -1.738 -2.479 -1.079</span>
-<span class="co">#&gt; Luke &lt;-&gt; D-O      -1.321 -1.988 -0.705</span>
-<span class="co">#&gt; C-3PO &lt;-&gt; D-O     -1.619 -2.625 -0.730</span>
-<span class="co">#&gt; BB-8 &lt;-&gt; D-O      -2.211 -3.298 -1.289</span>
-<span class="co">#&gt; R2-D2 &lt;-&gt; D-O     -0.565 -1.326  0.145</span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<span class="co">#&gt; Rey &lt;-&gt; Leia       0.803 -0.059  1.743</span>
+<span class="co">#&gt; Rey &lt;-&gt; Obi-Wan    1.857  1.247  2.556</span>
+<span class="co">#&gt; Leia &lt;-&gt; Obi-Wan   2.066  1.361  2.888</span>
+<span class="co">#&gt; Rey &lt;-&gt; Luke       1.285  0.275  2.420</span>
+<span class="co">#&gt; Leia &lt;-&gt; Luke      1.052  0.421  1.793</span>
+<span class="co">#&gt; Obi-Wan &lt;-&gt; Luke   0.716 -0.180  1.636</span>
+<span class="co">#&gt; Rey &lt;-&gt; C-3PO     -2.368 -3.372 -1.459</span>
+<span class="co">#&gt; Leia &lt;-&gt; C-3PO    -2.240 -3.152 -1.479</span>
+<span class="co">#&gt; Obi-Wan &lt;-&gt; C-3PO -1.223 -1.923 -0.574</span>
+<span class="co">#&gt; Luke &lt;-&gt; C-3PO    -1.592 -2.281 -0.974</span>
+<span class="co">#&gt; Rey &lt;-&gt; BB-8      -0.830 -1.396 -0.328</span>
+<span class="co">#&gt; Leia &lt;-&gt; BB-8     -1.688 -2.880 -0.646</span>
+<span class="co">#&gt; Obi-Wan &lt;-&gt; BB-8  -0.774 -1.394 -0.211</span>
+<span class="co">#&gt; Luke &lt;-&gt; BB-8     -1.515 -2.277 -0.881</span>
+<span class="co">#&gt; C-3PO &lt;-&gt; BB-8    -1.209 -1.799 -0.658</span>
+<span class="co">#&gt; Rey &lt;-&gt; R2-D2     -1.180 -2.093 -0.329</span>
+<span class="co">#&gt; Leia &lt;-&gt; R2-D2    -1.307 -1.895 -0.798</span>
+<span class="co">#&gt; Obi-Wan &lt;-&gt; R2-D2 -1.753 -2.562 -1.048</span>
+<span class="co">#&gt; Luke &lt;-&gt; R2-D2    -1.157 -1.715 -0.650</span>
+<span class="co">#&gt; C-3PO &lt;-&gt; R2-D2   -1.301 -2.237 -0.506</span>
+<span class="co">#&gt; BB-8 &lt;-&gt; R2-D2    -1.480 -2.056 -0.949</span>
+<span class="co">#&gt; Rey &lt;-&gt; D-O       -1.443 -2.063 -0.849</span>
+<span class="co">#&gt; Leia &lt;-&gt; D-O      -1.378 -2.301 -0.575</span>
+<span class="co">#&gt; Obi-Wan &lt;-&gt; D-O   -1.734 -2.486 -1.069</span>
+<span class="co">#&gt; Luke &lt;-&gt; D-O      -1.318 -1.999 -0.707</span>
+<span class="co">#&gt; C-3PO &lt;-&gt; D-O     -1.620 -2.629 -0.726</span>
+<span class="co">#&gt; BB-8 &lt;-&gt; D-O      -2.187 -3.271 -1.289</span>
+<span class="co">#&gt; R2-D2 &lt;-&gt; D-O     -0.569 -1.318  0.138</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_network.html">plot_network</a></span><span class="op">(</span><span class="va">fit_edge</span>, lwd<span class="op">=</span><span class="fl">2</span><span class="op">)</span></code></pre></div>
 <p><img src="edge_models_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_predictions.html">plot_predictions</a></span><span class="op">(</span><span class="va">fit_edge</span>, num_draws<span class="op">=</span><span class="fl">20</span><span class="op">)</span></code></pre></div>
 <p><img src="edge_models_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
   </main>
