@@ -29,13 +29,17 @@ head(df)
 ```
 
 ```{r}
-priors <- list(
-  ""
-)
+priors <- get_default_priors("binary")
+priors
 ```
 
 ```{r}
-fit_edge <- edge_model((event | 1) ~ dyad(node_1, node_2), data=df, data_type="binary")
+priors$fixed <- "normal(0, 1)"
+priors
+```
+
+```{r}
+fit_edge <- edge_model((event | 1) ~ dyad(node_1, node_2), data=df, data_type="binary", priors=priors)
 ```
 
 ```{r}

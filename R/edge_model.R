@@ -16,7 +16,7 @@ require(bayesplot)
 #' @return
 #'
 #' @export
-edge_model <- function(formula, data, data_type=c("binary", "count", "duration"), directed=FALSE, method="mcmc", verbose=FALSE, mc_cores=4) {
+edge_model <- function(formula, data, data_type=c("binary", "count", "duration"), directed=FALSE, method="mcmc", verbose=FALSE, mc_cores=4, priors=NULL) {
   # If verbose, print out MCMC chains.
   if (verbose) {
     refresh <- 500
@@ -24,11 +24,15 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
     refresh <- 0
   }
 
+  # If user-specified priors haven't been set, use the defaults
+  if (is.null(priors)) {
+    priors <- get_default_priors(data_type)
+  }
+
   # Set fitting method
   if (length(method) > 1) {
     method = "mcmc"
   }
-
 
   # If using duration data, require data to be in list with aggregated data as well as raw observations.
   if (data_type == "duration") {
@@ -60,11 +64,15 @@ edge_model <- function(formula, data, data_type=c("binary", "count", "duration")
     model_data <- prepare_data(formula, list(obs=data, obs_agg=data_agg), directed, node_to_idx, node_list, data_type)
   }
 
+  # Set the priors in model data
+  prior_parameters <- extract_prior_parameters(priors)
+  model_data <- c(model_data, prior_parameters)
+
   # Build model
   model <- build_stan_model(data_type)
 
   # Fit model
-  fit <- model$sample(data=model_data, refresh=refresh, chains=4, parallel_chains=mc_cores)
+  fit <- model$sample(data=model_data, refresh=refresh, chains=4, parallel_chains=mc_cores, step_size=0.1)
 
   # Extract edge weights from fitted edge model.
   chain <- fit$draws("beta_fixed", format="matrix")

@@ -10,7 +10,12 @@ require(bayesplot)
 #' @export
 #'
 #' @examples
-nodal_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500) {
+nodal_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, priors=NULL) {
+  # If user-specified priors haven't been set, use the defaults
+  if (is.null(priors)) {
+    priors <- get_default_priors("nodal_regression")
+  }
+
   design_matrices <- build_design_matrix(formula, df)
 
   num_nodes <- edgemodel$num_nodes
@@ -35,8 +40,12 @@ nodal_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500) {
     random_group_index=design_matrices$G
   )
 
+  # Set the priors in model data
+  prior_parameters <- extract_prior_parameters(priors)
+  model_data <- c(model_data, prior_parameters)
+
   model <- build_stan_model("nodal_regression")
-  fit <- model$sample(data=model_data, chains=4, parallel_chains=mc_cores, refresh=refresh)
+  fit <- model$sample(data=model_data, chains=4, parallel_chains=mc_cores, refresh=refresh, step_size=0.1)
   chain <- fit$draws("beta_fixed", format="matrix")
 
   obj <- list()

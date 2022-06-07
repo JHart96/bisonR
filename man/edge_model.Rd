@@ -11,7 +11,8 @@ edge_model(
   directed = FALSE,
   method = "mcmc",
   verbose = FALSE,
-  mc_cores = 4
+  mc_cores = 4,
+  priors = NULL
 )
 }
 \arguments{

@@ -10,7 +10,8 @@ dyadic_regression(
   df,
   mc_cores = 4,
   refresh = 500,
-  mm = TRUE
+  mm = TRUE,
+  priors = NULL
 )
 }
 \arguments{

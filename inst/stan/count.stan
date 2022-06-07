@@ -8,6 +8,11 @@ data {
   matrix[N, K_fixed] X; // Design matrix for fixed effects
   matrix[N, K_random] Z; // Design matrix for random effects.
   array[K_random] int<lower=0, upper=R> G; // Index for groupings for random effects
+  real prior_fixed_mu;
+  real<lower=0> prior_fixed_sigma;
+  real prior_random_mean_mu;
+  real<lower=0> prior_random_mean_sigma;
+  real<lower=0> prior_random_std_sigma;
 }
 
 parameters {
@@ -30,11 +35,11 @@ model {
   target += poisson_lpmf(y | exp(lprobs) .* divisor);
 
   // Priors
-  target += normal_lpdf(beta_fixed | 0, 2.5);
+  target += normal_lpdf(beta_fixed | prior_fixed_mu, prior_fixed_sigma);
   if (K_random > 0) {
     target += normal_lpdf(beta_random | H_mu[G], H_sigma[G]);
-    target += normal_lpdf(H_mu | 0, 2.5);
-    target += exponential_lpdf(H_sigma | 1);
+    target += normal_lpdf(H_mu | prior_random_mean_mu, prior_random_mean_sigma);
+    target += normal_lpdf(H_sigma | 0, prior_random_std_sigma);
   }
 }
 

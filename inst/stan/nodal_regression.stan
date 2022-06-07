@@ -8,6 +8,12 @@ data {
   matrix[num_nodes, num_fixed] design_fixed; // Design matrix for fixed effects
   matrix[num_nodes, num_random] design_random; // Design matrix for random effects
   array[num_random] int<lower=0, upper=num_random_groups> random_group_index; // Index for groupings for random effects
+  real prior_fixed_mu;
+  real<lower=0> prior_fixed_sigma;
+  real prior_random_mean_mu;
+  real<lower=0> prior_random_mean_sigma;
+  real<lower=0> prior_random_std_sigma;
+  real<lower=0> prior_error_sigma;
 }
 parameters {
   vector[num_fixed] beta_fixed; // Parameters for fixed effects.
@@ -24,12 +30,12 @@ transformed parameters {
 }
 model {
   centrality_mu ~ multi_normal(predictor, centrality_cov + diag_matrix(rep_vector(sigma, num_nodes)));
-  beta_fixed ~ normal(0, 1);
-  sigma ~ normal(0, 1);
+  beta_fixed ~ normal(prior_fixed_mu, prior_fixed_sigma);
+  sigma ~ normal(0, prior_error_sigma);
   if (num_random > 0) {
     beta_random ~ normal(random_group_mu[random_group_index], random_group_sigma[random_group_index]);
-    random_group_mu ~ normal(0, 2.5);
-    random_group_sigma ~ normal(0, 1);
+    random_group_mu ~ normal(prior_random_mean_mu, prior_random_mean_sigma);
+    random_group_sigma ~ normal(0, prior_random_std_sigma);
   }
 }
 generated quantities {

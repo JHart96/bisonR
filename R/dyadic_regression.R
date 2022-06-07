@@ -13,7 +13,12 @@ require(bayesplot)
 #' @export
 #'
 #' @examples
-dyadic_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, mm=TRUE) {
+dyadic_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, mm=TRUE, priors=NULL) {
+  # If user-specified priors haven't been set, use the defaults
+  if (is.null(priors)) {
+    priors <- get_default_priors("dyadic_regression")
+  }
+
   design_matrices <- build_design_matrix(formula, df)
 
   num_nodes <- edgemodel$num_nodes
@@ -45,8 +50,13 @@ dyadic_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, m
     node_ids_2=node_ids_2,
     include_multimembership=as.integer(mm)
   )
+
+  # Set the priors in model data
+  prior_parameters <- extract_prior_parameters(priors)
+  model_data <- c(model_data, prior_parameters)
+
   model <- build_stan_model("dyadic_regression")
-  fit <- model$sample(data=model_data, chains=4, parallel_chains=mc_cores, refresh=refresh)
+  fit <- model$sample(data=model_data, chains=4, parallel_chains=mc_cores, refresh=refresh, step_size=0.1)
   chain <- fit$draws("beta_fixed", format="matrix")
   obj <- list()
   obj$formula <- formula

@@ -12,7 +12,13 @@ data {
   int<lower=0> R; // Number of random effect groups
   matrix[N, K_random] Z; // Design matrix for random effects.
   array[K_random] int<lower=0, upper=R> G; // Index for groupings for random effects
-
+  real prior_fixed_mu;
+  real<lower=0> prior_fixed_sigma;
+  real prior_random_mean_mu;
+  real<lower=0> prior_random_mean_sigma;
+  real<lower=0> prior_random_std_sigma;
+  real<lower=0> prior_error_sigma;
+  real<lower=0> prior_multimembership_sigma;
 }
 parameters {
   vector[K_fixed] beta_fixed; // Parameters for fixed effects.
@@ -37,16 +43,16 @@ model {
   // Main model
   edge_mu ~ multi_normal(predictor, edge_cov + diag_matrix(rep_vector(sigma, N)));
   // Priors
-  beta_fixed ~ normal(0, 1);
-  sigma ~ normal(0, 1);
+  beta_fixed ~ normal(prior_fixed_mu, prior_fixed_sigma);
+  sigma ~ normal(0, prior_error_sigma);
   if (include_multimembership == 1) {
     mm_nodes ~ normal(0, sigma_mm);
-    sigma_mm ~ normal(0, 1);
+    sigma_mm ~ normal(0, prior_multimembership_sigma);
   }
   if (K_random > 0) {
     beta_random ~ normal(H_mu[G], H_sigma[G]);
-    H_mu ~ normal(0, 2.5);
-    H_sigma ~ normal(0, 1);
+    H_mu ~ normal(prior_random_mean_mu, prior_random_mean_sigma);
+    H_sigma ~ normal(0, prior_random_std_sigma);
   }
 }
 generated quantities {

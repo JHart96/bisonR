@@ -42,7 +42,12 @@ df_reg
 ```
 
 ```{r}
-fit_node <- nodal_regression(strength(node_names) ~ node_type, fit_edge, df_reg)
+priors <- get_default_priors("nodal_regression")
+priors
+```
+
+```{r}
+fit_node <- nodal_regression(strength(node_names) ~ node_type, fit_edge, df_reg, priors=priors)
 ```
 
 ```{r}

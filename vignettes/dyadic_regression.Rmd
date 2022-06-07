@@ -42,9 +42,13 @@ df_reg
 df_reg$relatedness <- as.factor(sample(1:3, 28, replace=TRUE))
 df_reg
 ```
+```{r}
+priors <- get_default_priors("dyadic_regression")
+priors$error <- "half-normal(2.5)"
+```
 
 ```{r}
-fit_dyad <- dyadic_regression(dyad(node_1, node_2) ~ dyad_type, fit_edge, df_reg, mm=FALSE)
+fit_dyad <- dyadic_regression(dyad(node_1, node_2) ~ dyad_type, fit_edge, df_reg, mm=FALSE, priors=priors)
 ```
 
 ```{r}

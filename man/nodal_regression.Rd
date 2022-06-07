@@ -4,7 +4,14 @@
 \alias{nodal_regression}
 \title{Fit a nodel regression model}
 \usage{
-nodal_regression(formula, edgemodel, df, mc_cores = 4, refresh = 500)
+nodal_regression(
+  formula,
+  edgemodel,
+  df,
+  mc_cores = 4,
+  refresh = 500,
+  priors = NULL
+)
 }
 \arguments{
 \item{mc_cores}{}
