@@ -1,49 +1,53 @@
 data {
-  int<lower=0> N; // Number of data points
-  int<lower=0> K_fixed; // Number of fixed effect parameters
-  int<lower=0> K_random; // Number of random effect parameters
-  int<lower=0> R; // Number of random effect groups
-  array[N] int y; // Outcome for each data point (presence/absence)
-  vector[N] divisor; // Duration of each observation
-  matrix[N, K_fixed] X; // Design matrix for fixed effects
-  matrix[N, K_random] Z; // Design matrix for random effects.
-  array[K_random] int<lower=0, upper=R> G; // Index for groupings for random effects
-  real prior_fixed_mu;
-  real<lower=0> prior_fixed_sigma;
-  real prior_random_mean_mu;
-  real<lower=0> prior_random_mean_sigma;
-  real<lower=0> prior_random_std_sigma;
+  int<lower=0> num_rows; // Number of data points
+  int<lower=0> num_fixed; // Number of fixed effect parameters
+  int<lower=0> num_random; // Number of random effect parameters
+  int<lower=0> num_random_groups; // Number of random effect groups
+
+  array[num_rows] int event; // Outcome for each data point (presence/absence)
+  vector[num_rows] divisor; // Duration of each observation
+  matrix[num_rows, num_fixed] design_fixed; // Design matrix for fixed effects
+  matrix[num_rows, num_random] design_random; // Design matrix for random effects.
+  array[num_random] int<lower=0, upper=num_random_groups> random_group_index; // Index for groupings for random effects
+
+  real prior_fixed_mu; // Prior mean for fixed effects
+  real<lower=0> prior_fixed_sigma; // Prior standard deviation for fixed effects
+  real prior_random_mean_mu; // Prior mean on centralisation of random effects
+  real<lower=0> prior_random_mean_sigma; // Prior standard deviation on centralisation of random effects
+  real<lower=0> prior_random_std_sigma; // Prior standard deviation on dispersion of random effects
 }
 
 parameters {
-  vector[K_fixed] beta_fixed; // Parameters for fixed effects.
-  vector[K_random] beta_random; // Parameters for random effects.
-  vector[R] H_mu; // Hyperpriors for random effects (mean).
-  vector<lower=0>[R] H_sigma; // Hyperpriors for random effects (std. dev.).
+  vector[num_fixed] beta_fixed; // Parameters for fixed effects.
+  vector[num_random] beta_random; // Parameters for random effects.
+  vector[num_random_groups] random_group_mu; // Hyperpriors for random effects (mean).
+  vector<lower=0>[num_random_groups] random_group_sigma; // Hyperpriors for random effects (std. dev.).
 }
 
 transformed parameters {
-  vector[N] lprobs;
-  lprobs = X * beta_fixed;
-  if (K_random > 0) {
-    lprobs += Z * beta_random;
+  vector[num_rows] predictor;
+  predictor = design_fixed * beta_fixed;
+  if (num_random > 0) {
+    predictor += design_random * beta_random;
   }
 }
 
 model {
   // Main model
-  target += poisson_lpmf(y | exp(lprobs) .* divisor);
+  event ~ poisson(exp(predictor) .* divisor);
 
   // Priors
-  target += normal_lpdf(beta_fixed | prior_fixed_mu, prior_fixed_sigma);
-  if (K_random > 0) {
-    target += normal_lpdf(beta_random | H_mu[G], H_sigma[G]);
-    target += normal_lpdf(H_mu | prior_random_mean_mu, prior_random_mean_sigma);
-    target += normal_lpdf(H_sigma | 0, prior_random_std_sigma);
+  beta_fixed ~ normal(prior_fixed_mu, prior_fixed_sigma);
+
+  if (num_random > 0) {
+    beta_random ~ normal(random_group_mu[random_group_index], random_group_sigma[random_group_index]);
+    // Hyperpriors
+    random_group_mu ~ normal(prior_random_mean_mu, prior_random_mean_sigma);
+    random_group_sigma ~ normal(0, prior_random_std_sigma);
   }
 }
 
 generated quantities {
-  array[N] int y_pred;
-  y_pred = poisson_rng(exp(lprobs) .* divisor);
+  array[num_rows] int event_pred;
+  event_pred = poisson_rng(exp(predictor) .* divisor);
 }

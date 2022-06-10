@@ -19,8 +19,8 @@ library(bisonR)
 ```
 
 ```{r}
-data("binary_ex1")
-df <- binary_ex1
+sim_data <- simulate_edge_model("binary", aggregated=F)
+df <- sim_data
 head(df)
 ```
 
@@ -35,7 +35,7 @@ priors
 ```
 
 ```{r}
-fit_edge <- edge_model((event | 1) ~ dyad(node_1, node_2), data=df, data_type="binary", priors=priors)
+fit_edge <- edge_model((event | duration) ~ dyad(node_1_id, node_2_id), data=df, data_type="binary", priors=priors)
 ```
 
 ```{r}
@@ -52,4 +52,20 @@ plot_network(fit_edge, lwd=2)
 
 ```{r}
 plot_predictions(fit_edge, num_draws=20)
+```
+
+```{r}
+priors <- get_default_priors("dyadic_regression")
+priors$error <- "half-normal(2.5)"
+```
+
+```{r}
+df_dyadic <- df %>%
+  distinct(node_1_id, node_2_id, age_diff)
+
+fit_dyadic <- dyadic_regression(dyad(node_1_id, node_2_id) ~ age_diff, fit_edge, df_dyadic, mm=FALSE, priors=priors)
+```
+
+```{r}
+
 ```

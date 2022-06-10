@@ -3,11 +3,13 @@ data {
   int num_fixed; // Number of fixed effects
   int num_random; // Number of random effects
   int num_random_groups; // Number of random effect groups
-  vector[num_nodes] centrality_mu; // Means of Gaussian approximation of logit/log edge weights
-  matrix[num_nodes, num_nodes] centrality_cov; // Covariance matrix of Gaussian approximation of logit/log edge weights
+
+  vector[num_nodes] metric_mu; // Means of Gaussian approximation of logit/log edge weights
+  matrix[num_nodes, num_nodes] metric_cov; // Covariance matrix of Gaussian approximation of logit/log edge weights
   matrix[num_nodes, num_fixed] design_fixed; // Design matrix for fixed effects
   matrix[num_nodes, num_random] design_random; // Design matrix for random effects
   array[num_random] int<lower=0, upper=num_random_groups> random_group_index; // Index for groupings for random effects
+
   real prior_fixed_mu;
   real<lower=0> prior_fixed_sigma;
   real prior_random_mean_mu;
@@ -29,7 +31,7 @@ transformed parameters {
   if (num_random > 0) predictor += design_random * beta_random;
 }
 model {
-  centrality_mu ~ multi_normal(predictor, centrality_cov + diag_matrix(rep_vector(sigma, num_nodes)));
+  metric_mu ~ multi_normal(predictor, metric_cov + diag_matrix(rep_vector(sigma, num_nodes)));
   beta_fixed ~ normal(prior_fixed_mu, prior_fixed_sigma);
   sigma ~ normal(0, prior_error_sigma);
   if (num_random > 0) {
@@ -39,6 +41,6 @@ model {
   }
 }
 generated quantities {
-  vector[num_nodes] centrality_pred;
-  centrality_pred = multi_normal_rng(predictor, centrality_cov + diag_matrix(rep_vector(sigma, num_nodes)));
+  vector[num_nodes] metric_pred;
+  metric_pred = multi_normal_rng(predictor, metric_cov + diag_matrix(rep_vector(sigma, num_nodes)));
 }
