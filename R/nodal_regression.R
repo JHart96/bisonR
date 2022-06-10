@@ -16,7 +16,7 @@ nodal_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, pr
     priors <- get_default_priors("nodal_regression")
   }
 
-  design_matrices <- build_design_matrix(formula, df)
+  design_matrices <- build_design_matrix_dyadic(formula, df)
 
   num_nodes <- edgemodel$num_nodes
   num_fixed <- ncol(design_matrices$X)

@@ -19,37 +19,10 @@ dyadic_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, m
     priors <- get_default_priors("dyadic_regression")
   }
 
-  design_matrices <- build_design_matrix(formula, df)
-
-  num_nodes <- edgemodel$num_nodes
-  N <- edgemodel$num_dyads
-  K_fixed <- ncol(design_matrices$X)
-  K_random <- ncol(design_matrices$Z)
-  R <- length(unique(design_matrices$G))
-
-  node_ids_1 <- edgemodel$node_to_idx[as.vector(df[all.vars(formula)[1]][, 1])]
-  node_ids_2 <- edgemodel$node_to_idx[as.vector(df[all.vars(formula)[2]][, 1])]
-
-  dyad_ids <- edgemodel$dyad_mapping[cbind(node_ids_1, node_ids_2)]
-  edge_samples <- edgemodel$chain[, dyad_ids]
-  edge_mu <- apply(edge_samples, 2, mean)
-  edge_cov <- cov(edge_samples)
-
-  model_data <- list(
-    N=N,
-    num_nodes=num_nodes,
-    K_fixed=K_fixed,
-    K_random=K_random,
-    edge_mu=edge_mu,
-    edge_cov=edge_cov,
-    X=design_matrices$X,
-    Z=design_matrices$Z,
-    R=R,
-    G=design_matrices$G,
-    node_ids_1=node_ids_1,
-    node_ids_2=node_ids_2,
-    include_multimembership=as.integer(mm)
-  )
+  # design_matrices <- build_design_matrix(formula, df)
+  model_info <- get_dyadic_regression_model_data(formula, edgemodel, df)
+  model_data <- model_info$model_data
+  model_data$include_multimembership = as.integer(mm)
 
   # Set the priors in model data
   prior_parameters <- extract_prior_parameters(priors)
@@ -58,15 +31,16 @@ dyadic_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, m
   model <- build_stan_model("dyadic_regression")
   fit <- model$sample(data=model_data, chains=4, parallel_chains=mc_cores, refresh=refresh, step_size=0.1)
   chain <- fit$draws("beta_fixed", format="matrix")
-  obj <- list()
-  obj$formula <- formula
-  obj$edgemodel <- edgemodel
-  obj$fit <- fit
-  obj$model_data <- model_data
-  obj$design_matrices <- design_matrices
-  obj$chain <- chain
-  obj$edge_samples <- edge_samples
-  obj$dyad_ids <- dyad_ids
+
+  obj <- list(
+    formula = formula,
+    edgemodel = edgemodel,
+    fit = fit,
+    model_data = model_data,
+    chain = chain,
+    dyad_ids = model_info$dyad_ids
+  )
+
   class(obj) <- "dyadic_model"
   obj
 }
@@ -81,7 +55,7 @@ dyadic_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, m
 #' @examples
 print.dyadic_model <- function(obj) {
   coefficients <- t(apply(obj$chain, 2, function(x) quantile(x, probs=c(0.5, 0.05, 0.95))))
-  rownames(coefficients) <- colnames(obj$design_matrices$X)
+  rownames(coefficients) <- colnames(obj$model_data$design_fixed)
   coefficients <- round(coefficients, 3)
   cat(paste0(
     "=== Fitted dyadic regression model ===\n",
@@ -120,18 +94,18 @@ plot_predictions.dyadic_model <- function(obj, num_draws=20) {
   }
 
   # Extract edge samples and predictions
-  edge_samples <- obj$edge_samples
+  edge_samples <- obj$edgemodel$edge_samples
   edge_preds <- obj$fit$draws("edge_pred", format="matrix")
 
   # Generate densities for edge sample and prediction
   sample_densities <- list()
   pred_densities <- list()
   for (i in 1:num_draws) {
-    df_draw <- data.frame(y=as.vector(edge_samples[i, ]), dyad_ids=obj$dyad_ids)
-    df_summed <- aggregate(y ~ as.factor(dyad_ids), df_draw, sum)
+    df_draw <- data.frame(y=as.vector(edge_samples[i, ]), dyad_id=obj$dyad_ids)
+    df_summed <- aggregate(y ~ as.factor(dyad_id), df_draw, sum)
     pred_densities[[i]] <- density(df_summed$y)
     df_draw$y <- as.vector(edge_preds[i, ])
-    df_summed <- aggregate(y ~ as.factor(dyad_ids), df_draw, sum)
+    df_summed <- aggregate(y ~ as.factor(dyad_id), df_draw, sum)
     sample_densities[[i]] <- density(df_summed$y)
   }
 
@@ -157,29 +131,23 @@ plot_predictions.dyadic_model <- function(obj, num_draws=20) {
 
 }
 
-build_design_matrix <- function(formula, data) {
-  # Builds two design matrices for fixed and random effects.
-  # Also builds a group vector for the random effects.
-  # Don't forget intercept.
+get_dyadic_regression_model_data <- function(formula, edgemodel, data) {
+  design_fixed <- data.frame(empty_col = rep(0, nrow(data)))
+  design_random <- data.frame(empty_col = rep(0, nrow(data)))
 
-  X <- data.frame(empty_col = rep(0, nrow(data)))
-  Z <- data.frame(empty_col = rep(0, nrow(data)))
-
-  lpar <- list()
-  hyper <- c() # Vector of hyperparameters.
+  model_spec <- get_dyadic_regression_spec(formula)
+  # If there is an intercept
+  if (model_spec$intercept) {
+    design_fixed[, "intercept"] <- 1
+  }
 
   # Get model specification
   model_spec <- get_dyadic_regression_spec(formula)
 
-  # If there is an intercept
-  if (model_spec$intercept) {
-    X[, "intercept"] <- 1
-  }
-
   # print(model_terms)
 
   # Variable grouping for random effects
-  G <- c()
+  random_group_index <- c()
 
   # Get additional fixed effects
   if (!is.null(model_spec$fixed)) {
@@ -190,12 +158,12 @@ build_design_matrix <- function(formula, data) {
         term_levels <- levels(data[, term_name])
         for (term_level in term_levels) {
           new_term_name <-  paste0("fixed_", term_name, term_level)
-          X[, new_term_name] <- 1 * (data[, term_name] == term_level)
+          design_fixed[, new_term_name] <- 1 * (data[, term_name] == term_level)
         }
       } else {
         # Otherwise, create a single column:
         new_term_name <- paste0(c("fixed_", term_name), collapse="")
-        X[, new_term_name] <- data[, term_name]
+        design_fixed[, new_term_name] <- data[, term_name]
       }
     }
   }
@@ -207,15 +175,48 @@ build_design_matrix <- function(formula, data) {
       term_levels <- levels(as.factor(data[, term_name]))
       for (term_level in term_levels) {
         new_term_name <-  paste0("random_", term_name, term_level)
-        Z[, new_term_name] <- 1 * (as.factor(data[, term_name]) == term_level)
-        G[length(G) + 1] <- var_group
+        design_random[, new_term_name] <- 1 * (as.factor(data[, term_name]) == term_level)
+        random_group_index[length(random_group_index) + 1] <- var_group
       }
     }
   }
 
-  lpar$hyper <- hyper
+  num_nodes <- edgemodel$num_nodes
+  num_dyads <- edgemodel$num_dyads
+  num_fixed <- ncol(design_fixed) - 1
+  num_random <- ncol(design_random) - 1
+  num_random_groups <- length(unique(random_group_index))
 
-  return(list(X=as.matrix(X[, -1]), Z=as.matrix(Z[, -1]), G=G))
+  # Should come from model spec
+  node_ids_1 <- edgemodel$node_to_idx[dplyr::pull(data, model_spec$node_1_name)]
+  node_ids_2 <- edgemodel$node_to_idx[dplyr::pull(data, model_spec$node_2_name)]
+
+  dyad_ids <- edgemodel$dyad_to_idx[cbind(node_ids_1, node_ids_2)]
+  edge_samples <- edgemodel$chain[, dyad_ids]
+  edge_mu <- apply(edge_samples, 2, mean)
+  edge_cov <- cov(edge_samples)
+
+  model_data <- list(
+    num_rows = edgemodel$num_dyads,
+    num_nodes = num_nodes,
+    num_fixed = num_fixed,
+    num_random = num_random,
+    num_random_groups = num_random_groups,
+    edge_mu = edge_mu,
+    edge_cov = edge_cov,
+    design_fixed = as.matrix(design_fixed[, -1]),
+    design_random = as.matrix(design_random[, -1]),
+    node_ids_1 = node_ids_1,
+    node_ids_2 = node_ids_2,
+    random_group_index = random_group_index
+  )
+
+  model_info <- list(
+    model_data = model_data,
+    dyad_ids = dyad_ids
+  )
+
+  return(model_info)
 }
 
 get_dyadic_regression_spec <- function(formula) {

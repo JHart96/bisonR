@@ -7,12 +7,11 @@
 edge_model(
   formula,
   data,
-  data_type = c("binary", "count", "duration"),
+  data_type = c("binary", "count"),
   directed = FALSE,
-  method = "mcmc",
-  verbose = FALSE,
-  mc_cores = 4,
-  priors = NULL
+  priors = NULL,
+  refresh = 0,
+  mc_cores = 4
 )
 }
 \arguments{

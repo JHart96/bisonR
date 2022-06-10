@@ -27,7 +27,7 @@ simulate_edge_model <- function(model_type, aggregated) {
         for (k in 1:sample.int(max_obs, 1)) {
           location_id <- sample.int(num_locations, 1)
           age_diff <- ages[i] - ages[j]
-          predictor <- edge_weights[i, j] + 0.25 * age_diff + locations[location_id]
+          predictor <- edge_weights[i, j] + age_diff + locations[location_id]
           if (model_type == "binary") {
             event <- rbinom(1, 1, plogis(predictor))
             df_sim[nrow(df_sim) + 1, ] <- list(event=event, node_1_id=i, node_2_id=j, age_diff=age_diff, location=location_id, duration=1)

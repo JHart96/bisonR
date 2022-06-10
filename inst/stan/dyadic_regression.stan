@@ -26,7 +26,7 @@ parameters {
   vector[num_fixed] beta_fixed; // Parameters for fixed effects.
   real<lower=0> sigma;
   vector[include_multimembership ? num_nodes : 0] mm_nodes;
-  array[include_multimembership] real<lower=0> sigma_mm;
+  vector<lower=0>[include_multimembership] sigma_mm;
   vector[num_random] beta_random; // Parameters for random effects.
   vector[num_random_groups] random_group_mu; // Hyperpriors for random effects (mean).
   vector<lower=0>[num_random_groups] random_group_sigma; // Hyperpriors for random effects (std. dev.).
@@ -46,7 +46,7 @@ model {
   beta_fixed ~ normal(prior_fixed_mu, prior_fixed_sigma);
   sigma ~ normal(0, prior_error_sigma);
   if (include_multimembership == 1) {
-    mm_nodes ~ normal(0, sigma_mm);
+    mm_nodes ~ normal(0, sigma_mm[1]); // Why would this be a problem?
     sigma_mm ~ normal(0, prior_multimembership_sigma);
   }
   if (num_random > 0) {

@@ -1,0 +1,119 @@
+---
+title: "Getting Started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+bisonR is an R package for running social network analyses in the BISoN framework.
+
+# Edge Models
+
+```{r}
+library(bisonR)
+library(dplyr)
+```
+
+```{r}
+sim_data <- simulate_edge_model("binary", aggregated=F)
+df <- sim_data
+head(df)
+```
+
+```{r}
+priors <- get_default_priors("binary")
+priors
+```
+
+```{r}
+priors$fixed <- "normal(0, 1)"
+priors
+```
+
+```{r}
+fit_edge <- edge_model((event | duration) ~ dyad(node_1_id, node_2_id), data=df, data_type="binary", priors=priors)
+```
+
+```{r}
+plot_trace(fit_edge)
+```
+
+```{r}
+summary(fit_edge) # 0.810 -0.051  1.740 
+```
+
+```{r}
+plot_network(fit_edge, lwd=2)
+```
+
+```{r}
+plot_predictions(fit_edge, num_draws=20)
+```
+
+# Dyadic Regression
+
+Dyadic regression is also useful:
+
+```{r}
+priors <- get_default_priors("dyadic_regression")
+priors$error <- "half-normal(2.5)"
+```
+
+```{r}
+df_dyadic <- df %>%
+  distinct(node_1_id, node_2_id, age_diff)
+
+fit_dyadic <- dyadic_regression(dyad(node_1_id, node_2_id) ~ age_diff, fit_edge, df_dyadic, mm=TRUE, priors=priors)
+```
+
+```{r}
+summary(fit_dyadic)
+```
+
+```{r}
+plot_trace(fit_dyadic)
+```
+
+```{r}
+plot_predictions(fit_dyadic, num_draws=20)
+```
+```{r}
+# get_contrasts(fit_dyadic, "fixed_dyad_typeLifeform-Lifeform", "fixed_dyad_typeDroid-Droid")
+```
+
+# Nodal Regression
+
+Is useful too
+
+```{r}
+# df_nodal <- df 
+```
+
+
+```{r}
+# fit_nodal <- nodal_regression(strength(node_names) ~ node_type, fit_edge, df_nodal, priors=priors)
+```
+
+```{r}
+# plot_trace(fit_nodal)
+```
+
+```{r}
+# plot_predictions(fit_nodL, num_draws=20)
+```
+
+
+```{r}
+# get_contrasts(fit_node, "fixed_node_typeLifeform", "fixed_node_typeDroid")
+```

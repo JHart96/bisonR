@@ -24,8 +24,10 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
   # If user-specified priors haven't been set, use the defaults
   if (is.null(priors)) priors <- get_default_priors(data_type)
 
+  model_spec <- get_edge_model_spec(formula)
+
   # Set up model data depending on data type.
-  model_info <- prepare_data(formula, data, directed, data_type)
+  model_info <- get_edge_model_data(formula, data, directed, data_type)
 
   # Set the priors in model data
   prior_parameters <- extract_prior_parameters(priors)
@@ -41,9 +43,14 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
   chain <- fit$draws("beta_fixed", format="matrix")
   colnames(chain) <- colnames(model_data$design_fixed)
 
+  # Extract edge samples
+  if(!model_spec$intercept) dyad_start <- 1 else dyad_start <- 2
+  edge_samples <- chain[, dyad_start:(model_info$num_dyads + dyad_start - 1)]
+
   # Prepare output object.
   obj <- list(
     chain = chain,
+    edge_samples=edge_samples,
     num_nodes = model_info$num_nodes,
     num_dyads = model_info$num_dyads,
     node_to_idx = model_info$node_to_idx,
@@ -113,15 +120,10 @@ get_edgelist <- function (obj, ci=0.9) {
   )
   lb <- 0.5 * (1 - ci)
   ub <- 1 - lb
-  dyad_start <- 1
-  model_spec <- get_edge_model_spec(obj$formula)
-  if(model_spec$intercept) {
-    dyad_start <- 2
-  }
-  dyad_samples <- obj$chain[, dyad_start:(obj$num_dyads + dyad_start - 1)]
-  edge_lower <- apply(dyad_samples, 2, function(x) quantile(x, probs=lb))
-  edge_upper <- apply(dyad_samples, 2, function(x) quantile(x, probs=ub))
-  edge_median <- apply(dyad_samples, 2, function(x) quantile(x, probs=0.5))
+
+  edge_lower <- apply(obj$edge_samples, 2, function(x) quantile(x, probs=lb))
+  edge_upper <- apply(obj$edge_samples, 2, function(x) quantile(x, probs=ub))
+  edge_median <- apply(obj$edge_samples, 2, function(x) quantile(x, probs=0.5))
   edgelist <- data.frame(
     node_1 = node_names[1, ],
     node_2 = node_names[2, ],
@@ -158,7 +160,7 @@ draw_edgelist_samples <- function (obj, num_draws) {
 
 plot_predictions.edge_model <- function(obj, num_draws=20) {
   event_preds <- obj$fit$draws("event_pred", format="matrix")
-  df_draw <- data.frame(event=obj$model_data$event, dyad_id=obj$model_info$row_dyad_ids)
+  df_draw <- data.frame(event=obj$model_data$event, dyad_id=obj$model_info$row_dyad_ids) # Get dyad IDs from somewhere sensible.
   df_summed <- aggregate(event ~ as.factor(dyad_id), df_draw, sum)
   pred_density <- density(df_summed$event)
   plot(pred_density, main="Observed vs predicted social events", xlab="Social events", ylim=c(0, max(pred_density$y) * 1.1))
@@ -196,7 +198,7 @@ plot_network <- function(obj, ci=0.9, lwd=1, ciwd=10) {
   igraph::plot.igraph(net, edge.width=weights * lwd * ciwd, layout=coords, edge.color=rgb(0, 0, 0, 0.25), add=TRUE)
 }
 
-prepare_data <- function(formula, observations, directed, data_type) {
+get_edge_model_data <- function(formula, observations, directed, data_type) {
   if (data_type == "duration") {
     observations_agg <- observations[[2]]
     observations <- observations[[1]]
