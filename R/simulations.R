@@ -14,7 +14,7 @@ simulate_edge_model <- function(model_type, aggregated) {
   locations <- rnorm(num_locations, 0, 1)
 
   if (model_type %in% c("binary", "count")) {
-    df_sim <- data.frame(event=numeric(), node_1_id=numeric(), node_2_id=numeric(), age_diff=numeric(), location=numeric(), duration=numeric())
+    df_sim <- data.frame(event=numeric(), node_1_id=numeric(), node_2_id=numeric(), age_diff=numeric(), age_1=numeric(), age_2=numeric(), location=numeric(), duration=numeric())
   }
   if (model_type == "duration") {
     df_sim <- data.frame(event=numeric(), node_1_id=numeric(), node_2_id=numeric(), age_diff=numeric(), location=numeric())
@@ -30,12 +30,12 @@ simulate_edge_model <- function(model_type, aggregated) {
           predictor <- edge_weights[i, j] + age_diff + locations[location_id]
           if (model_type == "binary") {
             event <- rbinom(1, 1, plogis(predictor))
-            df_sim[nrow(df_sim) + 1, ] <- list(event=event, node_1_id=i, node_2_id=j, age_diff=age_diff, location=location_id, duration=1)
+            df_sim[nrow(df_sim) + 1, ] <- list(event=event, node_1_id=i, node_2_id=j, age_diff=age_diff, age_1=ages[i], age_2=ages[j], location=location_id, duration=1)
           }
           if (model_type == "count") {
             duration <- runif(1, 1, max_obs)
             event <- rpois(1, exp(predictor) * duration)
-            df_sim[nrow(df_sim) + 1, ] <- list(event=event, node_1_id=i, node_2_id=j, age_diff=age_diff, location=location_id, duration=duration)
+            df_sim[nrow(df_sim) + 1, ] <- list(event=event, node_1_id=i, node_2_id=j, age_diff=age_diff, age_1=ages[i], age_2=ages[j], location=location_id, duration=duration)
           }
         }
         if (model_type == "duration") {

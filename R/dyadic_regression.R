@@ -135,16 +135,12 @@ get_dyadic_regression_model_data <- function(formula, edgemodel, data) {
   design_fixed <- data.frame(empty_col = rep(0, nrow(data)))
   design_random <- data.frame(empty_col = rep(0, nrow(data)))
 
+  # Get model specification
   model_spec <- get_dyadic_regression_spec(formula)
   # If there is an intercept
   if (model_spec$intercept) {
     design_fixed[, "intercept"] <- 1
   }
-
-  # Get model specification
-  model_spec <- get_dyadic_regression_spec(formula)
-
-  # print(model_terms)
 
   # Variable grouping for random effects
   random_group_index <- c()

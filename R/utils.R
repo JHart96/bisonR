@@ -45,7 +45,7 @@ plot_predictions <- function(obj, ...) {
 #' @examples
 get_contrasts <- function(obj, parameter_1, parameter_2, ci=0.90) {
   beta_samples <- obj$chain
-  colnames(beta_samples) <- colnames(obj$design_matrices$X)
+  colnames(beta_samples) <- colnames(obj$model_data$design_fixed)
   beta_diff <- beta_samples[, parameter_1] - beta_samples[, parameter_2]
   beta_quant <- quantile(beta_diff, probs=c(0.5, 0.5 * (1 - ci), ci + 0.5 * (1 - ci)))
   return(round(beta_quant, 3))

@@ -147,8 +147,8 @@ get_edgelist <- function (obj, ci=0.9) {
 #' @examples
 draw_edgelist_samples <- function (obj, num_draws) {
   node_names <- sapply(
-    1:max(obj$dyad_mapping),
-    function(x) names(obj$node_to_idx)[which(obj$dyad_mapping == x, arr.ind=TRUE)[1, 2:1]]
+    1:max(obj$dyad_to_idx),
+    function(x) names(obj$node_to_idx)[which(obj$dyad_to_idx == x, arr.ind=TRUE)[1, 2:1]]
   )
   edgelist_samples <- data.frame(
     node_1 = factor(node_names[1, ], levels=names(obj$node_to_idx)),
@@ -189,13 +189,11 @@ plot_trace.edge_model <- function(obj, par_ids=1:12, ...) {
 plot_network <- function(obj, ci=0.9, lwd=1, ciwd=10) {
   edgelist <- get_edgelist(obj, ci=ci)
   net <- igraph::graph_from_edgelist(as.matrix(edgelist[, 1:2]), directed=FALSE)
-  edge_weights <- plogis(edgelist[, 3])
-  weights <- (edge_weights - min(edge_weights))/(max(edge_weights) - min(edge_weights))
+  lb <- plogis(edgelist[, 3])
+  ub <- plogis(edgelist[, 5])
   coords <- igraph::layout_nicely(net)
-  igraph::plot.igraph(net, edge.width=weights * lwd, layout=coords)
-  ci_widths <- plogis(edgelist[, 5]) - plogis(edgelist[, 4])
-  weights <- (ci_widths - min(edge_weights))/(max(edge_weights) - min(edge_weights))
-  igraph::plot.igraph(net, edge.width=weights * lwd * ciwd, layout=coords, edge.color=rgb(0, 0, 0, 0.25), add=TRUE)
+  igraph::plot.igraph(net, edge.width=ub * lwd, layout=coords, edge.color=rgb(0.1, 0.1, 0.1, 0.9),)
+  igraph::plot.igraph(net, edge.width=lb * lwd, layout=coords, edge.color=rgb(0.9, 0.9, 0.9, 0.9), add=TRUE)
 }
 
 get_edge_model_data <- function(formula, observations, directed, data_type) {
