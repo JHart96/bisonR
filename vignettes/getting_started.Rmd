@@ -31,7 +31,7 @@ We will also use the `simulate_edge_model()` function from `bisonR` to simulate 
 
 ```{r}
 sim_data <- simulate_edge_model("binary", aggregated = FALSE)
-df <- sim_data
+df <- sim_data$df_sim
 head(df)
 ```
 
@@ -49,7 +49,7 @@ priors
 This list shows the priors set on the "fixed effect" parameters: the edge weights and any additional fixed effects included in the edge weight model; and the "random effect" parameters: any additional random effects included in the edge weight model. Imagine we decide that a normal distribution with mean zero and standard deviation 1 is not appropriate for the fixed effects, and we'd prefer a standard deviation of 2, we can change this using the following code:
 
 ```{r}
-priors$fixed <- "normal(0, 2)"
+priors$fixed <- "normal(0, 2.5)"
 priors
 ```
 
@@ -60,9 +60,13 @@ In bisonR, the left hand side of the `~` describes the sampling data, and uses t
 The right hand side of the `~` describes the predictors that are associated with social events. In the standard BISoN model this is primarily the edge weight that we use to build the network, but this can also include additional effects such as age, sex, or even observation-level factors such as location, time of day, or weather, to name a few. Including additional effects will change the interpretation of edge weights, but could be useful if interested in the social network once some factors have been controlled for. *Note* the edge weights don't need to be included, and you could use bisonR to estimate generative effects in a network. In this example we'll keep things simple and just use edge weight as the only predictor. This is done using the `dyad(node_1_id, node_2_id)` notation. `node_1_id` and `node_2_id` represent the nodes corresponding to each individual in the network, and need to be stored as factors in the dataframe. They don't need to be IDs, and could be individual names, as long as they're stored as factors. Now we understand the basics of the formula notation, we can now fit the edge weight model:
 
 ```{r}
-fit_edge <- edge_model((event | duration) ~ dyad(node_1_id, node_2_id), data=df, data_type="binary", priors=priors)
+fit_edge <- edge_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id), 
+  data=df, 
+  data_type="binary", 
+  priors=priors
+)
 ```
-
 Depending on your dataset this can take anywhere between a few tenths of a second and several hours. In particular if you have a large dataset and no observation-level predictors, it's probably a good idea to use the aggregated version of the model where all observations per dyad are collapsed to a single row. This will speed up model fitting considerably.
 
 Once the model has fitted, we need to check that the MCMC algorithm has behaved correctly. Usually if there's a major problem, the `edge_model()` function itself will have triggered warning messages above. But even if everything is silent, it's still worth checking the traceplots to check the MCMC chains have converged. The chains should be well-mixed and look something like a fuzzy caterpillar. We can check for this using the `plot_trace()` function:
@@ -97,7 +101,7 @@ Dyadic regression is where dyadic network properties (usually edge weight) are r
 
 ```{r}
 priors <- get_default_priors("dyadic_regression")
-priors$fixed <- "normal(0, 2.5)"
+priors$error <- "half-normal(2.5)"
 priors
 ```
 
@@ -146,7 +150,7 @@ Priors can be set in the exact same way as for the `dyadic_regression()` functio
 
 ```{r}
 priors <- get_default_priors("nodal_regression")
-priors$fixed <- "normal(0, 2.5)"
+priors$error <- "half-normal(2.5)"
 priors
 ```
 

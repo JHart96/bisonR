@@ -92,7 +92,7 @@ get_nodal_regression_model_data <- function(formula, edgemodel, data) {
   num_random <- ncol(design_random) - 1
   num_random_groups <- length(unique(random_group_index))
 
-  metric_samples <- draw_node_metric_samples(edgemodel, model_spec$metric_name, 1000)
+  metric_samples <- draw_node_metric_samples(edgemodel, model_spec$metric_name, 1000, standardise=TRUE)
   metric_mu <- apply(metric_samples, 2, mean)
   metric_cov <- cov(metric_samples)
 
@@ -127,7 +127,7 @@ get_nodal_regression_model_data <- function(formula, edgemodel, data) {
 #' @examples
 print.nodal_model <- function(obj) {
   coefficients <- t(apply(obj$chain, 2, function(x) quantile(x, probs=c(0.5, 0.05, 0.95))))
-  rownames(coefficients) <- colnames(obj$design_matrices$X)
+  rownames(coefficients) <- colnames(obj$model_data$design_fixed)
   coefficients <- round(coefficients, 3)
   cat(paste0(
     "=== Fitted nodal regression model ===\n",
@@ -169,8 +169,8 @@ plot_predictions.nodal_model <- function(obj, num_draws=20) {
   sample_densities <- list()
   pred_densities <- list()
   for (i in 1:num_draws) {
-    pred_densities[[i]] <- density(metric_samples[i, ])
-    sample_densities[[i]] <- density(as.vector(metric_preds[i, ]))
+    sample_densities[[i]] <- density(metric_samples[i, ])
+    pred_densities[[i]] <- density(as.vector(metric_preds[i, ]))
   }
 
   # Set plot limits according to maximum density of samples

@@ -7,7 +7,7 @@
 #' @export
 #'
 #' @examples
-draw_node_metric_samples <- function(obj, metric_name, num_draws=1000) {
+draw_node_metric_samples <- function(obj, metric_name, num_draws=1000, standardise=TRUE) {
   edgelist_samples <- draw_edgelist_samples(obj, num_draws)
   net <- igraph::graph_from_edgelist(as.matrix(edgelist_samples[, 1:2]), directed = FALSE)
   metric_fn <- get_metric_fn(metric_name)
@@ -22,7 +22,12 @@ draw_node_metric_samples <- function(obj, metric_name, num_draws=1000) {
     } else if (obj$data_type == "duration") {
       igraph::E(net)$weight <- plogis(edgelist_samples[, 2 + i])
     }
-    metric_samples[i, ] <- metric_fn(net)
+    metric_sample <- metric_fn(net)
+    if (standardise) {
+      metric_samples[i, ] <- metric_sample - mean(metric_sample)
+    } else {
+      metric_samples[i, ] <- metric_sample
+    }
   }
   metric_samples
 }

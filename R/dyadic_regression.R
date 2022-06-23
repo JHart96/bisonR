@@ -59,7 +59,7 @@ print.dyadic_model <- function(obj) {
   coefficients <- round(coefficients, 3)
   cat(paste0(
     "=== Fitted dyadic regression model ===\n",
-    "Formula: ", obj$formula, "\n",
+    "Formula: ", format(obj$formula), "\n",
     "Number of dyads: ", obj$edgemodel$num_dyads, "\n",
     "=== Coefficient summary ==="
   ))
@@ -103,10 +103,10 @@ plot_predictions.dyadic_model <- function(obj, num_draws=20) {
   for (i in 1:num_draws) {
     df_draw <- data.frame(y=as.vector(edge_samples[i, ]), dyad_id=obj$dyad_ids)
     df_summed <- aggregate(y ~ as.factor(dyad_id), df_draw, sum)
-    pred_densities[[i]] <- density(df_summed$y)
+    sample_densities[[i]] <- density(df_summed$y)
     df_draw$y <- as.vector(edge_preds[i, ])
     df_summed <- aggregate(y ~ as.factor(dyad_id), df_draw, sum)
-    sample_densities[[i]] <- density(df_summed$y)
+    pred_densities[[i]] <- density(df_summed$y)
   }
 
   # Set plot limits according to maximum density of samples

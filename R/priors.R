@@ -9,7 +9,7 @@
 get_default_priors <- function(model_type) {
   if (model_type == "binary") {
     priors <- list(
-      fixed="normal(0, 1)",
+      fixed="normal(0, 2.5)",
       random_mean="normal(0, 1)",
       random_std="half-normal(1)"
     )
@@ -17,7 +17,7 @@ get_default_priors <- function(model_type) {
   }
   if (model_type == "count") {
     priors <- list(
-      fixed="normal(0, 1)",
+      fixed="normal(0, 2.5)",
       random_mean="normal(0, 1)",
       random_std="half-normal(1)"
     )
@@ -25,7 +25,7 @@ get_default_priors <- function(model_type) {
   }
   if (model_type == "duration") {
     priors <- list(
-      fixed="normal(0, 1)",
+      fixed="normal(0, 2.5)",
       random_mean="normal(0, 1)",
       random_std="half-normal(1)"
     )
@@ -33,7 +33,7 @@ get_default_priors <- function(model_type) {
   }
   if (model_type == "dyadic_regression") {
     priors <- list(
-      fixed="normal(0, 1)",
+      fixed="normal(0, 2.5)",
       random_mean="normal(0, 1)",
       random_std="half-normal(1)",
       multimembership="half-normal(1)",
@@ -43,7 +43,7 @@ get_default_priors <- function(model_type) {
   }
   if (model_type == "nodal_regression") {
     priors <- list(
-      fixed="normal(0, 1)",
+      fixed="normal(0, 2.5)",
       random_mean="normal(0, 1)",
       random_std="half-normal(1)",
       error="half-normal(1)"
