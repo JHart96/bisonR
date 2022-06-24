@@ -70,15 +70,47 @@
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>verbose</dt>
-<dd></dd>
+    <dl><dt>formula</dt>
+<dd><p>Formula specifying social events and sampling effort on the LHS and edge weights, fixed, and random effects on the RHS.</p></dd>
+
+
+<dt>data</dt>
+<dd><p>Aggregated or disaggregated dataframe of dyadic observations.</p></dd>
+
+
+<dt>data_type</dt>
+<dd><p>"binary", "count", or "duration", specifying the type of edge weight model to use.</p></dd>
+
+
+<dt>directed</dt>
+<dd><p><code>TRUE</code> or <code>FALSE</code> specifying whether the network is directed or not.</p></dd>
+
+
+<dt>priors</dt>
+<dd><p>List of priors in the format supplied by <code><a href="get_default_priors.html">get_default_priors()</a></code>.</p></dd>
+
+
+<dt>refresh</dt>
+<dd><p>Frequency of messages printed while running the sampler.</p></dd>
+
+
+<dt>mc_cores</dt>
+<dd><p>Number of cores to use when running the sampler.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-
+<p>An S3 edge model object containing edge samples and processed data.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Fits a BISoN edge weight model to a user-provided dataframe. The function supports either aggregated (at the
+dyad-level) or disaggregated (at the observation-level) dataframes. Node names or IDs need to be formatted
+as factors with the same levels.</p>
+<p>The type of edge model and the interpretation of edge weights used depends on <code>data_type</code>, and will change
+the interpretation of the edge weights.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
