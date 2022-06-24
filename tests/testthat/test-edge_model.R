@@ -2,7 +2,7 @@ test_that("Binary edge model parameter estimation", {
   library(dplyr)
   library(igraph)
 
-  set.seed(123)
+  set.seed(1)
 
   # Load data in with minimal effects
   sim_data <- simulate_edge_model("binary", aggregated = TRUE, location_effect = FALSE, age_diff_effect = FALSE)
@@ -29,7 +29,9 @@ test_that("Binary edge model parameter estimation", {
 
   # Check that plots don't produce warnings
   expect_warning(plot_predictions(fit_edge), regexp=NA)
+  expect_warning(plot_network(fit_edge), regexp=NA)
   expect_warning(plot_trace(fit_edge, par_ids=1), regexp=NA)
+  expect_output(summary(fit_edge))
 
   # Modify comparison dataframe to test dyadic regression.
   df_dyadic <- comparison
@@ -68,7 +70,7 @@ test_that("Binary edge model parameter estimation", {
 test_that("Count edge model parameter estimation", {
   library(dplyr)
 
-  set.seed(123)
+  set.seed(1)
 
   # Load data in with minimal effects
   sim_data <- simulate_edge_model("count", aggregated = TRUE, location_effect = FALSE, age_diff_effect = FALSE)
