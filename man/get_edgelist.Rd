@@ -4,7 +4,7 @@
 \alias{get_edgelist}
 \title{Retrieves an edgelist with uncertainty for a fitted edge weight model object}
 \usage{
-get_edgelist(obj, ci = 0.9)
+get_edgelist(obj, ci = 0.9, transform = TRUE)
 }
 \arguments{
 \item{obj}{}

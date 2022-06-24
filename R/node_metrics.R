@@ -17,9 +17,11 @@ draw_node_metric_samples <- function(obj, metric_name, num_draws=1000, standardi
   for (i in 1:num_draws) {
     if (obj$data_type == "binary") {
       igraph::E(net)$weight <- plogis(edgelist_samples[, 2 + i])
-    } else if (obj$data_type == "count") {
+    }
+    if (obj$data_type == "count") {
       igraph::E(net)$weight <- exp(edgelist_samples[, 2 + i])
-    } else if (obj$data_type == "duration") {
+    }
+    if (obj$data_type == "duration") {
       igraph::E(net)$weight <- plogis(edgelist_samples[, 2 + i])
     }
     metric_sample <- metric_fn(net)

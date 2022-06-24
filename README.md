@@ -12,6 +12,8 @@ bisonR is an R package implementing the BISoN framework for conducting Bayesian 
 
 ## Installation
 
+cmdstanR needs to be installed for the bisonR package to work. To install cmdstanR, follow the instructions at https://mc-stan.org/cmdstanr/, then run `cmdstanr::install_cmdstan()`.
+
 bisonR isn't currently on CRAN, but it can be installed from GitHub. To do this, make sure you have the `remotes` package installed. Then run the following command:
 
 ```

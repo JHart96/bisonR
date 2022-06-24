@@ -4,7 +4,7 @@
 \alias{print.edge_model}
 \title{Prints out details of a fitted edge model object}
 \usage{
-\method{print}{edge_model}(obj, ci = 0.9)
+\method{print}{edge_model}(object, ci = 0.9, transform = TRUE)
 }
 \arguments{
 \item{ci}{}

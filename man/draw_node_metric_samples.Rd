@@ -4,7 +4,12 @@
 \alias{draw_node_metric_samples}
 \title{Draw samples from the posterior node metric for a fitted edge weight model}
 \usage{
-draw_node_metric_samples(obj, metric_name, num_draws = 1000)
+draw_node_metric_samples(
+  obj,
+  metric_name,
+  num_draws = 1000,
+  standardise = TRUE
+)
 }
 \arguments{
 \item{metric_name}{}

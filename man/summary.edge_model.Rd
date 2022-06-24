@@ -4,7 +4,7 @@
 \alias{summary.edge_model}
 \title{Summarises a fitted edge model object}
 \usage{
-\method{summary}{edge_model}(obj)
+\method{summary}{edge_model}(object, ...)
 }
 \arguments{
 \item{obj}{}

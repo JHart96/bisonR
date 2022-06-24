@@ -33,6 +33,8 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
   prior_parameters <- extract_prior_parameters(priors)
   model_data <- c(model_info$model_data, prior_parameters)
 
+  print(prior_parameters)
+
   # Build model
   model <- build_stan_model(data_type)
 
@@ -40,12 +42,11 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
   fit <- model$sample(data=model_data, refresh=refresh, chains=4, parallel_chains=mc_cores, step_size=0.1)
 
   # Extract edge weights from fitted edge model.
-  chain <- fit$draws("beta_fixed", format="matrix")
+  chain <- fit$draws("edge_weight", format="matrix")
   colnames(chain) <- colnames(model_data$design_fixed)
 
   # Extract edge samples
-  if(!model_spec$intercept) dyad_start <- 1 else dyad_start <- 2
-  edge_samples <- chain[, dyad_start:(model_info$num_dyads + dyad_start - 1)]
+  edge_samples <- chain
 
   # Prepare output object.
   obj <- list(
@@ -77,8 +78,8 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
 #' @export
 #'
 #' @examples
-summary.edge_model <- function(obj) {
-  print(obj)
+summary.edge_model <- function(object, ...) {
+  print(object, ...)
 }
 
 #' Prints out details of a fitted edge model object
@@ -87,18 +88,18 @@ summary.edge_model <- function(obj) {
 #' @param ci
 #'
 #' @export
-print.edge_model <- function(obj, ci=0.90) {
+print.edge_model <- function(object, ci=0.90, transform=TRUE) {
   cat(paste0(
     "=== Fitted BISoN edge model ===",
-    "\nData type: ", obj$data_type,
-    "\nFormula: ", format(obj$formula),
-    "\nNumber of nodes: ", obj$num_nodes,
-    "\nNumber of dyads: ", obj$num_dyads,
-    "\nDirected: ", obj$directed,
+    "\nData type: ", object$data_type,
+    "\nFormula: ", format(object$formula),
+    "\nNumber of nodes: ", object$num_nodes,
+    "\nNumber of dyads: ", object$num_dyads,
+    "\nDirected: ", object$directed,
     "\n=== Edge list summary ===\n"
   ))
 
-  edgelist <- get_edgelist(obj, ci=ci)
+  edgelist <- get_edgelist(object, ci=ci, transform=transform)
   dyad_names <- do.call(paste, c(get_edgelist(fit_edge)[, 1:2], sep=" <-> "))
   summary_matrix <- as.matrix(edgelist[, 3:5])
   rownames(summary_matrix) <- dyad_names
@@ -113,7 +114,7 @@ print.edge_model <- function(obj, ci=0.90) {
 #' @export
 #'
 #' @examples
-get_edgelist <- function (obj, ci=0.9) {
+get_edgelist <- function (obj, ci=0.9, transform=TRUE) {
   node_names <- sapply(
     1:max(obj$dyad_to_idx),
     function(x) names(obj$node_to_idx)[which(obj$dyad_to_idx == x, arr.ind=TRUE)[1, 2:1]]
@@ -121,9 +122,14 @@ get_edgelist <- function (obj, ci=0.9) {
   lb <- 0.5 * (1 - ci)
   ub <- 1 - lb
 
-  edge_lower <- apply(obj$edge_samples, 2, function(x) quantile(x, probs=lb))
-  edge_upper <- apply(obj$edge_samples, 2, function(x) quantile(x, probs=ub))
-  edge_median <- apply(obj$edge_samples, 2, function(x) quantile(x, probs=0.5))
+  edge_samples <- obj$edge_samples
+  if (transform) {
+    edge_samples <- edge_transform(obj)
+  }
+
+  edge_lower <- apply(edge_samples, 2, function(x) quantile(x, probs=lb))
+  edge_upper <- apply(edge_samples, 2, function(x) quantile(x, probs=ub))
+  edge_median <- apply(edge_samples, 2, function(x) quantile(x, probs=0.5))
   edgelist <- data.frame(
     node_1 = node_names[1, ],
     node_2 = node_names[2, ],
@@ -175,7 +181,7 @@ plot_trace.edge_model <- function(obj, par_ids=1:12, ...) {
   if (dim(obj$chain)[2] < 12) {
     par_ids <- 1:dim(obj$chain[2])
   }
-  bayesplot::mcmc_trace(obj$fit$draws("beta_fixed")[,,par_ids])
+  bayesplot::mcmc_trace(obj$fit$draws("edge_weight")[,,par_ids])
 }
 
 #' Sociogram plot with uncertainty of a fitted edge weight model object
@@ -187,10 +193,10 @@ plot_trace.edge_model <- function(obj, par_ids=1:12, ...) {
 #'
 #' @examples
 plot_network <- function(obj, ci=0.9, lwd=1, ciwd=10) {
-  edgelist <- get_edgelist(obj, ci=ci)
+  edgelist <- get_edgelist(obj, ci=ci, transform=TRUE)
   net <- igraph::graph_from_edgelist(as.matrix(edgelist[, 1:2]), directed=FALSE)
-  lb <- plogis(edgelist[, 3])
-  ub <- plogis(edgelist[, 5])
+  lb <- edgelist[, 3]
+  ub <- edgelist[, 5]
   coords <- igraph::layout_nicely(net)
   igraph::plot.igraph(net, edge.width=ub * lwd, layout=coords, edge.color=rgb(0.1, 0.1, 0.1, 0.9),)
   igraph::plot.igraph(net, edge.width=lb * lwd, layout=coords, edge.color=rgb(0.9, 0.9, 0.9, 0.9), add=TRUE)
@@ -248,14 +254,14 @@ get_edge_model_data <- function(formula, observations, directed, data_type) {
     node_1_names <- dplyr::pull(observations, model_spec$node_1_name)
     node_2_names <- dplyr::pull(observations, model_spec$node_2_name)
     dyad_ids=as.factor(dyad_to_idx[cbind(node_to_idx[node_1_names], node_to_idx[node_2_names])])
-
-    # Populate design matrix
-    term_levels <- levels(dyad_ids)
-    for (i in 1:length(term_levels)) {
-      term_level <- term_levels[i]
-      new_term_name <-  paste0("dyad_", term_level)
-      design_fixed[, new_term_name] <- 1 * (dyad_ids == term_level)
-    }
+    #
+    # # Populate design matrix
+    # term_levels <- levels(dyad_ids)
+    # for (i in 1:length(term_levels)) {
+    #   term_level <- term_levels[i]
+    #   new_term_name <-  paste0("dyad_", term_level)
+    #   design_fixed[, new_term_name] <- 1 * (dyad_ids == term_level)
+    # }
   }
 
   # Variable grouping for random effects
@@ -311,22 +317,15 @@ get_edge_model_data <- function(formula, observations, directed, data_type) {
     num_rows=nrow(design_fixed),
     event=event,
     divisor=divisor,
+    dyad_ids=dyad_ids,
     design_fixed=data.matrix(design_fixed[, -1]),
     design_random=data.matrix(design_random[, -1]),
+    num_edges = length(unique(dyad_ids)),
     num_fixed=ncol(design_fixed[, -1]),
     num_random=ncol(design_random[, -1]),
     num_random_groups=length(unique(random_group_index)),
     random_group_index=as.integer(as.factor(random_group_index))
   )
-
-  # ,
-  #   node_to_idx=node_to_idx,
-  #   dyad_id=dyad_id,
-  #   dyad_ids=as.integer(dyad_ids),
-  #   num_nodes=n,
-  #
-  #   # sri=sri
-  # )
 
   if (data_type == "duration") {
     model_data$k <- dplyr::pull(observations_agg, model_spec$divisor_var_name)

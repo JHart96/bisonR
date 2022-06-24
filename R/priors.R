@@ -9,6 +9,7 @@
 get_default_priors <- function(model_type) {
   if (model_type == "binary") {
     priors <- list(
+      edge="normal(0, 2.5)",
       fixed="normal(0, 2.5)",
       random_mean="normal(0, 1)",
       random_std="half-normal(1)"
@@ -17,6 +18,7 @@ get_default_priors <- function(model_type) {
   }
   if (model_type == "count") {
     priors <- list(
+      edge="normal(0, 2.5)",
       fixed="normal(0, 2.5)",
       random_mean="normal(0, 1)",
       random_std="half-normal(1)"
@@ -25,6 +27,7 @@ get_default_priors <- function(model_type) {
   }
   if (model_type == "duration") {
     priors <- list(
+      edge="normal(0, 2.5)",
       fixed="normal(0, 2.5)",
       random_mean="normal(0, 1)",
       random_std="half-normal(1)"

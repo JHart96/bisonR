@@ -4,7 +4,12 @@
 \alias{simulate_edge_model}
 \title{Simulates observations from an edge model}
 \usage{
-simulate_edge_model(model_type, aggregated)
+simulate_edge_model(
+  model_type,
+  aggregated,
+  location_effect = TRUE,
+  age_diff_effect = TRUE
+)
 }
 \value{
 

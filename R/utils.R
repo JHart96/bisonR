@@ -51,6 +51,19 @@ get_contrasts <- function(obj, parameter_1, parameter_2, ci=0.90) {
   return(round(beta_quant, 3))
 }
 
+edge_transform <- function(obj) {
+  edge_samples <- obj$edge_samples
+  if (obj$data_type == "binary") {
+    return(plogis(edge_samples))
+  }
+  if (obj$data_type == "count") {
+    return(exp(edge_samples))
+  }
+  if (obj$data_type == "duration") {
+    return(plogis(edge_samples))
+  }
+}
+
 build_stan_model <- function(model_name) {
   model_filepath <- system.file("stan", paste0(model_name, ".stan"), package="bisonR")
   model <- cmdstanr::cmdstan_model(model_filepath)

@@ -19,7 +19,7 @@ test_that("Binary edge model parameter estimation", {
   true <- sim_data$df_true %>%
     mutate(edge_weight=edge_weight) %>%
     select(node_1=node_1_id, node_2=node_2_id, true=edge_weight)
-  est <- get_edgelist(fit_edge) %>%
+  est <- get_edgelist(fit_edge, transform=FALSE) %>%
     select(node_1, node_2, est=median, est_lb="5%", est_ub="95%")
   comparison <- left_join(true, est, by=c("node_1", "node_2"))
 
