@@ -15,11 +15,31 @@ edge_model(
 )
 }
 \arguments{
-\item{verbose}{}
+\item{formula}{Formula specifying social events and sampling effort on the LHS and edge weights, fixed, and random effects on the RHS.}
+
+\item{data}{Aggregated or disaggregated dataframe of dyadic observations.}
+
+\item{data_type}{"binary", "count", or "duration", specifying the type of edge weight model to use.}
+
+\item{directed}{\code{TRUE} or \code{FALSE} specifying whether the network is directed or not.}
+
+\item{priors}{List of priors in the format supplied by \code{get_default_priors()}.}
+
+\item{refresh}{Frequency of messages printed while running the sampler.}
+
+\item{mc_cores}{Number of cores to use when running the sampler.}
 }
 \value{
-
+An S3 edge model object containing edge samples and processed data.
 }
 \description{
 Fit an edge model to data
+}
+\details{
+Fits a BISoN edge weight model to a user-provided dataframe. The function supports either aggregated (at the
+dyad-level) or disaggregated (at the observation-level) dataframes. Node names or IDs need to be formatted
+as factors with the same levels.
+
+The type of edge model and the interpretation of edge weights used depends on \code{data_type}, and will change
+the interpretation of the edge weights.
 }

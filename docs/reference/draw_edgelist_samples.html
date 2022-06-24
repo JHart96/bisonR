@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">bisonR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,10 +24,7 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/dyadic_regression.html">Running a dyadic regression</a>
-    <a class="dropdown-item" href="../articles/edge_models.html">Fitting an Edge Model</a>
-    <a class="dropdown-item" href="../articles/nodal_regression.html">Running a nodal regression</a>
-    <a class="dropdown-item" href="../articles/nonrandom_edges.html">Testing for non-random edge weights</a>
+    <a class="dropdown-item" href="../articles/getting_started.html">Getting Started</a>
   </div>
 </li>
 <li class="nav-item">
@@ -65,12 +62,14 @@
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>num_draws</dt>
-<dd></dd>
+    <dl><dt>obj</dt>
+<dd><p>An S3 edge model object to be summarised.</p></dd>
+<dt>num_draws</dt>
+<dd><p>Number of sample distributions to draw from the posterior.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    
+    <p>A <code>data.frame</code> of sample draws from the posteriors, where each column corresponds to a posterior draw.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

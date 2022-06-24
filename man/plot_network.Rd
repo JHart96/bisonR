@@ -7,10 +7,7 @@
 plot_network(obj, ci = 0.9, lwd = 1, ciwd = 10)
 }
 \arguments{
-\item{obj}{}
-}
-\value{
-
+\item{obj}{An S3 edge model object to be summarised.}
 }
 \description{
 Sociogram plot with uncertainty of a fitted edge weight model object

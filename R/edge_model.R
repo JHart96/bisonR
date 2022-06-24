@@ -6,14 +6,24 @@ require(bayesplot)
 
 #' Fit an edge model to data
 #'
-#' @param formula
-#' @param data
-#' @param data_type
-#' @param directed
-#' @param method
-#' @param verbose
 #'
-#' @return
+#' @param formula Formula specifying social events and sampling effort on the LHS and edge weights, fixed, and random effects on the RHS.
+#' @param data Aggregated or disaggregated dataframe of dyadic observations.
+#' @param data_type "binary", "count", or "duration", specifying the type of edge weight model to use.
+#' @param directed `TRUE` or `FALSE` specifying whether the network is directed or not.
+#' @param priors List of priors in the format supplied by `get_default_priors()`.
+#' @param refresh Frequency of messages printed while running the sampler.
+#' @param mc_cores Number of cores to use when running the sampler.
+#'
+#' @details
+#' Fits a BISoN edge weight model to a user-provided dataframe. The function supports either aggregated (at the
+#' dyad-level) or disaggregated (at the observation-level) dataframes. Node names or IDs need to be formatted
+#' as factors with the same levels.
+#'
+#' The type of edge model and the interpretation of edge weights used depends on `data_type`, and will change
+#' the interpretation of the edge weights.
+#'
+#' @return An S3 edge model object containing edge samples and processed data.
 #'
 #' @export
 edge_model <- function(formula, data, data_type=c("binary", "count"), directed=FALSE, priors=NULL, refresh=0, mc_cores=4) {
@@ -72,20 +82,19 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
 
 #' Summarises a fitted edge model object
 #'
-#' @param obj
+#' @param object An S3 edge model object to be summarised.
+#' @param ... Additional arguments to be passed to `print.edge_model()`.
 #'
-#' @return
 #' @export
-#'
-#' @examples
 summary.edge_model <- function(object, ...) {
   print(object, ...)
 }
 
 #' Prints out details of a fitted edge model object
 #'
-#' @param obj
-#' @param ci
+#' @param obj An S3 edge model object.
+#' @param ci Credible interval to use in summary, based on quantiles.
+#' @param transform `TRUE` or `FALSE` specifying whether to transform the edge weights from the internal link function scale.
 #'
 #' @export
 print.edge_model <- function(object, ci=0.90, transform=TRUE) {
@@ -100,7 +109,7 @@ print.edge_model <- function(object, ci=0.90, transform=TRUE) {
   ))
 
   edgelist <- get_edgelist(object, ci=ci, transform=transform)
-  dyad_names <- do.call(paste, c(get_edgelist(fit_edge)[, 1:2], sep=" <-> "))
+  dyad_names <- do.call(paste, c(get_edgelist(object)[, 1:2], sep=" <-> "))
   summary_matrix <- as.matrix(edgelist[, 3:5])
   rownames(summary_matrix) <- dyad_names
   print(summary_matrix)
@@ -108,12 +117,12 @@ print.edge_model <- function(object, ci=0.90, transform=TRUE) {
 
 #' Retrieves an edgelist with uncertainty for a fitted edge weight model object
 #'
-#' @param obj
+#' @param obj An S3 edge model object.
+#' @param ci Credible interval to use in summary, based on quantiles.
+#' @param transform `TRUE` or `FALSE` specifying whether to transform the edge weights from the internal link function scale.
 #'
-#' @return
+#' @return A `data.frame` object with columns of node IDs, median, lower, and upper bounds.
 #' @export
-#'
-#' @examples
 get_edgelist <- function (obj, ci=0.9, transform=TRUE) {
   node_names <- sapply(
     1:max(obj$dyad_to_idx),
@@ -144,13 +153,11 @@ get_edgelist <- function (obj, ci=0.9, transform=TRUE) {
 
 #' Draw samples from edgelist posterior
 #'
-#' @param obj
-#' @param num_draws
+#' @param obj An S3 edge model object to be summarised.
+#' @param num_draws Number of sample distributions to draw from the posterior.
 #'
-#' @return
+#' @return A `data.frame` of sample draws from the posteriors, where each column corresponds to a posterior draw.
 #' @export
-#'
-#' @examples
 draw_edgelist_samples <- function (obj, num_draws) {
   node_names <- sapply(
     1:max(obj$dyad_to_idx),
@@ -186,12 +193,9 @@ plot_trace.edge_model <- function(obj, par_ids=1:12, ...) {
 
 #' Sociogram plot with uncertainty of a fitted edge weight model object
 #'
-#' @param obj
+#' @param obj An S3 edge model object to be summarised.
 #'
-#' @return
 #' @export
-#'
-#' @examples
 plot_network <- function(obj, ci=0.9, lwd=1, ciwd=10) {
   edgelist <- get_edgelist(obj, ci=ci, transform=TRUE)
   net <- igraph::graph_from_edgelist(as.matrix(edgelist[, 1:2]), directed=FALSE)
@@ -254,14 +258,6 @@ get_edge_model_data <- function(formula, observations, directed, data_type) {
     node_1_names <- dplyr::pull(observations, model_spec$node_1_name)
     node_2_names <- dplyr::pull(observations, model_spec$node_2_name)
     dyad_ids=as.factor(dyad_to_idx[cbind(node_to_idx[node_1_names], node_to_idx[node_2_names])])
-    #
-    # # Populate design matrix
-    # term_levels <- levels(dyad_ids)
-    # for (i in 1:length(term_levels)) {
-    #   term_level <- term_levels[i]
-    #   new_term_name <-  paste0("dyad_", term_level)
-    #   design_fixed[, new_term_name] <- 1 * (dyad_ids == term_level)
-    # }
   }
 
   # Variable grouping for random effects

@@ -7,7 +7,11 @@
 \method{print}{edge_model}(object, ci = 0.9, transform = TRUE)
 }
 \arguments{
-\item{ci}{}
+\item{ci}{Credible interval to use in summary, based on quantiles.}
+
+\item{transform}{\code{TRUE} or \code{FALSE} specifying whether to transform the edge weights from the internal link function scale.}
+
+\item{obj}{An S3 edge model object.}
 }
 \description{
 Prints out details of a fitted edge model object

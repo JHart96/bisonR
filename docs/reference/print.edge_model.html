@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">bisonR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,10 +24,7 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/dyadic_regression.html">Running a dyadic regression</a>
-    <a class="dropdown-item" href="../articles/edge_models.html">Fitting an Edge Model</a>
-    <a class="dropdown-item" href="../articles/nodal_regression.html">Running a nodal regression</a>
-    <a class="dropdown-item" href="../articles/nonrandom_edges.html">Testing for non-random edge weights</a>
+    <a class="dropdown-item" href="../articles/getting_started.html">Getting Started</a>
   </div>
 </li>
 <li class="nav-item">
@@ -61,13 +58,17 @@
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S3 method for edge_model</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">obj</span>, ci <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">object</span>, ci <span class="op">=</span> <span class="fl">0.9</span>, transform <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>obj</dt>
-<dd></dd>
+    <dl><dt>ci</dt>
+<dd><p>Credible interval to use in summary, based on quantiles.</p></dd>
+<dt>transform</dt>
+<dd><p><code>TRUE</code> or <code>FALSE</code> specifying whether to transform the edge weights from the internal link function scale.</p></dd>
+<dt>obj</dt>
+<dd><p>An S3 edge model object.</p></dd>
 </dl></div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

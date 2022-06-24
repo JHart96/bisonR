@@ -7,10 +7,9 @@
 \method{summary}{edge_model}(object, ...)
 }
 \arguments{
-\item{obj}{}
-}
-\value{
+\item{object}{An S3 edge model object to be summarised.}
 
+\item{...}{Additional arguments to be passed to \code{print.edge_model()}.}
 }
 \description{
 Summarises a fitted edge model object

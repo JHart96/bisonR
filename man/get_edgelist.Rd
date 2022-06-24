@@ -7,10 +7,14 @@
 get_edgelist(obj, ci = 0.9, transform = TRUE)
 }
 \arguments{
-\item{obj}{}
+\item{obj}{An S3 edge model object.}
+
+\item{ci}{Credible interval to use in summary, based on quantiles.}
+
+\item{transform}{\code{TRUE} or \code{FALSE} specifying whether to transform the edge weights from the internal link function scale.}
 }
 \value{
-
+A \code{data.frame} object with columns of node IDs, median, lower, and upper bounds.
 }
 \description{
 Retrieves an edgelist with uncertainty for a fitted edge weight model object
