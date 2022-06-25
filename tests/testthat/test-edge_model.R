@@ -2,7 +2,7 @@ test_that("Binary edge model parameter estimation", {
   library(dplyr)
   library(igraph)
 
-  set.seed(1)
+  set.seed(123)
 
   # Load data in with minimal effects
   sim_data <- simulate_edge_model("binary", aggregated = TRUE, location_effect = FALSE, age_diff_effect = FALSE)
@@ -42,7 +42,7 @@ test_that("Binary edge model parameter estimation", {
   fit_dyadic <- dyadic_regression(dyad(node_1, node_2) ~ dyadic_trait, fit_edge, df_dyadic, mm=FALSE)
 
   summary_dyadic <- summary(fit_dyadic)
-  expect_equal(summary_dyadic[1, 2] < 0 & summary_dyadic[1, 3] > 0, TRUE)
+  expect_equal(summary_dyadic[1, 2] <= 0.1 & summary_dyadic[1, 3] >= -0.1, TRUE)
   expect_equal(summary_dyadic[2, 2] < dyadic_coef_true & summary_dyadic[2, 3] > dyadic_coef_true, TRUE)
 
   # Check that plots don't produce warnings
@@ -59,7 +59,7 @@ test_that("Binary edge model parameter estimation", {
 
   fit_nodal <- nodal_regression(strength(node) ~ nodal_trait, fit_edge, df_nodal)
   summary_nodal <- summary(fit_nodal)
-  expect_equal(summary_nodal[1, 2] <= 0 & summary_nodal[1, 3] >= 0, TRUE)
+  expect_equal(summary_nodal[1, 2] <= 0.1 & summary_nodal[1, 3] >= -0.1, TRUE)
   expect_equal(summary_nodal[2, 2] <= nodal_coef_true & summary_nodal[2, 3] >= nodal_coef_true, TRUE)
 
   # Check that plots don't produce warnings
@@ -70,7 +70,7 @@ test_that("Binary edge model parameter estimation", {
 test_that("Count edge model parameter estimation", {
   library(dplyr)
 
-  set.seed(1)
+  set.seed(123)
 
   # Load data in with minimal effects
   sim_data <- simulate_edge_model("count", aggregated = TRUE, location_effect = FALSE, age_diff_effect = FALSE)
