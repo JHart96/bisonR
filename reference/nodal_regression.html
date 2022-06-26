@@ -69,15 +69,35 @@
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>mc_cores</dt>
-<dd></dd>
+    <dl><dt>formula</dt>
+<dd><p>Formula of the model</p></dd>
+
+
+<dt>edgemodel</dt>
+<dd><p>Fitted edge weight model</p></dd>
+
+
+<dt>df</dt>
+<dd><p>Dataframe for regression</p></dd>
+
+
+<dt>mc_cores</dt>
+<dd><p>Number of cores to use for the MCMC sampler</p></dd>
+
+
+<dt>refresh</dt>
+<dd><p>Frequency of print-outs from MCMC sampler</p></dd>
+
+
+<dt>priors</dt>
+<dd><p>List of priors in the format supplied by <code><a href="get_default_priors.html">get_default_priors()</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-
+<p>An S3 nodal model object containing chain samples and processed data.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

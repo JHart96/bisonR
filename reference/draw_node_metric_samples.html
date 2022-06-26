@@ -67,15 +67,27 @@
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>metric_name</dt>
-<dd></dd>
+    <dl><dt>obj</dt>
+<dd><p>Fitted S3 edge weight model.</p></dd>
+
+
+<dt>metric_name</dt>
+<dd><p>Character name of node-level metric function.</p></dd>
+
+
+<dt>num_draws</dt>
+<dd><p>Number of posterior draws to use.</p></dd>
+
+
+<dt>standardise</dt>
+<dd><p>TRUE/FALSE indicating whether to mean-center the metrics within sample.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-
+<p>A matrix of metric samles where each column corresponds to a node, and each row corresponds to a posterior draw.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
