@@ -6,7 +6,7 @@
 [![Codecov test coverage](https://codecov.io/gh/JHart96/bisonR/branch/main/graph/badge.svg)](https://app.codecov.io/gh/JHart96/bisonR?branch=main)
 <!-- badges: end -->
 
-:warning: **Do not use this package! (yet): This package is still in very early stages of development and not ready for real use. If you're looking to use BISoN for social network analysis check out the examples repository in Stan and INLA here: [github.com/JHart96/bison_examples](https://github.com/JHart96/bison_examples). **
+:warning: **This package is still in early stages of development and has not yet been fully tested**
 
 bisonR is an R package implementing the BISoN framework for conducting Bayesian analysis of social networks. BISoN estimates uncertainty over edge weights in social networks from empirical data (such as observations) and builds networks with uncertainty. The networks can then be visualised *with* uncertainty, and can also be analysed with a fully Bayesian methodology using standard tools such as regression.
 
