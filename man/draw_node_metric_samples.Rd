@@ -12,10 +12,16 @@ draw_node_metric_samples(
 )
 }
 \arguments{
-\item{metric_name}{}
+\item{obj}{Fitted S3 edge weight model.}
+
+\item{metric_name}{Character name of node-level metric function.}
+
+\item{num_draws}{Number of posterior draws to use.}
+
+\item{standardise}{TRUE/FALSE indicating whether to mean-center the metrics within sample.}
 }
 \value{
-
+A matrix of metric samles where each column corresponds to a node, and each row corresponds to a posterior draw.
 }
 \description{
 Draw samples from the posterior node metric for a fitted edge weight model

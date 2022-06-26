@@ -8,11 +8,13 @@ require(bayesplot)
 #' @param mc_cores Number of cores to use for the MCMC sampler
 #' @param refresh Frequency of print-outs from MCMC sampler
 #' @param mm TRUE/FALSE indicating whether to include multi-membership effects in the regression
+#' @param priors List of priors in the format supplied by `get_default_priors()`.
 #'
-#' @return Fitted dyadic regression model object
+#' @return An S3 dyadic model object containing chain samples and processed data.
 #' @export
 #'
-#' @examples
+#' @details
+#' Fits a dyadic regression mixed model of the form where edge weight (with uncertainty) is either a response or predictor.
 dyadic_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, mm=TRUE, priors=NULL) {
   # If user-specified priors haven't been set, use the defaults
   if (is.null(priors)) {
@@ -47,20 +49,19 @@ dyadic_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, m
 
 #' Print information about a fitted dyadic regression model
 #'
-#' @param obj
+#' @param x An S3 dyadic regression model
+#' @param ci Credible interval to use in summary, based on quantiles.
+#' @param ... Additional arguments to be passed to summary calculations.
 #'
-#' @return
 #' @export
-#'
-#' @examples
-print.dyadic_model <- function(obj) {
-  coefficients <- t(apply(obj$chain, 2, function(x) quantile(x, probs=c(0.5, 0.05, 0.95))))
-  rownames(coefficients) <- colnames(obj$model_data$design_fixed)
+print.dyadic_model <- function(x, ci=0.90, ...) {
+  coefficients <- t(apply(x$chain, 2, function(x) quantile(x, probs=c(0.5, 0.5 * (1 - ci), ci + 0.5 * (1 - ci)))))
+  rownames(coefficients) <- colnames(x$model_data$design_fixed)
   coefficients <- round(coefficients, 3)
   cat(paste0(
     "=== Fitted dyadic regression model ===\n",
-    "Formula: ", format(obj$formula), "\n",
-    "Number of dyads: ", obj$edgemodel$num_dyads, "\n",
+    "Formula: ", format(x$formula), "\n",
+    "Number of dyads: ", x$edgemodel$num_dyads, "\n",
     "=== Coefficient summary ==="
   ))
   print(coefficients)
@@ -68,14 +69,13 @@ print.dyadic_model <- function(obj) {
 
 #' Summary of a fitted dyadic regression model
 #'
-#' @param obj
+#' @param object An S3 dyadic regression model
+#' @param ... Additional arguments to be passed to summary calculations.
 #'
-#' @return
 #' @export
 #'
-#' @examples
-summary.dyadic_model <- function(obj) {
-  print(obj)
+summary.dyadic_model <- function(object, ...) {
+  print(object, ...)
 }
 
 plot_trace.dyadic_model <- function (obj, par_ids=1:12, ...) {

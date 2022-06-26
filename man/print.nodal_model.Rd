@@ -4,13 +4,14 @@
 \alias{print.nodal_model}
 \title{Print information about a fitted nodal regression model}
 \usage{
-\method{print}{nodal_model}(obj)
+\method{print}{nodal_model}(x, ci = 0.9, ...)
 }
 \arguments{
-\item{obj}{}
-}
-\value{
+\item{x}{An S3 nodal regression model}
 
+\item{ci}{Credible interval to use in summary, based on quantiles.}
+
+\item{...}{Additional arguments to be passed to summary calculations.}
 }
 \description{
 Print information about a fitted nodal regression model

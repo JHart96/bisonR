@@ -4,13 +4,14 @@
 \alias{print.dyadic_model}
 \title{Print information about a fitted dyadic regression model}
 \usage{
-\method{print}{dyadic_model}(obj)
+\method{print}{dyadic_model}(x, ci = 0.9, ...)
 }
 \arguments{
-\item{obj}{}
-}
-\value{
+\item{x}{An S3 dyadic regression model}
 
+\item{ci}{Credible interval to use in summary, based on quantiles.}
+
+\item{...}{Additional arguments to be passed to summary calculations.}
 }
 \description{
 Print information about a fitted dyadic regression model

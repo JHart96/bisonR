@@ -1,12 +1,12 @@
 #' Draw samples from the posterior node metric for a fitted edge weight model
 #'
-#' @param obj
-#' @param metric_name
+#' @param obj Fitted S3 edge weight model.
+#' @param metric_name Character name of node-level metric function.
+#' @param num_draws Number of posterior draws to use.
+#' @param standardise TRUE/FALSE indicating whether to mean-center the metrics within sample.
 #'
-#' @return
+#' @return A matrix of metric samles where each column corresponds to a node, and each row corresponds to a posterior draw.
 #' @export
-#'
-#' @examples
 draw_node_metric_samples <- function(obj, metric_name, num_draws=1000, standardise=TRUE) {
   edgelist_samples <- draw_edgelist_samples(obj, num_draws)
   net <- igraph::graph_from_edgelist(as.matrix(edgelist_samples[, 1:2]), directed = FALSE)

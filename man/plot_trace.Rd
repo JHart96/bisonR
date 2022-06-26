@@ -7,11 +7,14 @@
 plot_trace(obj, ...)
 }
 \arguments{
-\item{...}{}
-}
-\value{
+\item{obj}{A fitted S3 object for edge weight, dyadic regression, or nodal regression models.}
 
+\item{...}{Additional arguments to be passed to trace plots.}
 }
 \description{
 Traceplot of MCMC chains
+}
+\details{
+Plots MCMC chains for a fitted model. If the model has too many parameters to plot, only the first 12
+will be plotted. To change the parameters being plotted, pass the \code{par_ids} argument
 }

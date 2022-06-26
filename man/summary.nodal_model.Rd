@@ -4,13 +4,12 @@
 \alias{summary.nodal_model}
 \title{Summary of a fitted nodal regression model}
 \usage{
-\method{summary}{nodal_model}(obj)
+\method{summary}{nodal_model}(object, ...)
 }
 \arguments{
-\item{obj}{}
-}
-\value{
+\item{object}{An S3 dyadic regression model}
 
+\item{...}{Additional arguments to be passed to summary calculations.}
 }
 \description{
 Summary of a fitted nodal regression model

@@ -7,10 +7,16 @@
 get_contrasts(obj, parameter_1, parameter_2, ci = 0.9)
 }
 \arguments{
-\item{obj}{}
+\item{obj}{Fitted S3 dyadic or nodal model.}
+
+\item{parameter_1}{Name of parameter 1, as shown in the model summary.}
+
+\item{parameter_2}{Name of parameter 2, as shown in the model summary.}
+
+\item{ci}{Credible interval width, calculated by quantiles.}
 }
 \value{
-
+A vector of the median, lower bound, and upper bound of the posterior contrast between parameters 1 and 2.
 }
 \description{
 Calculate contrasts between parameters

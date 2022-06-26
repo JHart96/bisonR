@@ -4,14 +4,16 @@
 \alias{print.edge_model}
 \title{Prints out details of a fitted edge model object}
 \usage{
-\method{print}{edge_model}(object, ci = 0.9, transform = TRUE)
+\method{print}{edge_model}(x, ci = 0.9, transform = TRUE, ...)
 }
 \arguments{
+\item{x}{An S3 edge model object.}
+
 \item{ci}{Credible interval to use in summary, based on quantiles.}
 
 \item{transform}{\code{TRUE} or \code{FALSE} specifying whether to transform the edge weights from the internal link function scale.}
 
-\item{obj}{An S3 edge model object.}
+\item{...}{Additional parameters to be passed to print function.}
 }
 \description{
 Prints out details of a fitted edge model object

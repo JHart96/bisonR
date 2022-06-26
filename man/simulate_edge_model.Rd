@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulations.R
 \name{simulate_edge_model}
 \alias{simulate_edge_model}
-\title{Simulates observations from an edge model}
+\title{Simulates data}
 \usage{
 simulate_edge_model(
   model_type,
@@ -11,9 +11,18 @@ simulate_edge_model(
   age_diff_effect = TRUE
 )
 }
-\value{
+\arguments{
+\item{model_type}{Type of data to simulate, one of "binary", "count", and "duration".}
 
+\item{aggregated}{TRUE/FALSE indicating whether to aggregate over dyads or not.}
+
+\item{location_effect}{TRUE/FALSE indicating whether there is an effect of location on observations.}
+
+\item{age_diff_effect}{TRUE/FALSE indicating whether there is an effect of age difference on observations.}
+}
+\value{
+A dataframe of the format accepted by edge weight models.
 }
 \description{
-Simulates observations from an edge model
+Simulates data
 }

@@ -7,11 +7,14 @@
 plot_predictions(obj, ...)
 }
 \arguments{
-\item{obj}{}
-}
-\value{
+\item{obj}{A fitted S3 object for edge weight, dyadic regression, or nodal regression models.}
 
+\item{...}{Additional arguments to be passed to predictive plots.}
 }
 \description{
 Posterior predictive checks
+}
+\details{
+Plots the densities of summary statistics of observed data against predictions made by a model. These plots
+can be used to check the predictive performance of a model.
 }

@@ -92,24 +92,25 @@ summary.edge_model <- function(object, ...) {
 
 #' Prints out details of a fitted edge model object
 #'
-#' @param obj An S3 edge model object.
+#' @param x An S3 edge model object.
 #' @param ci Credible interval to use in summary, based on quantiles.
 #' @param transform `TRUE` or `FALSE` specifying whether to transform the edge weights from the internal link function scale.
+#' @param ... Additional parameters to be passed to print function.
 #'
 #' @export
-print.edge_model <- function(object, ci=0.90, transform=TRUE) {
+print.edge_model <- function(x, ci=0.90, transform=TRUE, ...) {
   cat(paste0(
     "=== Fitted BISoN edge model ===",
-    "\nData type: ", object$data_type,
-    "\nFormula: ", format(object$formula),
-    "\nNumber of nodes: ", object$num_nodes,
-    "\nNumber of dyads: ", object$num_dyads,
-    "\nDirected: ", object$directed,
+    "\nData type: ", x$data_type,
+    "\nFormula: ", format(x$formula),
+    "\nNumber of nodes: ", x$num_nodes,
+    "\nNumber of dyads: ", x$num_dyads,
+    "\nDirected: ", x$directed,
     "\n=== Edge list summary ===\n"
   ))
 
-  edgelist <- get_edgelist(object, ci=ci, transform=transform)
-  dyad_names <- do.call(paste, c(get_edgelist(object)[, 1:2], sep=" <-> "))
+  edgelist <- get_edgelist(x, ci=ci, transform=transform)
+  dyad_names <- do.call(paste, c(get_edgelist(x)[, 1:2], sep=" <-> "))
   summary_matrix <- as.matrix(edgelist[, 3:5])
   rownames(summary_matrix) <- dyad_names
   print(summary_matrix)
@@ -194,9 +195,11 @@ plot_trace.edge_model <- function(obj, par_ids=1:12, ...) {
 #' Sociogram plot with uncertainty of a fitted edge weight model object
 #'
 #' @param obj An S3 edge model object to be summarised.
+#' @param ci Credible interval to use in plot, based on quantiles.
+#' @param lwd Line width scaling for edge weights
 #'
 #' @export
-plot_network <- function(obj, ci=0.9, lwd=1, ciwd=10) {
+plot_network <- function(obj, ci=0.9, lwd=1) {
   edgelist <- get_edgelist(obj, ci=ci, transform=TRUE)
   net <- igraph::graph_from_edgelist(as.matrix(edgelist[, 1:2]), directed=FALSE)
   lb <- edgelist[, 3]

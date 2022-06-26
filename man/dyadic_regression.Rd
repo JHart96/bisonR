@@ -26,10 +26,15 @@ dyadic_regression(
 \item{refresh}{Frequency of print-outs from MCMC sampler}
 
 \item{mm}{TRUE/FALSE indicating whether to include multi-membership effects in the regression}
+
+\item{priors}{List of priors in the format supplied by \code{get_default_priors()}.}
 }
 \value{
-Fitted dyadic regression model object
+An S3 dyadic model object containing chain samples and processed data.
 }
 \description{
 Fit dyadic regression model
+}
+\details{
+Fits a dyadic regression mixed model of the form where edge weight (with uncertainty) is either a response or predictor.
 }

@@ -4,10 +4,14 @@
 \alias{plot_network}
 \title{Sociogram plot with uncertainty of a fitted edge weight model object}
 \usage{
-plot_network(obj, ci = 0.9, lwd = 1, ciwd = 10)
+plot_network(obj, ci = 0.9, lwd = 1)
 }
 \arguments{
 \item{obj}{An S3 edge model object to be summarised.}
+
+\item{ci}{Credible interval to use in plot, based on quantiles.}
+
+\item{lwd}{Line width scaling for edge weights}
 }
 \description{
 Sociogram plot with uncertainty of a fitted edge weight model object

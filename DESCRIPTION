@@ -14,11 +14,11 @@ Biarch: true
 Depends: 
     R (>= 4.0.0),
     cmdstanr,
-    igraph,
     methods
 Imports:
     formula.tools,
     stats,
+    igraph,
     stringr
 Remotes: 
     stan-dev/cmdstanr

@@ -1,12 +1,14 @@
 require(bayesplot)
 #' Fit a nodel regression model
 #'
-#' @param formula
-#' @param edgemodel
-#' @param df
-#' @param mc_cores
+#' @param formula Formula of the model
+#' @param edgemodel Fitted edge weight model
+#' @param df Dataframe for regression
+#' @param mc_cores Number of cores to use for the MCMC sampler
+#' @param refresh Frequency of print-outs from MCMC sampler
+#' @param priors List of priors in the format supplied by `get_default_priors()`.
 #'
-#' @return
+#' @return An S3 nodal model object containing chain samples and processed data.
 #' @export
 #'
 #' @examples
@@ -119,20 +121,20 @@ get_nodal_regression_model_data <- function(formula, edgemodel, data) {
 
 #' Print information about a fitted nodal regression model
 #'
-#' @param obj
+#' @param x An S3 nodal regression model
+#' @param ci Credible interval to use in summary, based on quantiles.
+#' @param ... Additional arguments to be passed to summary calculations.
 #'
-#' @return
 #' @export
 #'
-#' @examples
-print.nodal_model <- function(obj) {
-  coefficients <- t(apply(obj$chain, 2, function(x) quantile(x, probs=c(0.5, 0.05, 0.95))))
-  rownames(coefficients) <- colnames(obj$model_data$design_fixed)
+print.nodal_model <- function(x, ci=0.90, ...) {
+  coefficients <- t(apply(x$chain, 2, function(x) quantile(x, probs=c(0.5, 0.5 * (1 - ci), ci + 0.5 * (1 - ci)))))
+  rownames(coefficients) <- colnames(x$model_data$design_fixed)
   coefficients <- round(coefficients, 3)
   cat(paste0(
     "=== Fitted nodal regression model ===\n",
-    "Formula: ", format(obj$formula), "\n",
-    "Number of nodes: ", obj$edgemodel$num_nodes, "\n",
+    "Formula: ", format(x$formula), "\n",
+    "Number of nodes: ", x$edgemodel$num_nodes, "\n",
     "=== Coefficient summary ==="
   ))
   print(coefficients)
@@ -140,14 +142,13 @@ print.nodal_model <- function(obj) {
 
 #' Summary of a fitted nodal regression model
 #'
-#' @param obj
+#' @param object An S3 dyadic regression model
+#' @param ... Additional arguments to be passed to summary calculations.
 #'
-#' @return
 #' @export
 #'
-#' @examples
-summary.nodal_model <- function(obj) {
-  print(obj)
+summary.nodal_model <- function(object, ...) {
+  print(object, ...)
 }
 
 plot_trace.nodal_model <- function (obj, par_ids=1:12, ...) {

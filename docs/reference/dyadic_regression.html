@@ -82,10 +82,16 @@
 <dd><p>Frequency of print-outs from MCMC sampler</p></dd>
 <dt>mm</dt>
 <dd><p>TRUE/FALSE indicating whether to include multi-membership effects in the regression</p></dd>
+<dt>priors</dt>
+<dd><p>List of priors in the format supplied by <code><a href="get_default_priors.html">get_default_priors()</a></code>.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Fitted dyadic regression model object</p>
+    <p>An S3 dyadic model object containing chain samples and processed data.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Fits a dyadic regression mixed model of the form where edge weight (with uncertainty) is either a response or predictor.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

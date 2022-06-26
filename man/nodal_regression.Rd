@@ -14,10 +14,20 @@ nodal_regression(
 )
 }
 \arguments{
-\item{mc_cores}{}
+\item{formula}{Formula of the model}
+
+\item{edgemodel}{Fitted edge weight model}
+
+\item{df}{Dataframe for regression}
+
+\item{mc_cores}{Number of cores to use for the MCMC sampler}
+
+\item{refresh}{Frequency of print-outs from MCMC sampler}
+
+\item{priors}{List of priors in the format supplied by \code{get_default_priors()}.}
 }
 \value{
-
+An S3 nodal model object containing chain samples and processed data.
 }
 \description{
 Fit a nodel regression model

@@ -1,12 +1,12 @@
 #' Traceplot of MCMC chains
 #'
-#' @param obj
-#' @param ...
+#' @param obj A fitted S3 object for edge weight, dyadic regression, or nodal regression models.
+#' @param ... Additional arguments to be passed to trace plots.
 #'
-#' @return
+#' @details Plots MCMC chains for a fitted model. If the model has too many parameters to plot, only the first 12
+#' will be plotted. To change the parameters being plotted, pass the `par_ids` argument
+#'
 #' @export
-#'
-#' @examples
 plot_trace <- function(obj, ...) {
   if (class(obj) == "edge_model") {
     plot_trace.edge_model(obj, ...)
@@ -19,12 +19,14 @@ plot_trace <- function(obj, ...) {
 
 #' Posterior predictive checks
 #'
-#' @param obj
+#' @param obj A fitted S3 object for edge weight, dyadic regression, or nodal regression models.
+#' @param ... Additional arguments to be passed to predictive plots.
 #'
-#' @return
+#' @details
+#' Plots the densities of summary statistics of observed data against predictions made by a model. These plots
+#' can be used to check the predictive performance of a model.
+#'
 #' @export
-#'
-#' @examples
 plot_predictions <- function(obj, ...) {
   if (class(obj) == "edge_model") {
     plot_predictions.edge_model(obj, ...)
@@ -37,12 +39,13 @@ plot_predictions <- function(obj, ...) {
 
 #' Calculate contrasts between parameters
 #'
-#' @param obj
+#' @param obj Fitted S3 dyadic or nodal model.
+#' @param parameter_1 Name of parameter 1, as shown in the model summary.
+#' @param parameter_2 Name of parameter 2, as shown in the model summary.
+#' @param ci Credible interval width, calculated by quantiles.
 #'
-#' @return
+#' @return A vector of the median, lower bound, and upper bound of the posterior contrast between parameters 1 and 2.
 #' @export
-#'
-#' @examples
 get_contrasts <- function(obj, parameter_1, parameter_2, ci=0.90) {
   beta_samples <- obj$chain
   colnames(beta_samples) <- colnames(obj$model_data$design_fixed)

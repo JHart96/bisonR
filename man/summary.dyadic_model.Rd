@@ -4,13 +4,12 @@
 \alias{summary.dyadic_model}
 \title{Summary of a fitted dyadic regression model}
 \usage{
-\method{summary}{dyadic_model}(obj)
+\method{summary}{dyadic_model}(object, ...)
 }
 \arguments{
-\item{obj}{}
-}
-\value{
+\item{object}{An S3 dyadic regression model}
 
+\item{...}{Additional arguments to be passed to summary calculations.}
 }
 \description{
 Summary of a fitted dyadic regression model

@@ -1,9 +1,14 @@
-#' Simulates observations from an edge model
+utils::globalVariables(c("node_1_id", "node_2_id"))
+
+#' Simulates data
 #'
-#' @return
+#' @param model_type Type of data to simulate, one of "binary", "count", and "duration".
+#' @param aggregated TRUE/FALSE indicating whether to aggregate over dyads or not.
+#' @param location_effect TRUE/FALSE indicating whether there is an effect of location on observations.
+#' @param age_diff_effect TRUE/FALSE indicating whether there is an effect of age difference on observations.
+#'
+#' @return A dataframe of the format accepted by edge weight models.
 #' @export
-#'
-#' @examples
 simulate_edge_model <- function(model_type, aggregated, location_effect=TRUE, age_diff_effect=TRUE) {
   num_nodes <- 10
   num_locations <- 5

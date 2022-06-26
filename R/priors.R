@@ -1,11 +1,9 @@
 #' Return default priors for a given model
 #'
-#' @param model_type
+#' @param model_type A character specifying the type of model to retrieve priors for ("binary", "count", "duration", etc)
 #'
-#' @return
+#' @return A list of default priors that can be used in the `edge_model()` function.
 #' @export
-#'
-#' @examples
 get_default_priors <- function(model_type) {
   if (model_type == "binary") {
     priors <- list(
