@@ -4,3 +4,4 @@ inst/stan/*
 !inst/stan/*.stan
 *.png
 docs/*
+.Rhistory
