@@ -23,6 +23,18 @@ get_default_priors <- function(model_type) {
     )
     return(priors)
   }
+  if (model_type == "binary_conjugate") {
+    priors <- list(
+      edge="beta(1, 1)"
+    )
+    return(priors)
+  }
+  if (model_type == "count_conjugate") {
+    priors <- list(
+      edge="gamma(1, 1)"
+    )
+    return(priors)
+  }
   if (model_type == "duration") {
     priors <- list(
       edge="normal(0, 2.5)",
@@ -69,6 +81,14 @@ extract_prior_parameters <- function(priors) {
     }
     if (distribution_name == "half-normal") {
       prior_parameters[[paste("prior", parameter_name, "sigma", sep="_")]] <- parameter_values[1]
+    }
+    if (distribution_name == "beta") {
+      prior_parameters[[paste("prior", parameter_name, "alpha", sep="_")]] <- parameter_values[1]
+      prior_parameters[[paste("prior", parameter_name, "beta", sep="_")]] <- parameter_values[2]
+    }
+    if (distribution_name == "gamma") {
+      prior_parameters[[paste("prior", parameter_name, "alpha", sep="_")]] <- parameter_values[1]
+      prior_parameters[[paste("prior", parameter_name, "beta", sep="_")]] <- parameter_values[2]
     }
   }
   prior_parameters

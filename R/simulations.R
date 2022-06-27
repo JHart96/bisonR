@@ -12,7 +12,7 @@ utils::globalVariables(c("node_1_id", "node_2_id"))
 simulate_edge_model <- function(model_type, aggregated, location_effect=TRUE, age_diff_effect=TRUE) {
   num_nodes <- 10
   num_locations <- 5
-  max_obs <- 20
+  max_obs <- 5
   edge_weights <- matrix(rnorm(num_nodes^2, 0, 1), num_nodes, num_nodes)
   edge_weights <- edge_weights * upper.tri(edge_weights)
   ages <- rnorm(num_nodes, 20, 3)
@@ -47,7 +47,7 @@ simulate_edge_model <- function(model_type, aggregated, location_effect=TRUE, ag
           }
           if (model_type == "count") {
             duration <- runif(1, 1, max_obs)
-            event <- rpois(1, exp(predictor) * duration)
+            event <- rpois(1, exp(0.01 * predictor) * duration)
             df_sim[nrow(df_sim) + 1, ] <- list(event=event, node_1_id=i, node_2_id=j, age_diff=age_diff, age_1=ages[i], age_2=ages[j], location=location_id, duration=duration)
           }
         }
@@ -71,7 +71,7 @@ simulate_edge_model <- function(model_type, aggregated, location_effect=TRUE, ag
     }
   }
   if (aggregated) {
-    df_sim <- dplyr::summarise(dplyr::group_by(df_sim, node_1_id, node_2_id), event=sum(event), duration=sum(duration))
+    df_sim <- dplyr::summarise(dplyr::group_by(df_sim, node_1_id, node_2_id), event=sum(event), duration=sum(duration), age_diff=mean(age_diff))
   }
   df_sim$node_1_id <- factor(df_sim$node_1_id, levels=1:num_nodes)
   df_sim$node_2_id <- factor(df_sim$node_2_id, levels=1:num_nodes)

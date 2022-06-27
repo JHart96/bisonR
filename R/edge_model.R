@@ -27,6 +27,15 @@ require(bayesplot)
 #'
 #' @export
 edge_model <- function(formula, data, data_type=c("binary", "count"), directed=FALSE, priors=NULL, refresh=0, mc_cores=4) {
+  use_conjugate_model <- FALSE
+  if (length(str_match_all(data_type, "conjugate")[[1]]) > 0) {
+    use_conjugate_model <- TRUE
+    data_type <- str_split(data_type, "_")[[1]][1]
+    if (!(data_type %in% c("binary", "count"))) {
+      stop("Conjugate models only available for binary and count data")
+    }
+  }
+
   if (data_type == "duration") {
     stop("Duration model not yet supported")
   }
@@ -43,17 +52,26 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
   prior_parameters <- extract_prior_parameters(priors)
   model_data <- c(model_info$model_data, prior_parameters)
 
-  print(prior_parameters)
+  # Select sampling method
+  if (use_conjugate_model) {
+    # Fit conjugate model
+    model <- fit_conjugate_model(data_type, model_data)
+    chain <- model$chain
+    event_preds <- model$event_preds
+    fit <- NULL
+  } else {
+    # Build Stan model
+    model <- build_stan_model(data_type)
 
-  # Build model
-  model <- build_stan_model(data_type)
+    # Fit model
+    fit <- model$sample(data=model_data, refresh=refresh, chains=4, parallel_chains=mc_cores, step_size=0.1)
 
-  # Fit model
-  fit <- model$sample(data=model_data, refresh=refresh, chains=4, parallel_chains=mc_cores, step_size=0.1)
+    # Extract edge weights from fitted edge model.
+    chain <- fit$draws("edge_weight", format="matrix")
+    colnames(chain) <- model_data$dyad_ids
 
-  # Extract edge weights from fitted edge model.
-  chain <- fit$draws("edge_weight", format="matrix")
-  colnames(chain) <- colnames(model_data$design_fixed)
+    event_preds <- fit$draws("event_pred", format="matrix")
+  }
 
   # Extract edge samples
   edge_samples <- chain
@@ -61,6 +79,7 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
   # Prepare output object.
   obj <- list(
     chain = chain,
+    event_preds = event_preds,
     edge_samples=edge_samples,
     num_nodes = model_info$num_nodes,
     num_dyads = model_info$num_dyads,
@@ -173,7 +192,7 @@ draw_edgelist_samples <- function (obj, num_draws) {
 }
 
 plot_predictions.edge_model <- function(obj, num_draws=20) {
-  event_preds <- obj$fit$draws("event_pred", format="matrix")
+  event_preds <- obj$event_preds
   df_draw <- data.frame(event=obj$model_data$event, dyad_id=obj$model_info$row_dyad_ids) # Get dyad IDs from somewhere sensible.
   df_summed <- aggregate(event ~ as.factor(dyad_id), df_draw, sum)
   pred_density <- density(df_summed$event)
@@ -189,7 +208,7 @@ plot_trace.edge_model <- function(obj, par_ids=1:12, ...) {
   if (dim(obj$chain)[2] < 12) {
     par_ids <- 1:dim(obj$chain[2])
   }
-  bayesplot::mcmc_trace(obj$fit$draws("edge_weight")[,,par_ids])
+  bayesplot::mcmc_trace(obj$edge_samples[, par_ids])
 }
 
 #' Sociogram plot with uncertainty of a fitted edge weight model object
