@@ -35,6 +35,12 @@ df <- sim_data$df_sim
 head(df)
 ```
 
+```{r}
+sim_data <- simulate_edge_model("count", aggregated = TRUE)
+df <- sim_data$df_sim
+head(df)
+```
+
 # Edge Models
 
 Depending on the type of data being analysed, different edge models should be used. See the explanation of the bisonR framework here for more details on this. In this example we're using binary data, where events can either occur (1) or not occur (0) in a particular sampling period. In our dataframe this corresponds to `event = 1` or `event = 0`.
@@ -49,7 +55,7 @@ priors
 This list shows the priors set on the "fixed effect" parameters: the edge weights and any additional fixed effects included in the edge weight model; and the "random effect" parameters: any additional random effects included in the edge weight model. Imagine we decide that a normal distribution with mean zero and standard deviation 1 is not appropriate for the fixed effects, and we'd prefer a standard deviation of 2, we can change this using the following code:
 
 ```{r}
-priors$edge <- "gamma(0.5, 0.5)"
+priors$edge <- "gamma(2, 1)"
 priors
 ```
 
@@ -60,10 +66,21 @@ In bisonR, the left hand side of the `~` describes the sampling data, and uses t
 The right hand side of the `~` describes the predictors that are associated with social events. In the standard BISoN model this is primarily the edge weight that we use to build the network, but this can also include additional effects such as age, sex, or even observation-level factors such as location, time of day, or weather, to name a few. Including additional effects will change the interpretation of edge weights, but could be useful if interested in the social network once some factors have been controlled for. *Note* the edge weights don't need to be included, and you could use bisonR to estimate generative effects in a network. In this example we'll keep things simple and just use edge weight as the only predictor. This is done using the `dyad(node_1_id, node_2_id)` notation. `node_1_id` and `node_2_id` represent the nodes corresponding to each individual in the network, and need to be stored as factors in the dataframe. They don't need to be IDs, and could be individual names, as long as they're stored as factors. Now we understand the basics of the formula notation, we can now fit the edge weight model:
 
 ```{r}
+priors <- get_default_priors("count")
 fit_edge <- edge_model(
   (event | duration) ~ dyad(node_1_id, node_2_id), 
   data=df, 
-  data_type="count_conjugate", 
+  data_type="count",
+  priors=priors
+)
+```
+
+```{r}
+priors <- get_default_priors("count_conjugate")
+fit_edge_conjugate <- edge_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id), 
+  data=df, 
+  data_type="count_conjugate",
   priors=priors
 )
 ```
@@ -78,13 +95,28 @@ plot_trace(fit_edge)
 If we're satisfied that the MCMC algorithm has done its job properly, then it's time to see if the same is true for the model. One way to do this, among many others, is to check the predictions from the fitted model against the real data. This can be done using the `plot_predictions()` function. If the real data are within the ensemble of predictions from the model, then we have a little more faith that the model is capturing at least some important properties of the data. The statistical model implies a range of predictions that we can extract over multiple draws, the number of which can be set using the `num_draws` argument.
 
 ```{r}
-plot_predictions(fit_edge, num_draws=100)
+plot_predictions(fit_edge, num_draws=20)
+plot_predictions(fit_edge_conjugate, num_draws=20)
 ```
 
 The predictions from the model are shown in blue and the real data are shown in black. Ideally the blue lines should be distributed around the black line, indicating the real data are among the possible predictions of the model. Now we've conducted two basic diagnostic checks of the edge weight model, we can start to trust what it's telling us. To see a summary of edge weights and their credible intervals, we can use the `summary()` function:
 
 ```{r}
-summary(fit_edge)
+# summary(fit_edge)
+
+sri <- df %>%
+  mutate(edge_weight=event/duration) %>%
+  select(node_1=node_1_id, node_2=node_2_id, edge_weight=edge_weight, event=event, duration=duration)
+
+est <- get_edgelist(fit_edge, transform=TRUE) %>%
+  select(node_1, node_2, est=median, est_lb="5%", est_ub="95%")
+
+comparison <- left_join(sri, est, by=c("node_1", "node_2"))
+
+
+plot(comparison$edge_weight, comparison$est)
+arrows(x0=comparison$edge_weight, y0=comparison$est_lb, x1=comparison$edge_weight, y1=comparison$est_ub, angle=0)
+abline(a=0, b=1)
 ```
 
 It can be hard to get an intuitive idea for what's going on looking only at a summary table, so this is where it can be useful to visualise the network too. The `plot_network()` function does this for BISoN edge weight models, where uncertainty is shown on edge weights. Uncertainty is visualised by showing the lower and upper bounds as overlapping edges in the network.

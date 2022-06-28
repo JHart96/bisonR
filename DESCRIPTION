@@ -19,11 +19,11 @@ Imports:
     formula.tools,
     stats,
     igraph,
-    stringr
+    stringr,
+    bayesplot
 Remotes: 
     stan-dev/cmdstanr
 Suggests: 
-    bayesplot,
     tidyverse,
     dplyr,
     knitr,
