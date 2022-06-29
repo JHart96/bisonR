@@ -12,10 +12,33 @@ bisonR is an R package implementing the BISoN framework for conducting Bayesian 
 
 ## Installation
 
-cmdstanR needs to be installed for the bisonR package to work. To install cmdstanR, follow the instructions at https://mc-stan.org/cmdstanr/, then run `cmdstanr::install_cmdstan()`.
+### Installing CmdStanR
+
+The bisonR package is written in R, but uses the Stan programming language to fit Bayesian models. Stan is a separate program, and interfaces with bisonR using an R package called cmdstanR. Stan and cmdstanR are installed in a different way to standard R packages, so require a specific series of installation steps. 
+
+On Windows, before proceeding you may need to install the version of Rtools appropriate for your version of R. Rtools can be found here: https://cran.r-project.org/bin/windows/Rtools/.
+
+The full instructions to install cmdstanR can be found at https://mc-stan.org/cmdstanr/. We've found that the following steps often work, but depending on your operating system and version of R, the process may be more involved:
+
+```
+install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+library(cmdstanr)
+check_cmdstan_toolchain(fix = TRUE, quiet = TRUE)
+install_cmdstan()
+```
+
+### Installing bisonR
 
 bisonR isn't currently on CRAN, but it can be installed from GitHub. To do this, make sure you have the `remotes` package installed. Then run the following command:
 
 ```
 remotes::install_github("JHart96/bisonR")
+```
+
+#### Development version
+
+If you want to install the latest development version, bugs and all, you can install from the development branch. This option is not recommended for standard users.
+
+```
+remotes::install_github("JHart96/bisonR@dev")
 ```

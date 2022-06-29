@@ -62,8 +62,7 @@ The right hand side of the `~` describes the predictors that are associated with
 fit_edge <- edge_model(
   (event | duration) ~ dyad(node_1_id, node_2_id), 
   data=df, 
-  data_type="binary",
-  priors=priors
+  data_type="binary_conjugate"
 )
 ```
 
@@ -78,7 +77,7 @@ plot_trace(fit_edge)
 If we're satisfied that the MCMC algorithm has done its job properly, then it's time to see if the same is true for the model. One way to do this, among many others, is to check the predictions from the fitted model against the real data. This can be done using the `plot_predictions()` function. If the real data are within the ensemble of predictions from the model, then we have a little more faith that the model is capturing at least some important properties of the data. The statistical model implies a range of predictions that we can extract over multiple draws, the number of which can be set using the `num_draws` argument.
 
 ```{r}
-plot_predictions(fit_edge, num_draws=20)
+plot_predictions(fit_edge, num_draws=10)
 ```
 
 The predictions from the model are shown in blue and the real data are shown in black. Ideally the blue lines should be distributed around the black line, indicating the real data are among the possible predictions of the model. Now we've conducted two basic diagnostic checks of the edge weight model, we can start to trust what it's telling us. To see a summary of edge weights and their credible intervals, we can use the `summary()` function:

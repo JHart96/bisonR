@@ -27,6 +27,14 @@ require(bayesplot)
 #'
 #' @export
 edge_model <- function(formula, data, data_type=c("binary", "count"), directed=FALSE, priors=NULL, refresh=0, mc_cores=4) {
+  if (data_type == "duration") {
+    stop("Duration model not yet supported")
+  }
+
+  # If user-specified priors haven't been set, use the defaults
+  if (is.null(priors)) priors <- get_default_priors(data_type)
+
+  # If the model is a conjugate model, change the data type
   use_conjugate_model <- FALSE
   if (length(str_match_all(data_type, "conjugate")[[1]]) > 0) {
     use_conjugate_model <- TRUE
@@ -35,13 +43,6 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
       stop("Conjugate models only available for binary and count data")
     }
   }
-
-  if (data_type == "duration") {
-    stop("Duration model not yet supported")
-  }
-
-  # If user-specified priors haven't been set, use the defaults
-  if (is.null(priors)) priors <- get_default_priors(data_type)
 
   model_spec <- get_edge_model_spec(formula)
 
@@ -193,6 +194,7 @@ draw_edgelist_samples <- function (obj, num_draws) {
 
 plot_predictions.edge_model <- function(obj, num_draws=20) {
   par(mfrow=c(1, 2))
+
   # Density plot
   event_preds <- obj$event_preds
   df_draw <- data.frame(event=obj$model_data$event, dyad_id=obj$model_info$row_dyad_ids) # Get dyad IDs from somewhere sensible.
@@ -204,6 +206,7 @@ plot_predictions.edge_model <- function(obj, num_draws=20) {
     df_summed <- aggregate(event ~ as.factor(dyad_id), df_draw, sum)
     lines(density(df_summed$event), col=rgb(0, 0, 1, 0.5))
   }
+
   # Compare edge weights
   df_draw <- data.frame(event=obj$model_data$event, divisor=obj$model_data$divisor, dyad_id=obj$model_info$row_dyad_ids) # Get dyad IDs from somewhere sensible.
   df_summed <- aggregate(cbind(event, divisor) ~ as.factor(dyad_id), df_draw, sum)
@@ -215,6 +218,8 @@ plot_predictions.edge_model <- function(obj, num_draws=20) {
   plot(point_estimate, bison_median, ylim=c(min(bison_lower), max(bison_upper)), main="Point vs BISoN estimates", xlab="Point estimates", ylab="BISoN estimates")
   arrows(x0=point_estimate, y0=bison_lower, x1=point_estimate, y1=bison_upper, angle=0)
   abline(a=0, b=1)
+
+  par(mfrow=c(1, 1))
 }
 
 plot_trace.edge_model <- function(obj, par_ids=1:12, ...) {
