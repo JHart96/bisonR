@@ -20,7 +20,7 @@ On Windows, before proceeding you may need to install the version of Rtools appr
 
 The full instructions to install cmdstanR can be found at https://mc-stan.org/cmdstanr/. We've found that the following steps often work, but depending on your operating system and version of R, the process may be more involved:
 
-```
+```r
 install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
 library(cmdstanr)
 check_cmdstan_toolchain(fix = TRUE, quiet = TRUE)
@@ -31,7 +31,7 @@ install_cmdstan()
 
 bisonR isn't currently on CRAN, but it can be installed from GitHub. To do this, make sure you have the `remotes` package installed. Then run the following command:
 
-```
+```r
 remotes::install_github("JHart96/bisonR")
 ```
 
@@ -39,6 +39,6 @@ remotes::install_github("JHart96/bisonR")
 
 If you want to install the latest development version, bugs and all, you can install from the development branch. This option is not recommended for standard users.
 
-```
+```r
 remotes::install_github("JHart96/bisonR@dev")
 ```
