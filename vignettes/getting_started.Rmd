@@ -62,7 +62,8 @@ The right hand side of the `~` describes the predictors that are associated with
 fit_edge <- edge_model(
   (event | duration) ~ dyad(node_1_id, node_2_id), 
   data=df, 
-  data_type="binary"
+  data_type="binary",
+  priors=priors
 )
 ```
 

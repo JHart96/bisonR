@@ -192,32 +192,37 @@ draw_edgelist_samples <- function (obj, num_draws) {
   edgelist_samples
 }
 
-plot_predictions.edge_model <- function(obj, num_draws=20) {
-  par(mfrow=c(1, 2))
+plot_predictions.edge_model <- function(obj, num_draws=20, type=c("density", "point")) {
 
-  # Density plot
-  event_preds <- obj$event_preds
-  df_draw <- data.frame(event=obj$model_data$event, dyad_id=obj$model_info$row_dyad_ids) # Get dyad IDs from somewhere sensible.
-  df_summed <- aggregate(event ~ as.factor(dyad_id), df_draw, sum)
-  pred_density <- density(df_summed$event)
-  plot(pred_density, main="Observed vs predicted social events", xlab="Social events", ylim=c(0, max(pred_density$y) * 1.1))
-  for (i in 1:num_draws) {
-    df_draw$event <- as.vector(event_preds[i, ])
+  par(mfrow=c(1, length(type)))
+
+  if ("density" %in% type) {
+    # Density plot
+    event_preds <- obj$event_preds
+    df_draw <- data.frame(event=obj$model_data$event, dyad_id=obj$model_info$row_dyad_ids) # Get dyad IDs from somewhere sensible.
     df_summed <- aggregate(event ~ as.factor(dyad_id), df_draw, sum)
-    lines(density(df_summed$event), col=rgb(0, 0, 1, 0.5))
+    pred_density <- density(df_summed$event)
+    plot(pred_density, main="Observed vs predicted social events", xlab="Social events", ylim=c(0, max(pred_density$y) * 1.1))
+    for (i in 1:num_draws) {
+      df_draw$event <- as.vector(event_preds[i, ])
+      df_summed <- aggregate(event ~ as.factor(dyad_id), df_draw, sum)
+      lines(density(df_summed$event), col=rgb(0, 0, 1, 0.5))
+    }
   }
 
-  # Compare edge weights
-  df_draw <- data.frame(event=obj$model_data$event, divisor=obj$model_data$divisor, dyad_id=obj$model_info$row_dyad_ids) # Get dyad IDs from somewhere sensible.
-  df_summed <- aggregate(cbind(event, divisor) ~ as.factor(dyad_id), df_draw, sum)
-  point_estimate <- df_summed$event/df_summed$divisor
-  edgelist <- get_edgelist(obj)
-  bison_median <- edgelist[, 3]
-  bison_lower <- edgelist[, 4]
-  bison_upper <- edgelist[, 5]
-  plot(point_estimate, bison_median, ylim=c(min(bison_lower), max(bison_upper)), main="Point vs BISoN estimates", xlab="Point estimates", ylab="BISoN estimates")
-  arrows(x0=point_estimate, y0=bison_lower, x1=point_estimate, y1=bison_upper, angle=0)
-  abline(a=0, b=1)
+  if ("point" %in% type) {
+    # Compare edge weights to point estimates
+    df_draw <- data.frame(event=obj$model_data$event, divisor=obj$model_data$divisor, dyad_id=obj$model_info$row_dyad_ids) # Get dyad IDs from somewhere sensible.
+    df_summed <- aggregate(cbind(event, divisor) ~ as.factor(dyad_id), df_draw, sum)
+    point_estimate <- df_summed$event/df_summed$divisor
+    edgelist <- get_edgelist(obj)
+    bison_median <- edgelist[, 3]
+    bison_lower <- edgelist[, 4]
+    bison_upper <- edgelist[, 5]
+    plot(point_estimate, bison_median, ylim=c(min(bison_lower), max(bison_upper)), main="Point vs BISoN estimates", xlab="Point estimates", ylab="BISoN estimates")
+    arrows(x0=point_estimate, y0=bison_lower, x1=point_estimate, y1=bison_upper, angle=0)
+    abline(a=0, b=1)
+  }
 
   par(mfrow=c(1, 1))
 }
