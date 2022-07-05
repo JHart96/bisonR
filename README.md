@@ -42,3 +42,44 @@ If you want to install the latest development version, bugs and all, you can ins
 ```r
 remotes::install_github("JHart96/bisonR@dev")
 ```
+
+## Quick Start
+
+You can check your `bisonR` installation and get started with the package using the code below:
+
+```r
+library(bisonR)
+
+sim_data <- simulate_edge_model("binary", aggregated = TRUE)
+df <- sim_data$df_sim
+
+priors <- get_default_priors("binary")
+
+fit_edge <- edge_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id), 
+  data=df, 
+  data_type="binary",
+  priors=priors
+)
+
+summary(fit_edge)
+```
+
+This will fit a basic edge model model to simulated data and generate an output like this below:
+
+```
+=== Fitted BISoN edge model ===
+Data type: binary
+Formula: (event | duration) ~ dyad(node_1_id, node_2_id)
+Number of nodes: 10
+Number of dyads: 45
+Directed: FALSE
+=== Edge list summary ===
+         median    5%   95%
+1 <-> 2   0.156 0.014 0.530
+1 <-> 3   0.702 0.219 0.973
+2 <-> 3   0.793 0.356 0.982
+...
+```
+
+For a more detailed example check out the *Getting Started* page here: https://jhart96.github.io/bisonR/articles/getting_started.html.
