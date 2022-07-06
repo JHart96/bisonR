@@ -18,13 +18,13 @@ The bisonR package is written in R, but uses the Stan programming language to fi
 
 On Windows, before proceeding you may need to install the version of Rtools appropriate for your version of R. Rtools can be found here: https://cran.r-project.org/bin/windows/Rtools/.
 
-The full instructions to install cmdstanR can be found at https://mc-stan.org/cmdstanr/. We've found that the following steps often work, but depending on your operating system and version of R, the process may be more involved:
+The full instructions to install cmdstanR can be found at https://mc-stan.org/cmdstanr/. We've found that the following steps often work, but depending on your operating system and version of R, the process may be more involved.
 
 ```r
 install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
 library(cmdstanr)
 check_cmdstan_toolchain(fix = TRUE, quiet = TRUE)
-install_cmdstan()
+install_cmdstan() # On networked PCs, specify a local directory here with the argument dir=path_to_local_directory
 ```
 
 ### Installing bisonR
