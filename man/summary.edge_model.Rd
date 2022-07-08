@@ -2,15 +2,19 @@
 % Please edit documentation in R/edge_model.R
 \name{summary.edge_model}
 \alias{summary.edge_model}
-\title{Summarises a fitted edge model object}
+\title{Generates a summary object for an edge model object}
 \usage{
-\method{summary}{edge_model}(object, ...)
+\method{summary}{edge_model}(object, ci = 0.9, transform = TRUE, ...)
 }
 \arguments{
 \item{object}{An S3 edge model object to be summarised.}
 
-\item{...}{Additional arguments to be passed to \code{print.edge_model()}.}
+\item{ci}{Credible interval to use in summary, based on quantiles.}
+
+\item{transform}{\code{TRUE} or \code{FALSE} specifying whether to transform the edge weights from the internal link function scale.}
+
+\item{...}{Additional arguments}
 }
 \description{
-Summarises a fitted edge model object
+Generates a summary object for an edge model object
 }

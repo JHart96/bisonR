@@ -32,7 +32,10 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
   }
 
   # If user-specified priors haven't been set, use the defaults
-  if (is.null(priors)) priors <- get_default_priors(data_type)
+  if (is.null(priors)) {
+    message("No priors set by user, using default priors instead. We recommend setting and checking priors explicitly for reliable inference.")
+    priors <- get_default_priors(data_type)
+  }
 
   # If the model is a conjugate model, change the data type
   use_conjugate_model <- FALSE
@@ -69,7 +72,7 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
 
     # Extract edge weights from fitted edge model.
     chain <- fit$draws("edge_weight", format="matrix")
-    colnames(chain) <- model_data$dyad_ids
+    colnames(chain) <- 1:model_data$num_edges
 
     event_preds <- fit$draws("event_pred", format="matrix")
   }
@@ -94,46 +97,53 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
     data_type = data_type,
     model_data = model_data,
     input_data = data,
-    stan_model = model
+    stan_model = model,
+    conjugate = use_conjugate_model
   )
   class(obj) <- "edge_model"
   return(obj)
 }
 
-#' Summarises a fitted edge model object
+#' Generates a summary object for an edge model object
 #'
 #' @param object An S3 edge model object to be summarised.
-#' @param ... Additional arguments to be passed to `print.edge_model()`.
-#'
-#' @export
-summary.edge_model <- function(object, ...) {
-  print(object, ...)
-}
-
-#' Prints out details of a fitted edge model object
-#'
-#' @param x An S3 edge model object.
 #' @param ci Credible interval to use in summary, based on quantiles.
 #' @param transform `TRUE` or `FALSE` specifying whether to transform the edge weights from the internal link function scale.
+#' @param ... Additional arguments
+#'
+#' @export
+summary.edge_model <- function(object, ci=0.90, transform=TRUE, ...) {
+  summary_obj <- list()
+
+  summary_obj$description <- paste0(
+    "=== Fitted BISoN edge model ===",
+    "\nData type: ", object$data_type,
+    "\nFormula: ", format(object$formula),
+    "\nNumber of nodes: ", object$num_nodes,
+    "\nNumber of dyads: ", object$num_dyads,
+    "\nDirected: ", object$directed,
+    "\n=== Edge list summary ===\n"
+  )
+
+  summary_obj$edgelist <- get_edgelist(object, ci=ci, transform=transform)
+  summary_obj$dyad_names <- do.call(paste, c(get_edgelist(object)[, 1:2], sep=" <-> "))
+
+  class(summary_obj) <- "summary.edge_model"
+
+  summary_obj
+}
+
+#' Prints out an edge model summary object.
+#'
+#' @param x An S3 edge model object.
 #' @param ... Additional parameters to be passed to print function.
 #'
 #' @export
-print.edge_model <- function(x, ci=0.90, transform=TRUE, ...) {
-  cat(paste0(
-    "=== Fitted BISoN edge model ===",
-    "\nData type: ", x$data_type,
-    "\nFormula: ", format(x$formula),
-    "\nNumber of nodes: ", x$num_nodes,
-    "\nNumber of dyads: ", x$num_dyads,
-    "\nDirected: ", x$directed,
-    "\n=== Edge list summary ===\n"
-  ))
-
-  edgelist <- get_edgelist(x, ci=ci, transform=transform)
-  dyad_names <- do.call(paste, c(get_edgelist(x)[, 1:2], sep=" <-> "))
-  summary_matrix <- as.matrix(edgelist[, 3:5])
-  rownames(summary_matrix) <- dyad_names
-  print(summary_matrix)
+print.summary.edge_model <- function(x, ...) {
+  cat(x$description)
+  summary_matrix <- as.matrix(x$edgelist[, 3:5])
+  rownames(summary_matrix) <- x$dyad_names
+  print(summary_matrix, ...)
 }
 
 #' Retrieves an edgelist with uncertainty for a fitted edge weight model object

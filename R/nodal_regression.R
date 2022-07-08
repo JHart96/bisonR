@@ -122,33 +122,41 @@ get_nodal_regression_model_data <- function(formula, edgemodel, data) {
 #' Print information about a fitted nodal regression model
 #'
 #' @param x An S3 nodal regression model
-#' @param ci Credible interval to use in summary, based on quantiles.
+#' @param digits Number of digits for rounding coefficients.
 #' @param ... Additional arguments to be passed to summary calculations.
 #'
 #' @export
 #'
-print.nodal_model <- function(x, ci=0.90, ...) {
-  coefficients <- t(apply(x$chain, 2, function(x) quantile(x, probs=c(0.5, 0.5 * (1 - ci), ci + 0.5 * (1 - ci)))))
-  rownames(coefficients) <- colnames(x$model_data$design_fixed)
-  coefficients <- round(coefficients, 3)
-  cat(paste0(
-    "=== Fitted nodal regression model ===\n",
-    "Formula: ", format(x$formula), "\n",
-    "Number of nodes: ", x$edgemodel$num_nodes, "\n",
-    "=== Coefficient summary ==="
-  ))
+print.summary.nodal_model <- function(x, digits=3, ...) {
+  cat(x$description)
+  coefficients <- round(x$coefficients, digits)
   print(coefficients)
 }
 
 #' Summary of a fitted nodal regression model
 #'
 #' @param object An S3 dyadic regression model
+#' @param ci Credible interval to use in summary, based on quantiles.
 #' @param ... Additional arguments to be passed to summary calculations.
 #'
 #' @export
 #'
-summary.nodal_model <- function(object, ...) {
-  print(object, ...)
+summary.nodal_model <- function(object, ci=0.90, ...) {
+  summary_obj <- list()
+  coefficients <- t(apply(object$chain, 2, function(object) quantile(object, probs=c(0.5, 0.5 * (1 - ci), ci + 0.5 * (1 - ci)))))
+  rownames(coefficients) <- colnames(object$model_data$design_fixed)
+
+  summary_obj$coefficients <- coefficients
+  summary_obj$description <- paste0(
+    "=== Fitted dyadic regression model ===\n",
+    "Formula: ", format(object$formula), "\n",
+    "Number of dyads: ", object$edgemodel$num_dyads, "\n",
+    "=== Coefficient summary ==="
+  )
+
+  class(summary_obj) <- "summary.nodal_model"
+
+  summary_obj
 }
 
 plot_trace.nodal_model <- function (obj, par_ids=1:12, ...) {
