@@ -32,11 +32,19 @@ fit_conjugate_model_count <- function(model_data, num_samples) {
   # Draw samples from gamma posterior
   chain <- matrix(0, num_samples, model_data$num_rows)
   for (i in 1:model_data$num_rows) {
-    chain[, model_data$dyad_ids[i]] <- rgamma(
-      num_samples,
-      model_data$prior_edge_alpha + model_data$event[i],
-      model_data$prior_edge_beta/model_data$divisor[i] + 1
-    )/model_data$divisor[i]
+    if (model_data$divisor[i] > 0) {
+      chain[, model_data$dyad_ids[i]] <- rgamma(
+        num_samples,
+        model_data$prior_edge_alpha + model_data$event[i],
+        model_data$prior_edge_beta/model_data$divisor[i] + 1
+      )/model_data$divisor[i]
+    } else {
+      chain[, model_data$dyad_ids[i]] <- rgamma(
+        num_samples,
+        model_data$prior_edge_alpha,
+        model_data$prior_edge_beta
+      )
+    }
   }
 
   # Draw predictions from Poisson distribution

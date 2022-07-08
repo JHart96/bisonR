@@ -1,8 +1,6 @@
 require(igraph)
-require(bridgesampling)
 require(dplyr)
 require(stringr)
-require(bayesplot)
 
 #' Fit an edge model to data
 #'
@@ -216,8 +214,9 @@ plot_predictions.edge_model <- function(obj, num_draws=20, type=c("density", "po
     for (i in 1:num_draws) {
       df_draw$event <- as.vector(event_preds[i, ])
       df_summed <- aggregate(event ~ as.factor(dyad_id), df_draw, sum)
-      lines(density(df_summed$event), col=rgb(0, 0, 1, 0.5))
+      lines(density(df_summed$event), col=col2rgba(bison_colors[1], 0.5))
     }
+    legend("topright", legend=c("observed", "predicted"), fill=c("black", bison_colors[1]))
   }
 
   if ("point" %in% type) {
@@ -229,9 +228,13 @@ plot_predictions.edge_model <- function(obj, num_draws=20, type=c("density", "po
     bison_median <- edgelist[, 3]
     bison_lower <- edgelist[, 4]
     bison_upper <- edgelist[, 5]
-    plot(point_estimate, bison_median, ylim=c(min(bison_lower), max(bison_upper)), main="Point vs BISoN estimates", xlab="Point estimates", ylab="BISoN estimates")
-    arrows(x0=point_estimate, y0=bison_lower, x1=point_estimate, y1=bison_upper, angle=0)
+    edgelist_inner <- get_edgelist(obj, ci=0.5)
+    bison_inner_lower <- edgelist_inner[, 4]
+    bison_inner_upper <- edgelist_inner[, 5]
+    plot(point_estimate, bison_median, ylim=c(min(bison_lower), max(bison_upper)), main="Point vs BISoN estimates", xlab="Point estimates", ylab="BISoN estimates", col=rgb(0, 0, 0, 0))
     abline(a=0, b=1)
+    segments(x0=point_estimate, y0=bison_lower, x1=point_estimate, y1=bison_upper)
+    segments(x0=point_estimate, y0=bison_inner_lower, x1=point_estimate, y1=bison_inner_upper, lwd=5, col=bison_colors[1])
   }
 
   par(mfrow=c(1, 1))
@@ -241,6 +244,7 @@ plot_trace.edge_model <- function(obj, par_ids=1:12, ...) {
   if (dim(obj$chain)[2] < 12) {
     par_ids <- 1:dim(obj$chain[2])
   }
+
   bayesplot::mcmc_trace(obj$edge_samples[, par_ids])
 }
 
@@ -257,8 +261,8 @@ plot_network <- function(obj, ci=0.9, lwd=1) {
   lb <- edgelist[, 3]
   ub <- edgelist[, 5]
   coords <- igraph::layout_nicely(net)
-  igraph::plot.igraph(net, edge.width=ub * lwd, layout=coords, edge.color=rgb(0.1, 0.1, 0.1, 0.9),)
-  igraph::plot.igraph(net, edge.width=lb * lwd, layout=coords, edge.color=rgb(0.9, 0.9, 0.9, 0.9), add=TRUE)
+  igraph::plot.igraph(net, edge.width=ub * lwd, layout=coords, vertex.color=bison_colors[1], edge.color=rgb(0.1, 0.1, 0.1, 0.9),)
+  igraph::plot.igraph(net, edge.width=lb * lwd, layout=coords, vertex.color=bison_colors[1], edge.color=rgb(0.9, 0.9, 0.9, 0.9), add=TRUE)
 }
 
 get_edge_model_data <- function(formula, observations, directed, data_type) {
@@ -269,6 +273,17 @@ get_edge_model_data <- function(formula, observations, directed, data_type) {
 
   # Get model specification from formula
   model_spec <- get_edge_model_spec(formula)
+
+  # Automatically detect and apply factor levels
+  if (!is.null(model_spec$node_1_name)) {
+    node_1_names <- dplyr::pull(observations, model_spec$node_1_name)
+    node_2_names <- dplyr::pull(observations, model_spec$node_2_name)
+    if (!is.factor(node_1_names) || !all(levels(node_1_names) == levels(node_2_names))) {
+      unique_node_names <- sort(unique(c(node_1_names, node_2_names)))
+      observations[, model_spec$node_1_name] <- factor(node_1_names, levels=unique_node_names)
+      observations[, model_spec$node_2_name] <- factor(node_2_names, levels=unique_node_names)
+    }
+  }
 
   # Get node to index mapping
   node_to_idx <- 1:length(levels(dplyr::pull(observations, model_spec$node_1_name)))
@@ -312,6 +327,7 @@ get_edge_model_data <- function(formula, observations, directed, data_type) {
     # Get dyad IDs in the correct order
     node_1_names <- dplyr::pull(observations, model_spec$node_1_name)
     node_2_names <- dplyr::pull(observations, model_spec$node_2_name)
+
     dyad_ids=as.factor(dyad_to_idx[cbind(node_to_idx[node_1_names], node_to_idx[node_2_names])])
   }
 

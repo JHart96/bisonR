@@ -1,4 +1,3 @@
-require(bayesplot)
 #' Fit a nodel regression model
 #'
 #' @param formula Formula of the model
@@ -199,8 +198,9 @@ plot_predictions.nodal_model <- function(obj, num_draws=20) {
     } else {
       lines(sample_densities[[i]], col=rgb(0, 0, 0, 0.5))
     }
-    lines(pred_densities[[i]], col=rgb(0, 0, 1, 0.5))
+    lines(pred_densities[[i]], col=col2rgba(bison_colors[1], 0.5))
   }
+  legend("topright", legend=c("observed", "predicted"), fill=c("black", bison_colors[1]))
 }
 
 extract_metric_name <- function(term) {

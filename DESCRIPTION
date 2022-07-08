@@ -20,12 +20,11 @@ Imports:
     stats,
     igraph,
     stringr,
-    bayesplot
+    dplyr
 Remotes: 
     stan-dev/cmdstanr
 Suggests: 
     tidyverse,
-    dplyr,
     knitr,
     rmarkdown,
     testthat,
