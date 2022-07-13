@@ -13,6 +13,9 @@
 
 \item{...}{Additional arguments to be passed to summary calculations.}
 }
+\value{
+Returns a summary object of the fitted dyadic regression model.
+}
 \description{
 Summary of a fitted dyadic regression model
 }

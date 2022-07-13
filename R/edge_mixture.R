@@ -1,0 +1,115 @@
+#' Fit a dyadic mixture model
+#'
+#' @param edgemodel A fitted edge weight model
+#' @param component_range Vector of length 2 describing the minimum and maximum number of components to try to fit
+#'
+#' @return A edge_mixture object
+#'
+#' @export
+edge_mixture <- function(edgemodel, num_components=5, verbose=TRUE) {
+  # Prepare for fitting mixtures over the posterior networks
+  num_samples <- dim(edgemodel$edge_samples)[1]
+  num_edges <- dim(edgemodel$edge_samples)[2]
+  component_range <- 1:num_components
+  num_samples <- 200
+
+  component_probability_samples <- matrix(0, num_samples, length(component_range))
+  edge_component_samples <- array(0, c(num_samples, length(component_range), num_edges))
+
+  if (verbose) {
+    message(paste0("Fitting ", length(component_range), " mixture model(s) to edge weights..."))
+    pb <- txtProgressBar(max=num_samples, style=3)
+  }
+
+  # Fit mixture to each posterior draw of the networks
+  for (i in 1:num_samples) {
+    if (verbose) setTxtProgressBar(pb, i)
+    # Fit a model for each number of components
+    fit_mixtures <- list()
+    for (k in component_range) {
+      fit_mixtures[[k]] <- mclust::Mclust(edgemodel$edge_samples[i, ], G=k, verbose=FALSE)
+    }
+
+    # Calculate model weights from BIC differences
+    bics <- sapply(fit_mixtures, function(x) x$BIC[1])
+    bics_diff <- max(bics) - bics
+    half_exp_diffs <- exp(-0.5 * bics_diff)
+    component_probability_samples[i, ] <- half_exp_diffs/sum(half_exp_diffs)
+
+    # Draw samples of component memberships per posterior draw
+    edge_component_samples[i, , ] <- t(sapply(fit_mixtures, function(x) x$classification))
+  }
+  if (verbose) {
+    close(pb)
+  }
+
+  # Calculate network-level component probabilities from samples
+  component_probabilities <- apply(component_probability_samples, 2, mean)
+
+  # Calculate edge-level component probabilities for each model from samples
+  edge_component_probabilities <- lapply(component_range, function(k) {
+    cbind(sapply(1:k, function(i) {apply(edge_component_samples[, k, ], 2, function(x) mean(x == i))}))
+  })
+
+  obj <- list()
+  obj$component_probabilities <- component_probabilities
+  obj$edge_component_probabilities <- edge_component_probabilities
+  obj$component_probability_samples <- component_probability_samples
+  obj$edge_component_samples <- edge_component_samples
+  obj$edgemodel <- edgemodel
+  obj$component_range <- component_range
+  obj$num_components <- length(component_range)
+  class(obj) <- "edge_mixture"
+  obj
+}
+
+#' Summary of a edge mixture model
+#'
+#' @param object An S3 edge mixture model
+#' @param ... Additional arguments to be passed to summary calculations.
+#'
+#' @return Returns a summary object of an edge mixture model.
+#' @export
+summary.edge_mixture <- function(object, ...) {
+  summary_obj <- list()
+  summary_obj$description <- paste0(
+    "=== Fitted dyadic mixture model ===\n",
+    "Number of dyads: ", object$edgemodel$num_dyads, "\n",
+    "Number of components: ", object$num_components, "\n"
+  )
+  summary_obj$component_probabilities <- object$component_probabilities
+  names(summary_obj$component_probabilities) <- sapply(object$component_range, function(x) paste0("K = ", x))
+  summary_obj$edge_component_probabilities <- object$edge_component_probabilities
+  summary_obj$edge_mixture_obj <- object
+  class(summary_obj) <- "summary.edge_mixture"
+  summary_obj
+}
+
+#' Print information about an edge mixture model
+#'
+#' @param x An S3 edge mixture model summary
+#' @param ... Additional arguments to be passed to print functions.
+#'
+#' @export
+print.summary.edge_mixture <- function(x, digits=3, ...) {
+  best_model <- which.max(x$component_probabilities)
+  cat(paste0(
+    "=== Fitted dyadic mixture model ===\n",
+    "Maximum number of components: ", x$num_components, "\n",
+    "Best model: ", best_model, " components\n",
+    "Probability of best model: ", round(100 * x$component_probabilities[best_model], 1), "%\n"
+  ))
+  cat("=== Component probabilities ===\n")
+  cp <- matrix(round(x$component_probabilities, digits), nrow=1)
+  rownames(cp) <- "P(K=k)"
+  colnames(cp) <- 1:length(x$component_probabilities)
+  print(cp)
+  cat(paste0("=== Edge component probabilities for best model (K = ", best_model, ") ===\n"))
+  ecp <- x$edge_component_probabilities[[2]]
+  rownames(ecp) <- do.call(paste, c(get_edgelist(x$edge_mixture_obj$edgemodel)[, 1:2], sep=" <-> "))
+  colnames(ecp) <- 1:best_model
+  print(ecp[1:6, ])
+  cat("...")
+}
+
+

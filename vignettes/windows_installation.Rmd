@@ -1,0 +1,42 @@
+---
+title: "Installing cmdstanR on Windows"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Installing cmdstanR on Windows}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+
+The installation of cmdstanR can be troublesome on Windows computers, even more so for networked computers. Don't let this put you off though, once you get cmdstanR installed you'll be able to run bisonR and many other packages at speed and with less buggy-ness. In this article we've compiled a list of problems and fixes that have worked for us. In some cases we've resorted to editing the registry to fix some of the problems, but be careful when doing this and make sure only to make changes if you're confident, as the registry holds a lot of important information used by the OS. Don't change anything if you don't have a complete backup or don't fully understand what is being changed.
+
+# Fixes
+
+## Installing into a network directory/issues with tar.exe
+
+If you're using a computer on a network (i.e. in most universities and businesses), there's a good chance that your `HOME` environment variable will be a network location. This will cause many problems with installation and even if it did work, would likely be much slower too. The easiest solution to this problem is to create a local directory (i.e. somewhere in your C drive that isn't indexed by network backups etc) called "cmdstan". This will be the install location for cmdstan, and you can specify this directory when using `install_cmdstan()`:
+```r
+install_cmdstan(dir="C:/path/to/directory/cmdstan")
+```
+
+## RTools 4.x was not found but is required to run CmdStan with R version 4.x.
+
+This problem occurs because an environment variable was not set properly when Rtools was installed. This appears to be a common problem, but it can be fixed by adding an environment variable `RTOOLS40_HOME` (for Rtools 4.0) or `RTOOLS42_HOME` (for Rtools 4.2). The environment variable should point to the location of your Rtools installation.
+
+## Supplied csv file is corrupt
+
+This occurs after running the sampler. We don't know the source of this problem, but installing the github version of `cmdstanR` seems to fix the problem. This can be done by running the following code:
+```r
+remotes::install_github("stan-dev/cmdstanr")
+```
+
+If this doesn't work, make sure you're using the latest version of R (R 4.2.1) at the time of writing.
+
+## Error: CmdStan path has not been set yet.
+
+This can happen on the R session following the session in which you first installed cmdstanR. For some reason the environment variable `CMDSTAN`, which was set on installation, has be overwritten. We think this may be due to the configuration of managed computers. The solution to this problem is to set `CMDSTAN` to the path of your cmdstan installation. Specifically, this needs to point to the installation version directory (e.g. `.cmdstan/cmdstan-2.30.0`), rather than just the `.cmdstan/` or `cmdstan/` directory. 
+
+# Get in touch
+
+Let us know if any of these fixes work or don't work for you, or if there are any more elegant ways to fix these issues. We've spent several hours trying to fix these issues and we hope the lessons we've learned will be useful!

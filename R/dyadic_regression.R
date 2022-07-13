@@ -64,6 +64,8 @@ print.summary.dyadic_model <- function(x, digits=3, ...) {
 #' @param ci Credible interval to use in summary, based on quantiles.
 #' @param ... Additional arguments to be passed to summary calculations.
 #'
+#' @return Returns a summary object of the fitted dyadic regression model.
+#'
 #' @export
 #'
 summary.dyadic_model <- function(object, ci=0.90, ...) {

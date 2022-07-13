@@ -1,0 +1,64 @@
+---
+title: "Edge mixture models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Edge mixture models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+bisonR is an R package for running social network analyses in the BISoN framework. BISoN models consist of two main stages: 1) fitting an edge weight model, capturing uncertainty in social network edges; and 2) propagating this uncertainty through subsequent analyses such as regressions. In this short tutorial we'll cover how to fit edge weight models to a simulated dataset, and show how the fitted edge weight model can be used to run dyadic and nodal regression analysis.
+
+Before beginning, we'll load in the `bisonR` package using `library(bisonR)`, and we'll also bring in `dplyr` to help with data wrangling. If you don't already have `bisonR` installed, you can install it from Github using the following code:
+
+```{r}
+library(bisonR)
+library(dplyr)
+```
+
+We will also use the `simulate_edge_model()` function from `bisonR` to simulate some observation data. This dataframe is an example of the format that bisonR uses. Each row corresponds to an observation (such as an association within a sampling period of a dyad or a count of interactions between a dyad), but additional observation-level, dyad-level, or node-level factors can be included.
+
+```{r}
+sim_data <- simulate_edge_model_mixture("binary", num_components = 2, component_weights = c(0.5, 0.5))
+df <- sim_data$df_sim
+head(df)
+```
+
+```{r}
+hist(df$event/df$duration, breaks=20)
+```
+
+```{r}
+priors <- get_default_priors("binary")
+priors
+```
+
+```{r}
+fit_edge <- edge_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id), 
+  data=df, 
+  data_type="binary",
+  priors=priors
+)
+```
+
+```{r}
+fit_mixture <- edge_mixture(fit_edge, num_components=5)
+summary(fit_mixture)
+```
+
+# Conclusion
+
+This was a very brief introduction to the `bisonR` package, and we hope it was useful. The R package has many more features than were shown here, and the package is under constant development. We welcome any and all feedback and criticism. We hope you find this package useful, happy social network analysis!
+
+
+
