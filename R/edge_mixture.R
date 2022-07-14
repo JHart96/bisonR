@@ -116,10 +116,10 @@ print.summary.edge_mixture <- function(x, digits=3, ...) {
 
 #' Get probabilities of component membership for each edge
 #'
-#' @param object
-#' @param num_components
+#' @param object An S3 edge mixture model object
+#' @param num_components The number of components in the mixture model
 #'
-#' @return
+#' @return Dataframe summarising edge component probabilities for each edge
 #' @export
 get_edge_component_probabilities <- function(object, num_components) {
   node_names <- t(sapply(
@@ -138,9 +138,9 @@ get_edge_component_probabilities <- function(object, num_components) {
 
 #' Get probabilities of component membership for the entire network
 #'
-#' @param object
+#' @param object An S3 edge mixture model object
 #'
-#' @return
+#' @return A dataframe of probabilities of numbers of components over the entire network
 #' @export
 get_network_component_probabilities <- function(object) {
   num_components <- length(object$component_probabilities)

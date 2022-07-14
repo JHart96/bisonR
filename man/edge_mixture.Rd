@@ -4,7 +4,7 @@
 \alias{edge_mixture}
 \title{Fit a dyadic mixture model}
 \usage{
-edge_mixture(edgemodel, component_range = 1:5, verbose = TRUE)
+edge_mixture(edgemodel, num_components = 5, verbose = TRUE)
 }
 \arguments{
 \item{edgemodel}{A fitted edge weight model}

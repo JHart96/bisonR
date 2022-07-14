@@ -4,7 +4,7 @@
 \alias{print.summary.edge_mixture}
 \title{Print information about an edge mixture model}
 \usage{
-\method{print}{summary.edge_mixture}(x, ...)
+\method{print}{summary.edge_mixture}(x, digits = 3, ...)
 }
 \arguments{
 \item{x}{An S3 edge mixture model summary}
