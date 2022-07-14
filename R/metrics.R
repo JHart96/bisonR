@@ -77,5 +77,8 @@ get_metric_fn <- function(metric_name) {
   if (metric_name == "social_differentiation") {
     return(function(net) sd(E(net)$weight)/mean(E(net)$weight))
   }
+  if (metric_name == "standard_deviation") {
+    return(function(net) sd(E(net)$weight))
+  }
   return(NULL)
 }
