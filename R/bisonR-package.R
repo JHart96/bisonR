@@ -9,6 +9,7 @@
 #' @import stats
 #' @import stringr
 #' @import cmdstanr
+#' @import mclust
 #' @importFrom grDevices rgb
 #' @importFrom graphics lines
 #'

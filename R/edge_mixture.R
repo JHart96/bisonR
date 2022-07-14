@@ -13,6 +13,8 @@ edge_mixture <- function(edgemodel, num_components=5, verbose=TRUE) {
   component_range <- 1:num_components
   num_samples <- 200
 
+  mclustBIC <- mclust::mclustBIC
+
   component_probability_samples <- matrix(0, num_samples, length(component_range))
   edge_component_samples <- array(0, c(num_samples, length(component_range), num_edges))
 
@@ -112,4 +114,36 @@ print.summary.edge_mixture <- function(x, digits=3, ...) {
   cat("...")
 }
 
+#' Get probabilities of component membership for each edge
+#'
+#' @param object
+#' @param num_components
+#'
+#' @return
+#' @export
+get_edge_component_probabilities <- function(object, num_components) {
+  node_names <- t(sapply(
+    1:max(object$edgemodel$dyad_to_idx),
+    function(x) names(object$edgemodel$node_to_idx)[which(object$edgemodel$dyad_to_idx == x, arr.ind=TRUE)[1, 2:1]]
+  ))
+  if (num_components < length(object$edge_component_probabilities)) {
+    df_names <- data.frame(node_names)
+    df_components <- data.frame(object$edge_component_probabilities[[num_components]])
+    df <- cbind(df_names, df_components)
+    colnames(df)[1:2] <- c("node_1", "node_2")
+    colnames(df)[3:dim(df)[2]] <- sapply(1:num_components, function(i) paste0("P(K = ", i, ")"))
+    return(df)
+  }
+}
 
+#' Get probabilities of component membership for the entire network
+#'
+#' @param object
+#'
+#' @return
+#' @export
+get_network_component_probabilities <- function(object) {
+  num_components <- length(object$component_probabilities)
+  df <- data.frame(num_components=1:num_components, probability=object$component_probabilities)
+  return(df)
+}

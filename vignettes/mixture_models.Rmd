@@ -56,6 +56,14 @@ fit_mixture <- edge_mixture(fit_edge, num_components=5)
 summary(fit_mixture)
 ```
 
+```{r}
+get_edge_component_probabilities(fit_mixture, 3)
+```
+
+```{r}
+get_network_component_probabilities(fit_mixture)
+```
+
 # Conclusion
 
 This was a very brief introduction to the `bisonR` package, and we hope it was useful. The R package has many more features than were shown here, and the package is under constant development. We welcome any and all feedback and criticism. We hope you find this package useful, happy social network analysis!

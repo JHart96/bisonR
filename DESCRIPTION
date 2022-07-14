@@ -20,7 +20,8 @@ Imports:
     stats,
     igraph,
     stringr,
-    dplyr
+    dplyr,
+    mclust
 Remotes: 
     stan-dev/cmdstanr
 Suggests: 
