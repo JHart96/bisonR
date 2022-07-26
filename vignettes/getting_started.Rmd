@@ -63,7 +63,8 @@ fit_edge <- edge_model(
   (event | duration) ~ dyad(node_1_id, node_2_id), 
   data=df, 
   data_type="binary",
-  priors=priors
+  priors=priors,
+  iter_sampling = 2000
 )
 ```
 
@@ -72,7 +73,7 @@ Depending on your dataset this can take anywhere between a few tenths of a secon
 Once the model has fitted, we need to check that the MCMC algorithm has behaved correctly. Usually if there's a major problem, the `edge_model()` function itself will have triggered warning messages above. But even if everything is silent, it's still worth checking the traceplots to check the MCMC chains have converged. The chains should be well-mixed and look something like a fuzzy caterpillar. We can check for this using the `plot_trace()` function:
 
 ```{r}
-plot_trace(fit_edge, par_ids=1)
+plot_trace(fit_edge, par_ids=2)
 ```
 
 If we're satisfied that the MCMC algorithm has done its job properly, then it's time to see if the same is true for the model. One way to do this, among many others, is to check the predictions from the fitted model against the real data. This can be done using the `plot_predictions()` function. If the real data are within the ensemble of predictions from the model, then we have a little more faith that the model is capturing at least some important properties of the data. The statistical model implies a range of predictions that we can extract over multiple draws, the number of which can be set using the `num_draws` argument.
@@ -175,6 +176,14 @@ Just like the previous example, we can now summarise the regression coefficients
 
 ```{r}
 summary(fit_nodal)
+```
+
+# Network metrics
+
+As well as the types of statistical analysis we've already covered, network metrics can also be extracted for use in other quantitative or qualitative analyses.
+
+```{r}
+draw_network_metric_samples(fit_edge, "social_differentiation")
 ```
 
 # Conclusion

@@ -12,6 +12,8 @@ require(stringr)
 #' @param priors List of priors in the format supplied by `get_default_priors()`.
 #' @param refresh Frequency of messages printed while running the sampler.
 #' @param mc_cores Number of cores to use when running the sampler.
+#' @param iter_sampling Number of iterations to use for posterior samples.
+#' @param iter_warmup Number of iterations to use for warmup (will not be used for samples).
 #'
 #' @details
 #' Fits a BISoN edge weight model to a user-provided dataframe. The function supports either aggregated (at the
@@ -24,7 +26,7 @@ require(stringr)
 #' @return An S3 edge model object containing edge samples and processed data.
 #'
 #' @export
-edge_model <- function(formula, data, data_type=c("binary", "count"), directed=FALSE, priors=NULL, refresh=0, mc_cores=4) {
+edge_model <- function(formula, data, data_type=c("binary", "count"), directed=FALSE, priors=NULL, refresh=0, mc_cores=4, iter_sampling=1000, iter_warmup=1000) {
   if (data_type == "duration") {
     stop("Duration model not yet supported")
   }
@@ -66,7 +68,15 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
     model <- build_stan_model(data_type)
 
     # Fit model
-    fit <- model$sample(data=model_data, refresh=refresh, chains=4, parallel_chains=mc_cores, step_size=0.1)
+    fit <- model$sample(
+      data=model_data,
+      refresh=refresh,
+      chains=4,
+      parallel_chains=mc_cores,
+      step_size=0.1,
+      iter_sampling=iter_sampling,
+      iter_warmup=iter_warmup
+    )
 
     # Extract edge weights from fitted edge model.
     chain <- fit$draws("edge_weight", format="matrix")

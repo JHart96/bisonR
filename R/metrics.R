@@ -64,7 +64,27 @@ draw_network_metric_samples <- function(obj, metric_name, num_draws=1000, standa
   if (standardise) {
     metric_samples <- metric_samples - mean(metric_samples)
   }
-  metric_samples
+  obj <- list()
+  class(obj) <- "network_metric_samples"
+  obj$samples <- metric_samples
+  obj$metric_name <- metric_name
+  obj
+}
+
+"[.network_metric_samples" <- function(x, i) {
+  return(unclass(x)[i])
+}
+
+#' Print a network metric samples object
+#'
+#' @param x An S3 network metric samples object
+#' @param ci Credible interval to use for summary
+#' @param ... Additional parameters to be passed to print
+#'
+#' @export
+print.network_metric_samples <- function(x, ci=0.9, ...) {
+  qt <- quantile(x$samples, probs=c(0.5, 0.5 * (1 - ci), ci + 0.5 * (1 - ci)))
+  qt
 }
 
 get_metric_fn <- function(metric_name) {
@@ -72,13 +92,13 @@ get_metric_fn <- function(metric_name) {
     return(igraph::strength)
   }
   if (metric_name == "weighted_density") {
-    return(function(net) mean(E(net)$weight))
+    return(function(net) mean(igraph::E(net)$weight))
   }
   if (metric_name == "social_differentiation") {
-    return(function(net) sd(E(net)$weight)/mean(E(net)$weight))
+    return(function(net) sd(igraph::E(net)$weight)/mean(igraph::E(net)$weight))
   }
   if (metric_name == "standard_deviation") {
-    return(function(net) sd(E(net)$weight))
+    return(function(net) sd(igraph::E(net)$weight))
   }
   return(NULL)
 }

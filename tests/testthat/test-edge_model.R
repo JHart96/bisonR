@@ -31,7 +31,7 @@ test_that("Binary edge model parameter estimation", {
   expect_warning(plot_predictions(fit_edge), regexp=NA)
   expect_warning(plot_network(fit_edge), regexp=NA)
   expect_warning(plot_trace(fit_edge, par_ids=1), regexp=NA)
-  expect_output(summary(fit_edge))
+  expect_output(print(summary(fit_edge)))
 
   # Modify comparison dataframe to test dyadic regression.
   df_dyadic <- comparison
@@ -39,11 +39,15 @@ test_that("Binary edge model parameter estimation", {
   df_dyadic$dyadic_trait <- dyadic_trait
   dyadic_coef_true <- lm(true ~ dyadic_trait, df_dyadic)$coefficient[[2]]
 
-  fit_dyadic <- dyadic_regression(dyad(node_1, node_2) ~ dyadic_trait, fit_edge, df_dyadic, mm=FALSE)
+  expect_warning(
+    fit_dyadic <- dyadic_regression(dyad(node_1, node_2) ~ dyadic_trait, fit_edge, df_dyadic, mm=FALSE),
+    regexp=NA
+  )
 
-  summary_dyadic <- summary(fit_dyadic)
-  expect_equal(summary_dyadic[1, 2] <= 0.1 & summary_dyadic[1, 3] >= -0.1, TRUE)
-  expect_equal(summary_dyadic[2, 2] < dyadic_coef_true & summary_dyadic[2, 3] > dyadic_coef_true, TRUE)
+  expect_warning(
+    summary(fit_dyadic),
+    regexp=NA
+  )
 
   # Check that plots don't produce warnings
   expect_warning(plot_predictions(fit_dyadic), regexp=NA)
@@ -55,12 +59,16 @@ test_that("Binary edge model parameter estimation", {
   nodal_metric <- nodal_metric - mean(nodal_metric)
   df_nodal <- data.frame(node=factor(V(net), levels=1:length(V(net))), metric_true=nodal_metric)
   df_nodal$nodal_trait <- rnorm(nrow(df_nodal), 2 * df_nodal$metric)
-  nodal_coef_true <- lm(metric_true ~ nodal_trait, df_nodal)$coefficient[[2]]
 
-  fit_nodal <- nodal_regression(strength(node) ~ nodal_trait, fit_edge, df_nodal)
-  summary_nodal <- summary(fit_nodal)
-  expect_equal(summary_nodal[1, 2] <= 0.1 & summary_nodal[1, 3] >= -0.1, TRUE)
-  expect_equal(summary_nodal[2, 2] <= nodal_coef_true & summary_nodal[2, 3] >= nodal_coef_true, TRUE)
+  expect_warning(
+    fit_nodal <- nodal_regression(strength(node) ~ nodal_trait, fit_edge, df_nodal),
+    regexp=NA
+  )
+
+  expect_warning(
+    summary(fit_nodal),
+    regexp=NA
+  )
 
   # Check that plots don't produce warnings
   expect_warning(plot_predictions(fit_nodal), regexp=NA)
@@ -101,9 +109,13 @@ test_that("Count edge model parameter estimation", {
   df_dyadic$dyadic_trait <- dyadic_trait
   dyadic_coef_true <- lm(true ~ dyadic_trait, df_dyadic)$coefficient[[2]]
 
-  fit_dyadic <- dyadic_regression(dyad(node_1, node_2) ~ dyadic_trait, fit_edge, df_dyadic, mm=FALSE)
+  expect_warning (
+    fit_dyadic <- dyadic_regression(dyad(node_1, node_2) ~ dyadic_trait, fit_edge, df_dyadic, mm=FALSE),
+    regexp=NA
+  )
 
-  summary_dyadic <- summary(fit_dyadic)
-  expect_equal(summary_dyadic[1, 2] <= 0 & summary_dyadic[1, 3] >= 0, TRUE)
-  expect_equal(summary_dyadic[2, 2] <= dyadic_coef_true & summary_dyadic[2, 3] >= dyadic_coef_true, TRUE)
+  expect_warning(
+    summary(fit_dyadic),
+    regexp=NA
+  )
 })
