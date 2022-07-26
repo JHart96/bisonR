@@ -21,7 +21,8 @@ Imports:
     igraph,
     stringr,
     dplyr,
-    mclust
+    mclust,
+    extraDistr
 Remotes: 
     stan-dev/cmdstanr
 Suggests: 
