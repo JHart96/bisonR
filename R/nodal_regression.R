@@ -9,8 +9,6 @@
 #'
 #' @return An S3 nodal model object containing chain samples and processed data.
 #' @export
-#'
-#' @examples
 nodal_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, priors=NULL) {
   # If user-specified priors haven't been set, use the defaults
   if (is.null(priors)) {
@@ -156,13 +154,6 @@ summary.nodal_model <- function(object, ci=0.90, ...) {
   class(summary_obj) <- "summary.nodal_model"
 
   summary_obj
-}
-
-plot_trace.nodal_model <- function (obj, par_ids=1:12, ...) {
-  if (dim(obj$chain)[2] < 12) {
-    par_ids <- 1:dim(obj$chain)[2]
-  }
-  bayesplot::mcmc_trace(obj$fit$draws("beta_fixed")[,,par_ids])
 }
 
 plot_predictions.nodal_model <- function(obj, num_draws=20) {

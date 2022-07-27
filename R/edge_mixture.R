@@ -1,7 +1,8 @@
 #' Fit a dyadic mixture model
 #'
-#' @param edgemodel A fitted edge weight model
-#' @param component_range Vector of length 2 describing the minimum and maximum number of components to try to fit
+#' @param edgemodel A fitted edge weight model.
+#' @param num_components Maximum number of components to fit.
+#' @param verbose TRUE/FALSE indicating whether to output messages and progress when fitting.
 #'
 #' @return A edge_mixture object
 #'
@@ -89,7 +90,8 @@ summary.edge_mixture <- function(object, ...) {
 
 #' Print information about an edge mixture model
 #'
-#' @param x An S3 edge mixture model summary
+#' @param x An S3 edge mixture model summary.
+#' @param digits Number of digits to round summary values to.
 #' @param ... Additional arguments to be passed to print functions.
 #'
 #' @export

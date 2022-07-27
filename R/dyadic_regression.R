@@ -84,13 +84,6 @@ summary.dyadic_model <- function(object, ci=0.90, ...) {
   summary_obj
 }
 
-plot_trace.dyadic_model <- function (obj, par_ids=1:12, ...) {
-  if (dim(obj$chain)[2] < 12) {
-    par_ids <- 1:dim(obj$chain)[2]
-  }
-  bayesplot::mcmc_trace(obj$fit$draws("beta_fixed")[,,par_ids])
-}
-
 plot_predictions.dyadic_model <- function(obj, num_draws=20) {
   # Determine edge label
   if (obj$edgemodel$data_type == "binary") {

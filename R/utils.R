@@ -10,11 +10,11 @@
 #' @export
 plot_trace <- function(obj, par_ids=1:5, ...) {
   # Extract chains from objects
-  if (class(obj) == "edge_model") {
+  if (is(obj, "edge_model")) {
     chain <- obj$fit$draws("edge_weight")
-  } else if (class(obj) == "dyadic_model") {
+  } else if (is(obj, "dyadic_model")) {
     chain <- obj$fit$draws("beta_fixed")
-  } else if (class(obj) == "nodal_model") {
+  } else if (is(obj, "nodal_model")) {
     chain <- obj$fit$draws("beta_fixed")
   }
   # Set parameter IDs
@@ -42,11 +42,11 @@ plot_trace <- function(obj, par_ids=1:5, ...) {
 #'
 #' @export
 plot_predictions <- function(obj, ...) {
-  if (class(obj) == "edge_model") {
+  if (is(obj, "edge_model")) {
     plot_predictions.edge_model(obj, ...)
-  } else if (class(obj) == "dyadic_model") {
+  } else if (is(obj, "dyadic_model")) {
     plot_predictions.dyadic_model(obj, ...)
-  } else if (class(obj) == "nodal_model") {
+  } else if (is(obj, "nodal_model")) {
     plot_predictions.nodal_model(obj, ...)
   }
 }

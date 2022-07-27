@@ -10,8 +10,10 @@
 #' @import stringr
 #' @import cmdstanr
 #' @import mclust
-#' @importFrom grDevices rgb
-#' @importFrom graphics lines
+#' @import utils
+#' @import grDevices
+#' @import graphics
+#' @import formula.tools
 #'
 #'
 #'

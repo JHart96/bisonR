@@ -7,9 +7,11 @@
 edge_mixture(edgemodel, num_components = 5, verbose = TRUE)
 }
 \arguments{
-\item{edgemodel}{A fitted edge weight model}
+\item{edgemodel}{A fitted edge weight model.}
 
-\item{component_range}{Vector of length 2 describing the minimum and maximum number of components to try to fit}
+\item{num_components}{Maximum number of components to fit.}
+
+\item{verbose}{TRUE/FALSE indicating whether to output messages and progress when fitting.}
 }
 \value{
 A edge_mixture object

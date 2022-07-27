@@ -7,7 +7,9 @@
 \method{print}{summary.edge_mixture}(x, digits = 3, ...)
 }
 \arguments{
-\item{x}{An S3 edge mixture model summary}
+\item{x}{An S3 edge mixture model summary.}
+
+\item{digits}{Number of digits to round summary values to.}
 
 \item{...}{Additional arguments to be passed to print functions.}
 }

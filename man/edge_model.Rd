@@ -11,7 +11,9 @@ edge_model(
   directed = FALSE,
   priors = NULL,
   refresh = 0,
-  mc_cores = 4
+  mc_cores = 4,
+  iter_sampling = 1000,
+  iter_warmup = 1000
 )
 }
 \arguments{
@@ -28,6 +30,10 @@ edge_model(
 \item{refresh}{Frequency of messages printed while running the sampler.}
 
 \item{mc_cores}{Number of cores to use when running the sampler.}
+
+\item{iter_sampling}{Number of iterations to use for posterior samples.}
+
+\item{iter_warmup}{Number of iterations to use for warmup (will not be used for samples).}
 }
 \value{
 An S3 edge model object containing edge samples and processed data.

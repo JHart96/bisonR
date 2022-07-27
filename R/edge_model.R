@@ -250,14 +250,6 @@ plot_predictions.edge_model <- function(obj, num_draws=20, type=c("density", "po
   par(mfrow=c(1, 1))
 }
 
-plot_trace.edge_model <- function(obj, par_ids=1:12, ...) {
-  if (dim(obj$chain)[2] < 12) {
-    par_ids <- 1:dim(obj$chain[2])
-  }
-
-  bayesplot::mcmc_trace(obj$edge_samples[, par_ids])
-}
-
 #' Sociogram plot with uncertainty of a fitted edge weight model object
 #'
 #' @param obj An S3 edge model object to be summarised.
