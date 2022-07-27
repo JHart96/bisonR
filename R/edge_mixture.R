@@ -95,6 +95,7 @@ summary.edge_mixture <- function(object, ...) {
 #' @export
 print.summary.edge_mixture <- function(x, digits=3, ...) {
   best_model <- which.max(x$component_probabilities)
+
   cat(paste0(
     "=== Fitted dyadic mixture model ===\n",
     "Maximum number of components: ", x$num_components, "\n",
@@ -107,10 +108,12 @@ print.summary.edge_mixture <- function(x, digits=3, ...) {
   colnames(cp) <- 1:length(x$component_probabilities)
   print(cp)
   cat(paste0("=== Edge component probabilities for best model (K = ", best_model, ") ===\n"))
-  ecp <- x$edge_component_probabilities[[2]]
+  ecp <- x$edge_component_probabilities[[best_model]]
+
   rownames(ecp) <- do.call(paste, c(get_edgelist(x$edge_mixture_obj$edgemodel)[, 1:2], sep=" <-> "))
   colnames(ecp) <- 1:best_model
-  print(ecp[1:6, ])
+
+  print(head(ecp))
   cat("...")
 }
 
