@@ -5,3 +5,4 @@ inst/stan/*
 *.png
 docs/*
 .Rhistory
+.VSCodeCounter*

@@ -42,7 +42,11 @@ The bisonR framework is fully Bayesian, and therefore specifying priors are a ke
 
 ```{r}
 priors <- get_default_priors("binary")
-priors
+priors$edge <- "normal(0, 5)"
+```
+
+```{r}
+prior_check(priors, "binary")
 ```
 
 This list shows the priors set on the "fixed effect" parameters: the edge weights and any additional fixed effects included in the edge weight model; and the "random effect" parameters: any additional random effects included in the edge weight model. Imagine we decide that a normal distribution with mean zero and standard deviation 1 is not appropriate for the fixed effects, and we'd prefer a standard deviation of 2, we can change this using the following code:
@@ -63,8 +67,7 @@ fit_edge <- edge_model(
   (event | duration) ~ dyad(node_1_id, node_2_id), 
   data=df, 
   data_type="binary",
-  priors=priors,
-  iter_sampling = 2000
+  priors=priors
 )
 ```
 
@@ -82,7 +85,7 @@ If we're satisfied that the MCMC algorithm has done its job properly, then it's 
 plot_predictions(fit_edge, num_draws=20)
 ```
 
-The predictions from the model are shown in blue and the real data are shown in black. Ideally the blue lines should be distributed around the black line, indicating the real data are among the possible predictions of the model. Now we've conducted two basic diagnostic checks of the edge weight model, we can start to trust what it's telling us. To see a summary of edge weights and their credible intervals, we can use the `summary()` function:
+The predictions from the model are shown in teal and the real data are shown in black. Ideally the blue lines should be distributed around the black line, indicating the real data are among the possible predictions of the model. Now we've conducted two basic diagnostic checks of the edge weight model, we can start to trust what it's telling us. To see a summary of edge weights and their credible intervals, we can use the `summary()` function:
 
 ```{r}
 summary(fit_edge)
