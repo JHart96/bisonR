@@ -42,18 +42,13 @@ The bisonR framework is fully Bayesian, and therefore specifying priors are a ke
 
 ```{r}
 priors <- get_default_priors("binary")
-priors$edge <- "normal(0, 5)"
-```
-
-```{r}
-prior_check(priors, "binary")
 ```
 
 This list shows the priors set on the "fixed effect" parameters: the edge weights and any additional fixed effects included in the edge weight model; and the "random effect" parameters: any additional random effects included in the edge weight model. Imagine we decide that a normal distribution with mean zero and standard deviation 1 is not appropriate for the fixed effects, and we'd prefer a standard deviation of 2, we can change this using the following code:
 
 ```{r}
-priors$edge <- "normal(0, 2.5)"
-priors
+priors$edge <- "normal(0, 0.1)"
+prior_check(priors, "binary")
 ```
 
 Now we've set our priors and we're happy with them, we can fit the edge model using the `edge_model()` function. This is one of the main functions of the `bisonR` package and has a lot of functionality. The main thing to worry about is how to define the edge weight model formula. The formula are designed to be familar to those who have used `lm`, `lme4`, `brms`, and other regression packages. The main difference here is that we need to include some measure of sampling intensity to get accurate estimates of edge weight uncertainty.
