@@ -80,7 +80,11 @@ get_default_priors <- function(model_type) {
 #' @export
 prior_check <- function(priors, model_type, type="density") {
   if (type == "density") {
-    num_cols = 2
+    if (length(priors) > 1) {
+      num_cols = 2
+    } else {
+      num_cols = 1
+    }
     num_rows = ceiling(length(priors)/num_cols)
     par(mfrow=c(num_rows, num_cols))
     for (parameter_name in names(priors)) {
@@ -88,9 +92,18 @@ prior_check <- function(priors, model_type, type="density") {
       distribution_name <- prior_distribution$distribution_name
       parameter_values <- prior_distribution$parameter_values
 
+      quantile_fn <- get_quantile_fn(parameter_name, model_type, distribution_name)
       density_fn <- get_density_fn(parameter_name, model_type, distribution_name)
-      xlim <- get_xlim(function(x) do.call(density_fn, as.list(c(x, parameter_values)))) # This needs improving
-      x_values <- seq(xlim[1], xlim[2], (xlim[2] - xlim[1])/100)
+
+      if (is.null(quantile_fn) || is.null(density_fn)) {
+        stop("Distribution not available for this model type. Try using a different distribution in the priors.")
+      }
+
+      # Get limits on the X-axis
+      x_lower <- do.call(quantile_fn, as.list(c(0.001, parameter_values)))
+      x_upper <- do.call(quantile_fn, as.list(c(0.999, parameter_values)))
+
+      x_values <- seq(x_lower, x_upper, (x_upper - x_lower)/100)
       y_values <- sapply(
         x_values,
         function(x) do.call(density_fn, as.list(c(x, parameter_values)))
@@ -101,49 +114,72 @@ prior_check <- function(priors, model_type, type="density") {
   }
 }
 
-# Get reasonable limits of density function. Could be improved a lot.
-get_xlim <- function(density_fn) {
-  start <- 0.5
-  while(is.nan(density_fn(start)) || density_fn(start) <= 10^-3) {
-    if (density_fn(start + 0.01) >= density_fn(start)) {
-      start <- start + 0.01
-    } else {
-      start <- start - 0.01
-    }
-  }
-  xmin <- start
-  while(!is.nan(suppressWarnings(density_fn(xmin))) && density_fn(xmin) > 10^-3) {
-    xmin <- xmin - 0.01
-  }
-  xmax <- start
-  while(!is.nan(suppressWarnings(density_fn(xmax))) && density_fn(xmax) > 10^-3) {
-    xmax <- xmax + 0.01
-  }
-  return(c(xmin + 0.01, xmax - 0.01))
-}
-
 get_density_fn <- function(parameter_name, model_type, distribution_name) {
   if (parameter_name == "edge") {
     if (model_type == "binary") {
       if (distribution_name == "normal") {
-        density_fn <- function(x, ...) dnorm(qlogis(x), ...)
+        return(function(x, ...) dnorm(qlogis(x), ...))
       }
     }
     if (model_type == "count") {
       if (distribution_name == "normal") {
-        density_fn <- function(x, ...) dlnorm(x, ...)
+        return(function(x, ...) dlnorm(x, ...))
+      }
+    }
+    if (model_type == "binary_conjugate") {
+      if (distribution_name == "beta") {
+        return(function(x, ...) dbeta(x, ...))
+      }
+    }
+    if (model_type == "count_conjugate") {
+      if (distribution_name == "gamma") {
+        return(function(x, ...) dgamma(x, ...))
       }
     }
   } else {
     if (distribution_name == "normal") {
-      density_fn <- function(x, ...) dnorm(x, ...)
+      return(function(x, ...) dnorm(x, ...))
     }
     if (distribution_name == "half-normal") {
-      density_fn <- function(x, ...) extraDistr::dhnorm(x, ...)
+      return(function(x, ...) extraDistr::dhnorm(x, ...))
+    }
+  }
+  return(NULL)
+}
+
+get_quantile_fn <- function(parameter_name, model_type, distribution_name) {
+  if (parameter_name == "edge") {
+    if (model_type == "binary") {
+      if (distribution_name == "normal") {
+        return(function(x, ...) plogis(qnorm(x, ...)))
+      }
+
+    }
+    if (model_type == "count") {
+      if (distribution_name == "normal") {
+        return(function(x, ...) qlnorm(x, ...))
+      }
+    }
+    if (model_type == "binary_conjugate") {
+      if (distribution_name == "beta") {
+        return(function(x, ...) qbeta(x, ...))
+      }
+    }
+    if (model_type == "count_conjugate") {
+      if (distribution_name == "gamma") {
+        return(function(x, ...) qgamma(x, ...))
+      }
+    }
+  } else {
+    if (distribution_name == "normal") {
+      return(function(x, ...) qnorm(x, ...))
+    }
+    if (distribution_name == "half-normal") {
+      return(function(x, ...) extraDistr::qhnorm(x, ...))
     }
   }
 
-  return(density_fn)
+  return(NULL)
 }
 
 extract_prior_parameters <- function(priors) {

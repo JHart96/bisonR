@@ -42,16 +42,23 @@ The bisonR framework is fully Bayesian, and therefore specifying priors are a ke
 
 ```{r}
 priors <- get_default_priors("binary")
+priors
 ```
 
-This list shows the priors set on the "fixed effect" parameters: the edge weights and any additional fixed effects included in the edge weight model; and the "random effect" parameters: any additional random effects included in the edge weight model. Imagine we decide that a normal distribution with mean zero and standard deviation 1 is not appropriate for the fixed effects, and we'd prefer a standard deviation of 2, we can change this using the following code:
+The priors object gives a list of priors on the parameters for the edge model: the edge weights, additional fixed effects, and random effect parameters. The `prior_check()` function can be used to plot the prior distributions, and we'll use this to check that we're happy with the priors:
 
 ```{r}
-priors$edge <- "normal(0, 0.1)"
 prior_check(priors, "binary")
 ```
 
-Now we've set our priors and we're happy with them, we can fit the edge model using the `edge_model()` function. This is one of the main functions of the `bisonR` package and has a lot of functionality. The main thing to worry about is how to define the edge weight model formula. The formula are designed to be familar to those who have used `lm`, `lme4`, `brms`, and other regression packages. The main difference here is that we need to include some measure of sampling intensity to get accurate estimates of edge weight uncertainty.
+Imagine we decide that the prior on edge weights isn't appropriate as we'd prefer a flatter prior for the edge weight parameter, we can change this using the following code:
+
+```{r}
+priors$edge <- "normal(0, 10)"
+prior_check(priors, "binary")
+```
+
+Depending on the biology, this might be more like what we want to see. Now we've set our priors and we're happy with them, we can fit the edge model using the `edge_model()` function. This is one of the main functions of the `bisonR` package and has a lot of functionality. The main thing to worry about is how to define the edge weight model formula. The formula are designed to be familar to those who have used `lm`, `lme4`, `brms`, and other regression packages. The main difference here is that we need to include some measure of sampling intensity to get accurate estimates of edge weight uncertainty.
 
 In bisonR, the left hand side of the `~` describes the sampling data, and uses the `(event | duration)` notation. In this notation, `event` corresponds to the name of the column in the dataframe that represents the measure of social events, such as 1 and 0 in the binary model, or frequencies 0, 1, 2, ... in the count model. If using an unaggregated dataframe, the `duration` corresponds to the durations of each observation. In our case this is fixed, but this will depend on the data at hand.
 
