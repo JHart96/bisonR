@@ -6,10 +6,12 @@
 #' @param mc_cores Number of cores to use for the MCMC sampler
 #' @param refresh Frequency of print-outs from MCMC sampler
 #' @param priors List of priors in the format supplied by `get_default_priors()`.
+#' @param priors_only Whether to use priors as posteriors or to allow the posteriors to be updated by data.
+
 #'
 #' @return An S3 nodal model object containing chain samples and processed data.
 #' @export
-nodal_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, priors=NULL) {
+nodal_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, priors=NULL, priors_only=FALSE) {
   # If user-specified priors haven't been set, use the defaults
   if (is.null(priors)) {
     priors <- get_default_priors("nodal_regression")
@@ -21,6 +23,9 @@ nodal_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, pr
   # Set the priors in model data
   prior_parameters <- extract_prior_parameters(priors)
   model_data <- c(model_data, prior_parameters)
+
+  # Set whether only the priors should be sampled
+  model_data$priors_only <- priors_only
 
   model <- build_stan_model("nodal_regression")
   fit <- model$sample(data=model_data, chains=4, parallel_chains=mc_cores, refresh=refresh, step_size=0.1)
@@ -156,7 +161,7 @@ summary.nodal_model <- function(object, ci=0.90, ...) {
   summary_obj
 }
 
-plot_predictions.nodal_model <- function(obj, num_draws=20) {
+plot_predictions.nodal_model <- function(obj, num_draws=20, type=c("density"), draw_data=TRUE) {
   # Determine edge label
   xlab <- "Logit centrality"
 
@@ -173,25 +178,32 @@ plot_predictions.nodal_model <- function(obj, num_draws=20) {
   }
 
   # Set plot limits according to maximum density of samples
-  xlim = c(
-    min(sapply(sample_densities, function(x) min(x$x))),
-    max(sapply(sample_densities, function(x) max(x$x))) * 1.1
-  )
-  ylim = c(
-    min(sapply(sample_densities, function(x) min(x$y))),
-    max(sapply(sample_densities, function(x) max(x$y))) * 1.1
-  )
+  xmin <- min(sapply(pred_densities, function(x) min(x$x)))
+  xmax <- max(sapply(pred_densities, function(x) max(x$x)))
+  ymax <- max(sapply(pred_densities, function(x) max(x$y)))
+
+  if (draw_data) {
+    xmin <- min(c(xmin, sapply(sample_densities, function(x) min(x$x))))
+    xmax <- max(c(xmax, sapply(sample_densities, function(x) max(x$x))))
+    ymax <- max(c(ymax, sapply(sample_densities, function(x) max(x$y))))
+  }
 
   # Plot densities for subsequent draws
+  plot(NULL, main="Observed vs predicted response values", xlab="Response value", ylab="Probability",
+       xlim=c(xmin, xmax), ylim=c(0, ymax * 1.1))
+
   for (i in 1:num_draws) {
-    if (i == 1) {
-      plot(sample_densities[[i]], main="Observed vs predicted nodal metrics", xlab=xlab, col=rgb(0, 0, 0, 0.5), xlim=xlim, ylim=ylim)
-    } else {
+    if (draw_data) {
       lines(sample_densities[[i]], col=rgb(0, 0, 0, 0.5))
     }
     lines(pred_densities[[i]], col=col2rgba(bison_colors[1], 0.5))
   }
-  legend("topright", legend=c("observed", "predicted"), fill=c("black", bison_colors[1]))
+
+  if (draw_data) {
+    legend("topright", legend=c("observed", "predicted"), fill=c("black", bison_colors[1]))
+  } else {
+    legend("topright", legend=c("predicted"), fill=c(bison_colors[1]))
+  }
 }
 
 extract_metric_name <- function(term) {

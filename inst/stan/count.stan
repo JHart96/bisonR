@@ -19,6 +19,8 @@ data {
   real prior_random_mean_mu; // Prior mean on centralisation of random effects
   real<lower=0> prior_random_mean_sigma; // Prior standard deviation on centralisation of random effects
   real<lower=0> prior_random_std_sigma; // Prior standard deviation on dispersion of random effects
+
+  int<lower=0, upper=1> priors_only; // Whether to sample from only the priors
 }
 
 parameters {
@@ -44,9 +46,10 @@ transformed parameters {
 }
 
 model {
-  // Main model
-  event ~ poisson(exp(predictor) .* divisor);
-
+  if (!priors_only) {
+    // Main model
+    event ~ poisson(exp(predictor) .* divisor);
+  }
   // Priors
   if (num_edges > 0) {
     edge_weight ~ normal(prior_edge_mu, prior_edge_sigma);

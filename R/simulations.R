@@ -21,7 +21,7 @@ simulate_edge_model <- function(model_type, aggregated, location_effect=TRUE, ag
 
   if (model_type %in% c("binary", "count")) {
     df_sim <- data.frame(event=numeric(), node_1_id=numeric(), node_2_id=numeric(), age_diff=numeric(), age_1=numeric(), age_2=numeric(), location=numeric(), duration=numeric())
-    df_true <- data.frame(node_1_id=numeric(), node_2_id=numeric(), edge_weight=numeric(), age_diff=numeric())
+    df_true <- data.frame(node_1_id=numeric(), node_2_id=numeric(), edge_weight=numeric(), age_diff=numeric(), age_1=numeric(), age_2=numeric())
   }
   if (model_type == "duration") {
     df_sim <- data.frame(event=numeric(), node_1_id=numeric(), node_2_id=numeric(), age_diff=numeric(), location=numeric())
@@ -67,12 +67,12 @@ simulate_edge_model <- function(model_type, aggregated, location_effect=TRUE, ag
         }
 
         # Set true dataframe
-        df_true[nrow(df_true) + 1, ] <- list(node_1_id=i, node_2_id=j, edge_weight=edge_weights[i, j], age_diff=age_diff)
+        df_true[nrow(df_true) + 1, ] <- list(node_1_id=i, node_2_id=j, edge_weight=edge_weights[i, j], age_1=ages[i], age_2=ages[j], age_diff=age_diff)
       }
     }
   }
   if (aggregated) {
-    df_sim <- dplyr::summarise(dplyr::group_by(df_sim, node_1_id, node_2_id), event=sum(event), duration=sum(duration), age_diff=mean(age_diff))
+    df_sim <- dplyr::summarise(dplyr::group_by(df_sim, node_1_id, node_2_id), event=sum(event), duration=sum(duration), age_diff=mean(age_diff), age_1=mean(age_1), age_2=mean(age_2))
   }
   df_sim$node_1_id <- factor(df_sim$node_1_id, levels=1:num_nodes)
   df_sim$node_2_id <- factor(df_sim$node_2_id, levels=1:num_nodes)

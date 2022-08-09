@@ -14,6 +14,7 @@ require(stringr)
 #' @param mc_cores Number of cores to use when running the sampler.
 #' @param iter_sampling Number of iterations to use for posterior samples.
 #' @param iter_warmup Number of iterations to use for warmup (will not be used for samples).
+#' @param priors_only Whether to use priors as posteriors or to allow the posteriors to be updated by data.
 #'
 #' @details
 #' Fits a BISoN edge weight model to a user-provided dataframe. The function supports either aggregated (at the
@@ -26,10 +27,12 @@ require(stringr)
 #' @return An S3 edge model object containing edge samples and processed data.
 #'
 #' @export
-edge_model <- function(formula, data, data_type=c("binary", "count"), directed=FALSE, priors=NULL, refresh=0, mc_cores=4, iter_sampling=1000, iter_warmup=1000) {
+edge_model <- function(formula, data, data_type=c("binary", "count"), directed=FALSE, priors=NULL, refresh=0, mc_cores=4, iter_sampling=1000, iter_warmup=1000, priors_only=FALSE) {
   if (data_type == "duration") {
     stop("Duration model not yet supported")
   }
+
+  print(directed)
 
   # If user-specified priors haven't been set, use the defaults
   if (is.null(priors)) {
@@ -56,10 +59,13 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
   prior_parameters <- extract_prior_parameters(priors)
   model_data <- c(model_info$model_data, prior_parameters)
 
+  # Set whether only the priors should be sampled
+  model_data$priors_only <- priors_only
+
   # Select sampling method
   if (use_conjugate_model) {
     # Fit conjugate model
-    model <- fit_conjugate_model(data_type, model_data)
+    model <- fit_conjugate_model(data_type, model_data, priors_only=priors_only)
     chain <- model$chain
     event_preds <- model$event_preds
     fit <- NULL
@@ -210,7 +216,7 @@ draw_edgelist_samples <- function (obj, num_draws) {
   edgelist_samples
 }
 
-plot_predictions.edge_model <- function(obj, num_draws=20, type=c("density", "point")) {
+plot_predictions.edge_model <- function(obj, num_draws=20, type=c("density", "point"), draw_data=TRUE) {
 
   par(mfrow=c(1, length(type)))
 
@@ -219,14 +225,64 @@ plot_predictions.edge_model <- function(obj, num_draws=20, type=c("density", "po
     event_preds <- obj$event_preds
     df_draw <- data.frame(event=obj$model_data$event, dyad_id=obj$model_info$row_dyad_ids) # Get dyad IDs from somewhere sensible.
     df_summed <- aggregate(event ~ as.factor(dyad_id), df_draw, sum)
-    pred_density <- density(df_summed$event)
-    plot(pred_density, main="Observed vs predicted social events", xlab="Social events", ylim=c(0, max(pred_density$y) * 1.1))
+    obs_density <- density(df_summed$event)
+
+    pred_density <- list()
     for (i in 1:num_draws) {
       df_draw$event <- as.vector(event_preds[i, ])
       df_summed <- aggregate(event ~ as.factor(dyad_id), df_draw, sum)
-      lines(density(df_summed$event), col=col2rgba(bison_colors[1], 0.5))
+      pred_density[[i]] <- density(df_summed$event)
     }
-    legend("topright", legend=c("observed", "predicted"), fill=c("black", bison_colors[1]))
+
+    xmin <- min(c(sapply(pred_density, function(x) x$x)))
+    xmax <- max(c(sapply(pred_density, function(x) x$x)))
+    ymax <- max(c(sapply(pred_density, function(x) x$y)))
+
+    # Only include observation extrema in the limit calculation if draw_data is TRUE to prevent information leakage
+    if (draw_data) {
+      xmin <- min(xmin, obs_density$x)
+      xmax <- max(xmax, obs_density$x)
+      ymax <- max(ymax, obs_density$y)
+    }
+
+    plot(NULL, main="Observed vs predicted social events", xlab="Social events", ylab="Probability",
+         xlim=c(xmin, xmax), ylim=c(0, ymax * 1.1))
+
+    for (i in 1:num_draws) {
+      lines(pred_density[[i]], col=col2rgba(bison_colors[1], 0.5))
+    }
+
+    if (draw_data) {
+      lines(obs_density, lwd=2)
+      legend("topright", legend=c("observed", "predicted"), fill=c("black", bison_colors[1]))
+    } else {
+      legend("topright", legend=c("predicted"), fill=c(bison_colors[1]))
+    }
+  }
+
+  if ("histogram" %in% type) {
+    warning("This plot is experimental and does not yet work as intended.")
+    # Histogram plot
+    event_preds <- obj$event_preds
+    df_draw <- data.frame(event=obj$model_data$event, dyad_id=obj$model_info$row_dyad_ids) # Get dyad IDs from somewhere sensible.
+    df_summed <- aggregate(event ~ as.factor(dyad_id), df_draw, sum)
+    num_breaks <- max(df_summed$event) - min(df_summed$event)
+    pred_density <- density(df_summed$event)
+    plot(NULL, main="Observed vs predicted social events", xlab="Social events",
+         xlim=c(min(pred_density$x), max(pred_density$x)), ylim=c(0, max(pred_density$y) * 1.5))
+
+    if (draw_data) {
+      hist(df_summed$event, breaks=num_breaks, freq=FALSE, add=TRUE)
+      legend("topright", legend=c("observed", "predicted"), fill=c("black", bison_colors[1]))
+    } else {
+      legend("topright", legend=c("predicted"), fill=c(bison_colors[1]))
+    }
+
+    for (i in 1:num_draws) {
+      df_draw$event <- as.vector(event_preds[i, ])
+      df_summed <- aggregate(event ~ as.factor(dyad_id), df_draw, sum)
+      hist(df_summed$event, col=col2rgba(bison_colors[1], 0.2), breaks=num_breaks, freq=FALSE, add=TRUE)
+    }
   }
 
   if ("point" %in% type) {
