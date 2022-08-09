@@ -116,7 +116,7 @@ Dyadic regression is where dyadic network properties (usually edge weight) are r
 
 ```{r}
 priors <- get_default_priors("dyadic_regression")
-priors$error <- "half-normal(2.5)"
+# priors$error <- "half-normal(2.5)"
 priors
 ```
 
@@ -128,7 +128,8 @@ prior_predictive_check(
   data=df_dyadic,
   options=list(edgemodel=fit_edge, mm=FALSE),
   priors=priors,
-  model_type="dyadic_regression"
+  model_type="dyadic_regression",
+  plot_type="marginal"
 )
 ```
 
@@ -136,7 +137,13 @@ prior_predictive_check(
 df_dyadic <- df %>%
   distinct(node_1_id, node_2_id, age_diff)
 
-fit_dyadic <- dyadic_regression(dyad(node_1_id, node_2_id) ~ age_diff, fit_edge, df_dyadic, mm=FALSE, priors=priors)
+fit_dyadic <- dyadic_regression(
+  dyad(node_1_id, node_2_id) ~ age_diff, 
+  fit_edge, 
+  df_dyadic, 
+  mm=FALSE, 
+  priors=priors
+)
 ```
 
 Like last time we want to check that our model has fit properly and makes good predictions. This can be done in exactly the same way as last time:
@@ -146,7 +153,7 @@ plot_trace(fit_dyadic, par_ids=1)
 ```
 
 ```{r}
-plot_predictions(fit_dyadic, num_draws=20)
+plot_predictions(fit_dyadic, num_draws=20, type="marginal", draw_data=FALSE)
 ```
 
 Now we can examine the regression coefficients using `summary()`. These can be interpreted in mostly the same way as a standard regression, though categories will be treated differently. See here for more information on how categories are handled in `bisonR` regression functions.
@@ -192,12 +199,18 @@ prior_predictive_check(
   strength(node_id) ~ age_std,
   data=df_nodal,
   model_type="nodal_regression",
-  options=list(edgemodel=fit_edge)
+  options=list(edgemodel=fit_edge),
+  plot_type="marginal"
 )
 ```
 
 ```{r}
-fit_nodal <- nodal_regression(strength(node_id) ~ age, fit_edge, df_nodal, priors=priors)
+fit_nodal <- nodal_regression(
+  strength(node_id) ~ age_std, 
+  fit_edge, 
+  df_nodal, 
+  priors=priors
+)
 ```
 
 Once the model has been fitted, we need to employ the same diagnostic checks as last time to ensure the model is reliable. This may seem a little tedious, and it won't always go smoothly, but it's a vital part of model fitting that is essential for reliable inferences, even in frequentist statistics.
@@ -208,7 +221,7 @@ plot_trace(fit_nodal, par_ids=1)
 
 
 ```{r}
-plot_predictions(fit_nodal, num_draws=20)
+plot_predictions(fit_nodal, num_draws=20, type="marginal")
 ```
 
 Just like the previous example, we can now summarise the regression coefficients using the `summary()` function:

@@ -161,7 +161,7 @@ summary.nodal_model <- function(object, ci=0.90, ...) {
   summary_obj
 }
 
-plot_predictions.nodal_model <- function(obj, num_draws=20, type=c("density"), draw_data=TRUE) {
+plot_predictions.nodal_model <- function(obj, num_draws=20, type="density", draw_data=TRUE) {
   # Determine edge label
   xlab <- "Logit centrality"
 
@@ -169,40 +169,60 @@ plot_predictions.nodal_model <- function(obj, num_draws=20, type=c("density"), d
   metric_samples <- obj$metric_samples
   metric_preds <- obj$fit$draws("metric_pred", format="matrix")
 
-  # Generate densities for edge sample and prediction
-  sample_densities <- list()
-  pred_densities <- list()
-  for (i in 1:num_draws) {
-    sample_densities[[i]] <- density(metric_samples[i, ])
-    pred_densities[[i]] <- density(as.vector(metric_preds[i, ]))
-  }
-
-  # Set plot limits according to maximum density of samples
-  xmin <- min(sapply(pred_densities, function(x) min(x$x)))
-  xmax <- max(sapply(pred_densities, function(x) max(x$x)))
-  ymax <- max(sapply(pred_densities, function(x) max(x$y)))
-
-  if (draw_data) {
-    xmin <- min(c(xmin, sapply(sample_densities, function(x) min(x$x))))
-    xmax <- max(c(xmax, sapply(sample_densities, function(x) max(x$x))))
-    ymax <- max(c(ymax, sapply(sample_densities, function(x) max(x$y))))
-  }
-
-  # Plot densities for subsequent draws
-  plot(NULL, main="Observed vs predicted response values", xlab="Response value", ylab="Probability",
-       xlim=c(xmin, xmax), ylim=c(0, ymax * 1.1))
-
-  for (i in 1:num_draws) {
-    if (draw_data) {
-      lines(sample_densities[[i]], col=rgb(0, 0, 0, 0.5))
+  if (type == "density") {
+    # Generate densities for edge sample and prediction
+    sample_densities <- list()
+    pred_densities <- list()
+    for (i in 1:num_draws) {
+      sample_densities[[i]] <- density(metric_samples[i, ])
+      pred_densities[[i]] <- density(as.vector(metric_preds[i, ]))
     }
-    lines(pred_densities[[i]], col=col2rgba(bison_colors[1], 0.5))
+
+    # Set plot limits according to maximum density of samples
+    xmin <- min(sapply(pred_densities, function(x) min(x$x)))
+    xmax <- max(sapply(pred_densities, function(x) max(x$x)))
+    ymax <- max(sapply(pred_densities, function(x) max(x$y)))
+
+    if (draw_data) {
+      xmin <- min(c(xmin, sapply(sample_densities, function(x) min(x$x))))
+      xmax <- max(c(xmax, sapply(sample_densities, function(x) max(x$x))))
+      ymax <- max(c(ymax, sapply(sample_densities, function(x) max(x$y))))
+    }
+
+    # Plot densities for subsequent draws
+    plot(NULL, main="Observed vs predicted response values", xlab="Response value", ylab="Probability",
+         xlim=c(xmin, xmax), ylim=c(0, ymax * 1.1))
+
+    for (i in 1:num_draws) {
+      if (draw_data) {
+        lines(sample_densities[[i]], col=rgb(0, 0, 0, 0.5))
+      }
+      lines(pred_densities[[i]], col=col2rgba(bison_colors[1], 0.5))
+    }
+
+    if (draw_data) {
+      legend("topright", legend=c("observed", "predicted"), fill=c("black", bison_colors[1]))
+    } else {
+      legend("topright", legend=c("predicted"), fill=c(bison_colors[1]))
+    }
   }
 
-  if (draw_data) {
-    legend("topright", legend=c("observed", "predicted"), fill=c("black", bison_colors[1]))
-  } else {
-    legend("topright", legend=c("predicted"), fill=c(bison_colors[1]))
+  if (type == "marginal") {
+    # New plot for each fixed effect. Max 4 per plot?
+    coef_names <- colnames(obj$model_data$design_fixed)
+    for (i in 1:length(coef_names)) {
+      if (coef_names[i] != "intercept") {
+        predictor <- obj$model_data$design_fixed[, i]
+        responses <- list()
+        for (j in 1:num_draws) {
+          responses[[j]] <- as.numeric(metric_preds[j, ])
+        }
+        plot(NULL, xlim=c(min(predictor), max(predictor)), ylim=c(min(unlist(responses)), max(unlist(responses))), xlab=coef_names[i], ylab="Response value")
+        for (j in 1:num_draws) {
+          abline(lm(responses[[j]] ~ predictor), col=col2rgba(bison_colors[1], 0.5))
+        }
+      }
+    }
   }
 }
 
