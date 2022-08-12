@@ -83,7 +83,7 @@ edge_transform <- function(obj) {
 
 build_stan_model <- function(model_name) {
   model_filepath <- system.file("stan", paste0(model_name, ".stan"), package="bisonR")
-  model <- cmdstanr::cmdstan_model(model_filepath, compile=FALSE)
+  model <- cmdstanr::cmdstan_model(model_filepath, compile=FALSE, stanc_options = list("O1"))
   model$compile(dir=tempdir())
   return(model)
 }

@@ -69,6 +69,7 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
     chain <- model$chain
     event_preds <- model$event_preds
     fit <- NULL
+    log_lik <- NULL
   } else {
     # Build Stan model
     model <- build_stan_model(data_type)
@@ -89,6 +90,8 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
     colnames(chain) <- 1:model_data$num_edges
 
     event_preds <- fit$draws("event_pred", format="matrix")
+
+    log_lik <- fit$draws("log_lik", format="matrix")
   }
 
   # Extract edge samples
@@ -112,7 +115,8 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
     model_data = model_data,
     input_data = data,
     stan_model = model,
-    conjugate = use_conjugate_model
+    conjugate = use_conjugate_model,
+    log_lik = log_lik
   )
   class(obj) <- "edge_model"
   return(obj)

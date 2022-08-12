@@ -70,4 +70,8 @@ model {
 generated quantities {
   array[num_rows] int event_pred;
   event_pred = binomial_rng(divisor, inv_logit(predictor));
+  vector[num_rows] log_lik;
+  for (i in 1:num_rows) {
+    log_lik[i] = binomial_lpmf(event[i] | divisor[i], inv_logit(predictor[i]));
+  }
 }

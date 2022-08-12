@@ -70,4 +70,8 @@ model {
 generated quantities {
   array[num_rows] int event_pred;
   event_pred = poisson_rng(exp(predictor) .* divisor);
+  vector[num_rows] log_lik;
+  for (i in 1:num_rows) {
+    log_lik[i] = poisson_lpmf(event[i] | exp(predictor[i]) .* divisor[i]);
+  }
 }

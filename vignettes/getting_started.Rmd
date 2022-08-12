@@ -110,6 +110,18 @@ plot_network(fit_edge, lwd=1)
 
 Now that we have a fitted edge weight model we're happy with, we can start to look at downstream analyses. The first of these we'll consider is dyadic regression.
 
+
+```{r}
+fit_null <- edge_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id), 
+  data=df, 
+  data_type="binary"
+)
+
+model_comparison(list(fit_edge, fit_null))
+
+```
+
 # Dyadic Regression
 
 Dyadic regression is where dyadic network properties (usually edge weight) are regressed against dyad-level properties. In our case we'll be regressing edge weight against difference in age, to test the hypothesis that differences in age drive social connections. Just like edge weight models, we need to set priors, and this can be done in much the same way as last time:
