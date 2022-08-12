@@ -54,7 +54,7 @@ prior_check(priors, "binary")
 Imagine we decide that the prior on edge weights isn't appropriate as we'd prefer a flatter prior for the edge weight parameter, we can change this using the following code:
 
 ```{r}
-priors$edge <- "normal(-2, 1)"
+priors$edge <- "normal(-1, 1)"
 prior_check(priors, "binary")
 ```
 
@@ -113,13 +113,12 @@ Now that we have a fitted edge weight model we're happy with, we can start to lo
 
 ```{r}
 fit_null <- edge_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id), 
+  (event | duration) ~ 1, 
   data=df, 
   data_type="binary"
 )
 
 model_comparison(list(fit_edge, fit_null))
-
 ```
 
 # Dyadic Regression

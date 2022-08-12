@@ -32,8 +32,6 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
     stop("Duration model not yet supported")
   }
 
-  print(directed)
-
   # If user-specified priors haven't been set, use the defaults
   if (is.null(priors)) {
     message("No priors set by user, using default priors instead. We recommend setting and checking priors explicitly for reliable inference.")
@@ -173,6 +171,9 @@ print.summary.edge_model <- function(x, ...) {
 #' @return A `data.frame` object with columns of node IDs, median, lower, and upper bounds.
 #' @export
 get_edgelist <- function (obj, ci=0.9, transform=TRUE) {
+  if (is.null(obj$dyad_to_idx)) {
+    stop("No edge weights in this model.")
+  }
   node_names <- sapply(
     1:max(obj$dyad_to_idx),
     function(x) names(obj$node_to_idx)[which(obj$dyad_to_idx == x, arr.ind=TRUE)[1, 2:1]]
@@ -347,30 +348,41 @@ get_edge_model_data <- function(formula, observations, directed, data_type) {
     }
   }
 
-  # Get node to index mapping
-  node_to_idx <- 1:length(levels(dplyr::pull(observations, model_spec$node_1_name)))
-  names(node_to_idx) <- levels(dplyr::pull(observations, model_spec$node_1_name))
+  if (!is.null(model_spec$node_1_name)) {
+    # Get node to index mapping
+    node_to_idx <- 1:length(levels(dplyr::pull(observations, model_spec$node_1_name)))
+    names(node_to_idx) <- levels(dplyr::pull(observations, model_spec$node_1_name))
 
-  # Get number of nodes
-  num_nodes <- length(node_to_idx)
+    # Get number of nodes
+    num_nodes <- length(node_to_idx)
 
-  # Get dyad to index mapping
-  dyad_to_idx <- matrix(0, num_nodes, num_nodes)
-  if (directed == FALSE) {
-    num_dyads <- (0.5 * num_nodes * (num_nodes - 1))
-    dyad_to_idx[upper.tri(dyad_to_idx)] <- 1:(0.5 * num_nodes * (num_nodes - 1))
-    dyad_to_idx <- dyad_to_idx + t(dyad_to_idx)
+    # Get dyad to index mapping
+    dyad_to_idx <- matrix(0, num_nodes, num_nodes)
+    if (directed == FALSE) {
+      num_dyads <- (0.5 * num_nodes * (num_nodes - 1))
+      dyad_to_idx[upper.tri(dyad_to_idx)] <- 1:(0.5 * num_nodes * (num_nodes - 1))
+      dyad_to_idx <- dyad_to_idx + t(dyad_to_idx)
+    } else {
+      num_dyads <- num_nodes * (num_nodes - 1)
+      dyad_to_idx[upper.tri(dyad_to_idx)] <- 1:(0.5 * num_nodes * (num_nodes - 1))
+      dyad_to_idx[lower.tri(dyad_to_idx)] <- (0.5 * num_nodes * (num_nodes - 1) + 1):num_nodes
+    }
+
+    # Get dyad names
+    dyad_names <- sapply(
+      1:num_dyads,
+      function(x) paste0(names(node_to_idx)[which(dyad_to_idx == x, arr.ind=TRUE)[1, 2:1]], collapse=" <-> ")
+    )
   } else {
-    num_dyads <- num_nodes * (num_nodes - 1)
-    dyad_to_idx[upper.tri(dyad_to_idx)] <- 1:(0.5 * num_nodes * (num_nodes - 1))
-    dyad_to_idx[lower.tri(dyad_to_idx)] <- (0.5 * num_nodes * (num_nodes - 1) + 1):num_nodes
+    dyad_ids = rep(1, nrow(observations))
+    node_1_names = NULL
+    node_2_names = NULL
+    node_to_idx = NULL
+    dyad_to_idx = NULL
+    dyad_names = NULL
+    num_nodes = 0
+    num_dyads = 0
   }
-
-  # Get dyad names
-  dyad_names <- sapply(
-    1:num_dyads,
-    function(x) paste0(names(node_to_idx)[which(dyad_to_idx == x, arr.ind=TRUE)[1, 2:1]], collapse=" <-> ")
-  )
 
   # Get events
   event <- dplyr::pull(observations, model_spec$event_var_name)
@@ -450,8 +462,8 @@ get_edge_model_data <- function(formula, observations, directed, data_type) {
     design_fixed=data.matrix(design_fixed[, -1]),
     design_random=data.matrix(design_random[, -1]),
     num_edges = length(unique(dyad_ids)),
-    num_fixed=ncol(design_fixed[, -1]),
-    num_random=ncol(design_random[, -1]),
+    num_fixed=ncol(as.matrix(design_fixed[, -1])),
+    num_random=ncol(as.matrix(design_random[, -1])),
     num_random_groups=length(unique(random_group_index)),
     random_group_index=as.integer(as.factor(random_group_index))
   )
