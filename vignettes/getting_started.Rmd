@@ -30,7 +30,7 @@ library(dplyr)
 We will also use the `simulate_edge_model()` function from `bisonR` to simulate some observation data. This dataframe is an example of the format that bisonR uses. Each row corresponds to an observation (such as an association within a sampling period of a dyad or a count of interactions between a dyad), but additional observation-level, dyad-level, or node-level factors can be included.
 
 ```{r}
-sim_data <- simulate_edge_model("binary", aggregated = TRUE)
+sim_data <- simulate_edge_model("binary", aggregated = FALSE)
 df <- sim_data$df_sim
 head(df)
 ```
@@ -54,7 +54,7 @@ prior_check(priors, "binary")
 Imagine we decide that the prior on edge weights isn't appropriate as we'd prefer a flatter prior for the edge weight parameter, we can change this using the following code:
 
 ```{r}
-priors$edge <- "normal(-1, 1)"
+priors$edge <- "normal(0, 2.5)"
 prior_check(priors, "binary")
 ```
 
@@ -108,26 +108,33 @@ It can be hard to get an intuitive idea for what's going on looking only at a su
 plot_network(fit_edge, lwd=1)
 ```
 
-Now that we have a fitted edge weight model we're happy with, we can start to look at downstream analyses. The first of these we'll consider is dyadic regression.
+# Non-random Edge Weights
+
+Now that we have a fitted edge weight model we're happy with, we can start to look at downstream analyses. The first of these we'll consider is the non-random edge weight analysis, which is a Bayesian version of the Bejder et al. 1998 test for non-random association. In this analysis we compare the fitted edge weight model to a null version of the model where all edges have the same weight. We then use the `model_comparison` function to estimate the relative probabilities of the full edge weight model against the null model:
 
 
 ```{r}
 fit_null <- edge_model(
   (event | duration) ~ 1, 
   data=df, 
-  data_type="binary"
+  data_type="binary",
+  priors=priors
 )
 
-model_comparison(list(fit_edge, fit_null))
+model_comparison(list(non_random_model = fit_edge, random_model=fit_null))
 ```
+
+The results are pretty conclusive, the network seems to be non-random. It's likely that this is the case in almost all networks, but you might want to conduct this test anyway.
 
 # Dyadic Regression
 
 Dyadic regression is where dyadic network properties (usually edge weight) are regressed against dyad-level properties. In our case we'll be regressing edge weight against difference in age, to test the hypothesis that differences in age drive social connections. Just like edge weight models, we need to set priors, and this can be done in much the same way as last time:
 
 ```{r}
+df_dyadic <- df %>%
+  distinct(node_1_id, node_2_id, age_diff)
+
 priors <- get_default_priors("dyadic_regression")
-# priors$error <- "half-normal(2.5)"
 priors
 ```
 
@@ -145,9 +152,6 @@ prior_predictive_check(
 ```
 
 ```{r}
-df_dyadic <- df %>%
-  distinct(node_1_id, node_2_id, age_diff)
-
 fit_dyadic <- dyadic_regression(
   dyad(node_1_id, node_2_id) ~ age_diff, 
   fit_edge, 
@@ -186,8 +190,7 @@ df_2 <- df %>%
   select(node_id=node_2_id, age=age_2)
 df_nodal <- bind_rows(df_1, df_2) %>%
   distinct(node_id, age) %>%
-  mutate(age_std=(age - mean(df_nodal$age))/sd(df_nodal$age))
-# df_nodal$age_std <- df_nodal$age - mean(df_nodal$age)
+  mutate(age_std=scale(age))
 df_nodal
 ```
 
@@ -246,7 +249,12 @@ summary(fit_nodal)
 As well as the types of statistical analysis we've already covered, network metrics can also be extracted for use in other quantitative or qualitative analyses.
 
 ```{r}
-draw_network_metric_samples(fit_edge, "social_differentiation")
+social_differentiation_samples <- draw_network_metric_samples(fit_edge, "social_differentiation")
+social_differentiation_samples
+```
+
+```{r}
+plot(social_differentiation_samples)
 ```
 
 # Conclusion

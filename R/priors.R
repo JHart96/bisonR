@@ -86,7 +86,7 @@ prior_check <- function(priors, model_type, type="density") {
       num_cols = 1
     }
     num_rows = ceiling(length(priors)/num_cols)
-    par(mfrow=c(num_rows, num_cols))
+    par(mfrow=c(num_rows, num_cols), mar=c(4, 4, 1, 1))
     for (parameter_name in names(priors)) {
       prior_distribution <- extract_distribution(priors[parameter_name])
       distribution_name <- prior_distribution$distribution_name

@@ -8,7 +8,8 @@ prior_predictive_check(
   formula,
   data,
   model_type,
-  directed = FALSE,
+  plot_type = "density",
+  options = NULL,
   priors = NULL
 )
 }

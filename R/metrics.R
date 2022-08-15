@@ -83,8 +83,22 @@ draw_network_metric_samples <- function(obj, metric_name, num_draws=1000, standa
 #'
 #' @export
 print.network_metric_samples <- function(x, ci=0.9, ...) {
-  qt <- quantile(x$samples, probs=c(0.5, 0.5 * (1 - ci), ci + 0.5 * (1 - ci)))
-  qt
+  qt <- quantile(x$samples, probs=c(0.5 * (1 - ci), 0.5, ci + 0.5 * (1 - ci)))
+  print(qt)
+}
+
+#' Plot network metric samples
+#'
+#' @param x Network metric samples object
+#'
+#' @export
+plot.network_metric_samples <- function(x) {
+  fit_logspline <- logspline::logspline(x$samples)
+  xmin <- logspline::qlogspline(0.001, fit_logspline)
+  xmax <- logspline::qlogspline(0.999, fit_logspline)
+  curve(
+    logspline::dlogspline(x, fit_logspline), xlim=c(xmin, xmax),
+    lwd=2, col=bison_colors[1], xlab=x$metric_name, ylab="Probability density", main="")
 }
 
 get_metric_fn <- function(metric_name) {

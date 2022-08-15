@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="index.html">bisonR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,6 +49,8 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="articles/getting_started.html">Getting Started</a>
+    <a class="dropdown-item" href="articles/mixture_models.html">Edge mixture models</a>
+    <a class="dropdown-item" href="articles/windows_installation.html">Installing cmdstanR on Windows</a>
   </div>
 </li>
 <li class="nav-item">
@@ -81,12 +83,9 @@
 </div>
 <!-- badges: start -->
 
-<p><span class="emoji" data-emoji="warning">⚠️</span> <strong>Do not use
-this package! (yet): This package is still in very early stages of
-development and not ready for real use. If you’re looking to use BISoN
-for social network analysis check out the examples repository in Stan
-and INLA here: <a href="https://github.com/JHart96/bison_examples" class="external-link">github.com/JHart96/bison_examples</a>.
-</strong></p>
+<p><span class="emoji" data-emoji="warning">⚠️</span> <strong>This
+package is still in early stages of development and has not yet been
+fully tested</strong></p>
 <p>bisonR is an R package implementing the BISoN framework for
 conducting Bayesian analysis of social networks. BISoN estimates
 uncertainty over edge weights in social networks from empirical data
@@ -97,13 +96,81 @@ as regression.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>cmdstanR needs to be installed for the bisonR package to work. To
-install cmdstanR, follow the instructions at <a href="https://mc-stan.org/cmdstanr/" class="external-link uri">https://mc-stan.org/cmdstanr/</a>, then run
-<code><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">cmdstanr::install_cmdstan()</a></code>.</p>
+<div class="section level3">
+<h3 id="installing-cmdstanr">Installing CmdStanR<a class="anchor" aria-label="anchor" href="#installing-cmdstanr"></a>
+</h3>
+<p>The bisonR package is written in R, but uses the Stan programming
+language to fit Bayesian models. Stan is a separate program, and
+interfaces with bisonR using an R package called cmdstanR. Stan and
+cmdstanR are installed in a different way to standard R packages, so
+require a specific series of installation steps.</p>
+<p>On Windows, before proceeding you may need to install the version of
+Rtools appropriate for your version of R. Rtools can be found here: <a href="https://cran.r-project.org/bin/windows/Rtools/" class="external-link uri">https://cran.r-project.org/bin/windows/Rtools/</a>.</p>
+<p>The full instructions to install cmdstanR can be found at <a href="https://mc-stan.org/cmdstanr/" class="external-link uri">https://mc-stan.org/cmdstanr/</a>. We’ve found that the
+following steps often work, but depending on your operating system and
+version of R, the process may be more involved.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"cmdstanr"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://mc-stan.org/r-packages/"</span>, <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/cmdstanr/" class="external-link">cmdstanr</a></span><span class="op">)</span>
+<span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">check_cmdstan_toolchain</a></span><span class="op">(</span>fix <span class="op">=</span> <span class="cn">TRUE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">install_cmdstan</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># On networked PCs, specify a local directory here with the argument dir=path_to_local_directory</span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="installing-bisonr">Installing bisonR<a class="anchor" aria-label="anchor" href="#installing-bisonr"></a>
+</h3>
 <p>bisonR isn’t currently on CRAN, but it can be installed from GitHub.
 To do this, make sure you have the <code>remotes</code> package
 installed. Then run the following command:</p>
-<pre><code><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"JHart96/bisonR"</span><span class="op">)</span></code></pre>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"JHart96/bisonR"</span><span class="op">)</span></code></pre></div>
+<div class="section level4">
+<h4 id="development-version">Development version<a class="anchor" aria-label="anchor" href="#development-version"></a>
+</h4>
+<p>If you want to install the latest development version, bugs and all,
+you can install from the development branch. This option is not
+recommended for standard users.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"JHart96/bisonR@dev"</span><span class="op">)</span></code></pre></div>
+</div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
+</h2>
+<p>You can check your <code>bisonR</code> installation and get started
+with the package using the code below:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JHart96/bisonR" class="external-link">bisonR</a></span><span class="op">)</span>
+
+<span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_edge_model.html">simulate_edge_model</a></span><span class="op">(</span><span class="st">"binary"</span>, aggregated <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">df</span> <span class="op">&lt;-</span> <span class="va">sim_data</span><span class="op">$</span><span class="va">df_sim</span>
+
+<span class="va">priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_default_priors.html">get_default_priors</a></span><span class="op">(</span><span class="st">"binary"</span><span class="op">)</span>
+
+<span class="va">fit_edge</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/edge_model.html">edge_model</a></span><span class="op">(</span>
+  <span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="va">duration</span><span class="op">)</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span><span class="op">)</span>, 
+  data<span class="op">=</span><span class="va">df</span>, 
+  data_type<span class="op">=</span><span class="st">"binary"</span>,
+  priors<span class="op">=</span><span class="va">priors</span>
+<span class="op">)</span>
+
+<span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/fit-method-summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_edge</span><span class="op">)</span></code></pre></div>
+<p>This will fit a basic edge model model to simulated data and generate
+an output like this below:</p>
+<pre><code>=== Fitted BISoN edge model ===
+Data type: binary
+Formula: (event | duration) ~ dyad(node_1_id, node_2_id)
+Number of nodes: 10
+Number of dyads: 45
+Directed: FALSE
+=== Edge list summary ===
+         median    5%   95%
+1 &lt;-&gt; 2   0.156 0.014 0.530
+1 &lt;-&gt; 3   0.702 0.219 0.973
+2 &lt;-&gt; 3   0.793 0.356 0.982
+...</code></pre>
+<p>For a more detailed example check out the <em>Getting Started</em>
+page here: <a href="https://jhart96.github.io/bisonR/articles/getting_started.html" class="external-link uri">https://jhart96.github.io/bisonR/articles/getting_started.html</a>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

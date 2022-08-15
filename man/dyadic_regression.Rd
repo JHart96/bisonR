@@ -11,7 +11,8 @@ dyadic_regression(
   mc_cores = 4,
   refresh = 500,
   mm = TRUE,
-  priors = NULL
+  priors = NULL,
+  priors_only = FALSE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ dyadic_regression(
 \item{mm}{TRUE/FALSE indicating whether to include multi-membership effects in the regression}
 
 \item{priors}{List of priors in the format supplied by \code{get_default_priors()}.}
+
+\item{priors_only}{Whether to use priors as posteriors or to allow the posteriors to be updated by data.}
 }
 \value{
 An S3 dyadic model object containing chain samples and processed data.
