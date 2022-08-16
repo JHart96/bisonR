@@ -40,6 +40,18 @@ test_that("Binary edge model parameter estimation", {
   dyadic_coef_true <- lm(true ~ dyadic_trait, df_dyadic)$coefficient[[2]]
 
   expect_warning(
+    prior_predictive_check(
+      dyad(node_1, node_2) ~ dyadic_trait,
+      data=df_dyadic,
+      options=list(edgemodel=fit_edge, mm=FALSE),
+      priors=get_default_priors("dyadic_regression"),
+      model_type="dyadic_regression",
+      plot_type="marginal"
+    ),
+    regexp=NA
+  )
+
+  expect_warning(
     fit_dyadic <- dyadic_regression(dyad(node_1, node_2) ~ dyadic_trait, fit_edge, df_dyadic, mm=FALSE),
     regexp=NA
   )
@@ -61,7 +73,18 @@ test_that("Binary edge model parameter estimation", {
   df_nodal$nodal_trait <- rnorm(nrow(df_nodal), 2 * df_nodal$metric)
 
   expect_warning(
-    fit_nodal <- nodal_regression(strength(node) ~ nodal_trait, fit_edge, df_nodal),
+    prior_predictive_check(
+      strength(node) ~ nodal_trait,
+      data=df_nodal,
+      options=list(edgemodel=fit_edge),
+      model_type="nodal_regression",
+      plot_type="marginal"
+    ),
+    regexp=NA
+  )
+
+  fit_nodal <- expect_warning(
+    nodal_regression(strength(node) ~ nodal_trait, fit_edge, df_nodal),
     regexp=NA
   )
 

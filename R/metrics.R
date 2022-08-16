@@ -90,15 +90,17 @@ print.network_metric_samples <- function(x, ci=0.9, ...) {
 #' Plot network metric samples
 #'
 #' @param x Network metric samples object
+#' @param ... Additional parameters to be passed to plot function
 #'
 #' @export
-plot.network_metric_samples <- function(x) {
+plot.network_metric_samples <- function(x, ...) {
   fit_logspline <- logspline::logspline(x$samples)
   xmin <- logspline::qlogspline(0.001, fit_logspline)
   xmax <- logspline::qlogspline(0.999, fit_logspline)
   curve(
     logspline::dlogspline(x, fit_logspline), xlim=c(xmin, xmax),
-    lwd=2, col=bison_colors[1], xlab=x$metric_name, ylab="Probability density", main="")
+    lwd=2, col=bison_colors[1], xlab=x$metric_name, ylab="Probability density", main="", ...
+  )
 }
 
 get_metric_fn <- function(metric_name) {

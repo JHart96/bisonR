@@ -4,6 +4,8 @@
 #' @param data Data for the model
 #' @param model_type Type of model to fit
 #' @param priors List of priors for the model
+#' @param plot_type Type of predictive plot to show ("density" or "marginal")
+#' @param options List of additional information needed for the predictive plot. Check the examples for full details.
 #'
 #' @export
 prior_predictive_check <- function(formula, data, model_type, plot_type="density", options=NULL, priors=NULL) {

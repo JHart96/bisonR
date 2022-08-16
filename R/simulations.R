@@ -1,5 +1,5 @@
 utils::globalVariables(c("node_1_id", "node_2_id"))
-utils::globalVariables(c("num_locations", "age_diff", "locations"))
+utils::globalVariables(c("num_locations", "age_diff", "locations", "age_1", "age_2"))
 
 #' Simulates data
 #'

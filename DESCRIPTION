@@ -22,15 +22,16 @@ Imports:
     stringr,
     dplyr,
     mclust,
-    extraDistr
-Remotes: 
-    stan-dev/cmdstanr
-Suggests: 
+    extraDistr,
+    loo,
+    logspline,
     tidyverse,
     knitr,
     rmarkdown,
     testthat,
     covr
+Remotes: 
+    stan-dev/cmdstanr
 VignetteBuilder: knitr
 LazyData: true
 Config/testthat/edition: 3

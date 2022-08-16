@@ -20,6 +20,10 @@ prior_predictive_check(
 
 \item{model_type}{Type of model to fit}
 
+\item{plot_type}{Type of predictive plot to show ("density" or "marginal")}
+
+\item{options}{List of additional information needed for the predictive plot. Check the examples for full details.}
+
 \item{priors}{List of priors for the model}
 }
 \description{

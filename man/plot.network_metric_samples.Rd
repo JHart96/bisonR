@@ -4,10 +4,12 @@
 \alias{plot.network_metric_samples}
 \title{Plot network metric samples}
 \usage{
-\method{plot}{network_metric_samples}(x)
+\method{plot}{network_metric_samples}(x, ...)
 }
 \arguments{
 \item{x}{Network metric samples object}
+
+\item{...}{Additional parameters to be passed to plot function}
 }
 \description{
 Plot network metric samples
