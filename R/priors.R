@@ -16,7 +16,7 @@ get_default_priors <- function(model_type) {
   }
   if (model_type == "count") {
     priors <- list(
-      edge="normal(0, 2.5)",
+      edge="normal(0, 1)",
       fixed="normal(0, 2.5)",
       random_mean="normal(0, 1)",
       random_std="half-normal(1)"

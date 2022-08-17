@@ -24,8 +24,9 @@ simulate_edge_model <- function(model_type, aggregated, location_effect=TRUE, ag
     df_true <- data.frame(node_1_id=numeric(), node_2_id=numeric(), edge_weight=numeric(), age_diff=numeric(), age_1=numeric(), age_2=numeric())
   }
   if (model_type == "duration") {
-    df_sim <- data.frame(event=numeric(), node_1_id=numeric(), node_2_id=numeric(), age_diff=numeric(), location=numeric())
+    df_sim <- data.frame(event=numeric(), node_1_id=numeric(), node_2_id=numeric(), age_diff=numeric(), age_1=numeric(), age_2=numeric(), location=numeric())
     df_sim_agg <- data.frame(event_count=numeric(), node_1_id=numeric(), node_2_id=numeric())
+    df_true <- data.frame(node_1_id=numeric(), node_2_id=numeric(), edge_weight=numeric(), age_diff=numeric(), age_1=numeric(), age_2=numeric(), location=numeric())
   }
 
   for (i in 1:num_nodes) {
@@ -79,12 +80,13 @@ simulate_edge_model <- function(model_type, aggregated, location_effect=TRUE, ag
   df_true$node_1_id <- factor(df_true$node_1_id, levels=1:num_nodes)
   df_true$node_2_id <- factor(df_true$node_2_id, levels=1:num_nodes)
   if (model_type %in% c("binary", "count")) {
+
     return(list(df_sim=df_sim, df_true=df_true))
   }
   if (model_type == "duration") {
     df_sim_agg$node_1_id <- factor(df_sim_agg$node_1_id, levels=1:num_nodes)
     df_sim_agg$node_2_id <- factor(df_sim_agg$node_2_id, levels=1:num_nodes)
-    return(list(df=df_sim, df_agg=df_sim_agg))
+    return(list(df=df_sim, df_agg=df_sim_agg, df_true=df_true))
   }
 
   stop("Model type not supported")
@@ -135,19 +137,6 @@ simulate_edge_model_mixture <- function(model_type, num_components, component_we
             event <- rpois(1, exp(0.01 * predictor) * duration)
             df_sim[nrow(df_sim) + 1, ] <- list(event=event, node_1_id=i, node_2_id=j, duration=duration)
           }
-        }
-        if (model_type == "duration") {
-          # Draw a lambda, sample K, and loop through K
-          duration <- runif(1, 100, 1000) # Hours observed
-          lambda <- runif(1, 0, 0.1) # Events per hour
-          K <- rpois(1, lambda * duration)
-          for (k in 1:K) {
-            location_id <- sample.int(num_locations, 1)
-            predictor <- -5 + edge_weights[i, j] + 0.25 * age_diff + locations[location_id]
-            event <- min(rexp(1, lambda/plogis(predictor)), 1)
-            df_sim[nrow(df_sim) + 1, ] <- list(event=event, node_1_id=i, node_2_id=j)
-          }
-          df_sim_agg[nrow(df_sim_agg) + 1, ] <- list(event_count=K, node_1_id=i, node_2_id=j)
         }
 
         # Set true dataframe

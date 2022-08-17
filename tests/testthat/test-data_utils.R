@@ -15,3 +15,14 @@ test_that("convert_gbi_to_bison works", {
   }
   expect_true(all(results == TRUE))
 })
+
+test_that("convert_gbi_to_bison with constraints/properties works", {
+  gbi <- matrix(rbinom(20 * 10, 1, 0.25), 20, 10)
+  group_properties <- rnorm(20)
+  individual_properties <- rnorm(10)
+  individual_constraints <- sample(1:2, 10, replace=TRUE)
+  df <- expect_warning(
+    convert_gbi_to_bison(gbi, group_properties, individual_properties, individual_constraints),
+    regexp=NA
+  )
+})

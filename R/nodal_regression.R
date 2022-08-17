@@ -95,6 +95,7 @@ get_nodal_regression_model_data <- function(formula, edgemodel, data) {
   num_fixed <- ncol(design_fixed) - 1
   num_random <- ncol(design_random) - 1
   num_random_groups <- length(unique(random_group_index))
+  random_group_index <- as.numeric(as.factor(random_group_index))
 
   metric_samples <- draw_node_metric_samples(edgemodel, model_spec$metric_name, 1000, standardise=TRUE)
   metric_mu <- apply(metric_samples, 2, mean)

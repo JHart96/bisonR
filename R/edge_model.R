@@ -265,31 +265,6 @@ plot_predictions.edge_model <- function(obj, num_draws=20, type=c("density", "po
     }
   }
 
-  if ("histogram" %in% type) {
-    warning("This plot is experimental and does not yet work as intended.")
-    # Histogram plot
-    event_preds <- obj$event_preds
-    df_draw <- data.frame(event=obj$model_data$event, dyad_id=obj$model_info$row_dyad_ids) # Get dyad IDs from somewhere sensible.
-    df_summed <- aggregate(event ~ as.factor(dyad_id), df_draw, sum)
-    num_breaks <- max(df_summed$event) - min(df_summed$event)
-    pred_density <- density(df_summed$event)
-    plot(NULL, main="Observed vs predicted social events", xlab="Social events",
-         xlim=c(min(pred_density$x), max(pred_density$x)), ylim=c(0, max(pred_density$y) * 1.5))
-
-    if (draw_data) {
-      hist(df_summed$event, breaks=num_breaks, freq=FALSE, add=TRUE)
-      legend("topright", legend=c("observed", "predicted"), fill=c("black", bison_colors[1]))
-    } else {
-      legend("topright", legend=c("predicted"), fill=c(bison_colors[1]))
-    }
-
-    for (i in 1:num_draws) {
-      df_draw$event <- as.vector(event_preds[i, ])
-      df_summed <- aggregate(event ~ as.factor(dyad_id), df_draw, sum)
-      hist(df_summed$event, col=col2rgba(bison_colors[1], 0.2), breaks=num_breaks, freq=FALSE, add=TRUE)
-    }
-  }
-
   if ("point" %in% type) {
     # Compare edge weights to point estimates
     df_draw <- data.frame(event=obj$model_data$event, divisor=obj$model_data$divisor, dyad_id=obj$model_info$row_dyad_ids) # Get dyad IDs from somewhere sensible.

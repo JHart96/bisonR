@@ -44,7 +44,7 @@ convert_gbi_to_bison <- function(gbi, group_properties=NULL, individual_properti
           if (!is.null(group_properties)) {
             new_row$group_property=group_properties[row_idx]
           }
-          if (is.null(individual_constraints)) {
+          if (!is.null(individual_properties)) {
             new_row$node_1_property=individual_properties[i]
             new_row$node_2_property=individual_properties[j]
           }
