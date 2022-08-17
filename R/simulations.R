@@ -88,14 +88,12 @@ simulate_edge_model <- function(model_type, aggregated, location_effect=TRUE, ag
     df_sim_agg$node_2_id <- factor(df_sim_agg$node_2_id, levels=1:num_nodes)
     return(list(df=df_sim, df_agg=df_sim_agg, df_true=df_true))
   }
-
-  stop("Model type not supported")
 }
 
 #' Simulate data for an edge model with mixture components
 #'
 #' @param model_type Type of data to simulate, one of "binary", "count", and "duration".
-#' @param num_components Number of mixture components in the simulation.
+#' @param num_components Number of mixture components in the simulation (>=2).
 #' @param component_weights Vector of component weightings for each component. Must sum to 1.
 #' @return A dataframe of the format accepted by edge weight models.
 #' @export
@@ -104,24 +102,13 @@ simulate_edge_model_mixture <- function(model_type, num_components, component_we
   num_edges <- 0.5 * num_nodes * (num_nodes - 1)
   max_obs <- 20
   component_ids <- extraDistr::rcat(num_edges, component_weights)
-  if (num_components == 1) {
-    component_mu <- c(0)
-    component_sigma <- c(0.5)
-  } else {
-    component_mu <- seq(-2.5, 2.5, 5/(num_components - 1))
-    component_sigma <- rep(0.5, num_components)
-  }
+  component_mu <- seq(-2.5, 2.5, 5/(num_components - 1))
+  component_sigma <- rep(0.5, num_components)
   edge_weights <- matrix(0, num_nodes, num_nodes)
   edge_weights[upper.tri(edge_weights)] <- rnorm(num_edges, mean=component_mu[component_ids], sd=component_sigma[component_ids])
 
-  if (model_type %in% c("binary", "count")) {
-    df_sim <- data.frame(event=numeric(), node_1_id=numeric(), node_2_id=numeric(), age_diff=numeric(), age_1=numeric(), age_2=numeric(), location=numeric(), duration=numeric())
-    df_true <- data.frame(node_1_id=numeric(), node_2_id=numeric(), edge_weight=numeric(), age_diff=numeric())
-  }
-  if (model_type == "duration") {
-    df_sim <- data.frame(event=numeric(), node_1_id=numeric(), node_2_id=numeric(), age_diff=numeric(), location=numeric())
-    df_sim_agg <- data.frame(event_count=numeric(), node_1_id=numeric(), node_2_id=numeric())
-  }
+  df_sim <- data.frame(event=numeric(), node_1_id=numeric(), node_2_id=numeric(), age_diff=numeric(), age_1=numeric(), age_2=numeric(), location=numeric(), duration=numeric())
+  df_true <- data.frame(node_1_id=numeric(), node_2_id=numeric(), edge_weight=numeric(), age_diff=numeric())
 
   for (i in 1:num_nodes) {
     for (j in 1:num_nodes) {
@@ -149,15 +136,6 @@ simulate_edge_model_mixture <- function(model_type, num_components, component_we
   df_sim$node_2_id <- factor(df_sim$node_2_id, levels=1:num_nodes)
   df_true$node_1_id <- factor(df_true$node_1_id, levels=1:num_nodes)
   df_true$node_2_id <- factor(df_true$node_2_id, levels=1:num_nodes)
-  if (model_type %in% c("binary", "count")) {
-    return(list(df_sim=df_sim, df_true=df_true))
-  }
-  if (model_type == "duration") {
-    df_sim_agg$node_1_id <- factor(df_sim_agg$node_1_id, levels=1:num_nodes)
-    df_sim_agg$node_2_id <- factor(df_sim_agg$node_2_id, levels=1:num_nodes)
-    return(list(df=df_sim, df_agg=df_sim_agg))
-  }
-
-  stop("Model type not supported")
+  return(list(df_sim=df_sim, df_true=df_true))
 }
 

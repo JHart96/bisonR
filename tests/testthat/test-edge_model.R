@@ -44,6 +44,8 @@ test_that("Binary edge model parameter estimation", {
     regexp=NA
   )
 
+  expect_warning(plot_trace(fit_null, par_ids=1), regexp=NA)
+
   fit_compare <- suppressWarnings(model_comparison(list(non_random_model = fit_edge, random_model=fit_null)))
 
   expect_output(print(fit_compare))
@@ -96,6 +98,22 @@ test_that("Binary edge model parameter estimation", {
 
   expect_output(
     print(summary(fit_dyadic))
+  )
+
+  # Modify comparison dataframe to test dyadic regression.
+  df_dyadic <- comparison
+  dyadic_trait <- rnorm(nrow(df_dyadic), df_dyadic$true)
+  df_dyadic$group_id <- as.factor(sample(1:4, size=nrow(df_dyadic), replace=TRUE))
+  df_dyadic$dyadic_trait <- as.factor(sample(1:2, size=nrow(df_dyadic), replace=TRUE))
+
+  expect_warning(
+    fit_dyadic <- dyadic_regression(dyad(node_1, node_2) ~ dyadic_trait, fit_edge, df_dyadic, mm=FALSE),
+    regexp=NA
+  )
+
+  expect_warning(
+    get_contrasts(fit_dyadic, "fixed_dyadic_trait1", "fixed_dyadic_trait2"),
+    regexp=NA
   )
 
   # Check that plots don't produce warnings
