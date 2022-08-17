@@ -1,5 +1,5 @@
 test_that("edge mixtures work", {
-  sim_data <- simulate_edge_model("binary", aggregated = TRUE)
+  sim_data <- simulate_edge_model_mixture("binary", num_components = 2, component_weights = c(0.5, 0.5))
   df <- sim_data$df_sim
 
   fit_edge <- edge_model(

@@ -15,6 +15,21 @@ test_that("Binary edge model parameter estimation", {
     data_type="binary"
   )
 
+
+  fit_null <- expect_warning (
+    edge_model(
+      (event | duration) ~ 1,
+      data=df,
+      data_type="binary",
+      priors=get_default_priors("binary")
+    ),
+    regexp=NA
+  )
+
+  fit_compare <- suppressWarnings(model_comparison(list(non_random_model = fit_edge, random_model=fit_null)))
+
+  expect_output(print(fit_compare))
+
   # Extract estimates and true values.
   true <- sim_data$df_true %>%
     mutate(edge_weight=edge_weight) %>%
