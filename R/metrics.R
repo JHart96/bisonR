@@ -107,6 +107,12 @@ get_metric_fn <- function(metric_name) {
   if (metric_name == "strength") {
     return(igraph::strength)
   }
+  if (metric_name == "eigenvector") {
+    return(function(x) igraph::eigen_centrality(x)$vector)
+  }
+  if (metric_name == "betweenness") {
+    return(function(x) igraph::betweenness(x, weights=1/E(x)$weight))
+  }
   if (metric_name == "weighted_density") {
     return(function(net) mean(igraph::E(net)$weight))
   }

@@ -83,7 +83,11 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
     )
 
     # Extract edge weights from fitted edge model.
-    chain <- fit$draws("edge_weight", format="matrix")
+    if (model_info$num_dyads > 0) {
+      chain <- fit$draws("edge_weight", format="matrix")
+    } else {
+      chain <- NULL
+    }
     # colnames(chain) <- 1:model_data$num_edges
 
     event_preds <- fit$draws("event_pred", format="matrix")
