@@ -11,6 +11,9 @@
 plot_trace <- function(obj, par_ids=1:5, ...) {
   # Extract chains from objects
   if (is(obj, "edge_model")) {
+    if (obj$data_type %in% c("binary_conjugate", "count_conjugate")) {
+      stop("Trace plots not needed for conjugate models.")
+    }
     chain <- obj$fit$draws("edge_weight")
   } else if (is(obj, "dyadic_model")) {
     chain <- obj$fit$draws("beta_fixed")

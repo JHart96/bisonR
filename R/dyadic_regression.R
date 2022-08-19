@@ -33,7 +33,6 @@ dyadic_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, m
   model_data$priors_only <- priors_only
 
   model <- build_stan_model("dyadic_regression")
-  print(model_data)
   fit <- model$sample(data=model_data, chains=4, parallel_chains=mc_cores, refresh=refresh, step_size=0.1)
   chain <- fit$draws("beta_fixed", format="matrix")
 
@@ -215,7 +214,7 @@ get_dyadic_regression_model_data <- function(formula, edgemodel, data) {
   node_ids_1 <- edgemodel$node_to_idx[dplyr::pull(data, model_spec$node_1_name)]
   node_ids_2 <- edgemodel$node_to_idx[dplyr::pull(data, model_spec$node_2_name)]
 
-  dyad_ids <- edgemodel$dyad_to_idx[cbind(node_ids_1, node_ids_2)]
+  dyad_ids <- get_dyad_ids(node_ids_1, node_ids_2, edgemodel$dyad_to_idx, edgemodel$directed)
   edge_samples <- edgemodel$chain[, dyad_ids]
   edge_mu <- apply(edge_samples, 2, mean)
   edge_cov <- cov(edge_samples)

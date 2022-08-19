@@ -54,7 +54,7 @@ prior_check(priors, "binary")
 Imagine we decide that the prior on edge weights isn't appropriate as we'd prefer a flatter prior for the edge weight parameter, we can change this using the following code:
 
 ```{r}
-priors$edge <- "normal(0, 2.5)"
+priors$edge <- "normal(-1, 2.5)"
 prior_check(priors, "binary")
 ```
 

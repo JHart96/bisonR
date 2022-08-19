@@ -63,7 +63,7 @@ get_default_priors <- function(model_type) {
     )
     return(priors)
   }
-  warning("Model type", model_type, "not supported.")
+  warning("Model type ", model_type, " not supported.")
 }
 
 #' Prior checks

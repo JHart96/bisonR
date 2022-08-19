@@ -1,4 +1,6 @@
-# bisonR - An R package for Bayesian Inference of Social Networks <img src="man/figures/logo.png" width=128 align="right" />
+# bisonR - An R package for Bayesian Inference of Social Networks
+
+<img src="man/figures/hex.svg" width=160 align="right" />
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/JHart96/bisonR/workflows/R-CMD-check/badge.svg)](https://github.com/JHart96/bisonR/actions)

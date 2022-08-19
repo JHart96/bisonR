@@ -56,7 +56,6 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
   # Set the priors in model data
   prior_parameters <- extract_prior_parameters(priors)
   model_data <- c(model_info$model_data, prior_parameters)
-
   # Set whether only the priors should be sampled
   model_data$priors_only <- priors_only
 
@@ -85,7 +84,7 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
 
     # Extract edge weights from fitted edge model.
     chain <- fit$draws("edge_weight", format="matrix")
-    colnames(chain) <- 1:model_data$num_edges
+    # colnames(chain) <- 1:model_data$num_edges
 
     event_preds <- fit$draws("event_pred", format="matrix")
 
@@ -175,8 +174,8 @@ get_edgelist <- function (obj, ci=0.9, transform=TRUE) {
     stop("No edge weights in this model.")
   }
   node_names <- sapply(
-    1:max(obj$dyad_to_idx),
-    function(x) names(obj$node_to_idx)[which(obj$dyad_to_idx == x, arr.ind=TRUE)[1, 2:1]]
+    1:nrow(obj$dyad_to_idx),
+    function(x) names(obj$node_to_idx)[obj$dyad_to_idx[x, ]]
   )
   lb <- 0.5 * (1 - ci)
   ub <- 1 - lb
@@ -189,12 +188,14 @@ get_edgelist <- function (obj, ci=0.9, transform=TRUE) {
   edge_lower <- apply(edge_samples, 2, function(x) quantile(x, probs=lb))
   edge_upper <- apply(edge_samples, 2, function(x) quantile(x, probs=ub))
   edge_median <- apply(edge_samples, 2, function(x) quantile(x, probs=0.5))
+
   edgelist <- data.frame(
     node_1 = node_names[1, ],
     node_2 = node_names[2, ],
     median = round(edge_median, 3),
     lb = round(edge_lower, 3),
-    ub = round(edge_upper, 3)
+    ub = round(edge_upper, 3),
+    row.names=NULL
   )
   colnames(edgelist)[4] <- paste0(as.character(lb * 100), "%")
   colnames(edgelist)[5] <- paste0(as.character(ub * 100), "%")
@@ -210,13 +211,14 @@ get_edgelist <- function (obj, ci=0.9, transform=TRUE) {
 #' @export
 draw_edgelist_samples <- function (obj, num_draws) {
   node_names <- sapply(
-    1:max(obj$dyad_to_idx),
-    function(x) names(obj$node_to_idx)[which(obj$dyad_to_idx == x, arr.ind=TRUE)[1, 2:1]]
+    1:nrow(obj$dyad_to_idx),
+    function(x) names(obj$node_to_idx)[obj$dyad_to_idx[x, ]]
   )
   edgelist_samples <- data.frame(
     node_1 = factor(node_names[1, ], levels=names(obj$node_to_idx)),
     node_2 = factor(node_names[2, ], levels=names(obj$node_to_idx)),
-    draw = t(obj$chain[sample(1:dim(obj$chain)[1], size=num_draws, replace=TRUE), ])
+    draw = t(obj$chain[sample(1:dim(obj$chain)[1], size=num_draws, replace=TRUE), ]),
+    row.names=NULL
   )
   edgelist_samples
 }
@@ -293,14 +295,17 @@ plot_predictions.edge_model <- function(obj, num_draws=20, type=c("density", "po
 #' @param lwd Line width scaling for edge weights
 #'
 #' @export
-plot_network <- function(obj, ci=0.9, lwd=1) {
+plot_network <- function(obj, ci=0.9, lwd=2) {
   edgelist <- get_edgelist(obj, ci=ci, transform=TRUE)
-  net <- igraph::graph_from_edgelist(as.matrix(edgelist[, 1:2]), directed=FALSE)
+  net <- igraph::graph_from_edgelist(as.matrix(edgelist[, 1:2]), directed=obj$directed)
   lb <- edgelist[, 3]
   ub <- edgelist[, 5]
   coords <- igraph::layout_nicely(net)
-  igraph::plot.igraph(net, edge.width=ub * lwd, layout=coords, vertex.color=bison_colors[1], edge.color=rgb(0.1, 0.1, 0.1, 0.9),)
-  igraph::plot.igraph(net, edge.width=lb * lwd, layout=coords, vertex.color=bison_colors[1], edge.color=rgb(0.9, 0.9, 0.9, 0.9), add=TRUE)
+  igraph::plot.igraph(net, edge.width=ub * lwd, layout=coords, vertex.label.color="white", vertex.color=bison_colors[1], edge.color=rgb(0.1, 0.1, 0.1, 0.9), edge.arrow.size=0)
+  igraph::plot.igraph(net, edge.width=lb * lwd, layout=coords, vertex.label.color="white", vertex.color=bison_colors[1], edge.color=rgb(0.9, 0.9, 0.9, 0.9), edge.arrow.size=0, add=TRUE)
+  if (obj$directed) {
+    igraph::plot.igraph(net, edge.width=lb * 0, layout=coords, vertex.label.color="white", vertex.color=bison_colors[1], edge.color=rgb(0.5, 0.5, 0.5), add=TRUE)
+  }
 }
 
 get_edge_model_data <- function(formula, observations, directed, data_type) {
@@ -332,22 +337,36 @@ get_edge_model_data <- function(formula, observations, directed, data_type) {
     num_nodes <- length(node_to_idx)
 
     # Get dyad to index mapping
-    dyad_to_idx <- matrix(0, num_nodes, num_nodes)
-    if (directed == FALSE) {
-      num_dyads <- (0.5 * num_nodes * (num_nodes - 1))
-      dyad_to_idx[upper.tri(dyad_to_idx)] <- 1:(0.5 * num_nodes * (num_nodes - 1))
-      dyad_to_idx <- dyad_to_idx + t(dyad_to_idx)
-    } else {
-      num_dyads <- num_nodes * (num_nodes - 1)
-      dyad_to_idx[upper.tri(dyad_to_idx)] <- 1:(0.5 * num_nodes * (num_nodes - 1))
-      dyad_to_idx[lower.tri(dyad_to_idx)] <- (0.5 * num_nodes * (num_nodes - 1) + 1):num_nodes
-    }
 
-    # Get dyad names
-    dyad_names <- sapply(
-      1:num_dyads,
-      function(x) paste0(names(node_to_idx)[which(dyad_to_idx == x, arr.ind=TRUE)[1, 2:1]], collapse=" <-> ")
-    )
+    # Get unique dyads in both directions
+    unique_dyads_1 <- unique(cbind(
+      node_to_idx[dplyr::pull(observations, model_spec$node_1_name)],
+      node_to_idx[dplyr::pull(observations, model_spec$node_2_name)]
+    ))
+    unique_dyads_2 <- unique(cbind(
+      node_to_idx[dplyr::pull(observations, model_spec$node_2_name)],
+      node_to_idx[dplyr::pull(observations, model_spec$node_1_name)]
+    ))
+    if (directed == FALSE) {
+      dyad_to_idx <- unique_dyads_1
+      rownames(dyad_to_idx) <- 1:nrow(dyad_to_idx) # Assign dyad IDs
+
+      # Generate dyad names
+      dyad_names <- sapply(
+        1:nrow(dyad_to_idx),
+        function(x) paste0(names(node_to_idx)[dyad_to_idx[x, ]], collapse=" <-> ")
+      )
+    } else {
+      dyad_to_idx = unique(rbind(unique_dyads_1, unique_dyads_2))
+      rownames(dyad_to_idx) <- 1:nrow(dyad_to_idx) # Assign dyad IDs
+
+      # Generate dyad names
+      dyad_names <- sapply(
+        1:nrow(dyad_to_idx),
+        function(x) paste0(names(node_to_idx)[dyad_to_idx[x, ]], collapse=" -> ")
+      )
+    }
+    num_dyads <- nrow(dyad_to_idx)
   } else {
     dyad_ids = rep(1, nrow(observations))
     node_1_names = NULL
@@ -377,7 +396,12 @@ get_edge_model_data <- function(formula, observations, directed, data_type) {
     node_1_names <- dplyr::pull(observations, model_spec$node_1_name)
     node_2_names <- dplyr::pull(observations, model_spec$node_2_name)
 
-    dyad_ids=as.factor(dyad_to_idx[cbind(node_to_idx[node_1_names], node_to_idx[node_2_names])])
+    dyad_ids = as.factor(get_dyad_ids(
+      node_to_idx[node_1_names],
+      node_to_idx[node_2_names],
+      dyad_to_idx,
+      directed=directed
+    ))
   }
 
   # Variable grouping for random effects
@@ -436,7 +460,7 @@ get_edge_model_data <- function(formula, observations, directed, data_type) {
     dyad_ids=dyad_ids,
     design_fixed=data.matrix(design_fixed[, -1]),
     design_random=data.matrix(design_random[, -1]),
-    num_edges = length(unique(dyad_ids)),
+    num_edges = num_dyads,
     num_fixed=ncol(as.matrix(design_fixed[, -1])),
     num_random=ncol(as.matrix(design_random[, -1])),
     num_random_groups=length(unique(random_group_index)),
@@ -518,4 +542,20 @@ get_edge_model_spec <- function(formula) {
   }
 
   model_spec
+}
+
+get_dyad_ids <- function(node_id_1, node_id_2, dyad_to_idx, directed) {
+  dyad_ids <- rep(NA, length(node_id_1))
+  for (i in 1:length(node_id_1)) {
+    if (directed == TRUE) {
+      dyad_ids[i] <- which(dyad_to_idx[, 1] == node_id_1[i] & dyad_to_idx[, 2] == node_id_2[i])
+    }
+    if (directed == FALSE) {
+      dyad_ids[i] <- which(
+        (dyad_to_idx[, 1] == node_id_1[i] & dyad_to_idx[, 2] == node_id_2[i]) |
+        (dyad_to_idx[, 1] == node_id_2[i] & dyad_to_idx[, 2] == node_id_1[i])
+      )
+    }
+  }
+  dyad_ids
 }
