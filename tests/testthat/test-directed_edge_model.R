@@ -47,7 +47,7 @@ test_that("directed edge models work", {
   )
 
   edgelist <- get_edgelist(fit_edge, transform=FALSE)
-  net <- graph_from_edgelist(as.matrix(edgelist[, 1:2]), directed=FALSE)
+  net <- igraph::graph_from_edgelist(as.matrix(edgelist[, 1:2]), directed=FALSE)
   E(net)$weight <- plogis(edgelist[, 3])
   nodal_metric <- strength(net)
   nodal_metric <- nodal_metric - mean(nodal_metric)
