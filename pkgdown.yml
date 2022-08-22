@@ -5,5 +5,8 @@ articles:
   getting_started: getting_started.html
   mixture_models: mixture_models.html
   windows_installation: windows_installation.html
-last_built: 2022-08-22T17:40Z
+last_built: 2022-08-22T17:51Z
+urls:
+  reference: ~/bisonR/reference
+  article: ~/bisonR/articles
 
