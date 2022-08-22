@@ -8,46 +8,13 @@
 [![Codecov test coverage](https://codecov.io/gh/JHart96/bisonR/branch/main/graph/badge.svg)](https://app.codecov.io/gh/JHart96/bisonR?branch=main)
 <!-- badges: end -->
 
-:warning: **This package is still in early stages of development and has not yet been fully tested**
+**This package is still in continuous development and has not yet been fully tested. Please let us know if you encounter any unexpected behaviour.**
 
 bisonR is an R package implementing the BISoN framework for conducting Bayesian analysis of social networks. BISoN estimates uncertainty over edge weights in social networks from empirical data (such as observations) and builds networks with uncertainty. The networks can then be visualised *with* uncertainty, and can also be analysed with a fully Bayesian methodology using standard tools such as regression.
 
-## Installation
-
-### Installing CmdStanR
-
-The bisonR package is written in R, but uses the Stan programming language to fit Bayesian models. Stan is a separate program, and interfaces with bisonR using an R package called cmdstanR. Stan and cmdstanR are installed in a different way to standard R packages, so require a specific series of installation steps. 
-
-On Windows, before proceeding you may need to install the version of Rtools appropriate for your version of R. Rtools can be found here: https://cran.r-project.org/bin/windows/Rtools/.
-
-The full instructions to install cmdstanR can be found at https://mc-stan.org/cmdstanr/. We've found that the following steps often work, but depending on your operating system and version of R, the process may be more involved.
-
-```r
-install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
-library(cmdstanr)
-check_cmdstan_toolchain(fix = TRUE, quiet = TRUE)
-install_cmdstan() # On networked PCs, specify a local directory here with the argument dir=path_to_local_directory
-```
-
-### Installing bisonR
-
-bisonR isn't currently on CRAN, but it can be installed from GitHub. To do this, make sure you have the `remotes` package installed. Then run the following command:
-
-```r
-remotes::install_github("JHart96/bisonR")
-```
-
-#### Development version
-
-If you want to install the latest development version, bugs and all, you can install from the development branch. This option is not recommended for standard users.
-
-```r
-remotes::install_github("JHart96/bisonR@dev")
-```
-
 ## Quick Start
 
-You can check your `bisonR` installation and get started with the package using the code below:
+To get started with the package use the code below:
 
 ```r
 library(bisonR)
@@ -85,3 +52,36 @@ Directed: FALSE
 ```
 
 For a more detailed example check out the *Getting Started* page here: https://jhart96.github.io/bisonR/articles/getting_started.html.
+
+## Installation
+
+### Installing CmdStanR
+
+The bisonR package is written in R, but uses the Stan programming language to fit Bayesian models. Stan is a separate program, and interfaces with bisonR using an R package called cmdstanR. Stan and cmdstanR are installed in a different way to standard R packages, so require a specific series of installation steps. 
+
+On Windows, before proceeding you may need to install the version of Rtools appropriate for your version of R. Rtools can be found here: https://cran.r-project.org/bin/windows/Rtools/.
+
+The full instructions to install cmdstanR can be found at https://mc-stan.org/cmdstanr/. We've found that the following steps often work, but depending on your operating system and version of R, the process may be more involved.
+
+```r
+install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+library(cmdstanr)
+check_cmdstan_toolchain(fix = TRUE, quiet = TRUE)
+install_cmdstan() # On networked PCs, specify a local directory here with the argument dir=path_to_local_directory
+```
+
+### Installing bisonR
+
+bisonR isn't currently on CRAN, but it can be installed from GitHub. To do this, make sure you have the `remotes` package installed. Then run the following command:
+
+```r
+remotes::install_github("JHart96/bisonR")
+```
+
+#### Development version
+
+If you want to install the latest development version, bugs and all, you can install from the development branch. This option is not recommended for standard users.
+
+```r
+remotes::install_github("JHart96/bisonR@dev")
+```
