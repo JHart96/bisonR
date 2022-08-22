@@ -9,7 +9,7 @@ simulate_edge_model_mixture(model_type, num_components, component_weights)
 \arguments{
 \item{model_type}{Type of data to simulate, one of "binary", "count", and "duration".}
 
-\item{num_components}{Number of mixture components in the simulation.}
+\item{num_components}{Number of mixture components in the simulation (>=2).}
 
 \item{component_weights}{Vector of component weightings for each component. Must sum to 1.}
 }

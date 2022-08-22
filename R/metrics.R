@@ -83,7 +83,7 @@ draw_network_metric_samples <- function(obj, metric_name, num_draws=1000, standa
 #'
 #' @export
 print.network_metric_samples <- function(x, ci=0.9, ...) {
-  qt <- quantile(x$samples, probs=c(0.5 * (1 - ci), 0.5, ci + 0.5 * (1 - ci)))
+  qt <- quantile(x$samples, probs=c(0.5, 0.5 * (1 - ci), ci + 0.5 * (1 - ci)))
   print(qt)
 }
 
@@ -128,5 +128,5 @@ get_metric_fn <- function(metric_name) {
   if (metric_name == "standard_deviation") {
     return(function(net) sd(igraph::E(net)$weight))
   }
-  return(NULL)
+  stop("Network metric does not exist.")
 }

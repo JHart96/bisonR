@@ -8,7 +8,7 @@ draw_node_metric_samples(
   obj,
   metric_name,
   num_draws = 1000,
-  standardise = TRUE
+  standardise = FALSE
 )
 }
 \arguments{

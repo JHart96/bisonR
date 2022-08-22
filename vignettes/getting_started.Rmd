@@ -16,29 +16,32 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-bisonR is an R package for running social network analyses in the BISoN framework. BISoN models consist of two main stages: 1) fitting an edge weight model, capturing uncertainty in social network edges; and 2) propagating this uncertainty through subsequent analyses such as regressions. In this short tutorial we'll cover how to fit edge weight models to a simulated dataset, and show how the fitted edge weight model can be used to run dyadic and nodal regression analysis.
+bisonR is an R package for running social network analyses in the BISoN framework. BISoN models consist of two main stages: 1) fitting an edge weight model, capturing uncertainty in social network edges; and 2) propagating this uncertainty through subsequent analyses such as regressions. In this short tutorial we'll cover how to fit edge weight models to a simulated dataset, and show how the fitted edge weight model can be used to run dyadic and nodal regression analysis, as well as non-random edge weight tests.
 
 Before beginning, we'll load in the `bisonR` package using `library(bisonR)`, and we'll also bring in `dplyr` to help with data wrangling. If you don't already have `bisonR` installed, you can install it from Github using the following code:
 
-    remotes::install_github("JHart96/bisonR")
+```r
+remotes::install_github("JHart96/bisonR")
+```
 
 ```{r}
 library(bisonR)
 library(dplyr)
 ```
 
-We will also use the `simulate_edge_model()` function from `bisonR` to simulate some observation data. This dataframe is an example of the format that bisonR uses. Each row corresponds to an observation (such as an association within a sampling period of a dyad or a count of interactions between a dyad), but additional observation-level, dyad-level, or node-level factors can be included.
+We will use the `simulate_edge_model()` function from `bisonR` to simulate some observation data. This dataframe is an example of the format that bisonR uses. Each row corresponds to an observation (such as an association within a sampling period of a dyad or a count of interactions between a dyad). Additional observation-level, dyad-level, or node-level factors can also be included.
 
 ```{r}
 sim_data <- simulate_edge_model("binary", aggregated = FALSE)
 df <- sim_data$df_sim
 head(df)
 ```
+
 # Edge Models
 
-Depending on the type of data being analysed, different edge models should be used. See the explanation of the bisonR framework here for more details on this. In this example we're using binary data, where events can either occur (1) or not occur (0) in a particular sampling period. In our dataframe this corresponds to `event = 1` or `event = 0`.
+Depending on the type of data being analysed, different edge models should be used. See the `BISoN introduction` vignette for more details on this. In this example we're using binary data, where events can either occur (1) or not occur (0) in a particular sampling period. In our dataframe this corresponds to `event = 1` or `event = 0`.
 
-The bisonR framework is fully Bayesian, and therefore specifying priors are a key part of any analysis. Priors can be tricky to set, and techniques for choosing good priors are outside the scope of this tutorial, but see resources here for help on choosing priors in BISoN. We recommend retrieving the default priors from bisonR using the `get_default_priors()` function to get the correct set of default priors for your edge weight model.
+The bisonR framework is fully Bayesian, and therefore specifying priors is a key part of any analysis. Priors can be tricky to set, and techniques for choosing good priors are outside the scope of this tutorial. You can see which priors need to be set for a particular model using the `get_default_priors()` function. These are only defaults and should almost always be changed.
 
 ```{r}
 priors <- get_default_priors("binary")
@@ -51,27 +54,18 @@ The priors object gives a list of priors on the parameters for the edge model: t
 prior_check(priors, "binary")
 ```
 
-Imagine we decide that the prior on edge weights isn't appropriate as we'd prefer a flatter prior for the edge weight parameter, we can change this using the following code:
+The priors should encode our prior beliefs about likely values of the parameters. For demonstration purposes let's say we expect edge weights to be concentrated lower, towards zero. We can modify the priors on edge weight like this:
 
 ```{r}
 priors$edge <- "normal(-1, 2.5)"
 prior_check(priors, "binary")
 ```
 
-Depending on the biology, this might be more like what we want to see. Now we've set our priors and we're happy with them, we can fit the edge model using the `edge_model()` function. This is one of the main functions of the `bisonR` package and has a lot of functionality. The main thing to worry about is how to define the edge weight model formula. The formula are designed to be familar to those who have used `lm`, `lme4`, `brms`, and other regression packages. The main difference here is that we need to include some measure of sampling intensity to get accurate estimates of edge weight uncertainty.
+Depending on the biology, this might be more like what we want to see. Now we've set our priors and we're happy with them, we can fit the edge model using the `edge_model()` function. This is one of the main functions of the `bisonR` package and has a lot of functionality. The main thing to worry about is how to define the edge weight model formula. The formula are designed to be familar to those who have used `lm`, `lme4`, `brms`, and other regression packages. The main difference here is that we need to include some measure of observation effort to get accurate estimates of edge weight uncertainty.
 
 In bisonR, the left hand side of the `~` describes the sampling data, and uses the `(event | duration)` notation. In this notation, `event` corresponds to the name of the column in the dataframe that represents the measure of social events, such as 1 and 0 in the binary model, or frequencies 0, 1, 2, ... in the count model. If using an unaggregated dataframe, the `duration` corresponds to the durations of each observation. In our case this is fixed, but this will depend on the data at hand.
 
 The right hand side of the `~` describes the predictors that are associated with social events. In the standard BISoN model this is primarily the edge weight that we use to build the network, but this can also include additional effects such as age, sex, or even observation-level factors such as location, time of day, or weather, to name a few. Including additional effects will change the interpretation of edge weights, but could be useful if interested in the social network once some factors have been controlled for. *Note* the edge weights don't need to be included, and you could use bisonR to estimate generative effects in a network. In this example we'll keep things simple and just use edge weight as the only predictor. This is done using the `dyad(node_1_id, node_2_id)` notation. `node_1_id` and `node_2_id` represent the nodes corresponding to each individual in the network, and need to be stored as factors in the dataframe. They don't need to be IDs, and could be individual names, as long as they're stored as factors. Now we understand the basics of the formula notation, we can now fit the edge weight model:
-
-```{r}
-prior_predictive_check(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
-  data=df, 
-  model_type="binary",
-  priors=priors
-)
-```
 
 ```{r}
 fit_edge <- edge_model(
@@ -84,7 +78,7 @@ fit_edge <- edge_model(
 
 Depending on your dataset this can take anywhere between a few tenths of a second and several hours. In particular if you have a large dataset and no observation-level predictors, it's probably a good idea to use the aggregated version of the model where all observations per dyad are collapsed to a single row. This will speed up model fitting considerably.
 
-Once the model has fitted, we need to check that the MCMC algorithm has behaved correctly. Usually if there's a major problem, the `edge_model()` function itself will have triggered warning messages above. But even if everything is silent, it's still worth checking the traceplots to check the MCMC chains have converged. The chains should be well-mixed and look something like a fuzzy caterpillar. We can check for this using the `plot_trace()` function:
+Once the model has fitted, we need to check that the MCMC algorithm has behaved correctly. Often if there's a major problem, the `edge_model()` function itself will have triggered warning messages above. But even if everything is silent, it's still worth checking the traceplots to check the MCMC chains have converged. The chains should be well-mixed and look something like a fuzzy caterpillar. We can check for this using the `plot_trace()` function:
 
 ```{r}
 plot_trace(fit_edge, par_ids=2)
@@ -96,7 +90,15 @@ If we're satisfied that the MCMC algorithm has done its job properly, then it's 
 plot_predictions(fit_edge, num_draws=20, type="density")
 ```
 
-The predictions from the model are shown in teal and the real data are shown in black. Ideally the blue lines should be distributed around the black line, indicating the real data are among the possible predictions of the model. Now we've conducted two basic diagnostic checks of the edge weight model, we can start to trust what it's telling us. To see a summary of edge weights and their credible intervals, we can use the `summary()` function:
+The predictions from the model are shown in blue and the real data are shown in black. Ideally the blue lines should be distributed around the black line, indicating the real data are among the possible predictions of the model. It's usually a good idea to run multiple predictive checks to ensure the model has captured various important characteristics of the data. Another type of check supported by `bisonR` is a comparison against point estimates of edge weights:
+
+```{r}
+plot_predictions(fit_edge, num_draws=20, type="point")
+```
+
+This plot shows BISoN estimates denoted by an interval, where the 90% probability interval is shown by the thin line, and the 50% probability interval is shown by the thicker blue line. We should see a roughly linear relationship between point estimates and BISoN estimates, though at the extremes the BISoN estimates are likely to be less extreme unless there are sufficient data. This is by design, as BISoN uses a full probabilistic model of social events to generate its estimates, and will be sceptical of extreme values without sufficient evidence.
+
+Now we've conducted two basic diagnostic checks of the edge weight model, we can start to trust what it's telling us. To see a summary of edge weights and their credible intervals, we can use the `summary()` function:
 
 ```{r}
 summary(fit_edge)
@@ -105,13 +107,12 @@ summary(fit_edge)
 It can be hard to get an intuitive idea for what's going on looking only at a summary table, so this is where it can be useful to visualise the network too. The `plot_network()` function does this for BISoN edge weight models, where uncertainty is shown on edge weights. Uncertainty is visualised by showing the lower and upper bounds as overlapping edges in the network.
 
 ```{r}
-plot_network(fit_edge, lwd=1)
+plot_network(fit_edge, lwd=5)
 ```
 
 # Non-random Edge Weights
 
-Now that we have a fitted edge weight model we're happy with, we can start to look at downstream analyses. The first of these we'll consider is the non-random edge weight analysis, which is a Bayesian version of the Bejder et al. 1998 test for non-random association. In this analysis we compare the fitted edge weight model to a null version of the model where all edges have the same weight. We then use the `model_comparison` function to estimate the relative probabilities of the full edge weight model against the null model:
-
+Now that we have a fitted edge weight model we're happy with, we can move to downstream analyses. The first of these we'll consider is the non-random edge weight analysis, which is a Bayesian version of the Bejder et al. 1998 test for non-random association. In this analysis we compare the fitted edge weight model to a null version of the model where all edges have the same weight. We then use the `model_comparison` function to estimate the relative probabilities of the full edge weight model against the null model:
 
 ```{r}
 fit_null <- edge_model(
@@ -124,7 +125,7 @@ fit_null <- edge_model(
 model_comparison(list(non_random_model=fit_edge, random_model=fit_null))
 ```
 
-The results are pretty conclusive, the network seems to be non-random. It's likely that this is the case in almost all networks, but you might want to conduct this test anyway.
+This shows the relative probabilities of the models in the comparison. In our case the results are conclusive, the network seems to be non-random. It's likely that this is the case in almost all networks, but you might want to conduct this test anyway.
 
 # Dyadic Regression
 
@@ -138,7 +139,7 @@ priors <- get_default_priors("dyadic_regression")
 priors
 ```
 
-The dataframe for a dyadic regression will be different to the one used to fit an edge weight model. In this case we need a row for each dyad, and we need to index this using the same factor-typed node variables with the same levels as were used when fitting the edge weight model. In our example we have all the necessary data in the original dataframe, and we can extract it using dplyr. The `dyadic_regression()` function uses a similar formula syntax as the `edge_model` function. In our example we use the edge weight, described by `dyad(node_1_id, node_2_id)`, on the left hand side as the response variable. We use the `age_diff` variable from the dataframe as the single fixed effect, but additional fixed and random effects can also be included. *Note* by default the dyadic regression function uses multi-membership effects, denoted by the argument `mm`, to capture non-independence due to nodes in the regression. This is a vital feature for some analyses to prevent spurious conclusions, but for the sake of our simulated data we don't need to include this effect here.
+To check these priors we could use the `prior_check()` function like last time, but regression coefficients are usually harder to intuitively set priors for. Instead of visualising the coefficient priors directly, we'll simulate the predictions of the model based only on the priors. We can use `prior_predictive_check()` for this:
 
 ```{r}
 prior_predictive_check(
@@ -150,6 +151,10 @@ prior_predictive_check(
   plot_type="marginal"
 )
 ```
+
+The plot shows the marginal effect describing the relationship between predictor and response. At its most extreme, our prior allows an age difference of 10 to be associated with a difference in response of around 20 - 30. This is probably a bit more extreme than would be ideal, but for the purposes of this tutorial we'll leave the priors as they are for now.
+
+The dataframe for a dyadic regression will be different to the one used to fit an edge weight model. In this case we need a row for each dyad, and we need to index this using the same factor-typed node variables with the same levels as were used when fitting the edge weight model. In our example we have all the necessary data in the original dataframe, and we can extract it using dplyr. The `dyadic_regression()` function uses a similar formula syntax as the `edge_model` function. In our example we use the edge weight, described by `dyad(node_1_id, node_2_id)`, on the left hand side as the response variable. We use the `age_diff` variable from the dataframe as the single fixed effect, but additional fixed and random effects can also be included. *Note* by default the dyadic regression function uses multi-membership effects, denoted by the argument `mm`, to capture non-independence due to nodes in the regression. This is a vital feature for some analyses to prevent spurious conclusions, but for the sake of our simulated data we don't need to include this effect here.
 
 ```{r}
 fit_dyadic <- dyadic_regression(
@@ -167,8 +172,10 @@ Like last time we want to check that our model has fit properly and makes good p
 plot_trace(fit_dyadic, par_ids=1)
 ```
 
+Again we'll use `plot_predictions()` to check model fit:
+
 ```{r}
-plot_predictions(fit_dyadic, num_draws=20, type="marginal", draw_data=FALSE)
+plot_predictions(fit_dyadic, num_draws=20, type="density")
 ```
 
 Now we can examine the regression coefficients using `summary()`. These can be interpreted in mostly the same way as a standard regression, though categories will be treated differently. See here for more information on how categories are handled in `bisonR` regression functions.
@@ -177,7 +184,13 @@ Now we can examine the regression coefficients using `summary()`. These can be i
 summary(fit_dyadic)
 ```
 
-Now we've seen how to fit a dyadic regression, the next common type of analysis is nodal regression.
+We can also visualise the estimated marginal effect using `plot_predictions()`:
+
+```{r}
+plot_predictions(fit_dyadic, num_draws=20, type="marginal")
+```
+
+Now we've seen how to fit a dyadic regression, we can move to another common type of analysis: nodal regression.
 
 # Nodal Regression
 
@@ -202,11 +215,11 @@ priors$fixed <- "normal(0, 1)"
 priors
 ```
 
+Run the prior check in much the same way as well:
+
 ```{r}
 prior_check(priors, model_type="nodal_regression")
 ```
-
-The formula syntax for nodal regression is very similar to that of the dyadic regression, but because this analysis is at the level of the node, not the dyad, we no longer need a `dyad(node_1_id, node_2_id)` term. Instead we want to use a node-level network metric to characterise node positions within the network, while maintaining uncertainty from the edge weights. `bisonR` can handle all of this automatically, you simply need to specify a network metric to use. In our case we'll use the classic measure of centrality `strength()`, but many others are available. See the documentation here for further details.
 
 ```{r}
 prior_predictive_check(
@@ -217,6 +230,10 @@ prior_predictive_check(
   plot_type="marginal"
 )
 ```
+
+For the purposes of demonstration we won't worry too much about how these checks look, but this should give an idea about how to go about setting priors.
+
+The formula syntax for nodal regression is very similar to that of the dyadic regression, but because this analysis is at the level of the node, not the dyad, we no longer need a `dyad(node_1_id, node_2_id)` term. Instead we want to use a node-level network metric to characterise node positions within the network, while maintaining uncertainty from the edge weights. `bisonR` can handle all of this automatically, you simply need to specify a network metric to use. In our case we'll use the classic measure of centrality `strength()`, but many others are available. See the documentation here for further details.
 
 ```{r}
 fit_nodal <- nodal_regression(
@@ -233,29 +250,34 @@ Once the model has been fitted, we need to employ the same diagnostic checks as 
 plot_trace(fit_nodal, par_ids=1)
 ```
 
-
-```{r}
-plot_predictions(fit_nodal, num_draws=20, type="marginal")
-```
-
 Just like the previous example, we can now summarise the regression coefficients using the `summary()` function:
 
 ```{r}
 summary(fit_nodal)
 ```
 
+It's also nice to use predictions from the model to help understand the model:
+
+```{r}
+plot_predictions(fit_nodal, num_draws=20, type="marginal")
+```
+
 # Network metrics
 
-As well as the types of statistical analysis we've already covered, network metrics can also be extracted for use in other quantitative or qualitative analyses.
+As well as the types of statistical analysis we've already covered, network metrics can also be extracted for use in other quantitative or qualitative analyses. This can be done with the `draw_network_metric_samples()` function for network-level metrics (also known as global metrics) or  `draw_node_metric_samples()` for node-level metrics. Let's try this out for social differentiation:
 
 ```{r}
 social_differentiation_samples <- draw_network_metric_samples(fit_edge, "social_differentiation")
 social_differentiation_samples
 ```
 
+We can visualise the posterior distribution of social differentiation by 
+
 ```{r}
 plot(social_differentiation_samples)
 ```
+
+The posterior samples can now be used descriptively, to compare networks, or in other downstream analyses.
 
 # Conclusion
 
