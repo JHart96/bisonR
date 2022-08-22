@@ -7,7 +7,7 @@
 #'
 #' @return A matrix of metric samples where each column corresponds to a node, and each row corresponds to a posterior draw.
 #' @export
-draw_node_metric_samples <- function(obj, metric_name, num_draws=1000, standardise=TRUE) {
+draw_node_metric_samples <- function(obj, metric_name, num_draws=1000, standardise=FALSE) {
   edgelist_samples <- draw_edgelist_samples(obj, num_draws)
   net <- igraph::graph_from_edgelist(as.matrix(edgelist_samples[, 1:2]), directed = FALSE)
   metric_fn <- get_metric_fn(metric_name)
@@ -111,7 +111,13 @@ get_metric_fn <- function(metric_name) {
     return(function(x) igraph::eigen_centrality(x)$vector)
   }
   if (metric_name == "betweenness") {
-    return(function(x) igraph::betweenness(x, weights=1/E(x)$weight))
+    return(function(x) igraph::betweenness(x, weights=1/igraph::E(x)$weight))
+  }
+  if (!is.na(stringr::str_match(metric_name, "^degree\\[.*\\]$"))) {
+    threshold <- as.numeric(str_split(metric_name, "\\[|\\]")[[1]][2])
+    return(function(x) {
+      return(igraph::strength(x, weights=1 * (igraph::E(x)$weight < threshold)))
+    })
   }
   if (metric_name == "weighted_density") {
     return(function(net) mean(igraph::E(net)$weight))

@@ -10,20 +10,37 @@ test_that("network metrics work", {
   )
 
   x <- expect_warning(
+    draw_node_metric_samples(fit_edge, "strength"),
+    regexp=NA
+  )
+
+  x <- expect_warning(
+    draw_node_metric_samples(fit_edge, "betweenness"),
+    regexp=NA
+  )
+
+  x <- expect_warning(
+    draw_node_metric_samples(fit_edge, "eigenvector"),
+    regexp=NA
+  )
+
+  x <- expect_warning(
+    draw_node_metric_samples(fit_edge, "degree[0.5]"),
+    regexp=NA
+  )
+
+  x <- expect_warning(
     draw_network_metric_samples(fit_edge, "social_differentiation"),
     regexp=NA
   )
-  plot(x)
 
   x <- expect_warning(
     draw_network_metric_samples(fit_edge, "weighted_density"),
     regexp=NA
   )
-  plot(x)
 
   x <- expect_warning(
     draw_network_metric_samples(fit_edge, "standard_deviation"),
     regexp=NA
   )
-  plot(x)
 })

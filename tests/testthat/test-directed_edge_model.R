@@ -1,4 +1,6 @@
 test_that("directed edge models work", {
+  library(igraph)
+
   sim_data <- simulate_edge_model("binary", aggregated = FALSE)
   df <- sim_data$df_sim
   head(df)
@@ -48,8 +50,8 @@ test_that("directed edge models work", {
 
   edgelist <- get_edgelist(fit_edge, transform=FALSE)
   net <- igraph::graph_from_edgelist(as.matrix(edgelist[, 1:2]), directed=FALSE)
-  E(net)$weight <- plogis(edgelist[, 3])
-  nodal_metric <- strength(net)
+  igraph::E(net)$weight <- plogis(edgelist[, 3])
+  nodal_metric <- igraph::strength(net)
   nodal_metric <- nodal_metric - mean(nodal_metric)
   df_nodal <- data.frame(node=factor(V(net), levels=1:length(V(net))), metric_true=nodal_metric)
   df_nodal$nodal_trait <- rnorm(nrow(df_nodal), 2 * df_nodal$metric)
