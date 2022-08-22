@@ -1,132 +1,132 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>~/bisonR/404.html</loc>
+    <loc>/404.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/LICENSE-text.html</loc>
+    <loc>/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/LICENSE.html</loc>
+    <loc>/LICENSE.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/articles/getting_started.html</loc>
+    <loc>/articles/getting_started.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/articles/index.html</loc>
+    <loc>/articles/index.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/articles/mixture_models.html</loc>
+    <loc>/articles/mixture_models.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/articles/windows_installation.html</loc>
+    <loc>/articles/windows_installation.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/authors.html</loc>
+    <loc>/authors.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/index.html</loc>
+    <loc>/index.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/news/index.html</loc>
+    <loc>/news/index.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/bisonR-package.html</loc>
+    <loc>/reference/bisonR-package.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/convert_gbi_to_bison.html</loc>
+    <loc>/reference/convert_gbi_to_bison.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/draw_edgelist_samples.html</loc>
+    <loc>/reference/draw_edgelist_samples.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/draw_network_metric_samples.html</loc>
+    <loc>/reference/draw_network_metric_samples.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/draw_node_metric_samples.html</loc>
+    <loc>/reference/draw_node_metric_samples.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/dyadic_regression.html</loc>
+    <loc>/reference/dyadic_regression.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/edge_mixture.html</loc>
+    <loc>/reference/edge_mixture.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/edge_model.html</loc>
+    <loc>/reference/edge_model.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/get_contrasts.html</loc>
+    <loc>/reference/get_contrasts.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/get_default_priors.html</loc>
+    <loc>/reference/get_default_priors.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/get_edge_component_probabilities.html</loc>
+    <loc>/reference/get_edge_component_probabilities.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/get_edgelist.html</loc>
+    <loc>/reference/get_edgelist.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/get_network_component_probabilities.html</loc>
+    <loc>/reference/get_network_component_probabilities.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/index.html</loc>
+    <loc>/reference/index.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/model_comparison.html</loc>
+    <loc>/reference/model_comparison.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/nodal_regression.html</loc>
+    <loc>/reference/nodal_regression.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/plot.network_metric_samples.html</loc>
+    <loc>/reference/plot.network_metric_samples.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/plot_network.html</loc>
+    <loc>/reference/plot_network.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/plot_predictions.html</loc>
+    <loc>/reference/plot_predictions.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/plot_trace.html</loc>
+    <loc>/reference/plot_trace.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/print.network_metric_samples.html</loc>
+    <loc>/reference/print.network_metric_samples.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/print.summary.dyadic_model.html</loc>
+    <loc>/reference/print.summary.dyadic_model.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/print.summary.edge_mixture.html</loc>
+    <loc>/reference/print.summary.edge_mixture.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/print.summary.edge_model.html</loc>
+    <loc>/reference/print.summary.edge_model.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/print.summary.nodal_model.html</loc>
+    <loc>/reference/print.summary.nodal_model.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/prior_check.html</loc>
+    <loc>/reference/prior_check.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/prior_predictive_check.html</loc>
+    <loc>/reference/prior_predictive_check.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/simulate_edge_model.html</loc>
+    <loc>/reference/simulate_edge_model.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/simulate_edge_model_mixture.html</loc>
+    <loc>/reference/simulate_edge_model_mixture.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/summary.dyadic_model.html</loc>
+    <loc>/reference/summary.dyadic_model.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/summary.edge_mixture.html</loc>
+    <loc>/reference/summary.edge_mixture.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/summary.edge_model.html</loc>
+    <loc>/reference/summary.edge_model.html</loc>
   </url>
   <url>
-    <loc>~/bisonR/reference/summary.nodal_model.html</loc>
+    <loc>/reference/summary.nodal_model.html</loc>
   </url>
 </urlset>
