@@ -10,7 +10,7 @@
 
 **This package is still in continuous development and has not yet been fully tested. Please let us know if you encounter any unexpected behaviour.**
 
-bisonR is an R package implementing the BISoN framework for conducting Bayesian analysis of social networks. BISoN estimates uncertainty over edge weights in social networks from empirical data (such as observations) and builds networks with uncertainty. The networks can then be visualised *with* uncertainty, and can also be analysed with a fully Bayesian methodology using standard tools such as regression.
+bisonR is an R package implementing the BISoN framework for conducting Bayesian analysis of social networks. BISoN estimates uncertainty over edge weights in social networks from empirical data (such as observations) and builds networks with uncertainty. The networks can then be visualised *with* uncertainty and analysed with a fully Bayesian methodology.
 
 ## Quick Start
 
