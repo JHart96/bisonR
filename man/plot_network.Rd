@@ -4,7 +4,7 @@
 \alias{plot_network}
 \title{Sociogram plot with uncertainty of a fitted edge weight model object}
 \usage{
-plot_network(obj, ci = 0.9, lwd = 1)
+plot_network(obj, ci = 0.9, lwd = 2)
 }
 \arguments{
 \item{obj}{An S3 edge model object to be summarised.}

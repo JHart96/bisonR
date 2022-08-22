@@ -4,12 +4,14 @@
 \alias{plot_trace}
 \title{Traceplot of MCMC chains}
 \usage{
-plot_trace(obj, ...)
+plot_trace(obj, par_ids = 1:5, ...)
 }
 \arguments{
 \item{obj}{A fitted S3 object for edge weight, dyadic regression, or nodal regression models.}
 
-\item{...}{Additional arguments to be passed to trace plots.}
+\item{par_ids}{A vector of parameter IDs to be plotted.}
+
+\item{...}{Additional arguments to be passed to base R plots.}
 }
 \description{
 Traceplot of MCMC chains

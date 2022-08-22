@@ -19,6 +19,8 @@ data {
   real prior_random_mean_mu; // Prior mean on centralisation of random effects
   real<lower=0> prior_random_mean_sigma; // Prior standard deviation on centralisation of random effects
   real<lower=0> prior_random_std_sigma; // Prior standard deviation on dispersion of random effects
+
+  int<lower=0, upper=1> priors_only; // Whether to sample from only the priors
 }
 
 parameters {
@@ -44,9 +46,10 @@ transformed parameters {
 }
 
 model {
-  // Main model
-  event ~ binomial(divisor, inv_logit(predictor));
-
+  if (!priors_only) {
+    // Main model
+    event ~ binomial(divisor, inv_logit(predictor));
+  }
   // Priors
   if (num_edges > 0) {
     edge_weight ~ normal(prior_edge_mu, prior_edge_sigma);
@@ -67,4 +70,8 @@ model {
 generated quantities {
   array[num_rows] int event_pred;
   event_pred = binomial_rng(divisor, inv_logit(predictor));
+  vector[num_rows] log_lik;
+  for (i in 1:num_rows) {
+    log_lik[i] = binomial_lpmf(event[i] | divisor[i], inv_logit(predictor[i]));
+  }
 }

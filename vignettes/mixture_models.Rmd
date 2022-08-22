@@ -1,0 +1,67 @@
+---
+title: "Edge mixture models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Edge mixture models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+Edge mixture models can be used to detect different types of social connections by looking for clustering in edge weights. bisonR provides support for edge mixture models with the `edge_mixture` function. There are two key outputs from a bisonR edge mixture model. First it generates a posterior probability distribution over the number of components (clusters, interpreted associal connection types), from 1 to a maximum $K$, over the entire network. Secondly, for each edge it calculates the probability that each dyad belongs to each possible component. To show how this all works, first we'll load in bisonR and simulate some data:
+
+```{r}
+library(bisonR)
+library(dplyr)
+```
+
+In this example we simulate data from a binary edge model with 2 underlying clusters (also called components), with dyads belong to either cluster with equal probability:
+
+```{r}
+sim_data <- simulate_edge_model_mixture("binary", num_components = 2, component_weights = c(0.5, 0.5))
+df <- sim_data$df_sim
+head(df)
+```
+
+Since the data are already aggregated (e.g. a single row for each dyad), we can use the binary conjugate model for speed:
+
+```{r}
+fit_edge <- edge_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id), 
+  data=df, 
+  data_type="binary_conjugate"
+)
+```
+
+We won't conduct the usual checks for the sake of this tutorial, but at this point we'd recommend conducting diagnostic checks to ensure model fit. Once the model has fit well, we can use the `edge_mixture()` function to fit the edge mixture model:
+
+```{r}
+fit_mixture <- edge_mixture(fit_edge, num_components=5, verbose=FALSE) # verbose=FALSE for tutorial purposes
+summary(fit_mixture)
+```
+
+There's quite a bit going on in the summary, so let's break it down. The top section shows the model that fits best and the probability assigned to that model. The second section shows the probabilities of the models corresponding to each number of components ($K = 1, 2, 3, ...$). You'll notice the model with the highest probability is the same as the best fitting model from the section above. The final section shows the edge-level probabilities of component membership for the corresponding dyad. This can be interpreted as the probability a dyad belongs to a given component/cluster/social connection type.
+
+The information shown in the summary above can also be accessed using the functions `get_network_component_probabilities()` and `get_edge_component_probabilities()`. These two functions make it possible to access the mixture model output programmatically for downstream analysis or plotting. 
+
+To get network-level probabilities of the number of components, we can use `get_network_component_probabilities()` function:
+
+```{r}
+get_network_component_probabilities(fit_mixture)
+```
+To use probabilities over component membership for a given number of components, we can use the `get_edge_component_probabilities()` function, where `3` is the number of components we assume to exist in the network:
+
+```{r}
+get_edge_component_probabilities(fit_mixture, 3)
+```
+
+This was a short tutorial on how to use `edge_mixture()` to fit mixture models in bisonR. If you have any questions please get in touch.
+

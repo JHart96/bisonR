@@ -1,4 +1,3 @@
-require(bayesplot)
 #' Fit a nodel regression model
 #'
 #' @param formula Formula of the model
@@ -7,12 +6,12 @@ require(bayesplot)
 #' @param mc_cores Number of cores to use for the MCMC sampler
 #' @param refresh Frequency of print-outs from MCMC sampler
 #' @param priors List of priors in the format supplied by `get_default_priors()`.
+#' @param priors_only Whether to use priors as posteriors or to allow the posteriors to be updated by data.
+
 #'
 #' @return An S3 nodal model object containing chain samples and processed data.
 #' @export
-#'
-#' @examples
-nodal_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, priors=NULL) {
+nodal_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, priors=NULL, priors_only=FALSE) {
   # If user-specified priors haven't been set, use the defaults
   if (is.null(priors)) {
     priors <- get_default_priors("nodal_regression")
@@ -24,6 +23,9 @@ nodal_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, pr
   # Set the priors in model data
   prior_parameters <- extract_prior_parameters(priors)
   model_data <- c(model_data, prior_parameters)
+
+  # Set whether only the priors should be sampled
+  model_data$priors_only <- priors_only
 
   model <- build_stan_model("nodal_regression")
   fit <- model$sample(data=model_data, chains=4, parallel_chains=mc_cores, refresh=refresh, step_size=0.1)
@@ -93,6 +95,7 @@ get_nodal_regression_model_data <- function(formula, edgemodel, data) {
   num_fixed <- ncol(design_fixed) - 1
   num_random <- ncol(design_random) - 1
   num_random_groups <- length(unique(random_group_index))
+  random_group_index <- as.numeric(as.factor(random_group_index))
 
   metric_samples <- draw_node_metric_samples(edgemodel, model_spec$metric_name, 1000, standardise=TRUE)
   metric_mu <- apply(metric_samples, 2, mean)
@@ -122,43 +125,44 @@ get_nodal_regression_model_data <- function(formula, edgemodel, data) {
 #' Print information about a fitted nodal regression model
 #'
 #' @param x An S3 nodal regression model
-#' @param ci Credible interval to use in summary, based on quantiles.
+#' @param digits Number of digits for rounding coefficients.
 #' @param ... Additional arguments to be passed to summary calculations.
 #'
 #' @export
 #'
-print.nodal_model <- function(x, ci=0.90, ...) {
-  coefficients <- t(apply(x$chain, 2, function(x) quantile(x, probs=c(0.5, 0.5 * (1 - ci), ci + 0.5 * (1 - ci)))))
-  rownames(coefficients) <- colnames(x$model_data$design_fixed)
-  coefficients <- round(coefficients, 3)
-  cat(paste0(
-    "=== Fitted nodal regression model ===\n",
-    "Formula: ", format(x$formula), "\n",
-    "Number of nodes: ", x$edgemodel$num_nodes, "\n",
-    "=== Coefficient summary ==="
-  ))
+print.summary.nodal_model <- function(x, digits=3, ...) {
+  cat(x$description)
+  coefficients <- round(x$coefficients, digits)
   print(coefficients)
 }
 
 #' Summary of a fitted nodal regression model
 #'
 #' @param object An S3 dyadic regression model
+#' @param ci Credible interval to use in summary, based on quantiles.
 #' @param ... Additional arguments to be passed to summary calculations.
 #'
 #' @export
 #'
-summary.nodal_model <- function(object, ...) {
-  print(object, ...)
+summary.nodal_model <- function(object, ci=0.90, ...) {
+  summary_obj <- list()
+  coefficients <- t(apply(object$chain, 2, function(object) quantile(object, probs=c(0.5, 0.5 * (1 - ci), ci + 0.5 * (1 - ci)))))
+  rownames(coefficients) <- colnames(object$model_data$design_fixed)
+
+  summary_obj$coefficients <- coefficients
+  summary_obj$description <- paste0(
+    "=== Fitted dyadic regression model ===\n",
+    "Formula: ", format(object$formula), "\n",
+    "Number of dyads: ", object$edgemodel$num_dyads, "\n",
+    "=== Coefficient summary ==="
+  )
+
+  class(summary_obj) <- "summary.nodal_model"
+
+  summary_obj
 }
 
-plot_trace.nodal_model <- function (obj, par_ids=1:12, ...) {
-  if (dim(obj$chain)[2] < 12) {
-    par_ids <- 1:dim(obj$chain)[2]
-  }
-  bayesplot::mcmc_trace(obj$fit$draws("beta_fixed")[,,par_ids])
-}
-
-plot_predictions.nodal_model <- function(obj, num_draws=20) {
+plot_predictions.nodal_model <- function(obj, num_draws=20, type="density", draw_data=TRUE) {
   # Determine edge label
   xlab <- "Logit centrality"
 
@@ -166,32 +170,60 @@ plot_predictions.nodal_model <- function(obj, num_draws=20) {
   metric_samples <- obj$metric_samples
   metric_preds <- obj$fit$draws("metric_pred", format="matrix")
 
-  # Generate densities for edge sample and prediction
-  sample_densities <- list()
-  pred_densities <- list()
-  for (i in 1:num_draws) {
-    sample_densities[[i]] <- density(metric_samples[i, ])
-    pred_densities[[i]] <- density(as.vector(metric_preds[i, ]))
+  if (type == "density") {
+    # Generate densities for edge sample and prediction
+    sample_densities <- list()
+    pred_densities <- list()
+    for (i in 1:num_draws) {
+      sample_densities[[i]] <- density(metric_samples[i, ])
+      pred_densities[[i]] <- density(as.vector(metric_preds[i, ]))
+    }
+
+    # Set plot limits according to maximum density of samples
+    xmin <- min(sapply(pred_densities, function(x) min(x$x)))
+    xmax <- max(sapply(pred_densities, function(x) max(x$x)))
+    ymax <- max(sapply(pred_densities, function(x) max(x$y)))
+
+    if (draw_data) {
+      xmin <- min(c(xmin, sapply(sample_densities, function(x) min(x$x))))
+      xmax <- max(c(xmax, sapply(sample_densities, function(x) max(x$x))))
+      ymax <- max(c(ymax, sapply(sample_densities, function(x) max(x$y))))
+    }
+
+    # Plot densities for subsequent draws
+    plot(NULL, main="Observed vs predicted response values", xlab="Response value", ylab="Probability",
+         xlim=c(xmin, xmax), ylim=c(0, ymax * 1.1))
+
+    for (i in 1:num_draws) {
+      if (draw_data) {
+        lines(sample_densities[[i]], col=rgb(0, 0, 0, 0.5))
+      }
+      lines(pred_densities[[i]], col=col2rgba(bison_colors[1], 0.5))
+    }
+
+    if (draw_data) {
+      legend("topright", legend=c("observed", "predicted"), fill=c("black", bison_colors[1]))
+    } else {
+      legend("topright", legend=c("predicted"), fill=c(bison_colors[1]))
+    }
   }
 
-  # Set plot limits according to maximum density of samples
-  xlim = c(
-    min(sapply(sample_densities, function(x) min(x$x))),
-    max(sapply(sample_densities, function(x) max(x$x))) * 1.1
-  )
-  ylim = c(
-    min(sapply(sample_densities, function(x) min(x$y))),
-    max(sapply(sample_densities, function(x) max(x$y))) * 1.1
-  )
-
-  # Plot densities for subsequent draws
-  for (i in 1:num_draws) {
-    if (i == 1) {
-      plot(sample_densities[[i]], main="Observed vs predicted nodal metrics", xlab=xlab, col=rgb(0, 0, 0, 0.5), xlim=xlim, ylim=ylim)
-    } else {
-      lines(sample_densities[[i]], col=rgb(0, 0, 0, 0.5))
+  if (type == "marginal") {
+    # New plot for each fixed effect. Max 4 per plot?
+    coef_names <- colnames(obj$model_data$design_fixed)
+    for (i in 1:length(coef_names)) {
+      if (coef_names[i] != "intercept") {
+        predictor <- obj$model_data$design_fixed[, i]
+        responses <- list()
+        for (j in 1:num_draws) {
+          responses[[j]] <- as.numeric(metric_preds[j, ])
+        }
+        plot(NULL, xlim=c(min(predictor), max(predictor)), ylim=c(min(unlist(responses)), max(unlist(responses))), xlab=coef_names[i], ylab="Response value")
+        for (j in 1:num_draws) {
+          abline(lm(responses[[j]] ~ predictor), col=col2rgba(bison_colors[1], 0.5))
+        }
+      }
     }
-    lines(pred_densities[[i]], col=rgb(0, 0, 1, 0.5))
   }
 }
 

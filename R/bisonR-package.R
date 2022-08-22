@@ -9,8 +9,11 @@
 #' @import stats
 #' @import stringr
 #' @import cmdstanr
-#' @importFrom grDevices rgb
-#' @importFrom graphics lines
+#' @import mclust
+#' @import utils
+#' @import grDevices
+#' @import graphics
+#' @import formula.tools
 #'
 #'
 #'

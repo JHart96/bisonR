@@ -3,5 +3,7 @@ pkgdown: 2.0.2
 pkgdown_sha: ~
 articles:
   getting_started: getting_started.html
-last_built: 2022-06-26T09:54Z
+  mixture_models: mixture_models.html
+  windows_installation: windows_installation.html
+last_built: 2022-08-15T17:54Z
 

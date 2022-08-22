@@ -4,12 +4,17 @@
 \alias{summary.dyadic_model}
 \title{Summary of a fitted dyadic regression model}
 \usage{
-\method{summary}{dyadic_model}(object, ...)
+\method{summary}{dyadic_model}(object, ci = 0.9, ...)
 }
 \arguments{
 \item{object}{An S3 dyadic regression model}
 
+\item{ci}{Credible interval to use in summary, based on quantiles.}
+
 \item{...}{Additional arguments to be passed to summary calculations.}
+}
+\value{
+Returns a summary object of the fitted dyadic regression model.
 }
 \description{
 Summary of a fitted dyadic regression model

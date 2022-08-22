@@ -1,6 +1,6 @@
 Package: bisonR
 Title: Bayesian Inference of Social Networks in R
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: 
     person("Jordan", "Hart", , "jordan.da.hart@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4636-0760"))
@@ -19,17 +19,19 @@ Imports:
     formula.tools,
     stats,
     igraph,
-    stringr
-Remotes: 
-    stan-dev/cmdstanr
-Suggests: 
-    bayesplot,
-    tidyverse,
+    stringr,
     dplyr,
+    mclust,
+    extraDistr,
+    loo,
+    logspline,
+    tidyverse,
     knitr,
     rmarkdown,
     testthat,
     covr
+Remotes: 
+    stan-dev/cmdstanr
 VignetteBuilder: knitr
 LazyData: true
 Config/testthat/edition: 3

@@ -10,7 +10,8 @@ nodal_regression(
   df,
   mc_cores = 4,
   refresh = 500,
-  priors = NULL
+  priors = NULL,
+  priors_only = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ nodal_regression(
 \item{refresh}{Frequency of print-outs from MCMC sampler}
 
 \item{priors}{List of priors in the format supplied by \code{get_default_priors()}.}
+
+\item{priors_only}{Whether to use priors as posteriors or to allow the posteriors to be updated by data.}
 }
 \value{
 An S3 nodal model object containing chain samples and processed data.

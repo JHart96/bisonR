@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">bisonR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,8 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/getting_started.html">Getting Started</a>
+    <a class="dropdown-item" href="../articles/mixture_models.html">Edge mixture models</a>
+    <a class="dropdown-item" href="../articles/windows_installation.html">Installing cmdstanR on Windows</a>
   </div>
 </li>
 <li class="nav-item">
@@ -72,6 +74,11 @@
         <dd>Draw samples from edgelist posterior</dd>
       </dl><dl><dt>
           
+          <code><a href="draw_network_metric_samples.html">draw_network_metric_samples()</a></code> 
+        </dt>
+        <dd>Draw samples from posterior network-level metrics for a fitted edge weight model</dd>
+      </dl><dl><dt>
+          
           <code><a href="draw_node_metric_samples.html">draw_node_metric_samples()</a></code> 
         </dt>
         <dd>Draw samples from the posterior node metric for a fitted edge weight model</dd>
@@ -80,6 +87,11 @@
           <code><a href="dyadic_regression.html">dyadic_regression()</a></code> 
         </dt>
         <dd>Fit dyadic regression model</dd>
+      </dl><dl><dt>
+          
+          <code><a href="edge_mixture.html">edge_mixture()</a></code> 
+        </dt>
+        <dd>Fit a dyadic mixture model</dd>
       </dl><dl><dt>
           
           <code><a href="edge_model.html">edge_model()</a></code> 
@@ -97,9 +109,24 @@
         <dd>Return default priors for a given model</dd>
       </dl><dl><dt>
           
+          <code><a href="get_edge_component_probabilities.html">get_edge_component_probabilities()</a></code> 
+        </dt>
+        <dd>Get probabilities of component membership for each edge</dd>
+      </dl><dl><dt>
+          
           <code><a href="get_edgelist.html">get_edgelist()</a></code> 
         </dt>
         <dd>Retrieves an edgelist with uncertainty for a fitted edge weight model object</dd>
+      </dl><dl><dt>
+          
+          <code><a href="get_network_component_probabilities.html">get_network_component_probabilities()</a></code> 
+        </dt>
+        <dd>Get probabilities of component membership for the entire network</dd>
+      </dl><dl><dt>
+          
+          <code><a href="model_comparison.html">model_comparison()</a></code> 
+        </dt>
+        <dd>Run leave-one-out model comparison</dd>
       </dl><dl><dt>
           
           <code><a href="nodal_regression.html">nodal_regression()</a></code> 
@@ -122,24 +149,49 @@
         <dd>Traceplot of MCMC chains</dd>
       </dl><dl><dt>
           
-          <code><a href="print.dyadic_model.html">print(<i>&lt;dyadic_model&gt;</i>)</a></code> 
+          <code><a href="print.network_metric_samples.html">print(<i>&lt;network_metric_samples&gt;</i>)</a></code> 
         </dt>
-        <dd>Print information about a fitted dyadic regression model</dd>
+        <dd>Print a network metric samples object</dd>
       </dl><dl><dt>
           
-          <code><a href="print.edge_model.html">print(<i>&lt;edge_model&gt;</i>)</a></code> 
+          <code><a href="print.summary.dyadic_model.html">print(<i>&lt;summary.dyadic_model&gt;</i>)</a></code> 
         </dt>
-        <dd>Prints out details of a fitted edge model object</dd>
+        <dd>Print information about a dyadic regression model</dd>
       </dl><dl><dt>
           
-          <code><a href="print.nodal_model.html">print(<i>&lt;nodal_model&gt;</i>)</a></code> 
+          <code><a href="print.summary.edge_mixture.html">print(<i>&lt;summary.edge_mixture&gt;</i>)</a></code> 
+        </dt>
+        <dd>Print information about an edge mixture model</dd>
+      </dl><dl><dt>
+          
+          <code><a href="print.summary.edge_model.html">print(<i>&lt;summary.edge_model&gt;</i>)</a></code> 
+        </dt>
+        <dd>Prints out an edge model summary object.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="print.summary.nodal_model.html">print(<i>&lt;summary.nodal_model&gt;</i>)</a></code> 
         </dt>
         <dd>Print information about a fitted nodal regression model</dd>
       </dl><dl><dt>
           
+          <code><a href="prior_check.html">prior_check()</a></code> 
+        </dt>
+        <dd>Prior checks</dd>
+      </dl><dl><dt>
+          
+          <code><a href="prior_predictive_check.html">prior_predictive_check()</a></code> 
+        </dt>
+        <dd>Run prior predictive check for a model specification</dd>
+      </dl><dl><dt>
+          
           <code><a href="simulate_edge_model.html">simulate_edge_model()</a></code> 
         </dt>
-        <dd>Simulates observations from an edge model</dd>
+        <dd>Simulates data</dd>
+      </dl><dl><dt>
+          
+          <code><a href="simulate_edge_model_mixture.html">simulate_edge_model_mixture()</a></code> 
+        </dt>
+        <dd>Simulate data for an edge model with mixture components</dd>
       </dl><dl><dt>
           
           <code><a href="summary.dyadic_model.html">summary(<i>&lt;dyadic_model&gt;</i>)</a></code> 
@@ -147,9 +199,14 @@
         <dd>Summary of a fitted dyadic regression model</dd>
       </dl><dl><dt>
           
+          <code><a href="summary.edge_mixture.html">summary(<i>&lt;edge_mixture&gt;</i>)</a></code> 
+        </dt>
+        <dd>Summary of a edge mixture model</dd>
+      </dl><dl><dt>
+          
           <code><a href="summary.edge_model.html">summary(<i>&lt;edge_model&gt;</i>)</a></code> 
         </dt>
-        <dd>Summarises a fitted edge model object</dd>
+        <dd>Generates a summary object for an edge model object</dd>
       </dl><dl><dt>
           
           <code><a href="summary.nodal_model.html">summary(<i>&lt;nodal_model&gt;</i>)</a></code> 

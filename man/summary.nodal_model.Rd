@@ -4,10 +4,12 @@
 \alias{summary.nodal_model}
 \title{Summary of a fitted nodal regression model}
 \usage{
-\method{summary}{nodal_model}(object, ...)
+\method{summary}{nodal_model}(object, ci = 0.9, ...)
 }
 \arguments{
 \item{object}{An S3 dyadic regression model}
+
+\item{ci}{Credible interval to use in summary, based on quantiles.}
 
 \item{...}{Additional arguments to be passed to summary calculations.}
 }
