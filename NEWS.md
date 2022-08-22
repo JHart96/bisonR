@@ -1,3 +1,18 @@
+# bisonR 0.2.0
+
+* Conjugate models
+* Prior checks
+* Model comparison
+* Directed networks
+* Support for missing dyads
+* Mixture models
+* Refactored data processing
+* GBI data conversion
+* Global network metrics
+* Improved documentation
+* Non-random edge weight analysis
+* Threshold degree metrics
+
 # bisonR 0.1.0
 
 * Basic feature set implemented (edge models, dyadic and nodal regression, basic checks, etc).
