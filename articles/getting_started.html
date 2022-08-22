@@ -62,7 +62,7 @@
 
       <ul class="navbar-nav">
 <li class="nav-item">
-  <a class="nav-link" href="https://github.com/JHart96/bisonR/" aria-label="github">
+  <a class="external-link nav-link" href="https://github.com/JHart96/bisonR/" aria-label="github">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -81,7 +81,7 @@
       <img src="" class="logo" alt=""><h1>Getting Started</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/JHart96/bisonR/blob/HEAD/vignettes/getting_started.Rmd"><code>vignettes/getting_started.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/JHart96/bisonR/blob/HEAD/vignettes/getting_started.Rmd" class="external-link"><code>vignettes/getting_started.Rmd</code></a></small>
       <div class="d-none name"><code>getting_started.Rmd</code></div>
     </div>
 
@@ -91,11 +91,11 @@
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
 <p>bisonR is an R package for running social network analyses in the BISoN framework. BISoN models consist of two main stages: 1) fitting an edge weight model, capturing uncertainty in social network edges; and 2) propagating this uncertainty through subsequent analyses such as regressions. In this short tutorial we’ll cover how to fit edge weight models to a simulated dataset, and show how the fitted edge weight model can be used to run dyadic and nodal regression analysis, as well as non-random edge weight tests.</p>
-<p>Before beginning, we’ll load in the <code>bisonR</code> package using <code><a href="https://github.com/JHart96/bisonR">library(bisonR)</a></code>, and we’ll also bring in <code>dplyr</code> to help with data wrangling. If you don’t already have <code>bisonR</code> installed, you can install it from Github using the following code:</p>
+<p>Before beginning, we’ll load in the <code>bisonR</code> package using <code><a href="https://jhart96.github.io/bisonR">library(bisonR)</a></code>, and we’ll also bring in <code>dplyr</code> to help with data wrangling. If you don’t already have <code>bisonR</code> installed, you can install it from Github using the following code:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JHart96/bisonR"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JHart96/bisonR">bisonR</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jhart96.github.io/bisonR">bisonR</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: cmdstanr</span></span>
 <span><span class="co">#&gt; This is cmdstanr version 0.5.3</span></span>
 <span><span class="co">#&gt; - CmdStanR documentation and vignettes: mc-stan.org/cmdstanr</span></span>
@@ -115,13 +115,13 @@
 <code class="sourceCode R"><span><span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_edge_model.html">simulate_edge_model</a></span><span class="op">(</span><span class="st">"binary"</span>, aggregated <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">sim_data</span><span class="op">$</span><span class="va">df_sim</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   event node_1_id node_2_id age_diff   age_1    age_2 location duration</span></span>
-<span><span class="co">#&gt; 1     1         1         2 5.388522 21.2809 15.89238        3        1</span></span>
-<span><span class="co">#&gt; 2     1         1         2 5.388522 21.2809 15.89238        4        1</span></span>
-<span><span class="co">#&gt; 3     1         1         2 5.388522 21.2809 15.89238        4        1</span></span>
-<span><span class="co">#&gt; 4     1         1         3 5.862090 21.2809 15.41881        4        1</span></span>
-<span><span class="co">#&gt; 5     1         1         3 5.862090 21.2809 15.41881        1        1</span></span>
-<span><span class="co">#&gt; 6     1         1         3 5.862090 21.2809 15.41881        4        1</span></span></code></pre></div>
+<span><span class="co">#&gt;   event node_1_id node_2_id  age_diff    age_1    age_2 location duration</span></span>
+<span><span class="co">#&gt; 1     1         1         2  4.649926 24.27642 19.62649        5        1</span></span>
+<span><span class="co">#&gt; 2     1         1         2  4.649926 24.27642 19.62649        5        1</span></span>
+<span><span class="co">#&gt; 3     1         1         2  4.649926 24.27642 19.62649        5        1</span></span>
+<span><span class="co">#&gt; 4     1         1         2  4.649926 24.27642 19.62649        5        1</span></span>
+<span><span class="co">#&gt; 5     1         1         3  3.709088 24.27642 20.56733        3        1</span></span>
+<span><span class="co">#&gt; 6     1         1         4 -1.181156 24.27642 25.45757        5        1</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="edge-models">Edge Models<a class="anchor" aria-label="anchor" href="#edge-models"></a>
@@ -163,14 +163,14 @@
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Running MCMC with 4 parallel chains...</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Chain 1 finished in 1.1 seconds.</span></span>
-<span><span class="co">#&gt; Chain 2 finished in 1.1 seconds.</span></span>
-<span><span class="co">#&gt; Chain 3 finished in 1.0 seconds.</span></span>
-<span><span class="co">#&gt; Chain 4 finished in 1.0 seconds.</span></span>
+<span><span class="co">#&gt; Chain 1 finished in 0.9 seconds.</span></span>
+<span><span class="co">#&gt; Chain 2 finished in 0.9 seconds.</span></span>
+<span><span class="co">#&gt; Chain 3 finished in 0.9 seconds.</span></span>
+<span><span class="co">#&gt; Chain 4 finished in 0.9 seconds.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; All 4 chains finished successfully.</span></span>
-<span><span class="co">#&gt; Mean chain execution time: 1.1 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 1.3 seconds.</span></span></code></pre></div>
+<span><span class="co">#&gt; Mean chain execution time: 0.9 seconds.</span></span>
+<span><span class="co">#&gt; Total execution time: 1.2 seconds.</span></span></code></pre></div>
 <p>Depending on your dataset this can take anywhere between a few tenths of a second and several hours. In particular if you have a large dataset and no observation-level predictors, it’s probably a good idea to use the aggregated version of the model where all observations per dyad are collapsed to a single row. This will speed up model fitting considerably.</p>
 <p>Once the model has fitted, we need to check that the MCMC algorithm has behaved correctly. Often if there’s a major problem, the <code><a href="../reference/edge_model.html">edge_model()</a></code> function itself will have triggered warning messages above. But even if everything is silent, it’s still worth checking the traceplots to check the MCMC chains have converged. The chains should be well-mixed and look something like a fuzzy caterpillar. We can check for this using the <code><a href="../reference/plot_trace.html">plot_trace()</a></code> function:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -196,51 +196,51 @@
 <span><span class="co">#&gt; Directed: FALSE</span></span>
 <span><span class="co">#&gt; === Edge list summary ===</span></span>
 <span><span class="co">#&gt;          median    5%   95%</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 2   0.881 0.491 0.992</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 3   0.924 0.641 0.994</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 4   0.737 0.151 0.985</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 5   0.842 0.344 0.990</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 6   0.881 0.486 0.991</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 7   0.908 0.565 0.994</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 8   0.039 0.002 0.263</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 9   0.841 0.343 0.991</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 10  0.605 0.192 0.920</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 3   0.698 0.304 0.937</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 4   0.040 0.002 0.265</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 5   0.922 0.628 0.995</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 6   0.054 0.002 0.398</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 7   0.057 0.003 0.382</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 8   0.105 0.004 0.687</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 9   0.739 0.129 0.987</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 10  0.923 0.648 0.994</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 4   0.222 0.036 0.607</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 5   0.736 0.134 0.987</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 6   0.056 0.002 0.379</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 7   0.184 0.029 0.528</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 8   0.040 0.002 0.267</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 9   0.106 0.004 0.677</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 10  0.072 0.003 0.488</span></span>
-<span><span class="co">#&gt; 4 &lt;-&gt; 5   0.737 0.132 0.985</span></span>
-<span><span class="co">#&gt; 4 &lt;-&gt; 6   0.075 0.003 0.490</span></span>
-<span><span class="co">#&gt; 4 &lt;-&gt; 7   0.459 0.138 0.814</span></span>
-<span><span class="co">#&gt; 4 &lt;-&gt; 8   0.041 0.002 0.269</span></span>
-<span><span class="co">#&gt; 4 &lt;-&gt; 9   0.841 0.363 0.990</span></span>
-<span><span class="co">#&gt; 4 &lt;-&gt; 10  0.738 0.143 0.985</span></span>
-<span><span class="co">#&gt; 5 &lt;-&gt; 6   0.046 0.002 0.312</span></span>
-<span><span class="co">#&gt; 5 &lt;-&gt; 7   0.056 0.002 0.398</span></span>
-<span><span class="co">#&gt; 5 &lt;-&gt; 8   0.047 0.002 0.327</span></span>
-<span><span class="co">#&gt; 5 &lt;-&gt; 9   0.290 0.041 0.743</span></span>
-<span><span class="co">#&gt; 5 &lt;-&gt; 10  0.111 0.003 0.710</span></span>
-<span><span class="co">#&gt; 6 &lt;-&gt; 7   0.729 0.143 0.983</span></span>
-<span><span class="co">#&gt; 6 &lt;-&gt; 8   0.758 0.410 0.953</span></span>
-<span><span class="co">#&gt; 6 &lt;-&gt; 9   0.728 0.140 0.985</span></span>
-<span><span class="co">#&gt; 6 &lt;-&gt; 10  0.892 0.503 0.992</span></span>
-<span><span class="co">#&gt; 7 &lt;-&gt; 8   0.054 0.002 0.373</span></span>
-<span><span class="co">#&gt; 7 &lt;-&gt; 9   0.922 0.643 0.994</span></span>
-<span><span class="co">#&gt; 7 &lt;-&gt; 10  0.905 0.588 0.993</span></span>
-<span><span class="co">#&gt; 8 &lt;-&gt; 9   0.883 0.502 0.992</span></span>
-<span><span class="co">#&gt; 8 &lt;-&gt; 10  0.924 0.635 0.995</span></span>
-<span><span class="co">#&gt; 9 &lt;-&gt; 10  0.234 0.037 0.613</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 &lt;-&gt; 2   0.909 0.573 0.993</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 3   0.741 0.136 0.986</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 4   0.607 0.189 0.919</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 5   0.844 0.335 0.991</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 6   0.370 0.103 0.731</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 7   0.371 0.108 0.720</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 8   0.923 0.641 0.994</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 9   0.888 0.493 0.991</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 10  0.844 0.356 0.989</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 3   0.110 0.004 0.708</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 4   0.072 0.002 0.513</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 5   0.751 0.396 0.954</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 6   0.728 0.147 0.984</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 7   0.047 0.002 0.321</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 8   0.374 0.111 0.714</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 9   0.607 0.198 0.918</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 10  0.735 0.136 0.987</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 4   0.111 0.004 0.719</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 5   0.734 0.147 0.984</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 6   0.837 0.349 0.989</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 7   0.044 0.002 0.313</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 8   0.423 0.064 0.882</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 9   0.071 0.003 0.498</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 10  0.908 0.577 0.993</span></span>
+<span><span class="co">#&gt; 4 &lt;-&gt; 5   0.736 0.133 0.984</span></span>
+<span><span class="co">#&gt; 4 &lt;-&gt; 6   0.884 0.499 0.992</span></span>
+<span><span class="co">#&gt; 4 &lt;-&gt; 7   0.565 0.239 0.858</span></span>
+<span><span class="co">#&gt; 4 &lt;-&gt; 8   0.909 0.579 0.994</span></span>
+<span><span class="co">#&gt; 4 &lt;-&gt; 9   0.907 0.584 0.993</span></span>
+<span><span class="co">#&gt; 4 &lt;-&gt; 10  0.844 0.373 0.989</span></span>
+<span><span class="co">#&gt; 5 &lt;-&gt; 6   0.108 0.003 0.696</span></span>
+<span><span class="co">#&gt; 5 &lt;-&gt; 7   0.079 0.003 0.494</span></span>
+<span><span class="co">#&gt; 5 &lt;-&gt; 8   0.109 0.004 0.668</span></span>
+<span><span class="co">#&gt; 5 &lt;-&gt; 9   0.107 0.004 0.675</span></span>
+<span><span class="co">#&gt; 5 &lt;-&gt; 10  0.042 0.002 0.265</span></span>
+<span><span class="co">#&gt; 6 &lt;-&gt; 7   0.053 0.003 0.364</span></span>
+<span><span class="co">#&gt; 6 &lt;-&gt; 8   0.432 0.070 0.874</span></span>
+<span><span class="co">#&gt; 6 &lt;-&gt; 9   0.101 0.004 0.697</span></span>
+<span><span class="co">#&gt; 6 &lt;-&gt; 10  0.847 0.344 0.991</span></span>
+<span><span class="co">#&gt; 7 &lt;-&gt; 8   0.903 0.578 0.992</span></span>
+<span><span class="co">#&gt; 7 &lt;-&gt; 9   0.909 0.580 0.993</span></span>
+<span><span class="co">#&gt; 7 &lt;-&gt; 10  0.736 0.140 0.987</span></span>
+<span><span class="co">#&gt; 8 &lt;-&gt; 9   0.101 0.003 0.668</span></span>
+<span><span class="co">#&gt; 8 &lt;-&gt; 10  0.727 0.131 0.985</span></span>
+<span><span class="co">#&gt; 9 &lt;-&gt; 10  0.908 0.589 0.993</span></span></code></pre></div>
 <p>It can be hard to get an intuitive idea for what’s going on looking only at a summary table, so this is where it can be useful to visualise the network too. The <code><a href="../reference/plot_network.html">plot_network()</a></code> function does this for BISoN edge weight models, where uncertainty is shown on edge weights. Uncertainty is visualised by showing the lower and upper bounds as overlapping edges in the network.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_network.html">plot_network</a></span><span class="op">(</span><span class="va">fit_edge</span>, lwd<span class="op">=</span><span class="fl">5</span><span class="op">)</span></span></code></pre></div>
@@ -262,11 +262,11 @@
 <span><span class="co">#&gt; Chain 1 finished in 0.5 seconds.</span></span>
 <span><span class="co">#&gt; Chain 2 finished in 0.5 seconds.</span></span>
 <span><span class="co">#&gt; Chain 3 finished in 0.5 seconds.</span></span>
-<span><span class="co">#&gt; Chain 4 finished in 0.5 seconds.</span></span>
+<span><span class="co">#&gt; Chain 4 finished in 0.4 seconds.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; All 4 chains finished successfully.</span></span>
 <span><span class="co">#&gt; Mean chain execution time: 0.5 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 0.7 seconds.</span></span>
+<span><span class="co">#&gt; Total execution time: 0.6 seconds.</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/model_comparison.html">model_comparison</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>non_random_model<span class="op">=</span><span class="va">fit_edge</span>, random_model<span class="op">=</span><span class="va">fit_null</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.</span></span>
@@ -327,7 +327,6 @@
 <span><span class="co">#&gt; Chain 3 Iteration:  500 / 2000 [ 25%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 3 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 3 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span></span>
-<span><span class="co">#&gt; Chain 3 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span></span>
 <span><span class="co">#&gt; Chain 4 Iteration:    1 / 2000 [  0%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 4 Iteration:  500 / 2000 [ 25%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 4 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span></span>
@@ -336,17 +335,16 @@
 <span><span class="co">#&gt; Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling) </span></span>
 <span><span class="co">#&gt; Chain 1 finished in 0.2 seconds.</span></span>
 <span><span class="co">#&gt; Chain 2 Iteration: 2000 / 2000 [100%]  (Sampling) </span></span>
+<span><span class="co">#&gt; Chain 3 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span></span>
 <span><span class="co">#&gt; Chain 3 Iteration: 2000 / 2000 [100%]  (Sampling) </span></span>
 <span><span class="co">#&gt; Chain 4 Iteration: 2000 / 2000 [100%]  (Sampling) </span></span>
-<span><span class="co">#&gt; Chain 2 finished in 0.2 seconds.</span></span>
+<span><span class="co">#&gt; Chain 2 finished in 0.3 seconds.</span></span>
 <span><span class="co">#&gt; Chain 3 finished in 0.2 seconds.</span></span>
 <span><span class="co">#&gt; Chain 4 finished in 0.2 seconds.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; All 4 chains finished successfully.</span></span>
 <span><span class="co">#&gt; Mean chain execution time: 0.2 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 0.4 seconds.</span></span>
-<span><span class="co">#&gt; Warning: 3 of 4000 (0.0%) transitions ended with a divergence.</span></span>
-<span><span class="co">#&gt; See https://mc-stan.org/misc/warnings for details.</span></span></code></pre></div>
+<span><span class="co">#&gt; Total execution time: 0.4 seconds.</span></span></code></pre></div>
 <p><img src="getting_started_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
 <p>The plot shows the marginal effect describing the relationship between predictor and response. At its most extreme, our prior allows an age difference of 10 to be associated with a difference in response of around 20 - 30. This is probably a bit more extreme than would be ideal, but for the purposes of this tutorial we’ll leave the priors as they are for now.</p>
 <p>The dataframe for a dyadic regression will be different to the one used to fit an edge weight model. In this case we need a row for each dyad, and we need to index this using the same factor-typed node variables with the same levels as were used when fitting the edge weight model. In our example we have all the necessary data in the original dataframe, and we can extract it using dplyr. The <code><a href="../reference/dyadic_regression.html">dyadic_regression()</a></code> function uses a similar formula syntax as the <code>edge_model</code> function. In our example we use the edge weight, described by <code>dyad(node_1_id, node_2_id)</code>, on the left hand side as the response variable. We use the <code>age_diff</code> variable from the dataframe as the single fixed effect, but additional fixed and random effects can also be included. <em>Note</em> by default the dyadic regression function uses multi-membership effects, denoted by the argument <code>mm</code>, to capture non-independence due to nodes in the regression. This is a vital feature for some analyses to prevent spurious conclusions, but for the sake of our simulated data we don’t need to include this effect here.</p>
@@ -364,34 +362,34 @@
 <span><span class="co">#&gt; Chain 2 Iteration:    1 / 2000 [  0%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 3 Iteration:    1 / 2000 [  0%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 4 Iteration:    1 / 2000 [  0%]  (Warmup) </span></span>
-<span><span class="co">#&gt; Chain 2 Iteration:  500 / 2000 [ 25%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 1 Iteration:  500 / 2000 [ 25%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 3 Iteration:  500 / 2000 [ 25%]  (Warmup) </span></span>
+<span><span class="co">#&gt; Chain 2 Iteration:  500 / 2000 [ 25%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 4 Iteration:  500 / 2000 [ 25%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 1 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 1 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span></span>
 <span><span class="co">#&gt; Chain 2 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 2 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span></span>
-<span><span class="co">#&gt; Chain 4 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span></span>
-<span><span class="co">#&gt; Chain 4 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span></span>
 <span><span class="co">#&gt; Chain 3 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 3 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span></span>
-<span><span class="co">#&gt; Chain 1 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span></span>
+<span><span class="co">#&gt; Chain 4 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span></span>
+<span><span class="co">#&gt; Chain 4 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span></span>
 <span><span class="co">#&gt; Chain 4 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span></span>
-<span><span class="co">#&gt; Chain 3 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span></span>
+<span><span class="co">#&gt; Chain 1 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span></span>
 <span><span class="co">#&gt; Chain 2 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span></span>
-<span><span class="co">#&gt; Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling) </span></span>
+<span><span class="co">#&gt; Chain 3 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span></span>
+<span><span class="co">#&gt; Chain 2 Iteration: 2000 / 2000 [100%]  (Sampling) </span></span>
 <span><span class="co">#&gt; Chain 3 Iteration: 2000 / 2000 [100%]  (Sampling) </span></span>
 <span><span class="co">#&gt; Chain 4 Iteration: 2000 / 2000 [100%]  (Sampling) </span></span>
-<span><span class="co">#&gt; Chain 1 finished in 4.1 seconds.</span></span>
-<span><span class="co">#&gt; Chain 3 finished in 4.1 seconds.</span></span>
-<span><span class="co">#&gt; Chain 4 finished in 4.1 seconds.</span></span>
-<span><span class="co">#&gt; Chain 2 Iteration: 2000 / 2000 [100%]  (Sampling) </span></span>
-<span><span class="co">#&gt; Chain 2 finished in 4.4 seconds.</span></span>
+<span><span class="co">#&gt; Chain 2 finished in 3.7 seconds.</span></span>
+<span><span class="co">#&gt; Chain 3 finished in 3.7 seconds.</span></span>
+<span><span class="co">#&gt; Chain 4 finished in 3.6 seconds.</span></span>
+<span><span class="co">#&gt; Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling) </span></span>
+<span><span class="co">#&gt; Chain 1 finished in 3.8 seconds.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; All 4 chains finished successfully.</span></span>
-<span><span class="co">#&gt; Mean chain execution time: 4.2 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 4.5 seconds.</span></span></code></pre></div>
+<span><span class="co">#&gt; Mean chain execution time: 3.7 seconds.</span></span>
+<span><span class="co">#&gt; Total execution time: 3.9 seconds.</span></span></code></pre></div>
 <p>Like last time we want to check that our model has fit properly and makes good predictions. This can be done in exactly the same way as last time:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_trace.html">plot_trace</a></span><span class="op">(</span><span class="va">fit_dyadic</span>, par_ids<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
@@ -407,9 +405,9 @@
 <span><span class="co">#&gt; Formula: dyad(node_1_id, node_2_id) ~ age_diff</span></span>
 <span><span class="co">#&gt; Number of dyads: 45</span></span>
 <span><span class="co">#&gt; === Coefficient summary ===                </span></span>
-<span><span class="co">#&gt; variable           50%     5%   95%</span></span>
-<span><span class="co">#&gt;   intercept      0.060 -0.332 0.445</span></span>
-<span><span class="co">#&gt;   fixed_age_diff 0.423  0.328 0.516</span></span></code></pre></div>
+<span><span class="co">#&gt; variable            50%     5%   95%</span></span>
+<span><span class="co">#&gt;   intercept      -0.162 -0.561 0.229</span></span>
+<span><span class="co">#&gt;   fixed_age_diff  0.449  0.325 0.577</span></span></code></pre></div>
 <p>We can also visualise the estimated marginal effect using <code><a href="../reference/plot_predictions.html">plot_predictions()</a></code>:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_predictions.html">plot_predictions</a></span><span class="op">(</span><span class="va">fit_dyadic</span>, num_draws<span class="op">=</span><span class="fl">20</span>, type<span class="op">=</span><span class="st">"marginal"</span><span class="op">)</span></span></code></pre></div>
@@ -429,17 +427,17 @@
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">node_id</span>, <span class="va">age</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>age_std<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">df_nodal</span></span>
-<span><span class="co">#&gt;    node_id      age    age_std</span></span>
-<span><span class="co">#&gt; 1        1 21.28090  1.0615488</span></span>
-<span><span class="co">#&gt; 2        2 15.89238 -0.6683276</span></span>
-<span><span class="co">#&gt; 3        3 15.41881 -0.8203571</span></span>
-<span><span class="co">#&gt; 4        4 16.37406 -0.5136937</span></span>
-<span><span class="co">#&gt; 5        5 14.05589 -1.2578939</span></span>
-<span><span class="co">#&gt; 6        6 22.21531  1.3615239</span></span>
-<span><span class="co">#&gt; 7        7 18.70769  0.2354725</span></span>
-<span><span class="co">#&gt; 8        8 22.87677  1.5738717</span></span>
-<span><span class="co">#&gt; 9        9 15.97508 -0.6417791</span></span>
-<span><span class="co">#&gt; 10      10 16.94512 -0.3303654</span></span></code></pre></div>
+<span><span class="co">#&gt;    node_id      age      age_std</span></span>
+<span><span class="co">#&gt; 1        1 24.27642  1.085142306</span></span>
+<span><span class="co">#&gt; 2        2 19.62649 -0.758575204</span></span>
+<span><span class="co">#&gt; 3        3 20.56733 -0.385528698</span></span>
+<span><span class="co">#&gt; 4        4 25.45757  1.553476407</span></span>
+<span><span class="co">#&gt; 5        5 18.67625 -1.135349560</span></span>
+<span><span class="co">#&gt; 6        6 21.51575 -0.009474018</span></span>
+<span><span class="co">#&gt; 7        7 25.27911  1.482714173</span></span>
+<span><span class="co">#&gt; 8        8 20.47036 -0.423978289</span></span>
+<span><span class="co">#&gt; 9        9 20.05097 -0.590266751</span></span>
+<span><span class="co">#&gt; 10      10 19.47622 -0.818160366</span></span></code></pre></div>
 <p>Priors can be set in the exact same way as for the <code><a href="../reference/dyadic_regression.html">dyadic_regression()</a></code> function:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_default_priors.html">get_default_priors</a></span><span class="op">(</span><span class="st">"nodal_regression"</span><span class="op">)</span></span>
@@ -501,7 +499,9 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; All 4 chains finished successfully.</span></span>
 <span><span class="co">#&gt; Mean chain execution time: 0.1 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 0.2 seconds.</span></span></code></pre></div>
+<span><span class="co">#&gt; Total execution time: 0.2 seconds.</span></span>
+<span><span class="co">#&gt; Warning: 1 of 4000 (0.0%) transitions ended with a divergence.</span></span>
+<span><span class="co">#&gt; See https://mc-stan.org/misc/warnings for details.</span></span></code></pre></div>
 <p><img src="getting_started_files/figure-html/unnamed-chunk-24-1.png" width="700"></p>
 <p>For the purposes of demonstration we won’t worry too much about how these checks look, but this should give an idea about how to go about setting priors.</p>
 <p>The formula syntax for nodal regression is very similar to that of the dyadic regression, but because this analysis is at the level of the node, not the dyad, we no longer need a <code>dyad(node_1_id, node_2_id)</code> term. Instead we want to use a node-level network metric to characterise node positions within the network, while maintaining uncertainty from the edge weights. <code>bisonR</code> can handle all of this automatically, you simply need to specify a network metric to use. In our case we’ll use the classic measure of centrality <code>strength()</code>, but many others are available. See the documentation here for further details.</p>
@@ -517,35 +517,67 @@
 <span><span class="co">#&gt; Chain 1 Iteration:    1 / 2000 [  0%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 1 Iteration:  500 / 2000 [ 25%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 1 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span></span>
-<span><span class="co">#&gt; Chain 1 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span></span>
+<span><span class="co">#&gt; Chain 1 Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 1 Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:</span></span>
+<span><span class="co">#&gt; Chain 1 Exception: multi_normal_lpdf: LDLT_Factor of covariance parameter is not positive definite.  last conditional variance is -2.22045e-16. (in '/tmp/RtmpOLBkS9/model-3bb710bdc94e.stan', line 40, column 4 to column 96)</span></span>
+<span><span class="co">#&gt; Chain 1 If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,</span></span>
+<span><span class="co">#&gt; Chain 1 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.</span></span>
+<span><span class="co">#&gt; Chain 1</span></span>
+<span><span class="co">#&gt; Chain 1 Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:</span></span>
+<span><span class="co">#&gt; Chain 1 Exception: multi_normal_lpdf: LDLT_Factor of covariance parameter is not positive definite.  last conditional variance is -2.22045e-16. (in '/tmp/RtmpOLBkS9/model-3bb710bdc94e.stan', line 40, column 4 to column 96)</span></span>
+<span><span class="co">#&gt; Chain 1 If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,</span></span>
+<span><span class="co">#&gt; Chain 1 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.</span></span>
+<span><span class="co">#&gt; Chain 1</span></span>
 <span><span class="co">#&gt; Chain 2 Iteration:    1 / 2000 [  0%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 2 Iteration:  500 / 2000 [ 25%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 2 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span></span>
-<span><span class="co">#&gt; Chain 2 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span></span>
+<span><span class="co">#&gt; Chain 2 Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 2 Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:</span></span>
+<span><span class="co">#&gt; Chain 2 Exception: multi_normal_lpdf: LDLT_Factor of covariance parameter is not positive definite.  last conditional variance is -2.22045e-16. (in '/tmp/RtmpOLBkS9/model-3bb710bdc94e.stan', line 40, column 4 to column 96)</span></span>
+<span><span class="co">#&gt; Chain 2 If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,</span></span>
+<span><span class="co">#&gt; Chain 2 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.</span></span>
+<span><span class="co">#&gt; Chain 2</span></span>
 <span><span class="co">#&gt; Chain 3 Iteration:    1 / 2000 [  0%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 3 Iteration:  500 / 2000 [ 25%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 3 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span></span>
-<span><span class="co">#&gt; Chain 3 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span></span>
+<span><span class="co">#&gt; Chain 3 Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 3 Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:</span></span>
+<span><span class="co">#&gt; Chain 3 Exception: multi_normal_lpdf: LDLT_Factor of covariance parameter is not positive definite.  last conditional variance is -2.22045e-16. (in '/tmp/RtmpOLBkS9/model-3bb710bdc94e.stan', line 40, column 4 to column 96)</span></span>
+<span><span class="co">#&gt; Chain 3 If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,</span></span>
+<span><span class="co">#&gt; Chain 3 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.</span></span>
+<span><span class="co">#&gt; Chain 3</span></span>
+<span><span class="co">#&gt; Chain 3 Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:</span></span>
+<span><span class="co">#&gt; Chain 3 Exception: multi_normal_lpdf: LDLT_Factor of covariance parameter is not positive definite.  last conditional variance is -2.22045e-16. (in '/tmp/RtmpOLBkS9/model-3bb710bdc94e.stan', line 40, column 4 to column 96)</span></span>
+<span><span class="co">#&gt; Chain 3 If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,</span></span>
+<span><span class="co">#&gt; Chain 3 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.</span></span>
+<span><span class="co">#&gt; Chain 3</span></span>
 <span><span class="co">#&gt; Chain 4 Iteration:    1 / 2000 [  0%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 4 Iteration:  500 / 2000 [ 25%]  (Warmup) </span></span>
 <span><span class="co">#&gt; Chain 4 Iteration: 1000 / 2000 [ 50%]  (Warmup) </span></span>
-<span><span class="co">#&gt; Chain 4 Iteration: 1001 / 2000 [ 50%]  (Sampling) </span></span>
+<span><span class="co">#&gt; Chain 4 Iteration: 1001 / 2000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">#&gt; Chain 4 Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:</span></span>
+<span><span class="co">#&gt; Chain 4 Exception: multi_normal_lpdf: LDLT_Factor of covariance parameter is not positive definite.  last conditional variance is -2.22045e-16. (in '/tmp/RtmpOLBkS9/model-3bb710bdc94e.stan', line 40, column 4 to column 96)</span></span>
+<span><span class="co">#&gt; Chain 4 If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,</span></span>
+<span><span class="co">#&gt; Chain 4 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.</span></span>
+<span><span class="co">#&gt; Chain 4</span></span>
 <span><span class="co">#&gt; Chain 1 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span></span>
 <span><span class="co">#&gt; Chain 1 Iteration: 2000 / 2000 [100%]  (Sampling) </span></span>
 <span><span class="co">#&gt; Chain 2 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span></span>
-<span><span class="co">#&gt; Chain 3 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span></span>
-<span><span class="co">#&gt; Chain 4 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span></span>
-<span><span class="co">#&gt; Chain 1 finished in 0.3 seconds.</span></span>
 <span><span class="co">#&gt; Chain 2 Iteration: 2000 / 2000 [100%]  (Sampling) </span></span>
+<span><span class="co">#&gt; Chain 3 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span></span>
 <span><span class="co">#&gt; Chain 3 Iteration: 2000 / 2000 [100%]  (Sampling) </span></span>
+<span><span class="co">#&gt; Chain 4 Iteration: 1500 / 2000 [ 75%]  (Sampling) </span></span>
 <span><span class="co">#&gt; Chain 4 Iteration: 2000 / 2000 [100%]  (Sampling) </span></span>
+<span><span class="co">#&gt; Chain 1 finished in 0.3 seconds.</span></span>
 <span><span class="co">#&gt; Chain 2 finished in 0.3 seconds.</span></span>
 <span><span class="co">#&gt; Chain 3 finished in 0.3 seconds.</span></span>
 <span><span class="co">#&gt; Chain 4 finished in 0.3 seconds.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; All 4 chains finished successfully.</span></span>
 <span><span class="co">#&gt; Mean chain execution time: 0.3 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 0.4 seconds.</span></span></code></pre></div>
+<span><span class="co">#&gt; Total execution time: 0.4 seconds.</span></span>
+<span><span class="co">#&gt; Warning: 2 of 4000 (0.0%) transitions ended with a divergence.</span></span>
+<span><span class="co">#&gt; See https://mc-stan.org/misc/warnings for details.</span></span></code></pre></div>
 <p>Once the model has been fitted, we need to employ the same diagnostic checks as last time to ensure the model is reliable. This may seem a little tedious, and it won’t always go smoothly, but it’s a vital part of model fitting that is essential for reliable inferences, even in frequentist statistics.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_trace.html">plot_trace</a></span><span class="op">(</span><span class="va">fit_nodal</span>, par_ids<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
@@ -557,9 +589,9 @@
 <span><span class="co">#&gt; Formula: strength(node_id) ~ age_std</span></span>
 <span><span class="co">#&gt; Number of dyads: 45</span></span>
 <span><span class="co">#&gt; === Coefficient summary ===               </span></span>
-<span><span class="co">#&gt; variable          50%     5%   95%</span></span>
-<span><span class="co">#&gt;   intercept     0.011 -0.474 0.499</span></span>
-<span><span class="co">#&gt;   fixed_age_std 0.021 -0.524 0.602</span></span></code></pre></div>
+<span><span class="co">#&gt; variable           50%     5%   95%</span></span>
+<span><span class="co">#&gt;   intercept     -0.007 -0.440 0.442</span></span>
+<span><span class="co">#&gt;   fixed_age_std  0.151 -0.384 0.687</span></span></code></pre></div>
 <p>It’s also nice to use predictions from the model to help understand the model:</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_predictions.html">plot_predictions</a></span><span class="op">(</span><span class="va">fit_nodal</span>, num_draws<span class="op">=</span><span class="fl">20</span>, type<span class="op">=</span><span class="st">"marginal"</span><span class="op">)</span></span></code></pre></div>
@@ -573,7 +605,7 @@
 <code class="sourceCode R"><span><span class="va">social_differentiation_samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/draw_network_metric_samples.html">draw_network_metric_samples</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"social_differentiation"</span><span class="op">)</span></span>
 <span><span class="va">social_differentiation_samples</span></span>
 <span><span class="co">#&gt;       50%        5%       95% </span></span>
-<span><span class="co">#&gt; 0.7589647 0.6815023 0.8385932</span></span></code></pre></div>
+<span><span class="co">#&gt; 0.6634882 0.5820333 0.7429064</span></span></code></pre></div>
 <p>We can visualise the posterior distribution of social differentiation by</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">social_differentiation_samples</span><span class="op">)</span></span></code></pre></div>
