@@ -1,8 +1,8 @@
 ---
-title: "Edge mixture models"
+title: "Edge Mixture Models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Edge mixture models}
+  %\VignetteIndexEntry{Edge Mixture Models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
