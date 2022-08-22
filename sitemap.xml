@@ -16,6 +16,12 @@
     <loc>/articles/index.html</loc>
   </url>
   <url>
+    <loc>/articles/mixture_models.html</loc>
+  </url>
+  <url>
+    <loc>/articles/windows_installation.html</loc>
+  </url>
+  <url>
     <loc>/authors.html</loc>
   </url>
   <url>
@@ -28,13 +34,22 @@
     <loc>/reference/bisonR-package.html</loc>
   </url>
   <url>
+    <loc>/reference/convert_gbi_to_bison.html</loc>
+  </url>
+  <url>
     <loc>/reference/draw_edgelist_samples.html</loc>
+  </url>
+  <url>
+    <loc>/reference/draw_network_metric_samples.html</loc>
   </url>
   <url>
     <loc>/reference/draw_node_metric_samples.html</loc>
   </url>
   <url>
     <loc>/reference/dyadic_regression.html</loc>
+  </url>
+  <url>
+    <loc>/reference/edge_mixture.html</loc>
   </url>
   <url>
     <loc>/reference/edge_model.html</loc>
@@ -46,13 +61,25 @@
     <loc>/reference/get_default_priors.html</loc>
   </url>
   <url>
+    <loc>/reference/get_edge_component_probabilities.html</loc>
+  </url>
+  <url>
     <loc>/reference/get_edgelist.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_network_component_probabilities.html</loc>
   </url>
   <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
+    <loc>/reference/model_comparison.html</loc>
+  </url>
+  <url>
     <loc>/reference/nodal_regression.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot.network_metric_samples.html</loc>
   </url>
   <url>
     <loc>/reference/plot_network.html</loc>
@@ -64,19 +91,37 @@
     <loc>/reference/plot_trace.html</loc>
   </url>
   <url>
-    <loc>/reference/print.dyadic_model.html</loc>
+    <loc>/reference/print.network_metric_samples.html</loc>
   </url>
   <url>
-    <loc>/reference/print.edge_model.html</loc>
+    <loc>/reference/print.summary.dyadic_model.html</loc>
   </url>
   <url>
-    <loc>/reference/print.nodal_model.html</loc>
+    <loc>/reference/print.summary.edge_mixture.html</loc>
+  </url>
+  <url>
+    <loc>/reference/print.summary.edge_model.html</loc>
+  </url>
+  <url>
+    <loc>/reference/print.summary.nodal_model.html</loc>
+  </url>
+  <url>
+    <loc>/reference/prior_check.html</loc>
+  </url>
+  <url>
+    <loc>/reference/prior_predictive_check.html</loc>
   </url>
   <url>
     <loc>/reference/simulate_edge_model.html</loc>
   </url>
   <url>
+    <loc>/reference/simulate_edge_model_mixture.html</loc>
+  </url>
+  <url>
     <loc>/reference/summary.dyadic_model.html</loc>
+  </url>
+  <url>
+    <loc>/reference/summary.edge_mixture.html</loc>
   </url>
   <url>
     <loc>/reference/summary.edge_model.html</loc>
