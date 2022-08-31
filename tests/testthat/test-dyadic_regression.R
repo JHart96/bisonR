@@ -11,7 +11,7 @@ test_that("dyadic regression works", {
   )
 
   coef <- 1
-  df$trait <- rnorm(nrow(df), coef * fit_edge$chain[sample(1:100, size=1), ], 0.1)
+  df$trait <- rnorm(nrow(df), coef * apply(fit_edge$chain, 2, mean), 0.1)
 
   expect_warning(
     fit_dyad <- dyadic_regression(
@@ -26,6 +26,12 @@ test_that("dyadic regression works", {
   expect_warning(
     summary(fit_dyad),
     regexp=NA
+  )
+
+  ests <- fit_dyad$fit$summary()[3, 6:7]
+  expect_equal(
+    ests[1] < coef && ests[2] > coef,
+    TRUE
   )
 
   expect_warning(

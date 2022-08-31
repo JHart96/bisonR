@@ -18,6 +18,9 @@ data {
   real<lower=0> prior_error_sigma;
 
   int<lower=0, upper=1> priors_only; // Whether to sample from only the priors
+  int<lower=0, upper=1> node_response; // Whether node metrics are the response
+
+  vector[num_nodes] response;
 }
 
 parameters {
@@ -26,18 +29,31 @@ parameters {
   vector[num_random] beta_random; // Parameters for random effects.
   vector[num_random_groups] random_group_mu; // Hyperpriors for random effects (mean).
   vector<lower=0>[num_random_groups] random_group_sigma; // Hyperpriors for random effects (std. dev.).
+  array[1 - node_response] real beta_node;
 }
 
 transformed parameters {
   vector[num_nodes] predictor;
   predictor = rep_vector(0, num_nodes);
-  if (num_fixed > 0) predictor += design_fixed * beta_fixed;
-  if (num_random > 0) predictor += design_random * beta_random;
+  if (num_fixed > 0) {
+    predictor += design_fixed * beta_fixed;
+  }
+  if (num_random > 0) {
+    predictor += design_random * beta_random;
+  }
 }
 
 model {
   if (!priors_only) {
-    metric_mu ~ multi_normal(predictor, metric_cov + diag_matrix(rep_vector(sigma, num_nodes)));
+    if (node_response == 1) {
+      metric_mu ~ multi_normal(predictor, metric_cov + diag_matrix(rep_vector(sigma, num_nodes)));
+    } else {
+      response ~ multi_normal(predictor + beta_node[1] * metric_mu, beta_node[1]^2 * metric_cov + diag_matrix(rep_vector(sigma, num_nodes)));
+    }
+  }
+
+  if (node_response == 0) {
+    beta_node ~ normal(prior_fixed_mu, prior_fixed_sigma);
   }
 
   beta_fixed ~ normal(prior_fixed_mu, prior_fixed_sigma);
@@ -51,6 +67,10 @@ model {
 }
 
 generated quantities {
-  vector[num_nodes] metric_pred;
-  metric_pred = multi_normal_rng(predictor, metric_cov + diag_matrix(rep_vector(sigma, num_nodes)));
+  vector[num_nodes] response_pred;
+  if (node_response == 1) {
+    response_pred = multi_normal_rng(predictor, metric_cov + diag_matrix(rep_vector(sigma, num_nodes)));
+  } else {
+    response_pred = multi_normal_rng(predictor + beta_node[1] * metric_mu, beta_node[1]^2 * metric_cov + diag_matrix(rep_vector(sigma, num_nodes)));
+  }
 }

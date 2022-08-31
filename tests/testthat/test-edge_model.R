@@ -44,7 +44,7 @@ test_that("Binary edge model parameter estimation", {
     regexp=NA
   )
 
-  fit_compare <- suppressWarnings(model_comparison(list(non_random_model = fit_edge, random_model=fit_null)))
+  fit_compare <- suppressWarnings(model_comparison(list(non_random_model=fit_edge, random_model=fit_null)))
 
   expect_output(print(fit_compare))
 

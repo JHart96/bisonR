@@ -83,14 +83,13 @@ print.summary.dyadic_model <- function(x, digits=3, ...) {
 summary.dyadic_model <- function(object, ci=0.90, ...) {
   summary_obj <- list()
   coefficients <- t(apply(object$chain, 2, function(object) quantile(object, probs=c(0.5, 0.5 * (1 - ci), ci + 0.5 * (1 - ci)))))
-  # if (object$model_data$dyad_response == FALSE) {
-  #   coefficients <- cbind(coefficients, )
-  # }
+
   if (object$model_data$dyad_response) {
     rownames(coefficients) <- colnames(object$model_data$design_fixed)
   } else {
     rownames(coefficients) <- c("edge", colnames(object$model_data$design_fixed))
   }
+
   summary_obj$coefficients <- coefficients
   summary_obj$description <- paste0(
     "=== Fitted dyadic regression model ===\n",
@@ -175,7 +174,6 @@ plot_predictions.dyadic_model <- function(obj, num_draws=20, type="density", dra
 
   if (type == "marginal") {
     # If edge weight is the response variable, get coefficients from fixed effects.
-    print(colnames(obj$model_data$design_fixed))
     if (obj$model_data$dyad_response) {
       coef_names <- colnames(obj$model_data$design_fixed)
     } else {
