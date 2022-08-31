@@ -23,6 +23,9 @@ data {
   real<lower=0> prior_multimembership_sigma;
 
   int<lower=0, upper=1> priors_only; // Whether to sample from only the priors
+  int<lower=0, upper=1> dyad_response; // Whether edge weights are the response
+
+  vector[num_rows] response;
 }
 
 parameters {
@@ -33,11 +36,15 @@ parameters {
   vector[num_random] beta_random; // Parameters for random effects.
   vector[num_random_groups] random_group_mu; // Hyperpriors for random effects (mean).
   vector<lower=0>[num_random_groups] random_group_sigma; // Hyperpriors for random effects (std. dev.).
+  array[1 - dyad_response] real beta_dyad;
 }
 
 transformed parameters {
   vector[num_rows] predictor;
-  predictor =  design_fixed * beta_fixed;
+  predictor = rep_vector(0, num_rows);
+  if (num_fixed > 0) {
+    predictor += design_fixed * beta_fixed;
+  }
   if (num_random > 0) {
     predictor += design_random * beta_random;
   }
@@ -48,15 +55,20 @@ transformed parameters {
 
 model {
   if (!priors_only) {
-    edge_mu ~ multi_normal(predictor, edge_cov + diag_matrix(rep_vector(sigma, num_rows)));
+    if (dyad_response == 1) {
+      edge_mu ~ multi_normal(predictor, edge_cov + diag_matrix(rep_vector(sigma, num_rows)));
+    } else {
+      response ~ multi_normal(predictor + beta_dyad[1] * edge_mu, beta_dyad[1]^2 * edge_cov + diag_matrix(rep_vector(sigma, num_rows)));
+    }
   }
 
-  beta_fixed ~ normal(prior_fixed_mu, prior_fixed_sigma);
-  sigma ~ normal(0, prior_error_sigma);
+  if (dyad_response == 0) {
+    beta_dyad ~ normal(prior_fixed_mu, prior_fixed_sigma);
+  }
 
-  if (include_multimembership == 1) {
-    mm_nodes ~ normal(0, sigma_mm[1]); // Why would this be a problem?
-    sigma_mm ~ normal(0, prior_multimembership_sigma);
+  if (num_fixed > 0) {
+    beta_fixed ~ normal(prior_fixed_mu, prior_fixed_sigma);
+    sigma ~ normal(0, prior_error_sigma);
   }
 
   if (num_random > 0) {
@@ -64,9 +76,18 @@ model {
     random_group_mu ~ normal(prior_random_mean_mu, prior_random_mean_sigma);
     random_group_sigma ~ normal(0, prior_random_std_sigma);
   }
+
+  if (include_multimembership == 1) {
+    mm_nodes ~ normal(0, sigma_mm[1]); // Why would this be a problem?
+    sigma_mm ~ normal(0, prior_multimembership_sigma);
+  }
 }
 
 generated quantities {
-  vector[num_rows] edge_pred;
-  edge_pred = multi_normal_rng(predictor, edge_cov + diag_matrix(rep_vector(sigma, num_rows)));
+  vector[num_rows] response_pred;
+  if (dyad_response == 1) {
+    response_pred = multi_normal_rng(predictor, edge_cov + diag_matrix(rep_vector(sigma, num_rows)));
+  } else {
+    response_pred = multi_normal_rng(predictor + beta_dyad[1] * edge_mu, beta_dyad[1]^2 * edge_cov + diag_matrix(rep_vector(sigma, num_rows)));
+  }
 }

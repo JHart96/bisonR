@@ -34,7 +34,15 @@ dyadic_regression <- function(formula, edgemodel, df, mc_cores=4, refresh=500, m
 
   model <- build_stan_model("dyadic_regression")
   fit <- model$sample(data=model_data, chains=4, parallel_chains=mc_cores, refresh=refresh, step_size=0.1)
-  chain <- fit$draws("beta_fixed", format="matrix")
+  chain_params <- c()
+  if (model_data$dyad_response == 0) {
+    chain_params <- c(chain_params, "beta_dyad")
+  }
+  if (model_data$num_fixed > 0) {
+    chain_params <- c(chain_params, "beta_fixed")
+  }
+
+  chain <- fit$draws(chain_params, format="matrix")
 
   obj <- list(
     formula = formula,
@@ -75,8 +83,14 @@ print.summary.dyadic_model <- function(x, digits=3, ...) {
 summary.dyadic_model <- function(object, ci=0.90, ...) {
   summary_obj <- list()
   coefficients <- t(apply(object$chain, 2, function(object) quantile(object, probs=c(0.5, 0.5 * (1 - ci), ci + 0.5 * (1 - ci)))))
-  rownames(coefficients) <- colnames(object$model_data$design_fixed)
-
+  # if (object$model_data$dyad_response == FALSE) {
+  #   coefficients <- cbind(coefficients, )
+  # }
+  if (object$model_data$dyad_response) {
+    rownames(coefficients) <- colnames(object$model_data$design_fixed)
+  } else {
+    rownames(coefficients) <- c("edge", colnames(object$model_data$design_fixed))
+  }
   summary_obj$coefficients <- coefficients
   summary_obj$description <- paste0(
     "=== Fitted dyadic regression model ===\n",
@@ -97,17 +111,28 @@ plot_predictions.dyadic_model <- function(obj, num_draws=20, type="density", dra
   }
 
   # Extract edge samples and predictions
-  edge_samples <- obj$edgemodel$edge_samples
-  edge_preds <- obj$fit$draws("edge_pred", format="matrix")
+  if (obj$model_data$dyad_response) {
+    response_samples <- obj$edgemodel$edge_samples
+  } else {
+    response_samples <- matrix(obj$model_data$response, nrow=1)
+    predictor_samples <- obj$edgemodel$edge_samples
+  }
+  response_preds <- obj$fit$draws("response_pred", format="matrix")
 
   if (type == "density") {
     # Generate densities for edge sample and prediction
     sample_densities <- list()
     pred_densities <- list()
 
+    if (!obj$model_data$dyad_response) {
+      sample_densities[[1]] <- density(response_samples[1, ])
+    }
+
     for (i in 1:num_draws) {
-      sample_densities[[i]] <- density(edge_samples[i, ])
-      pred_densities[[i]] <- density(edge_preds[i, ])
+      if (obj$model_data$dyad_response) {
+        sample_densities[[i]] <- density(response_samples[i, ])
+      }
+      pred_densities[[i]] <- density(response_preds[i, ])
     }
 
     # Set plot limits according to maximum density of samples
@@ -122,36 +147,80 @@ plot_predictions.dyadic_model <- function(obj, num_draws=20, type="density", dra
     }
 
     # Plot densities for subsequent draws
-    plot(NULL, main="Observed vs predicted response values", xlab="Response value", ylab="Probability",
-         xlim=c(xmin, xmax), ylim=c(0, ymax * 1.1))
+    plot(NULL,
+         main="Observed vs predicted response values",
+         xlab="Response value",
+         ylab="Probability",
+         xlim=c(xmin, xmax),
+         ylim=c(0, ymax * 1.1)
+    )
+
+    if (!obj$model_data$dyad_response) {
+      lines(density(response_samples), col="black")
+    }
 
     for (i in 1:num_draws) {
-      if (draw_data) {
-        lines(sample_densities[[i]], col=rgb(0, 0, 0, 0.5))
+      if (obj$model_data$dyad_response) {
+        lines(sample_densities[[i]], col="black")
       }
       lines(pred_densities[[i]], col=col2rgba(bison_colors[1], 0.5))
     }
+
     if (draw_data) {
       legend("topright", legend=c("observed", "predicted"), fill=c("black", bison_colors[1]))
     } else {
       legend("topright", legend=c("predicted"), fill=c(bison_colors[1]))
     }
   }
+
   if (type == "marginal") {
-    # New plot for each fixed effect. Max 4 per plot?
-    coef_names <- colnames(obj$model_data$design_fixed)
+    # If edge weight is the response variable, get coefficients from fixed effects.
+    print(colnames(obj$model_data$design_fixed))
+    if (obj$model_data$dyad_response) {
+      coef_names <- colnames(obj$model_data$design_fixed)
+    } else {
+      coef_names <- c("edge")
+    }
+
     for (i in 1:length(coef_names)) {
       if (coef_names[i] != "intercept") {
-        predictor <- obj$model_data$design_fixed[, i]
-        responses <- list()
-        for (j in 1:num_draws) {
-          responses[[j]] <- as.numeric(edge_preds[j, ])
+        if (obj$model_data$dyad_response) {
+          predictor <- obj$model_data$design_fixed[, i]
+
+          responses <- list()
+          for (j in 1:num_draws) {
+            responses[[j]] <- as.numeric(response_preds[j, ])
+          }
+
+          plot(NULL,
+               xlim=c(min(predictor), max(predictor)),
+               ylim=c(min(unlist(responses)), max(unlist(responses))),
+               xlab=coef_names[i],
+               ylab="Response value"
+          )
+
+          for (j in 1:num_draws) {
+            abline(lm(responses[[j]] ~ predictor), col=col2rgba(bison_colors[1], 0.5))
+          }
+        } else {
+          responses <- list()
+          predictors <- list()
+          for (j in 1:num_draws) {
+            responses[[j]] <- as.numeric(response_preds[j, ])
+            predictors[[j]] <- as.numeric(predictor_samples[j, ])
+          }
+
+          plot(NULL,
+               xlim=c(min(unlist(predictors)), max(unlist(predictors))),
+               ylim=c(min(unlist(responses)), max(unlist(responses))),
+               xlab=coef_names[i],
+               ylab="Response value"
+          )
+
+          for (j in 1:num_draws) {
+            abline(lm(responses[[j]] ~ predictors[[j]]), col=col2rgba(bison_colors[1], 0.5))
+          }
         }
-        plot(NULL, xlim=c(min(predictor), max(predictor)), ylim=c(min(unlist(responses)), max(unlist(responses))), xlab=coef_names[i], ylab="Response value")
-        for (j in 1:num_draws) {
-          abline(lm(responses[[j]] ~ predictor), col=col2rgba(bison_colors[1], 0.5))
-        }
-        edge_samples
       }
     }
   }
@@ -170,6 +239,14 @@ get_dyadic_regression_model_data <- function(formula, edgemodel, data) {
 
   # Variable grouping for random effects
   random_group_index <- c()
+
+  # Get response data if present
+  response <- rep(0, nrow(data))
+  dyad_response = TRUE
+  if (!is.null(model_spec$response)) {
+    response <- dplyr::pull(data, model_spec$response)
+    dyad_response = FALSE
+  }
 
   # Get additional fixed effects
   if (!is.null(model_spec$fixed)) {
@@ -219,6 +296,10 @@ get_dyadic_regression_model_data <- function(formula, edgemodel, data) {
   edge_mu <- apply(edge_samples, 2, mean)
   edge_cov <- cov(edge_samples)
 
+  design_fixed_colnames <- colnames(design_fixed)[-1]
+  design_fixed <- as.matrix(design_fixed[, -1]) # R auto-converts it to a matrix and removes colname... Whyyyyyyyyyyyyy??????
+  colnames(design_fixed) <- design_fixed_colnames
+
   model_data <- list(
     num_rows = edgemodel$num_dyads,
     num_nodes = num_nodes,
@@ -227,11 +308,13 @@ get_dyadic_regression_model_data <- function(formula, edgemodel, data) {
     num_random_groups = num_random_groups,
     edge_mu = edge_mu,
     edge_cov = edge_cov,
-    design_fixed = as.matrix(design_fixed[, -1]),
+    design_fixed = design_fixed,
     design_random = as.matrix(design_random[, -1]),
     node_ids_1 = node_ids_1,
     node_ids_2 = node_ids_2,
-    random_group_index = random_group_index
+    random_group_index = random_group_index,
+    response = response,
+    dyad_response = dyad_response
   )
 
   model_info <- list(
@@ -262,6 +345,8 @@ get_dyadic_regression_spec <- function(formula) {
     node_names_split <- str_split(node_names, ",")[[1]]
     model_spec$node_1_name <- node_names_split[1]
     model_spec$node_2_name <- node_names_split[2]
+  } else {
+    model_spec$response = lhs
   }
 
   # Set intercept to true by default
