@@ -1,3 +1,7 @@
+# bisonR 0.3.0
+* Network data as a predictor in dyadic and nodal regression
+* Unit tests for dyadic and nodal regression
+
 # bisonR 0.2.0
 
 * Conjugate models

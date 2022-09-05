@@ -2,7 +2,7 @@
 #'
 #' @param model_type A character specifying the type of model to retrieve priors for ("binary", "count", "duration", etc)
 #'
-#' @return A list of default priors that can be used in the `edge_model()` function.
+#' @return A list of default priors that can be used in the `bison_model()` function.
 #' @export
 get_default_priors <- function(model_type) {
   if (model_type == "binary") {
@@ -41,25 +41,6 @@ get_default_priors <- function(model_type) {
       fixed="normal(0, 2.5)",
       random_mean="normal(0, 1)",
       random_std="half-normal(1)"
-    )
-    return(priors)
-  }
-  if (model_type == "dyadic_regression") {
-    priors <- list(
-      fixed="normal(0, 1)",
-      random_mean="normal(0, 1)",
-      random_std="half-normal(1)",
-      multimembership="half-normal(1)",
-      error="half-normal(1)"
-    )
-    return(priors)
-  }
-  if (model_type == "nodal_regression") {
-    priors <- list(
-      fixed="normal(0, 1)",
-      random_mean="normal(0, 1)",
-      random_std="half-normal(1)",
-      error="half-normal(1)"
     )
     return(priors)
   }

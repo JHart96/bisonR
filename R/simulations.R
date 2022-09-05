@@ -10,7 +10,7 @@ utils::globalVariables(c("num_locations", "age_diff", "locations", "age_1", "age
 #'
 #' @return A dataframe of the format accepted by edge weight models.
 #' @export
-simulate_edge_model <- function(model_type, aggregated, location_effect=TRUE, age_diff_effect=TRUE) {
+simulate_bison_model <- function(model_type, aggregated, location_effect=TRUE, age_diff_effect=TRUE) {
   num_nodes <- 10
   num_locations <- 5
   max_obs <- 5
@@ -97,7 +97,7 @@ simulate_edge_model <- function(model_type, aggregated, location_effect=TRUE, ag
 #' @param component_weights Vector of component weightings for each component. Must sum to 1.
 #' @return A dataframe of the format accepted by edge weight models.
 #' @export
-simulate_edge_model_mixture <- function(model_type, num_components, component_weights) {
+simulate_bison_model_mixture <- function(model_type, num_components, component_weights) {
   num_nodes <- 15
   num_edges <- 0.5 * num_nodes * (num_nodes - 1)
   max_obs <- 20

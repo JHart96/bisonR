@@ -14,30 +14,12 @@ prior_predictive_check <- function(formula, data, model_type, plot_type="density
     if (is.null(directed)) {
       directed=FALSE
     }
-    edge_model.prior_predictive_check(formula, data, model_type, directed, priors, plot_type)
-  }
-  if (model_type %in% c("dyadic_regression")) {
-    edgemodel <- options$edgemodel
-    mm <- options$mm
-    if (is.null(mm)) {
-      mm <- TRUE
-    }
-    if (is.null(edgemodel)) {
-      stop("Predictive checks for dyadic regressions require an edge model and to be provided.")
-    }
-    dyadic_regression.prior_predictive_check(formula, data, edgemodel, mm, priors, plot_type)
-  }
-  if(model_type %in% c("nodal_regression")) {
-    edgemodel <- options$edgemodel
-    if (is.null(edgemodel)) {
-      stop("Predictive checks for nodal regressions require an edge model to be provided.")
-    }
-    nodal_regression.prior_predictive_check(formula, data, edgemodel, priors, plot_type)
+    bison_model.prior_predictive_check(formula, data, model_type, directed, priors, plot_type)
   }
 }
 
-edge_model.prior_predictive_check <- function(formula, data, model_type, directed, priors, plot_type) {
-  fit <- edge_model(
+bison_model.prior_predictive_check <- function(formula, data, model_type, directed, priors, plot_type) {
+  fit <- bison_model(
     formula=formula,
     data=data,
     data_type=model_type,
@@ -47,28 +29,3 @@ edge_model.prior_predictive_check <- function(formula, data, model_type, directe
   )
   plot_predictions(fit, num_draws=20, draw_data=FALSE, type=plot_type)
 }
-
-dyadic_regression.prior_predictive_check <- function(formula, data, edgemodel, mm, priors, plot_type) {
-  fit <- dyadic_regression(
-    formula=formula,
-    edgemodel=edgemodel,
-    df=data,
-    mm=mm,
-    priors=priors,
-    priors_only=TRUE
-  )
-  plot_predictions(fit, num_draws=20, draw_data=FALSE, type=plot_type)
-}
-
-nodal_regression.prior_predictive_check <- function(formula, data, edgemodel, priors, plot_type) {
-  fit <- nodal_regression(
-    formula=formula,
-    edgemodel=edgemodel,
-    df=data,
-    priors=priors,
-    priors_only=TRUE
-  )
-  plot_predictions(fit, num_draws=20, draw_data=FALSE, type=plot_type)
-}
-
-

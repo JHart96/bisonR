@@ -10,7 +10,7 @@ get_default_priors(model_type)
 \item{model_type}{A character specifying the type of model to retrieve priors for ("binary", "count", "duration", etc)}
 }
 \value{
-A list of default priors that can be used in the \code{edge_model()} function.
+A list of default priors that can be used in the \code{bison_model()} function.
 }
 \description{
 Return default priors for a given model

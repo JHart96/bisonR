@@ -27,7 +27,7 @@ require(stringr)
 #' @return An S3 edge model object containing edge samples and processed data.
 #'
 #' @export
-edge_model <- function(formula, data, data_type=c("binary", "count"), directed=FALSE, priors=NULL, refresh=0, mc_cores=4, iter_sampling=1000, iter_warmup=1000, priors_only=FALSE) {
+bison_model <- function(formula, data, data_type=c("binary", "count"), directed=FALSE, priors=NULL, refresh=0, mc_cores=4, iter_sampling=1000, iter_warmup=1000, priors_only=FALSE) {
   if (data_type == "duration") {
     stop("Duration model not yet supported")
   }
@@ -48,10 +48,10 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
     }
   }
 
-  model_spec <- get_edge_model_spec(formula)
+  model_spec <- get_bison_model_spec(formula)
 
   # Set up model data depending on data type.
-  model_info <- get_edge_model_data(formula, data, directed, data_type)
+  model_info <- get_bison_model_data(formula, data, directed, data_type)
 
   # Set the priors in model data
   prior_parameters <- extract_prior_parameters(priors)
@@ -119,7 +119,7 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
     conjugate = use_conjugate_model,
     log_lik = log_lik
   )
-  class(obj) <- "edge_model"
+  class(obj) <- "bison_model"
   return(obj)
 }
 
@@ -131,7 +131,7 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
 #' @param ... Additional arguments
 #'
 #' @export
-summary.edge_model <- function(object, ci=0.90, transform=TRUE, ...) {
+summary.bison_model <- function(object, ci=0.90, transform=TRUE, ...) {
   summary_obj <- list()
 
   summary_obj$description <- paste0(
@@ -147,7 +147,7 @@ summary.edge_model <- function(object, ci=0.90, transform=TRUE, ...) {
   summary_obj$edgelist <- get_edgelist(object, ci=ci, transform=transform)
   summary_obj$dyad_names <- do.call(paste, c(get_edgelist(object)[, 1:2], sep=" <-> "))
 
-  class(summary_obj) <- "summary.edge_model"
+  class(summary_obj) <- "summary.bison_model"
 
   summary_obj
 }
@@ -158,7 +158,7 @@ summary.edge_model <- function(object, ci=0.90, transform=TRUE, ...) {
 #' @param ... Additional parameters to be passed to print function.
 #'
 #' @export
-print.summary.edge_model <- function(x, ...) {
+print.summary.bison_model <- function(x, ...) {
   cat(x$description)
   summary_matrix <- as.matrix(x$edgelist[, 3:5])
   rownames(summary_matrix) <- x$dyad_names
@@ -227,7 +227,7 @@ draw_edgelist_samples <- function (obj, num_draws) {
   edgelist_samples
 }
 
-plot_predictions.edge_model <- function(obj, num_draws=20, type=c("density", "point"), draw_data=TRUE) {
+plot_predictions.bison_model <- function(obj, num_draws=20, type=c("density", "point"), draw_data=TRUE) {
 
   par(mfrow=c(1, length(type)))
 
@@ -312,14 +312,14 @@ plot_network <- function(obj, ci=0.9, lwd=2) {
   }
 }
 
-get_edge_model_data <- function(formula, observations, directed, data_type) {
+get_bison_model_data <- function(formula, observations, directed, data_type) {
   if (data_type == "duration") {
     observations_agg <- observations[[2]]
     observations <- observations[[1]]
   }
 
   # Get model specification from formula
-  model_spec <- get_edge_model_spec(formula)
+  model_spec <- get_bison_model_spec(formula)
 
   # Automatically detect and apply factor levels
   if (!is.null(model_spec$node_1_name)) {
@@ -490,7 +490,7 @@ get_edge_model_data <- function(formula, observations, directed, data_type) {
   return(obj)
 }
 
-get_edge_model_spec <- function(formula) {
+get_bison_model_spec <- function(formula) {
   model_spec <- list()
 
   x <- str_split(deparse1(formula), "~")[[1]]

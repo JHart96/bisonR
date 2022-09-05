@@ -10,7 +10,7 @@
 #' @export
 plot_trace <- function(obj, par_ids=1:5, ...) {
   # Extract chains from objects
-  if (is(obj, "edge_model")) {
+  if (is(obj, "bison_model")) {
     if (obj$data_type %in% c("binary_conjugate", "count_conjugate")) {
       stop("Trace plots not needed for conjugate models.")
     }
@@ -45,8 +45,8 @@ plot_trace <- function(obj, par_ids=1:5, ...) {
 #'
 #' @export
 plot_predictions <- function(obj, ...) {
-  if (is(obj, "edge_model")) {
-    plot_predictions.edge_model(obj, ...)
+  if (is(obj, "bison_model")) {
+    plot_predictions.bison_model(obj, ...)
   } else if (is(obj, "dyadic_model")) {
     plot_predictions.dyadic_model(obj, ...)
   } else if (is(obj, "nodal_model")) {

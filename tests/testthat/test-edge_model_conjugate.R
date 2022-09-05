@@ -1,5 +1,5 @@
 test_that("binary conjugate works", {
-  sim_data <- simulate_edge_model("binary", aggregated = TRUE)
+  sim_data <- simulate_bison_model("binary", aggregated = TRUE)
   df <- sim_data$df_sim
 
   priors = expect_warning(
@@ -23,7 +23,7 @@ test_that("binary conjugate works", {
   )
 
   expect_warning(
-    fit_edge <- edge_model(
+    fit_edge <- bison_model(
       (event | duration) ~ dyad(node_1_id, node_2_id),
       data=df,
       data_type="binary_conjugate",
@@ -41,7 +41,7 @@ test_that("binary conjugate works", {
 
 
 test_that("count conjugate works", {
-  sim_data <- simulate_edge_model("count", aggregated = TRUE)
+  sim_data <- simulate_bison_model("count", aggregated = TRUE)
   df <- sim_data$df_sim
 
   priors = expect_warning(
@@ -65,7 +65,7 @@ test_that("count conjugate works", {
   )
 
   expect_warning(
-    fit_edge <- edge_model(
+    fit_edge <- bison_model(
       (event | duration) ~ dyad(node_1_id, node_2_id),
       data=df,
       data_type="count_conjugate",

@@ -19,12 +19,12 @@ To get started with the package use the code below:
 ```r
 library(bisonR)
 
-sim_data <- simulate_edge_model("binary", aggregated = TRUE)
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 df <- sim_data$df_sim
 
 priors <- get_default_priors("binary")
 
-fit_edge <- edge_model(
+fit_edge <- bison_model(
   (event | duration) ~ dyad(node_1_id, node_2_id), 
   data=df, 
   data_type="binary",

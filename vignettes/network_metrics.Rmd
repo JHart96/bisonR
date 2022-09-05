@@ -1,0 +1,33 @@
+---
+title: "network_metrics"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{network_metrics}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Network metrics can be extracted using the function `extract_metric(bison_model, metric_name)`. The `metric_name` variable is made up of two parts: the network feature and the network metric. For example, `node_eigen` will calculate the eigenvector centrality of each node.
+
+The following feature/metric pairs are currently supported in bisonR:
+
+* `edge` - Edge-level properties
+  * `weight` - Edge weight
+* `node` - Node-level properties
+  * `strength` - Node strength
+  * `eigencentrality` - Node eigenvector centrality
+  * `betweenness` - Node betweenness
+  * `closeness` - Node closeness
+* `global` - Network-level properties
+  * `density` - Weighted density
+  * `social_differentiation` - Coefficient of variation of edge weights - often called social differentiation
+  * `standard_deviation` - Standard deviation of edge weights
+
+

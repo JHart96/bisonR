@@ -1,8 +1,8 @@
 test_that("binary edge mixtures work", {
-  sim_data <- simulate_edge_model_mixture("binary", num_components = 2, component_weights = c(0.5, 0.5))
+  sim_data <- simulate_bison_model_mixture("binary", num_components = 2, component_weights = c(0.5, 0.5))
   df <- sim_data$df_sim
 
-  fit_edge <- edge_model(
+  fit_edge <- bison_model(
     (event | duration) ~ dyad(node_1_id, node_2_id),
     data=df,
     data_type="binary_conjugate",
@@ -30,10 +30,10 @@ test_that("binary edge mixtures work", {
 })
 
 test_that("count edge mixtures work", {
-  sim_data <- simulate_edge_model_mixture("count", num_components = 2, component_weights = c(0.5, 0.5))
+  sim_data <- simulate_bison_model_mixture("count", num_components = 2, component_weights = c(0.5, 0.5))
   df <- sim_data$df_sim
 
-  fit_edge <- edge_model(
+  fit_edge <- bison_model(
     (event | duration) ~ dyad(node_1_id, node_2_id),
     data=df,
     data_type="count_conjugate",
