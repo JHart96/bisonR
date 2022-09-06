@@ -30,7 +30,8 @@ Imports:
     rmarkdown,
     testthat,
     covr,
-    brms
+    brms,
+    mice
 Remotes: 
     stan-dev/cmdstanr
 VignetteBuilder: knitr

@@ -4,20 +4,18 @@
 \alias{bison_brm}
 \title{Fit a brms model on BISoN network data}
 \usage{
-bison_brm(formula, edgemodel, data, num_draws = 100, ...)
+bison_brm(formula, edgemodel_list, data_list, num_draws = 100, ...)
 }
 \arguments{
 \item{formula}{A formula compatible with a brms model}
 
-\item{edgemodel}{A fitted bisonR edge model}
+\item{edgemodel_list}{A bisonR edge model (or a list of them)}
 
-\item{data}{A dataframe of regression variables compatible with a brms model}
+\item{data_list}{A dataframe of regression variables compatible with a brms model (or a list of them)}
 
 \item{num_draws}{Number of draws from the network posterior to use when fitting model}
 
 \item{...}{}
-
-\item{family}{Regression family compatible with a brms model}
 }
 \value{
 A fitted brms model
