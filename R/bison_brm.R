@@ -22,11 +22,11 @@ bison_brm <- function(formula, edgemodel, data, num_draws=100, ...) {
   if (target_name == "edge") {
     node_1_ids <- sapply(
       dplyr::pull(data, param_names[1]),
-      function(x) which(names(fit_edge$node_to_idx) == x)
+      function(x) which(names(edgemodel$node_to_idx) == x)
     )
     node_2_ids <- sapply(
       dplyr::pull(data, param_names[2]),
-      function(x) which(names(fit_edge$node_to_idx) == x)
+      function(x) which(names(edgemodel$node_to_idx) == x)
     )
     dyad_ids <- get_dyad_ids(node_1_ids, node_2_ids, edgemodel$dyad_to_idx, edgemodel$directed)
 
@@ -37,7 +37,7 @@ bison_brm <- function(formula, edgemodel, data, num_draws=100, ...) {
   } else if (target_name == "node") {
     node_ids <- sapply(
       dplyr::pull(data, param_names[1]),
-      function(x) which(names(fit_edge$node_to_idx) == x)
+      function(x) which(names(edgemodel$node_to_idx) == x)
     )
     posterior_samples <- extract_metric(edgemodel, paste0(target_name, "_", metric_name), num_draws)[, node_ids]
   } else {
