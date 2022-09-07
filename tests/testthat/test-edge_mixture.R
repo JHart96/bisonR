@@ -10,7 +10,7 @@ test_that("binary edge mixtures work", {
   )
 
   fit_mixture <- expect_warning(
-    edge_mixture(fit_edge, num_components=3, verbose=TRUE),
+    bison_mixture(fit_edge, num_components=3, verbose=TRUE),
     regexp=NA
   )
 
@@ -41,7 +41,7 @@ test_that("count edge mixtures work", {
   )
 
   fit_mixture <- expect_warning(
-    edge_mixture(fit_edge, num_components=3, verbose=TRUE),
+    bison_mixture(fit_edge, num_components=3, verbose=TRUE),
     regexp=NA
   )
 

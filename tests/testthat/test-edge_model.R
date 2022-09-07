@@ -27,12 +27,25 @@ test_that("Binary edge model parameter estimation", {
   )
 
   # Fit model to the data
-  fit_edge <- bison_model(
-    (event | duration) ~ dyad(node_1_id, node_2_id) + age_diff + (1 | group_id),
-    data=df,
-    data_type="binary"
+  fit_edge <- expect_warning(
+    bison_model(
+      (event | duration) ~ dyad(node_1_id, node_2_id) + age_diff + (1 | group_id),
+      data=df,
+      data_type="binary"
+    ),
+    regexp=NA
   )
 
+  # Fit model to the data
+  fit_pool <- expect_warning(
+    bison_model(
+      (event | duration) ~ dyad(node_1_id, node_2_id) + age_diff + (1 | group_id),
+      data=df,
+      data_type="binary",
+      partial_pooling=TRUE
+    ),
+    regexp=NA
+  )
 
   fit_null <- expect_warning (
     bison_model(

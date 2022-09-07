@@ -4,10 +4,10 @@
 #' @param num_components Maximum number of components to fit.
 #' @param verbose TRUE/FALSE indicating whether to output messages and progress when fitting.
 #'
-#' @return A edge_mixture object
+#' @return A bison_mixture object
 #'
 #' @export
-edge_mixture <- function(edgemodel, num_components=5, verbose=TRUE) {
+bison_mixture <- function(edgemodel, num_components=5, verbose=TRUE) {
   # Prepare for fitting mixtures over the posterior networks
   num_samples <- dim(edgemodel$edge_samples)[1]
   num_edges <- dim(edgemodel$edge_samples)[2]
@@ -62,7 +62,7 @@ edge_mixture <- function(edgemodel, num_components=5, verbose=TRUE) {
   obj$edgemodel <- edgemodel
   obj$component_range <- component_range
   obj$num_components <- length(component_range)
-  class(obj) <- "edge_mixture"
+  class(obj) <- "bison_mixture"
   obj
 }
 
@@ -73,7 +73,7 @@ edge_mixture <- function(edgemodel, num_components=5, verbose=TRUE) {
 #'
 #' @return Returns a summary object of an edge mixture model.
 #' @export
-summary.edge_mixture <- function(object, ...) {
+summary.bison_mixture <- function(object, ...) {
   summary_obj <- list()
   summary_obj$description <- paste0(
     "=== Fitted dyadic mixture model ===\n",
@@ -83,8 +83,8 @@ summary.edge_mixture <- function(object, ...) {
   summary_obj$component_probabilities <- object$component_probabilities
   names(summary_obj$component_probabilities) <- sapply(object$component_range, function(x) paste0("K = ", x))
   summary_obj$edge_component_probabilities <- object$edge_component_probabilities
-  summary_obj$edge_mixture_obj <- object
-  class(summary_obj) <- "summary.edge_mixture"
+  summary_obj$bison_mixture_obj <- object
+  class(summary_obj) <- "summary.bison_mixture"
   summary_obj
 }
 
@@ -95,7 +95,7 @@ summary.edge_mixture <- function(object, ...) {
 #' @param ... Additional arguments to be passed to print functions.
 #'
 #' @export
-print.summary.edge_mixture <- function(x, digits=3, ...) {
+print.summary.bison_mixture <- function(x, digits=3, ...) {
   best_model <- which.max(x$component_probabilities)
 
   cat(paste0(
@@ -112,7 +112,7 @@ print.summary.edge_mixture <- function(x, digits=3, ...) {
   cat(paste0("=== Edge component probabilities for best model (K = ", best_model, ") ===\n"))
   ecp <- x$edge_component_probabilities[[best_model]]
 
-  rownames(ecp) <- do.call(paste, c(get_edgelist(x$edge_mixture_obj$edgemodel)[, 1:2], sep=" <-> "))
+  rownames(ecp) <- do.call(paste, c(get_edgelist(x$bison_mixture_obj$edgemodel)[, 1:2], sep=" <-> "))
   colnames(ecp) <- 1:best_model
 
   print(head(ecp))

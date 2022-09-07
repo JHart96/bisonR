@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-Edge mixture models can be used to detect different types of social connections by looking for clustering in edge weights. bisonR provides support for edge mixture models with the `edge_mixture` function. There are two key outputs from a bisonR edge mixture model. First it generates a posterior probability distribution over the number of components (clusters, interpreted associal connection types), from 1 to a maximum $K$, over the entire network. Secondly, for each edge it calculates the probability that each dyad belongs to each possible component. To show how this all works, first we'll load in bisonR and simulate some data:
+Edge mixture models can be used to detect different types of social connections by looking for clustering in edge weights. bisonR provides support for edge mixture models with the `bison_mixture` function. There are two key outputs from a bisonR edge mixture model. First it generates a posterior probability distribution over the number of components (clusters, interpreted associal connection types), from 1 to a maximum $K$, over the entire network. Secondly, for each edge it calculates the probability that each dyad belongs to each possible component. To show how this all works, first we'll load in bisonR and simulate some data:
 
 ```{r}
 library(bisonR)
@@ -41,10 +41,10 @@ fit_edge <- bison_model(
 )
 ```
 
-We won't conduct the usual checks for the sake of this tutorial, but at this point we'd recommend conducting diagnostic checks to ensure model fit. Once the model has fit well, we can use the `edge_mixture()` function to fit the edge mixture model:
+We won't conduct the usual checks for the sake of this tutorial, but at this point we'd recommend conducting diagnostic checks to ensure model fit. Once the model has fit well, we can use the `bison_mixture()` function to fit the edge mixture model:
 
 ```{r}
-fit_mixture <- edge_mixture(fit_edge, num_components=5, verbose=FALSE) # verbose=FALSE for tutorial purposes
+fit_mixture <- bison_mixture(fit_edge, num_components=5, verbose=FALSE) # verbose=FALSE for tutorial purposes
 summary(fit_mixture)
 ```
 
@@ -63,5 +63,5 @@ To use probabilities over component membership for a given number of components,
 get_edge_component_probabilities(fit_mixture, 3)
 ```
 
-This was a short tutorial on how to use `edge_mixture()` to fit mixture models in bisonR. If you have any questions please get in touch.
+This was a short tutorial on how to use `bison_mixture()` to fit mixture models in bisonR. If you have any questions please get in touch.
 

@@ -21,6 +21,7 @@ data {
   real<lower=0> prior_random_std_sigma; // Prior standard deviation on dispersion of random effects
 
   int<lower=0, upper=1> priors_only; // Whether to sample from only the priors
+  int<lower=0, upper=1> partial_pooling; // Whether to pool edge weight estimates
 }
 
 parameters {
@@ -29,6 +30,7 @@ parameters {
   vector[num_random] beta_random; // Parameters for random effects.
   vector[num_random_groups] random_group_mu; // Hyperpriors for random effects (mean).
   vector<lower=0>[num_random_groups] random_group_sigma; // Hyperpriors for random effects (std. dev.).
+  vector<lower=0>[partial_pooling] edge_sigma; // Random effect for edge weight pooling.
 }
 
 transformed parameters {
@@ -52,7 +54,12 @@ model {
   }
   // Priors
   if (num_edges > 0) {
-    edge_weight ~ normal(prior_edge_mu, prior_edge_sigma);
+    if (partial_pooling == 0) {
+      edge_weight ~ normal(prior_edge_mu, prior_edge_sigma);
+    } else {
+      edge_weight ~ normal(prior_edge_mu, edge_sigma[1]);
+      edge_sigma ~ normal(0, prior_edge_sigma);
+    }
   }
 
   if (num_fixed > 0) {

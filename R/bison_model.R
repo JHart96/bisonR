@@ -27,7 +27,7 @@ require(stringr)
 #' @return An S3 edge model object containing edge samples and processed data.
 #'
 #' @export
-bison_model <- function(formula, data, data_type=c("binary", "count"), directed=FALSE, priors=NULL, refresh=0, mc_cores=4, iter_sampling=1000, iter_warmup=1000, priors_only=FALSE) {
+bison_model <- function(formula, data, data_type=c("binary", "count"), directed=FALSE, partial_pooling=FALSE, priors=NULL, refresh=0, mc_cores=4, iter_sampling=1000, iter_warmup=1000, priors_only=FALSE) {
   if (data_type == "duration") {
     stop("Duration model not yet supported")
   }
@@ -58,6 +58,7 @@ bison_model <- function(formula, data, data_type=c("binary", "count"), directed=
   model_data <- c(model_info$model_data, prior_parameters)
   # Set whether only the priors should be sampled
   model_data$priors_only <- priors_only
+  model_data$partial_pooling <- (partial_pooling * 1)
 
   # Select sampling method
   if (use_conjugate_model) {
