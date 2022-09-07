@@ -4,10 +4,12 @@
 \alias{plot_metric}
 \title{Plot metric samples}
 \usage{
-plot_metric(x, ...)
+plot_metric(x, metric_name = "Network Metric", ...)
 }
 \arguments{
 \item{x}{Network metric samples object}
+
+\item{metric_name}{Metric name to use for plot axis label}
 
 \item{...}{Additional parameters to be passed to plot function}
 }
