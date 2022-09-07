@@ -14,13 +14,6 @@ test_that("network metrics work", {
     regexp=NA
   )
 
-  fit_edge <- bison_model(
-    (event | duration) ~ dyad(node_1_id, node_2_id),
-    data=df,
-    data_type="count_conjugate",
-    priors=get_default_priors("count_conjugate")
-  )
-
   x <- expect_error(
     extract_metric(fit_edge, "not_a_metric", standardise=TRUE)
   )
@@ -59,4 +52,11 @@ test_that("network metrics work", {
     extract_metric(fit_edge, "global_std"),
     regexp=NA
   )
+
+  expect_warning (
+    plot_metric(x),
+    regexp=NA
+  )
+
+
 })

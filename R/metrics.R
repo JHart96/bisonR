@@ -56,18 +56,25 @@ extract_metric <- function(obj, metric_string, num_draws=1000, standardise=FALSE
 #' Plot metric samples
 #'
 #' @param x Network metric samples object
+#' @param metric_name Metric name to use for plot axis label
 #' @param ... Additional parameters to be passed to plot function
 #'
 #' @export
-plot.metric_samples <- function(x, ...) {
-  fit_logspline <- logspline::logspline(x)
-  xmin <- logspline::qlogspline(0.001, fit_logspline)
-  xmax <- logspline::qlogspline(0.999, fit_logspline)
-  curve(
-    logspline::dlogspline(x, fit_logspline), xlim=c(xmin, xmax),
-    lwd=2, col=bison_colors[1], xlab=x$metric_name, ylab="Probability density", main="",
-    ...
-  )
+plot_metric <- function(x, metric_name="Network Metric", ...) {
+  plot_name <- ""
+  for (i in 1:ncol(x)) {
+    if (ncol(x) > 1) {
+      plot_name <- i
+    }
+    fit_logspline <- logspline::logspline(x[, i])
+    xmin <- logspline::qlogspline(0.001, fit_logspline)
+    xmax <- logspline::qlogspline(0.999, fit_logspline)
+    curve(
+      logspline::dlogspline(x, fit_logspline), xlim=c(xmin, xmax),
+      lwd=2, col=bison_colors[1], xlab=paste0(metric_name, " ", plot_name), ylab="Probability density", main="",
+      ...
+    )
+  }
 }
 
 get_metric_fn <- function(metric_string) {
