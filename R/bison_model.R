@@ -15,6 +15,8 @@ require(stringr)
 #' @param iter_sampling Number of iterations to use for posterior samples.
 #' @param iter_warmup Number of iterations to use for warmup (will not be used for samples).
 #' @param priors_only Whether to use priors as posteriors or to allow the posteriors to be updated by data.
+#' @param partial_pooling Whether to pool edge weights so that information is shared between edges.
+#' @param zero_inflated Whether to use a zero-inflated model to model excess zeroes.
 #'
 #' @details
 #' Fits a BISoN edge weight model to a user-provided dataframe. The function supports either aggregated (at the
@@ -27,7 +29,7 @@ require(stringr)
 #' @return An S3 edge model object containing edge samples and processed data.
 #'
 #' @export
-bison_model <- function(formula, data, data_type=c("binary", "count"), directed=FALSE, partial_pooling=FALSE, priors=NULL, refresh=0, mc_cores=4, iter_sampling=1000, iter_warmup=1000, priors_only=FALSE) {
+bison_model <- function(formula, data, data_type=c("binary", "count"), directed=FALSE, partial_pooling=FALSE, zero_inflated=FALSE, priors=NULL, refresh=0, mc_cores=4, iter_sampling=1000, iter_warmup=1000, priors_only=FALSE) {
   if (data_type == "duration") {
     stop("Duration model not yet supported")
   }
@@ -59,6 +61,7 @@ bison_model <- function(formula, data, data_type=c("binary", "count"), directed=
   # Set whether only the priors should be sampled
   model_data$priors_only <- priors_only
   model_data$partial_pooling <- (partial_pooling * 1)
+  model_data$zero_inflated <- zero_inflated
 
   # Select sampling method
   if (use_conjugate_model) {
@@ -89,7 +92,6 @@ bison_model <- function(formula, data, data_type=c("binary", "count"), directed=
     } else {
       chain <- NULL
     }
-    # colnames(chain) <- 1:model_data$num_edges
 
     event_preds <- fit$draws("event_pred", format="matrix")
 

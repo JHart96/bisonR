@@ -10,16 +10,19 @@ get_default_priors <- function(model_type) {
       edge="normal(0, 2.5)",
       fixed="normal(0, 2.5)",
       random_mean="normal(0, 1)",
-      random_std="half-normal(1)"
+      random_std="half-normal(1)",
+      zero_prob="beta(1, 1)"
     )
     return(priors)
   }
+
   if (model_type == "count") {
     priors <- list(
       edge="normal(0, 1)",
       fixed="normal(0, 2.5)",
       random_mean="normal(0, 1)",
-      random_std="half-normal(1)"
+      random_std="half-normal(1)",
+      zero_prob="beta(1, 1)"
     )
     return(priors)
   }
@@ -124,6 +127,9 @@ get_density_fn <- function(parameter_name, model_type, distribution_name) {
     if (distribution_name == "half-normal") {
       return(function(x, ...) extraDistr::dhnorm(x, ...))
     }
+    if (distribution_name == "beta") {
+      return(function(x, ...) dbeta(x, ...))
+    }
   }
   return(NULL)
 }
@@ -157,6 +163,9 @@ get_quantile_fn <- function(parameter_name, model_type, distribution_name) {
     }
     if (distribution_name == "half-normal") {
       return(function(x, ...) extraDistr::qhnorm(x, ...))
+    }
+    if (distribution_name == "beta") {
+      return(function(x, ...) qbeta(x, ...))
     }
   }
 
