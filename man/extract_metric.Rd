@@ -2,22 +2,22 @@
 % Please edit documentation in R/metrics.R
 \name{extract_metric}
 \alias{extract_metric}
-\title{Draw samples from posterior network-level metrics for a fitted edge weight model}
+\title{Extract samples from posterior metrics for a fitted edge weight model}
 \usage{
 extract_metric(obj, metric_string, num_draws = 1000, standardise = FALSE)
 }
 \arguments{
 \item{obj}{Fitted S3 edge weight model.}
 
+\item{metric_string}{Character name of metric function (e.g. node_strength).}
+
 \item{num_draws}{Number of posterior draws to use.}
 
 \item{standardise}{TRUE/FALSE indicating whether to mean-center the metrics within sample.}
-
-\item{metric_name}{Character name of network-level metric function.}
 }
 \value{
 A matrix of metric samples where each column corresponds to a node, and each row corresponds to a posterior draw.
 }
 \description{
-Draw samples from posterior network-level metrics for a fitted edge weight model
+Extract samples from posterior metrics for a fitted edge weight model
 }

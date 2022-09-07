@@ -1,7 +1,7 @@
-#' Draw samples from posterior network-level metrics for a fitted edge weight model
+#' Extract samples from posterior metrics for a fitted edge weight model
 #'
 #' @param obj Fitted S3 edge weight model.
-#' @param metric_name Character name of network-level metric function.
+#' @param metric_string Character name of metric function (e.g. node_strength).
 #' @param num_draws Number of posterior draws to use.
 #' @param standardise TRUE/FALSE indicating whether to mean-center the metrics within sample.
 #'

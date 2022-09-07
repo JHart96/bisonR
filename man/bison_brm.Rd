@@ -15,7 +15,7 @@ bison_brm(formula, edgemodel_list, data_list, num_draws = 100, ...)
 
 \item{num_draws}{Number of draws from the network posterior to use when fitting model}
 
-\item{...}{}
+\item{...}{Additional arguments to be passed to brm(), such as family or priors}
 }
 \value{
 A fitted brms model

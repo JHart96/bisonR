@@ -14,8 +14,8 @@ test_that("brms works", {
   expect_error (
     suppressWarnings(bison_brm(
       age_diff ~ bison(edge_weight(node_1_id, node_2_id)),
-      fit_edge,
-      df_sim,
+      list(fit_edge, fit_edge),
+      list(df_sim, df_sim),
       num_draws=5,
       silent=2,
       refresh=0
