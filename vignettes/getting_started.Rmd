@@ -71,7 +71,7 @@ The right hand side of the `~` describes the predictors that are associated with
 fit_edge <- bison_model(
   (event | duration) ~ dyad(node_1_id, node_2_id), 
   data=df, 
-  data_type="binary",
+  model_type="binary",
   priors=priors
 )
 ```
@@ -118,7 +118,7 @@ Now that we have a fitted edge weight model we're happy with, we can move to dow
 fit_null <- bison_model(
   (event | duration) ~ 1, 
   data=df, 
-  data_type="binary",
+  model_type="binary",
   priors=priors
 )
 

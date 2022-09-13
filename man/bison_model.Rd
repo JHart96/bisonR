@@ -7,7 +7,7 @@
 bison_model(
   formula,
   data,
-  data_type = c("binary", "count"),
+  model_type = c("binary", "count"),
   directed = FALSE,
   partial_pooling = FALSE,
   zero_inflated = FALSE,
@@ -24,7 +24,7 @@ bison_model(
 
 \item{data}{Aggregated or disaggregated dataframe of dyadic observations.}
 
-\item{data_type}{"binary", "count", or "duration", specifying the type of edge weight model to use.}
+\item{model_type}{"binary", "count", or "duration", specifying the type of edge weight model to use.}
 
 \item{directed}{\code{TRUE} or \code{FALSE} specifying whether the network is directed or not.}
 
@@ -55,6 +55,6 @@ Fits a BISoN edge weight model to a user-provided dataframe. The function suppor
 dyad-level) or disaggregated (at the observation-level) dataframes. Node names or IDs need to be formatted
 as factors with the same levels.
 
-The type of edge model and the interpretation of edge weights used depends on \code{data_type}, and will change
+The type of edge model and the interpretation of edge weights used depends on \code{model_type}, and will change
 the interpretation of the edge weights.
 }

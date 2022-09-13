@@ -27,7 +27,7 @@ priors <- get_default_priors("binary")
 fit_edge <- bison_model(
   (event | duration) ~ dyad(node_1_id, node_2_id), 
   data=df, 
-  data_type="binary",
+  model_type="binary",
   priors=priors
 )
 

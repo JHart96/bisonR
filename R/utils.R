@@ -11,7 +11,7 @@
 plot_trace <- function(obj, par_ids=1:5, ...) {
   # Extract chains from objects
   if (is(obj, "bison_model")) {
-    if (obj$data_type %in% c("binary_conjugate", "count_conjugate")) {
+    if (obj$model_type %in% c("binary_conjugate", "count_conjugate")) {
       stop("Trace plots not needed for conjugate models.")
     }
     chain <- obj$fit$draws("edge_weight")
@@ -48,13 +48,13 @@ plot_predictions <- function(obj, ...) {
 
 edge_transform <- function(obj) {
   edge_samples <- obj$edge_samples
-  if (obj$data_type == "binary") {
+  if (obj$model_type == "binary") {
     return(plogis(edge_samples))
   }
-  if (obj$data_type == "count") {
+  if (obj$model_type == "count") {
     return(exp(edge_samples))
   }
-  if (obj$data_type == "duration") {
+  if (obj$model_type == "duration") {
     return(plogis(edge_samples))
   }
 }

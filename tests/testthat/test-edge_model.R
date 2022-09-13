@@ -31,7 +31,7 @@ test_that("Binary edge model parameter estimation", {
     bison_model(
       (event | duration) ~ dyad(node_1_id, node_2_id) + age_diff + (1 | group_id),
       data=df,
-      data_type="binary"
+      model_type="binary"
     ),
     regexp=NA
   )
@@ -41,7 +41,7 @@ test_that("Binary edge model parameter estimation", {
     bison_model(
       (event | duration) ~ dyad(node_1_id, node_2_id),
       data=df,
-      data_type="binary",
+      model_type="binary",
       partial_pooling=TRUE,
       zero_inflated=TRUE
     ),
@@ -52,7 +52,7 @@ test_that("Binary edge model parameter estimation", {
     bison_model(
       (event | duration) ~ 1,
       data=df,
-      data_type="binary",
+      model_type="binary",
       priors=get_default_priors("binary")
     ),
     regexp=NA
@@ -94,7 +94,7 @@ test_that("Count edge model parameter estimation", {
   fit_edge <- bison_model(
     (event | duration) ~ dyad(node_1_id, node_2_id),
     data=df,
-    data_type="count"
+    model_type="count"
   )
 
   # Extract estimates and true values.

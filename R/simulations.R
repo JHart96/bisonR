@@ -24,7 +24,7 @@ simulate_bison_model <- function(model_type, aggregated, location_effect=TRUE, a
     df_true <- data.frame(node_1_id=numeric(), node_2_id=numeric(), edge_weight=numeric(), age_diff=numeric(), age_1=numeric(), age_2=numeric())
   }
   if (model_type == "duration") {
-    df_sim <- data.frame(event=numeric(), node_1_id=numeric(), node_2_id=numeric(), age_diff=numeric(), age_1=numeric(), age_2=numeric(), location=numeric())
+    df_sim <- data.frame(event=numeric(), node_1_id=numeric(), node_2_id=numeric(), age_diff=numeric(), age_1=numeric(), age_2=numeric(), location=numeric(), duration=numeric())
     df_sim_agg <- data.frame(event_count=numeric(), node_1_id=numeric(), node_2_id=numeric())
     df_true <- data.frame(node_1_id=numeric(), node_2_id=numeric(), edge_weight=numeric(), age_diff=numeric(), age_1=numeric(), age_2=numeric(), location=numeric())
   }
@@ -54,15 +54,19 @@ simulate_bison_model <- function(model_type, aggregated, location_effect=TRUE, a
           }
         }
         if (model_type == "duration") {
+          edge_weights <- edge_weights - 5
           # Draw a lambda, sample K, and loop through K
           duration <- runif(1, 100, 1000) # Hours observed
           lambda <- runif(1, 0, 0.1) # Events per hour
           K <- rpois(1, lambda * duration)
           for (k in 1:K) {
             location_id <- sample.int(num_locations, 1)
-            predictor <- -5 + edge_weights[i, j] + 0.25 * age_diff + locations[location_id]
+            predictor <- edge_weights[i, j] # + 0.25 * age_diff + locations[location_id]
             event <- min(rexp(1, lambda/plogis(predictor)), 1)
-            df_sim[nrow(df_sim) + 1, ] <- list(event=event, node_1_id=i, node_2_id=j, age_diff=age_diff, location=location_id)
+            df_sim[nrow(df_sim) + 1, ] <- list(
+              event=event, node_1_id=i, node_2_id=j, age_diff=age_diff,
+              location=location_id
+            )
           }
           df_sim_agg[nrow(df_sim_agg) + 1, ] <- list(event_count=K, node_1_id=i, node_2_id=j)
         }

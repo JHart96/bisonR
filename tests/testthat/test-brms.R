@@ -7,11 +7,11 @@ test_that("brms works", {
   fit_edge <- bison_model(
     (event | duration) ~ dyad(node_1_id, node_2_id),
     data=df_sim,
-    data_type="binary_conjugate",
+    model_type="binary_conjugate",
     priors=get_default_priors("binary_conjugate")
   )
 
-  expect_error (
+  fit_brm <- expect_error (
     suppressWarnings(bison_brm(
       age_diff ~ bison(edge_weight(node_1_id, node_2_id)),
       list(fit_edge, fit_edge),
@@ -20,6 +20,28 @@ test_that("brms works", {
       silent=2,
       refresh=0
     )),
+    regexp=NA
+  )
+
+  fit_brm <- expect_error (
+    suppressWarnings(bison_brm(
+      age_diff ~ bison(edge_weight(node_1_id, node_2_id)),
+      list(fit_edge, fit_edge),
+      list(df_sim, df_sim),
+      num_draws=5,
+      silent=2,
+      refresh=0,
+      sample_prior="only",
+      prior=brms::prior(normal(0, 10), class="b")
+    )),
+    regexp=NA
+  )
+
+  priors <- expect_warning(bison_brm_get_prior(
+      age_diff ~ bison(edge_weight(node_1_id, node_2_id)),
+      list(fit_edge, fit_edge),
+      list(df_sim, df_sim)
+    ),
     regexp=NA
   )
 

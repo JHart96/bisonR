@@ -5,7 +5,7 @@ test_that("network metrics work", {
   fit_edge <- bison_model(
     (event | duration) ~ dyad(node_1_id, node_2_id),
     data=df,
-    data_type="binary_conjugate",
+    model_type="binary_conjugate",
     priors=get_default_priors("binary_conjugate")
   )
 

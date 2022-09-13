@@ -7,7 +7,7 @@ require(stringr)
 #'
 #' @param formula Formula specifying social events and sampling effort on the LHS and edge weights, fixed, and random effects on the RHS.
 #' @param data Aggregated or disaggregated dataframe of dyadic observations.
-#' @param data_type "binary", "count", or "duration", specifying the type of edge weight model to use.
+#' @param model_type "binary", "count", or "duration", specifying the type of edge weight model to use.
 #' @param directed `TRUE` or `FALSE` specifying whether the network is directed or not.
 #' @param priors List of priors in the format supplied by `get_default_priors()`.
 #' @param refresh Frequency of messages printed while running the sampler.
@@ -17,35 +17,36 @@ require(stringr)
 #' @param priors_only Whether to use priors as posteriors or to allow the posteriors to be updated by data.
 #' @param partial_pooling Whether to pool edge weights so that information is shared between edges.
 #' @param zero_inflated Whether to use a zero-inflated model to model excess zeroes.
+#' @param duration_data If using the duration model, set this to a dataframe where each row corresponds to a dyad, with 3 columns for node 1 ID, node 2 ID, and number of events.
 #'
 #' @details
 #' Fits a BISoN edge weight model to a user-provided dataframe. The function supports either aggregated (at the
 #' dyad-level) or disaggregated (at the observation-level) dataframes. Node names or IDs need to be formatted
 #' as factors with the same levels.
 #'
-#' The type of edge model and the interpretation of edge weights used depends on `data_type`, and will change
+#' The type of edge model and the interpretation of edge weights used depends on `model_type`, and will change
 #' the interpretation of the edge weights.
 #'
 #' @return An S3 edge model object containing edge samples and processed data.
 #'
 #' @export
-bison_model <- function(formula, data, data_type=c("binary", "count"), directed=FALSE, partial_pooling=FALSE, zero_inflated=FALSE, priors=NULL, refresh=0, mc_cores=4, iter_sampling=1000, iter_warmup=1000, priors_only=FALSE) {
-  if (data_type == "duration") {
-    stop("Duration model not yet supported")
-  }
+bison_model <- function(formula, data, model_type=c("binary", "count", "duration"),
+                        directed=FALSE, partial_pooling=FALSE, zero_inflated=FALSE,
+                        priors=NULL, refresh=0, mc_cores=4, iter_sampling=1000,
+                        iter_warmup=1000, priors_only=FALSE, duration_data=NULL) {
 
   # If user-specified priors haven't been set, use the defaults
   if (is.null(priors)) {
     message("No priors set by user, using default priors instead. We recommend setting and checking priors explicitly for reliable inference.")
-    priors <- get_default_priors(data_type)
+    priors <- get_default_priors(model_type)
   }
 
   # If the model is a conjugate model, change the data type
   use_conjugate_model <- FALSE
-  if (length(str_match_all(data_type, "conjugate")[[1]]) > 0) {
+  if (length(str_match_all(model_type, "conjugate")[[1]]) > 0) {
     use_conjugate_model <- TRUE
-    data_type <- str_split(data_type, "_")[[1]][1]
-    if (!(data_type %in% c("binary", "count"))) {
+    model_type <- str_split(model_type, "_")[[1]][1]
+    if (!(model_type %in% c("binary", "count"))) {
       stop("Conjugate models only available for binary and count data")
     }
   }
@@ -53,7 +54,11 @@ bison_model <- function(formula, data, data_type=c("binary", "count"), directed=
   model_spec <- get_bison_model_spec(formula)
 
   # Set up model data depending on data type.
-  model_info <- get_bison_model_data(formula, data, directed, data_type)
+  if (model_type == "duration") {
+    model_info <- get_bison_model_data(formula, data, directed, model_type, duration_data=duration_data)
+  } else {
+    model_info <- get_bison_model_data(formula, data, directed, model_type)
+  }
 
   # Set the priors in model data
   prior_parameters <- extract_prior_parameters(priors)
@@ -66,14 +71,14 @@ bison_model <- function(formula, data, data_type=c("binary", "count"), directed=
   # Select sampling method
   if (use_conjugate_model) {
     # Fit conjugate model
-    model <- fit_conjugate_model(data_type, model_data, priors_only=priors_only)
+    model <- fit_conjugate_model(model_type, model_data, priors_only=priors_only)
     chain <- model$chain
     event_preds <- model$event_preds
     fit <- NULL
     log_lik <- NULL
   } else {
     # Build Stan model
-    model <- build_stan_model(data_type)
+    model <- build_stan_model(model_type)
 
     # Fit model
     fit <- model$sample(
@@ -115,7 +120,7 @@ bison_model <- function(formula, data, data_type=c("binary", "count"), directed=
     directed = directed,
     fit = fit,
     formula = formula,
-    data_type = data_type,
+    model_type = model_type,
     model_data = model_data,
     input_data = data,
     stan_model = model,
@@ -139,7 +144,7 @@ summary.bison_model <- function(object, ci=0.90, transform=TRUE, ...) {
 
   summary_obj$description <- paste0(
     "=== Fitted BISoN edge model ===",
-    "\nData type: ", object$data_type,
+    "\nData type: ", object$model_type,
     "\nFormula: ", format(object$formula),
     "\nNumber of nodes: ", object$num_nodes,
     "\nNumber of dyads: ", object$num_dyads,
@@ -315,12 +320,7 @@ plot_network <- function(obj, ci=0.9, lwd=2) {
   }
 }
 
-get_bison_model_data <- function(formula, observations, directed, data_type) {
-  if (data_type == "duration") {
-    observations_agg <- observations[[2]]
-    observations <- observations[[1]]
-  }
-
+get_bison_model_data <- function(formula, observations, directed, model_type, duration_data=NULL) {
   # Get model specification from formula
   model_spec <- get_bison_model_spec(formula)
 
@@ -409,6 +409,13 @@ get_bison_model_data <- function(formula, observations, directed, data_type) {
       dyad_to_idx,
       directed=directed
     ))
+
+    dyad_pairs = get_dyad_pairs(
+      node_to_idx[node_1_names],
+      node_to_idx[node_2_names],
+      dyad_to_idx,
+      directed=directed
+    )
   }
 
   # Variable grouping for random effects
@@ -446,13 +453,11 @@ get_bison_model_data <- function(formula, observations, directed, data_type) {
     }
   }
 
-  if (data_type %in% c("binary", "count")) {
-    # Check if divisor is a real
-    if (!is.na(str_match(model_spec$divisor_var_name, "\\d+"))) {
-      divisor <- rep(as.numeric(model_spec$divisor_var_name), nrow(observations))
-    } else {
-      divisor <- dplyr::pull(observations, model_spec$divisor_var_name)
-    }
+  # Check if divisor is a real
+  if (!is.na(str_match(model_spec$divisor_var_name, "\\d+"))) {
+    divisor <- rep(as.numeric(model_spec$divisor_var_name), nrow(observations))
+  } else {
+    divisor <- dplyr::pull(observations, model_spec$divisor_var_name)
   }
 
   # If divisor is a single value, convert it to a list.
@@ -465,6 +470,7 @@ get_bison_model_data <- function(formula, observations, directed, data_type) {
     event=event,
     divisor=divisor,
     dyad_ids=dyad_ids,
+    dyad_ # Set this to the receiver.
     design_fixed=data.matrix(design_fixed[, -1]),
     design_random=data.matrix(design_random[, -1]),
     num_edges = num_dyads,
@@ -474,10 +480,21 @@ get_bison_model_data <- function(formula, observations, directed, data_type) {
     random_group_index=as.integer(as.factor(random_group_index))
   )
 
-  if (data_type == "duration") {
-    model_data$k <- dplyr::pull(observations_agg, model_spec$divisor_var_name)
-    # data$d <- observations_agg$d
-    model_data$observations_agg <- observations_agg
+  if (model_type == "duration") {
+    if (!is.null(model_spec$node_1_name)) {
+      # Get dyad IDs in the correct order
+      node_1_names <- dplyr::pull(duration_data, model_spec$node_1_name)
+      node_2_names <- dplyr::pull(duration_data, model_spec$node_2_name)
+
+      dyad_ids = as.factor(get_dyad_ids(
+        node_to_idx[node_1_names],
+        node_to_idx[node_2_names],
+        dyad_to_idx,
+        directed=directed
+      ))
+
+      model_data$event_count <- dplyr::pull(duration_data, "event_count")[dyad_ids]
+    }
   }
 
   obj <- list(
@@ -565,4 +582,10 @@ get_dyad_ids <- function(node_id_1, node_id_2, dyad_to_idx, directed) {
     }
   }
   dyad_ids
+}
+
+get_dyad_pairs <- function(node_id_1, node_id_2, dyad_to_idx, directed) {
+  dyad_ids_1 <- get_dyad_ids(node_id_1, node_id_2, dyad_to_idx, directed)
+  dyad_ids_2 <- get_dyad_ids(node_id_2, node_id_1, dyad_to_idx, directed)
+  cbind(dyad_ids_1, dyad_ids_2)
 }

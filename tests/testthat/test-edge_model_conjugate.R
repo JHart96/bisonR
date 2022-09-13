@@ -26,7 +26,7 @@ test_that("binary conjugate works", {
     fit_edge <- bison_model(
       (event | duration) ~ dyad(node_1_id, node_2_id),
       data=df,
-      data_type="binary_conjugate",
+      model_type="binary_conjugate",
       priors=priors
     ),
     regexp=NA
@@ -68,7 +68,7 @@ test_that("count conjugate works", {
     fit_edge <- bison_model(
       (event | duration) ~ dyad(node_1_id, node_2_id),
       data=df,
-      data_type="count_conjugate",
+      model_type="count_conjugate",
       priors=priors
     ),
     regexp=NA

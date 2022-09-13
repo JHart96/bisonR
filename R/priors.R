@@ -26,24 +26,29 @@ get_default_priors <- function(model_type) {
     )
     return(priors)
   }
+
+  if (model_type == "duration") {
+    priors <- list(
+      edge="normal(0, 1)",
+      fixed="normal(0, 2.5)",
+      random_mean="normal(0, 1)",
+      random_std="half-normal(1)",
+      zero_prob="beta(1, 1)",
+      rate="half-normal(1)"
+    )
+    return(priors)
+  }
+
   if (model_type == "binary_conjugate") {
     priors <- list(
       edge="beta(1, 1)"
     )
     return(priors)
   }
+
   if (model_type == "count_conjugate") {
     priors <- list(
       edge="gamma(1, 1)"
-    )
-    return(priors)
-  }
-  if (model_type == "duration") {
-    priors <- list(
-      edge="normal(0, 2.5)",
-      fixed="normal(0, 2.5)",
-      random_mean="normal(0, 1)",
-      random_std="half-normal(1)"
     )
     return(priors)
   }
@@ -108,6 +113,11 @@ get_density_fn <- function(parameter_name, model_type, distribution_name) {
     if (model_type == "count") {
       if (distribution_name == "normal") {
         return(function(x, ...) dlnorm(x, ...))
+      }
+    }
+    if (model_type == "duration") {
+      if (distribution_name == "normal") {
+        return(function(x, ...) dnorm(qlogis(x), ...))
       }
     }
     if (model_type == "binary_conjugate") {

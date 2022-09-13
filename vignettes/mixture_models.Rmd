@@ -37,7 +37,7 @@ Since the data are already aggregated (e.g. a single row for each dyad), we can 
 fit_edge <- bison_model(
   (event | duration) ~ dyad(node_1_id, node_2_id), 
   data=df, 
-  data_type="binary_conjugate"
+  model_type="binary_conjugate"
 )
 ```
 

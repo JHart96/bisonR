@@ -22,7 +22,7 @@ bison_model.prior_predictive_check <- function(formula, data, model_type, direct
   fit <- bison_model(
     formula=formula,
     data=data,
-    data_type=model_type,
+    model_type=model_type,
     directed=directed,
     priors=priors,
     priors_only=TRUE

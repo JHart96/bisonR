@@ -31,6 +31,38 @@ bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, ...) {
   brms::brm_multiple(brms_formula, mice_obj, backend="cmdstanr", ...)
 }
 
+#' Get priors for BISoN brm model
+#'
+#' Wrapper for brms::get_prior() for use with bison_brm.
+#'
+#' @param formula A formula compatible with a brms model
+#' @param edgemodel_list A bisonR edge model (or a list of them)
+#' @param data_list A dataframe of regression variables compatible with a brms model (or a list of them)
+#' @param ... Additional parameters to be passed to brms::get_prior()
+#'
+#' @return The output from brms::get_prior()
+#'
+#' @export
+bison_brm_get_prior <- function(formula, edgemodel_list, data_list, ...) {
+  # Parse formula
+  parsed_formula <- parse_bison_brms_formula(formula)
+  brms_formula <- parsed_formula$brms_formula
+
+  # Generate mice object
+  mice_obj <- bison_mice(
+    edgemodel_list,
+    data_list,
+    parsed_formula$param_names,
+    parsed_formula$target_name,
+    parsed_formula$metric_name,
+    1
+  )
+
+  data <- mice::complete(mids)
+
+  brms::get_prior(brms_formula, data, ...)
+}
+
 parse_bison_brms_formula <- function(formula) {
   # Parse formula string
   formula_string <- deparse1(formula)[1]

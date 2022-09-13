@@ -1,8 +1,8 @@
-fit_conjugate_model <- function(data_type, model_data, num_samples=10000, priors_only=FALSE) {
-  if (data_type == "binary") {
+fit_conjugate_model <- function(model_type, model_data, num_samples=10000, priors_only=FALSE) {
+  if (model_type == "binary") {
     model <- fit_conjugate_model_binary(model_data, num_samples, priors_only)
   }
-  if (data_type == "count") {
+  if (model_type == "count") {
     model <- fit_conjugate_model_count(model_data, num_samples, priors_only)
   }
   return(model)
