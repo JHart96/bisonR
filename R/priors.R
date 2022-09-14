@@ -115,11 +115,6 @@ get_density_fn <- function(parameter_name, model_type, distribution_name) {
         return(function(x, ...) dlnorm(x, ...))
       }
     }
-    if (model_type == "duration") {
-      if (distribution_name == "normal") {
-        return(function(x, ...) dnorm(qlogis(x), ...))
-      }
-    }
     if (model_type == "binary_conjugate") {
       if (distribution_name == "beta") {
         return(function(x, ...) dbeta(x, ...))

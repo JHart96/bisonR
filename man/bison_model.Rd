@@ -24,7 +24,7 @@ bison_model(
 
 \item{data}{Aggregated or disaggregated dataframe of dyadic observations.}
 
-\item{model_type}{"binary", "count", or "duration", specifying the type of edge weight model to use.}
+\item{model_type}{"binary" or "count", specifying the type of edge weight model to use.}
 
 \item{directed}{\code{TRUE} or \code{FALSE} specifying whether the network is directed or not.}
 

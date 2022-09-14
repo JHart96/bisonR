@@ -1,4 +1,4 @@
-test_that("duration simulation works", {
+test_that("simulations work", {
   expect_warning(
     simulate_bison_model("binary", aggregated = FALSE, location_effect = TRUE, age_diff_effect = TRUE),
     regexp=NA
@@ -11,11 +11,6 @@ test_that("duration simulation works", {
 
   expect_warning(
     simulate_bison_model("count", aggregated = FALSE, location_effect = TRUE, age_diff_effect = TRUE),
-    regexp=NA
-  )
-
-  expect_warning(
-    simulate_bison_model("duration", aggregated = FALSE, location_effect = TRUE, age_diff_effect = TRUE),
     regexp=NA
   )
 

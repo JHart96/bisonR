@@ -7,7 +7,7 @@ require(stringr)
 #'
 #' @param formula Formula specifying social events and sampling effort on the LHS and edge weights, fixed, and random effects on the RHS.
 #' @param data Aggregated or disaggregated dataframe of dyadic observations.
-#' @param model_type "binary", "count", or "duration", specifying the type of edge weight model to use.
+#' @param model_type "binary" or "count", specifying the type of edge weight model to use.
 #' @param directed `TRUE` or `FALSE` specifying whether the network is directed or not.
 #' @param priors List of priors in the format supplied by `get_default_priors()`.
 #' @param refresh Frequency of messages printed while running the sampler.
@@ -29,7 +29,7 @@ require(stringr)
 #' @return An S3 edge model object containing edge samples and processed data.
 #'
 #' @export
-bison_model <- function(formula, data, model_type=c("binary", "count", "duration"),
+bison_model <- function(formula, data, model_type=c("binary", "count"),
                         directed=FALSE, partial_pooling=FALSE, zero_inflated=FALSE,
                         priors=NULL, refresh=0, mc_cores=4, iter_sampling=1000,
                         iter_warmup=1000, priors_only=FALSE) {
@@ -52,12 +52,7 @@ bison_model <- function(formula, data, model_type=c("binary", "count", "duration
 
   model_spec <- get_bison_model_spec(formula)
 
-  # Set up model data depending on data type.
-  if (model_type == "duration") {
-    model_info <- get_bison_model_data(formula, data, directed, model_type, duration_data=duration_data)
-  } else {
-    model_info <- get_bison_model_data(formula, data, directed, model_type)
-  }
+  model_info <- get_bison_model_data(formula, data, directed, model_type)
 
   # Set the priors in model data
   prior_parameters <- extract_prior_parameters(priors)
@@ -321,7 +316,7 @@ plot_network <- function(obj, ci=0.9, lwd=2) {
   }
 }
 
-get_bison_model_data <- function(formula, observations, directed, model_type, duration_data=NULL) {
+get_bison_model_data <- function(formula, observations, directed, model_type) {
   # Get model specification from formula
   model_spec <- get_bison_model_spec(formula)
 

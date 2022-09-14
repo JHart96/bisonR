@@ -7,7 +7,7 @@
 simulate_bison_model_mixture(model_type, num_components, component_weights)
 }
 \arguments{
-\item{model_type}{Type of data to simulate, one of "binary", "count", and "duration".}
+\item{model_type}{Type of data to simulate, either "binary" or "count".}
 
 \item{num_components}{Number of mixture components in the simulation (>=2).}
 

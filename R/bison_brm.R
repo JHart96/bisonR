@@ -58,7 +58,7 @@ bison_brm_get_prior <- function(formula, edgemodel_list, data_list, ...) {
     1
   )
 
-  data <- mice::complete(mids)
+  data <- mice::complete(mice_obj)
 
   brms::get_prior(brms_formula, data, ...)
 }
