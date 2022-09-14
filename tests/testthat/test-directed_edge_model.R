@@ -10,14 +10,23 @@ test_that("directed edge models work", {
       (event | duration) ~ dyad(node_1_id, node_2_id),
       data=df,
       model_type="binary",
-      directed=T,
+      directed=TRUE,
       priors=get_default_priors("binary")
     ),
     regexp=NA
   )
 
+  get_dyad_ids(df$node_1_id, df$node_2_id, fit_edge$dyad_to_idx, directed=TRUE)
+  get_dyad_ids(df$node_2_id, df$node_1_id, fit_edge$dyad_to_idx, directed=TRUE)
+
+
   expect_warning(
     get_edgelist(fit_edge),
+    regexp=NA
+  )
+
+  expect_warning(
+    plot_predictions(fit_edge),
     regexp=NA
   )
 

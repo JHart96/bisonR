@@ -17,7 +17,6 @@ require(stringr)
 #' @param priors_only Whether to use priors as posteriors or to allow the posteriors to be updated by data.
 #' @param partial_pooling Whether to pool edge weights so that information is shared between edges.
 #' @param zero_inflated Whether to use a zero-inflated model to model excess zeroes.
-#' @param duration_data If using the duration model, set this to a dataframe where each row corresponds to a dyad, with 3 columns for node 1 ID, node 2 ID, and number of events.
 #'
 #' @details
 #' Fits a BISoN edge weight model to a user-provided dataframe. The function supports either aggregated (at the
@@ -33,7 +32,7 @@ require(stringr)
 bison_model <- function(formula, data, model_type=c("binary", "count", "duration"),
                         directed=FALSE, partial_pooling=FALSE, zero_inflated=FALSE,
                         priors=NULL, refresh=0, mc_cores=4, iter_sampling=1000,
-                        iter_warmup=1000, priors_only=FALSE, duration_data=NULL) {
+                        iter_warmup=1000, priors_only=FALSE) {
 
   # If user-specified priors haven't been set, use the defaults
   if (is.null(priors)) {
@@ -282,15 +281,17 @@ plot_predictions.bison_model <- function(obj, num_draws=20, type=c("density", "p
   if ("point" %in% type) {
     # Compare edge weights to point estimates
     df_draw <- data.frame(event=obj$model_data$event, divisor=obj$model_data$divisor, dyad_id=obj$model_info$row_dyad_ids) # Get dyad IDs from somewhere sensible.
-    df_summed <- aggregate(cbind(event, divisor) ~ as.factor(dyad_id), df_draw, sum)
+    df_draw$dyad_id <- as.factor(df_draw$dyad_id)
+    df_summed <- aggregate(cbind(event, divisor) ~ dyad_id, df_draw, sum)
     point_estimate <- df_summed$event/df_summed$divisor
+    dyad_ids <- as.integer(as.character(df_summed$dyad_id))
     edgelist <- get_edgelist(obj)
-    bison_median <- edgelist[, 3]
-    bison_lower <- edgelist[, 4]
-    bison_upper <- edgelist[, 5]
+    bison_median <- edgelist[dyad_ids, 3]
+    bison_lower <- edgelist[dyad_ids, 4]
+    bison_upper <- edgelist[dyad_ids, 5]
     edgelist_inner <- get_edgelist(obj, ci=0.5)
-    bison_inner_lower <- edgelist_inner[, 4]
-    bison_inner_upper <- edgelist_inner[, 5]
+    bison_inner_lower <- edgelist_inner[dyad_ids, 4]
+    bison_inner_upper <- edgelist_inner[dyad_ids, 5]
     plot(point_estimate, bison_median, ylim=c(min(bison_lower), max(bison_upper)), main="Point vs BISoN estimates", xlab="Point estimates", ylab="BISoN estimates", col=rgb(0, 0, 0, 0))
     abline(a=0, b=1)
     segments(x0=point_estimate, y0=bison_lower, x1=point_estimate, y1=bison_upper)
@@ -409,13 +410,6 @@ get_bison_model_data <- function(formula, observations, directed, model_type, du
       dyad_to_idx,
       directed=directed
     ))
-
-    dyad_pairs = get_dyad_pairs(
-      node_to_idx[node_1_names],
-      node_to_idx[node_2_names],
-      dyad_to_idx,
-      directed=directed
-    )
   }
 
   # Variable grouping for random effects
@@ -470,7 +464,6 @@ get_bison_model_data <- function(formula, observations, directed, model_type, du
     event=event,
     divisor=divisor,
     dyad_ids=dyad_ids,
-    dyad_ # Set this to the receiver.
     design_fixed=data.matrix(design_fixed[, -1]),
     design_random=data.matrix(design_random[, -1]),
     num_edges = num_dyads,
@@ -479,23 +472,6 @@ get_bison_model_data <- function(formula, observations, directed, model_type, du
     num_random_groups=length(unique(random_group_index)),
     random_group_index=as.integer(as.factor(random_group_index))
   )
-
-  if (model_type == "duration") {
-    if (!is.null(model_spec$node_1_name)) {
-      # Get dyad IDs in the correct order
-      node_1_names <- dplyr::pull(duration_data, model_spec$node_1_name)
-      node_2_names <- dplyr::pull(duration_data, model_spec$node_2_name)
-
-      dyad_ids = as.factor(get_dyad_ids(
-        node_to_idx[node_1_names],
-        node_to_idx[node_2_names],
-        dyad_to_idx,
-        directed=directed
-      ))
-
-      model_data$event_count <- dplyr::pull(duration_data, "event_count")[dyad_ids]
-    }
-  }
 
   obj <- list(
     model_data=model_data,
@@ -572,13 +548,13 @@ get_dyad_ids <- function(node_id_1, node_id_2, dyad_to_idx, directed) {
   dyad_ids <- rep(NA, length(node_id_1))
   for (i in 1:length(node_id_1)) {
     if (directed == TRUE) {
-      dyad_ids[i] <- which(dyad_to_idx[, 1] == node_id_1[i] & dyad_to_idx[, 2] == node_id_2[i])
+      dyad_ids[i] <- which(dyad_to_idx[, 1] == node_id_1[i] & dyad_to_idx[, 2] == node_id_2[i])[[1]]
     }
     if (directed == FALSE) {
       dyad_ids[i] <- which(
         (dyad_to_idx[, 1] == node_id_1[i] & dyad_to_idx[, 2] == node_id_2[i]) |
         (dyad_to_idx[, 1] == node_id_2[i] & dyad_to_idx[, 2] == node_id_1[i])
-      )
+      )[[1]]
     }
   }
   dyad_ids

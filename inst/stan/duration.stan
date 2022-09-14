@@ -28,7 +28,7 @@ data {
   int<lower=0, upper=1> priors_only; // Whether to sample from only the priors
   int<lower=0, upper=1> partial_pooling; // Whether to pool edge weight estimates
   int<lower=0, upper=1> zero_inflated; // Whether to use zero-inflated edge model
-  int<lower=0, upper=1> sender_receiver;
+  int<lower=0, upper=1> sender_receiver; // Whether to use sender-receiver effects
 }
 
 parameters {
