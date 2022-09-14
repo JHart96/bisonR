@@ -42,9 +42,6 @@ extract_metric <- function(obj, metric_string, num_draws=1000, standardise=FALSE
     if (obj$model_type == "count") {
       igraph::E(net)$weight <- exp(edgelist_samples[, 2 + i])
     }
-    if (obj$model_type == "duration") {
-      igraph::E(net)$weight <- plogis(edgelist_samples[, 2 + i])
-    }
     metric_samples[i, ] <- metric_fn(net)
   }
   if (standardise) {

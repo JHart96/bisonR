@@ -554,9 +554,3 @@ get_dyad_ids <- function(node_id_1, node_id_2, dyad_to_idx, directed) {
   }
   dyad_ids
 }
-
-get_dyad_pairs <- function(node_id_1, node_id_2, dyad_to_idx, directed) {
-  dyad_ids_1 <- get_dyad_ids(node_id_1, node_id_2, dyad_to_idx, directed)
-  dyad_ids_2 <- get_dyad_ids(node_id_2, node_id_1, dyad_to_idx, directed)
-  cbind(dyad_ids_1, dyad_ids_2)
-}

@@ -54,9 +54,6 @@ edge_transform <- function(obj) {
   if (obj$model_type == "count") {
     return(exp(edge_samples))
   }
-  if (obj$model_type == "duration") {
-    return(plogis(edge_samples))
-  }
 }
 
 build_stan_model <- function(model_name) {
