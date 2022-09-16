@@ -1,7 +1,7 @@
 #' Generate a mice mids object
 #'
 #' @param edgemodel_list A bisonR edge model (or a list of them)
-#' @param data_list A dataframe of regression variables compatible with a brms model (or a list of them)
+#' @param data_list A dataframe of regression variables compatible with a brms model (or a list of them).
 #' @param num_draws Number of draws from the network posterior
 #' @param param_names List of column names for network features (e.g. node_1_id, node_2_id or just node_id)
 #' @param target_name Name of network feature (edge, node, global)
@@ -10,6 +10,11 @@
 #' @return A mice mids object
 #' @export
 bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metric_name, num_draws=100) {
+  if (target_name == "global" && class(data_list) == "data.frame") {
+    data_list <- lapply(1:nrow(data_list), function(i) data_list[i, ])
+    print(data_list)
+  }
+
   # If the data aren't lists yet, convert them
   if (class(edgemodel_list)[1] != "list") edgemodel_list <- list(edgemodel_list)
   if (class(data_list)[1] != "list") data_list <- list(data_list)
@@ -46,6 +51,8 @@ bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metr
         function(x) which(names(edgemodel_list[[i]]$node_to_idx) == x)
       )
       posterior_samples <- extract_metric(edgemodel_list[[i]], paste0(target_name, "_", metric_name), num_draws)[, node_ids]
+    } else if (target_name == "global") {
+      posterior_samples <- extract_metric(edgemodel_list[[i]], paste0(target_name, "_", metric_name), num_draws)
     } else {
       stop("Network feature not supported.")
     }

@@ -1,8 +1,8 @@
 ---
-title: "network_metrics"
+title: "Network metrics"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{network_metrics}
+  %\VignetteIndexEntry{Network metrics}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

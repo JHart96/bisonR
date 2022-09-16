@@ -72,6 +72,17 @@ test_that("brms works", {
     regexp=NA
   )
 
+  df_global <- data.frame(bison_network=as.factor(c("1", "2")), condition=c("before", "after"))
 
-
+  fit_brm <- expect_error(
+    suppressWarnings(bison_brm(
+      bison(global_cv(bison_network)) ~ condition,
+      list(fit_edge, fit_edge),
+      df_global,
+      num_draws=5,
+      silent=2,
+      refresh=0
+    )),
+    regexp=NA
+  )
 })
