@@ -59,4 +59,19 @@ test_that("brms works", {
     )),
     regexp=NA
   )
+
+  fit_brm <- expect_error(
+    suppressWarnings(bison_brm(
+      trait ~ bison(node_eigen(node)) + bison_network,
+      list(fit_edge, fit_edge),
+      list(df_nodal, df_nodal),
+      num_draws=5,
+      silent=2,
+      refresh=0
+    )),
+    regexp=NA
+  )
+
+
+
 })

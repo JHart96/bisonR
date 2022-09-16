@@ -60,11 +60,11 @@ bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metr
     new_data_list <- lapply(1:length(edgemodel_list), function(j) {
       new_data <- data_list[[j]]
       new_data[new_bison_term] <- posterior_samples_list[[j]][i, ]
-      new_data["bison_model"] <- j
+      new_data["bison_network"] <- j
       new_data
     })
     new_data <- dplyr::bind_rows(new_data_list)
-    new_data$bison_model <- factor(new_data$bison_model)
+    new_data$bison_network <- factor(new_data$bison_network)
     new_data
   })
 
@@ -73,8 +73,8 @@ bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metr
 
   original_dataframes <- lapply(1:length(edgemodel_list), function(j) {
     new_data <- data_list[[j]]
-    new_data["bison_model"] <- j
-    new_data$bison_model <- factor(new_data$bison_model)
+    new_data["bison_network"] <- j
+    new_data$bison_network <- factor(new_data$bison_network)
     new_data
   })
   original_dataframes <- dplyr::bind_rows(original_dataframes)

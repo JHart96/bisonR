@@ -14,6 +14,24 @@ knitr::opts_chunk$set(
 )
 ```
 
+
 ```{r setup}
 library(bisonR)
 ```
+
+bisonR can fully integrate with the popular Bayesian modelling package `brms`. This means that any brms model can be fit to network data such as edge weights, node centrality, or even global metrics comparing networks. This is achieved by treating network posteriors as imputed data and running multiple Bayesian models on these imputed data. This function is implemented as `bison_brm` and uses largely the same arguments as brms.
+
+bisonR uses a special notation to include network data in a brms formula. To specify network data, the wrapper `bison()` is used to tell the function that this variable should come from network data with uncertainty. Network properties can be calculated at three different levels: edge, node, and global. See the `network_metrics` vignette for information on available metrics. Depending on the type of analysis, you will need to specify node IDs or network IDs to ensure the data in your dataframe align with the network properties calculated in bisonR. This information is included as arguments to the network property in the formula.
+
+When running analyses comparing global properties of networks, multiple fitted edge models must be provided, corresponding to each network. `bisonR` introduces a preserved factor variable `bison_network` that can be used to reference the different networks. `bison_network` is an integer factor corresponding to the order that fitted edge models were provided to `bison_brm`.
+
+This sounds a little complex, but is much easier to understand with examples. The table below shows some examples of how the analysis would be conducted in brms (or lm/lmer/etc) compared to `bison_brm`.
+
+| Standard formula | bison_brm formula |
+| ----------- | ----------- |
+| `edge_weight ~ x` | `bison(edge_weight(node_1_id, node_2_id)) ~ x` |
+| `y ~ edge_weight` | `y ~ bison(edge_weight(node_1_id, node_2_id))` |
+| `strength ~ x` | `bison(strength(node_id)) ~ x` |
+| `y ~ strength` | `y ~ bison(strength(node_id))` |
+| `cv ~ x` | `global_cv(bison_network) ~ x`|
+| `y ~ cv` | `y ~ global_cv(bison_network) `|
