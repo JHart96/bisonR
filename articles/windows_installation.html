@@ -32,7 +32,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">bisonR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,8 +47,10 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/getting_started.html">Getting Started</a>
+    <a class="dropdown-item" href="../articles/bison_brms.html">Using brms with BISoN</a>
+    <a class="dropdown-item" href="../articles/getting_started.html">Getting started</a>
     <a class="dropdown-item" href="../articles/mixture_models.html">Edge Mixture Models</a>
+    <a class="dropdown-item" href="../articles/network_metrics.html">Network metrics</a>
     <a class="dropdown-item" href="../articles/windows_installation.html">Installing cmdstanR on Windows</a>
   </div>
 </li>
@@ -79,6 +81,7 @@
 <script src="windows_installation_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Installing cmdstanR on Windows</h1>
+                        <h4 data-toc-skip class="author">Jordan Hart, Joe Wilde</h4>
             
       
       <small class="dont-index">Source: <a href="https://github.com/JHart96/bisonR/blob/HEAD/vignettes/windows_installation.Rmd" class="external-link"><code>vignettes/windows_installation.Rmd</code></a></small>
@@ -118,7 +121,7 @@
 <div class="section level3">
 <h3 id="error-cmdstan-path-has-not-been-set-yet-">Error: CmdStan path has not been set yet.<a class="anchor" aria-label="anchor" href="#error-cmdstan-path-has-not-been-set-yet-"></a>
 </h3>
-<p>This can happen on the R session following the session in which you first installed cmdstanR. For some reason the environment variable <code>CMDSTAN</code>, which was set on installation, has be overwritten. We think this may be due to the configuration of managed computers. The solution to this problem is to set <code>CMDSTAN</code> to the path of your cmdstan installation. Specifically, this needs to point to the installation version directory (e.g. <code>.cmdstan/cmdstan-2.30.0</code>), rather than just the <code>.cmdstan/</code> or <code>cmdstan/</code> directory.</p>
+<p>This can happen on the R session following the session in which you first installed cmdstanR. For some reason the environment variable <code>CMDSTAN</code>, which was set on installation, has been overwritten. We think this may be due to the configuration of managed computers. The solution to this problem is to set <code>CMDSTAN</code> to the path of your cmdstan installation. Specifically, this needs to point to the installation version directory (e.g. <code>.cmdstan/cmdstan-2.30.0</code>), rather than just the <code>.cmdstan/</code> or <code>cmdstan/</code> directory.</p>
 </div>
 </div>
 <div class="section level2">

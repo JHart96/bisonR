@@ -32,7 +32,7 @@
     
     <a class="navbar-brand me-2" href="index.html">bisonR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,8 +47,10 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="articles/getting_started.html">Getting Started</a>
+    <a class="dropdown-item" href="articles/bison_brms.html">Using brms with BISoN</a>
+    <a class="dropdown-item" href="articles/getting_started.html">Getting started</a>
     <a class="dropdown-item" href="articles/mixture_models.html">Edge Mixture Models</a>
+    <a class="dropdown-item" href="articles/network_metrics.html">Network metrics</a>
     <a class="dropdown-item" href="articles/windows_installation.html">Installing cmdstanR on Windows</a>
   </div>
 </li>
@@ -88,15 +90,15 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jhart96.github.io/bisonR">bisonR</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_edge_model.html">simulate_edge_model</a></span><span class="op">(</span><span class="st">"binary"</span>, aggregated <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_bison_model.html">simulate_bison_model</a></span><span class="op">(</span><span class="st">"binary"</span>, aggregated <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">sim_data</span><span class="op">$</span><span class="va">df_sim</span></span>
 <span></span>
 <span><span class="va">priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_default_priors.html">get_default_priors</a></span><span class="op">(</span><span class="st">"binary"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">fit_edge</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/edge_model.html">edge_model</a></span><span class="op">(</span></span>
+<span><span class="va">fit_edge</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bison_model.html">bison_model</a></span><span class="op">(</span></span>
 <span>  <span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="va">duration</span><span class="op">)</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span><span class="op">)</span>, </span>
 <span>  data<span class="op">=</span><span class="va">df</span>, </span>
-<span>  data_type<span class="op">=</span><span class="st">"binary"</span>,</span>
+<span>  model_type<span class="op">=</span><span class="st">"binary"</span>,</span>
 <span>  priors<span class="op">=</span><span class="va">priors</span></span>
 <span><span class="op">)</span></span>
 <span></span>
