@@ -10,3 +10,10 @@ navbar:
 authors:
   Jordan Hart:
     href: https://jordanhart.co.uk/
+articles:
+- title: bisonR
+  navbar: bisonR
+  contents: [getting_started, bison_brms, mixture_models, network_metrics]
+- title: Help
+  navbar: Help
+  contents: [windows_installation]
