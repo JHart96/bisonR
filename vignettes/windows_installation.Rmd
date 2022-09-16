@@ -1,6 +1,7 @@
 ---
 title: "Installing cmdstanR on Windows"
 output: rmarkdown::html_vignette
+author: "Jordan Hart, Joe Wilde"
 vignette: >
   %\VignetteIndexEntry{Installing cmdstanR on Windows}
   %\VignetteEngine{knitr::rmarkdown}
@@ -35,7 +36,7 @@ If this doesn't work, make sure you're using the latest version of R (R 4.2.1) a
 
 ## Error: CmdStan path has not been set yet.
 
-This can happen on the R session following the session in which you first installed cmdstanR. For some reason the environment variable `CMDSTAN`, which was set on installation, has be overwritten. We think this may be due to the configuration of managed computers. The solution to this problem is to set `CMDSTAN` to the path of your cmdstan installation. Specifically, this needs to point to the installation version directory (e.g. `.cmdstan/cmdstan-2.30.0`), rather than just the `.cmdstan/` or `cmdstan/` directory. 
+This can happen on the R session following the session in which you first installed cmdstanR. For some reason the environment variable `CMDSTAN`, which was set on installation, has been overwritten. We think this may be due to the configuration of managed computers. The solution to this problem is to set `CMDSTAN` to the path of your cmdstan installation. Specifically, this needs to point to the installation version directory (e.g. `.cmdstan/cmdstan-2.30.0`), rather than just the `.cmdstan/` or `cmdstan/` directory. 
 
 # Get in touch
 

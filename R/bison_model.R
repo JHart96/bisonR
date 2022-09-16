@@ -7,7 +7,7 @@ require(stringr)
 #'
 #' @param formula Formula specifying social events and sampling effort on the LHS and edge weights, fixed, and random effects on the RHS.
 #' @param data Aggregated or disaggregated dataframe of dyadic observations.
-#' @param data_type "binary", "count", or "duration", specifying the type of edge weight model to use.
+#' @param model_type "binary" or "count", specifying the type of edge weight model to use.
 #' @param directed `TRUE` or `FALSE` specifying whether the network is directed or not.
 #' @param priors List of priors in the format supplied by `get_default_priors()`.
 #' @param refresh Frequency of messages printed while running the sampler.
@@ -15,61 +15,64 @@ require(stringr)
 #' @param iter_sampling Number of iterations to use for posterior samples.
 #' @param iter_warmup Number of iterations to use for warmup (will not be used for samples).
 #' @param priors_only Whether to use priors as posteriors or to allow the posteriors to be updated by data.
+#' @param partial_pooling Whether to pool edge weights so that information is shared between edges.
+#' @param zero_inflated Whether to use a zero-inflated model to model excess zeroes.
 #'
 #' @details
 #' Fits a BISoN edge weight model to a user-provided dataframe. The function supports either aggregated (at the
 #' dyad-level) or disaggregated (at the observation-level) dataframes. Node names or IDs need to be formatted
 #' as factors with the same levels.
 #'
-#' The type of edge model and the interpretation of edge weights used depends on `data_type`, and will change
+#' The type of edge model and the interpretation of edge weights used depends on `model_type`, and will change
 #' the interpretation of the edge weights.
 #'
 #' @return An S3 edge model object containing edge samples and processed data.
 #'
 #' @export
-edge_model <- function(formula, data, data_type=c("binary", "count"), directed=FALSE, priors=NULL, refresh=0, mc_cores=4, iter_sampling=1000, iter_warmup=1000, priors_only=FALSE) {
-  if (data_type == "duration") {
-    stop("Duration model not yet supported")
-  }
+bison_model <- function(formula, data, model_type=c("binary", "count"),
+                        directed=FALSE, partial_pooling=FALSE, zero_inflated=FALSE,
+                        priors=NULL, refresh=0, mc_cores=4, iter_sampling=1000,
+                        iter_warmup=1000, priors_only=FALSE) {
 
   # If user-specified priors haven't been set, use the defaults
   if (is.null(priors)) {
     message("No priors set by user, using default priors instead. We recommend setting and checking priors explicitly for reliable inference.")
-    priors <- get_default_priors(data_type)
+    priors <- get_default_priors(model_type)
   }
 
   # If the model is a conjugate model, change the data type
   use_conjugate_model <- FALSE
-  if (length(str_match_all(data_type, "conjugate")[[1]]) > 0) {
+  if (length(str_match_all(model_type, "conjugate")[[1]]) > 0) {
     use_conjugate_model <- TRUE
-    data_type <- str_split(data_type, "_")[[1]][1]
-    if (!(data_type %in% c("binary", "count"))) {
+    model_type <- str_split(model_type, "_")[[1]][1]
+    if (!(model_type %in% c("binary", "count"))) {
       stop("Conjugate models only available for binary and count data")
     }
   }
 
-  model_spec <- get_edge_model_spec(formula)
+  model_spec <- get_bison_model_spec(formula)
 
-  # Set up model data depending on data type.
-  model_info <- get_edge_model_data(formula, data, directed, data_type)
+  model_info <- get_bison_model_data(formula, data, directed, model_type)
 
   # Set the priors in model data
   prior_parameters <- extract_prior_parameters(priors)
   model_data <- c(model_info$model_data, prior_parameters)
   # Set whether only the priors should be sampled
   model_data$priors_only <- priors_only
+  model_data$partial_pooling <- (partial_pooling * 1)
+  model_data$zero_inflated <- zero_inflated
 
   # Select sampling method
   if (use_conjugate_model) {
     # Fit conjugate model
-    model <- fit_conjugate_model(data_type, model_data, priors_only=priors_only)
+    model <- fit_conjugate_model(model_type, model_data, priors_only=priors_only)
     chain <- model$chain
     event_preds <- model$event_preds
     fit <- NULL
     log_lik <- NULL
   } else {
     # Build Stan model
-    model <- build_stan_model(data_type)
+    model <- build_stan_model(model_type)
 
     # Fit model
     fit <- model$sample(
@@ -88,7 +91,6 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
     } else {
       chain <- NULL
     }
-    # colnames(chain) <- 1:model_data$num_edges
 
     event_preds <- fit$draws("event_pred", format="matrix")
 
@@ -112,14 +114,14 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
     directed = directed,
     fit = fit,
     formula = formula,
-    data_type = data_type,
+    model_type = model_type,
     model_data = model_data,
     input_data = data,
     stan_model = model,
     conjugate = use_conjugate_model,
     log_lik = log_lik
   )
-  class(obj) <- "edge_model"
+  class(obj) <- "bison_model"
   return(obj)
 }
 
@@ -131,12 +133,12 @@ edge_model <- function(formula, data, data_type=c("binary", "count"), directed=F
 #' @param ... Additional arguments
 #'
 #' @export
-summary.edge_model <- function(object, ci=0.90, transform=TRUE, ...) {
+summary.bison_model <- function(object, ci=0.90, transform=TRUE, ...) {
   summary_obj <- list()
 
   summary_obj$description <- paste0(
     "=== Fitted BISoN edge model ===",
-    "\nData type: ", object$data_type,
+    "\nData type: ", object$model_type,
     "\nFormula: ", format(object$formula),
     "\nNumber of nodes: ", object$num_nodes,
     "\nNumber of dyads: ", object$num_dyads,
@@ -147,7 +149,7 @@ summary.edge_model <- function(object, ci=0.90, transform=TRUE, ...) {
   summary_obj$edgelist <- get_edgelist(object, ci=ci, transform=transform)
   summary_obj$dyad_names <- do.call(paste, c(get_edgelist(object)[, 1:2], sep=" <-> "))
 
-  class(summary_obj) <- "summary.edge_model"
+  class(summary_obj) <- "summary.bison_model"
 
   summary_obj
 }
@@ -158,7 +160,7 @@ summary.edge_model <- function(object, ci=0.90, transform=TRUE, ...) {
 #' @param ... Additional parameters to be passed to print function.
 #'
 #' @export
-print.summary.edge_model <- function(x, ...) {
+print.summary.bison_model <- function(x, ...) {
   cat(x$description)
   summary_matrix <- as.matrix(x$edgelist[, 3:5])
   rownames(summary_matrix) <- x$dyad_names
@@ -227,7 +229,7 @@ draw_edgelist_samples <- function (obj, num_draws) {
   edgelist_samples
 }
 
-plot_predictions.edge_model <- function(obj, num_draws=20, type=c("density", "point"), draw_data=TRUE) {
+plot_predictions.bison_model <- function(obj, num_draws=20, type=c("density", "point"), draw_data=TRUE) {
 
   par(mfrow=c(1, length(type)))
 
@@ -274,15 +276,17 @@ plot_predictions.edge_model <- function(obj, num_draws=20, type=c("density", "po
   if ("point" %in% type) {
     # Compare edge weights to point estimates
     df_draw <- data.frame(event=obj$model_data$event, divisor=obj$model_data$divisor, dyad_id=obj$model_info$row_dyad_ids) # Get dyad IDs from somewhere sensible.
-    df_summed <- aggregate(cbind(event, divisor) ~ as.factor(dyad_id), df_draw, sum)
+    df_draw$dyad_id <- as.factor(df_draw$dyad_id)
+    df_summed <- aggregate(cbind(event, divisor) ~ dyad_id, df_draw, sum)
     point_estimate <- df_summed$event/df_summed$divisor
+    dyad_ids <- as.integer(as.character(df_summed$dyad_id))
     edgelist <- get_edgelist(obj)
-    bison_median <- edgelist[, 3]
-    bison_lower <- edgelist[, 4]
-    bison_upper <- edgelist[, 5]
+    bison_median <- edgelist[dyad_ids, 3]
+    bison_lower <- edgelist[dyad_ids, 4]
+    bison_upper <- edgelist[dyad_ids, 5]
     edgelist_inner <- get_edgelist(obj, ci=0.5)
-    bison_inner_lower <- edgelist_inner[, 4]
-    bison_inner_upper <- edgelist_inner[, 5]
+    bison_inner_lower <- edgelist_inner[dyad_ids, 4]
+    bison_inner_upper <- edgelist_inner[dyad_ids, 5]
     plot(point_estimate, bison_median, ylim=c(min(bison_lower), max(bison_upper)), main="Point vs BISoN estimates", xlab="Point estimates", ylab="BISoN estimates", col=rgb(0, 0, 0, 0))
     abline(a=0, b=1)
     segments(x0=point_estimate, y0=bison_lower, x1=point_estimate, y1=bison_upper)
@@ -312,14 +316,9 @@ plot_network <- function(obj, ci=0.9, lwd=2) {
   }
 }
 
-get_edge_model_data <- function(formula, observations, directed, data_type) {
-  if (data_type == "duration") {
-    observations_agg <- observations[[2]]
-    observations <- observations[[1]]
-  }
-
+get_bison_model_data <- function(formula, observations, directed, model_type) {
   # Get model specification from formula
-  model_spec <- get_edge_model_spec(formula)
+  model_spec <- get_bison_model_spec(formula)
 
   # Automatically detect and apply factor levels
   if (!is.null(model_spec$node_1_name)) {
@@ -443,13 +442,11 @@ get_edge_model_data <- function(formula, observations, directed, data_type) {
     }
   }
 
-  if (data_type %in% c("binary", "count")) {
-    # Check if divisor is a real
-    if (!is.na(str_match(model_spec$divisor_var_name, "\\d+"))) {
-      divisor <- rep(as.numeric(model_spec$divisor_var_name), nrow(observations))
-    } else {
-      divisor <- dplyr::pull(observations, model_spec$divisor_var_name)
-    }
+  # Check if divisor is a real
+  if (!is.na(str_match(model_spec$divisor_var_name, "\\d+"))) {
+    divisor <- rep(as.numeric(model_spec$divisor_var_name), nrow(observations))
+  } else {
+    divisor <- dplyr::pull(observations, model_spec$divisor_var_name)
   }
 
   # If divisor is a single value, convert it to a list.
@@ -471,12 +468,6 @@ get_edge_model_data <- function(formula, observations, directed, data_type) {
     random_group_index=as.integer(as.factor(random_group_index))
   )
 
-  if (data_type == "duration") {
-    model_data$k <- dplyr::pull(observations_agg, model_spec$divisor_var_name)
-    # data$d <- observations_agg$d
-    model_data$observations_agg <- observations_agg
-  }
-
   obj <- list(
     model_data=model_data,
     node_to_idx=node_to_idx,
@@ -490,7 +481,7 @@ get_edge_model_data <- function(formula, observations, directed, data_type) {
   return(obj)
 }
 
-get_edge_model_spec <- function(formula) {
+get_bison_model_spec <- function(formula) {
   model_spec <- list()
 
   x <- str_split(deparse1(formula), "~")[[1]]
@@ -552,13 +543,13 @@ get_dyad_ids <- function(node_id_1, node_id_2, dyad_to_idx, directed) {
   dyad_ids <- rep(NA, length(node_id_1))
   for (i in 1:length(node_id_1)) {
     if (directed == TRUE) {
-      dyad_ids[i] <- which(dyad_to_idx[, 1] == node_id_1[i] & dyad_to_idx[, 2] == node_id_2[i])
+      dyad_ids[i] <- which(dyad_to_idx[, 1] == node_id_1[i] & dyad_to_idx[, 2] == node_id_2[i])[[1]]
     }
     if (directed == FALSE) {
       dyad_ids[i] <- which(
         (dyad_to_idx[, 1] == node_id_1[i] & dyad_to_idx[, 2] == node_id_2[i]) |
         (dyad_to_idx[, 1] == node_id_2[i] & dyad_to_idx[, 2] == node_id_1[i])
-      )
+      )[[1]]
     }
   }
   dyad_ids

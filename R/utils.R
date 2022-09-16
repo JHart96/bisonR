@@ -10,15 +10,11 @@
 #' @export
 plot_trace <- function(obj, par_ids=1:5, ...) {
   # Extract chains from objects
-  if (is(obj, "edge_model")) {
-    if (obj$data_type %in% c("binary_conjugate", "count_conjugate")) {
+  if (is(obj, "bison_model")) {
+    if (obj$model_type %in% c("binary_conjugate", "count_conjugate")) {
       stop("Trace plots not needed for conjugate models.")
     }
     chain <- obj$fit$draws("edge_weight")
-  } else if (is(obj, "dyadic_model")) {
-    chain <- obj$fit$draws("beta_fixed")
-  } else if (is(obj, "nodal_model")) {
-    chain <- obj$fit$draws("beta_fixed")
   }
   # Set parameter IDs
   if (dim(chain)[3] < max(par_ids)) par_ids <- 1:dim(chain)[3]
@@ -45,42 +41,18 @@ plot_trace <- function(obj, par_ids=1:5, ...) {
 #'
 #' @export
 plot_predictions <- function(obj, ...) {
-  if (is(obj, "edge_model")) {
-    plot_predictions.edge_model(obj, ...)
-  } else if (is(obj, "dyadic_model")) {
-    plot_predictions.dyadic_model(obj, ...)
-  } else if (is(obj, "nodal_model")) {
-    plot_predictions.nodal_model(obj, ...)
+  if (is(obj, "bison_model")) {
+    plot_predictions.bison_model(obj, ...)
   }
-}
-
-#' Calculate contrasts between parameters
-#'
-#' @param obj Fitted S3 dyadic or nodal model.
-#' @param parameter_1 Name of parameter 1, as shown in the model summary.
-#' @param parameter_2 Name of parameter 2, as shown in the model summary.
-#' @param ci Credible interval width, calculated by quantiles.
-#'
-#' @return A vector of the median, lower bound, and upper bound of the posterior contrast between parameters 1 and 2.
-#' @export
-get_contrasts <- function(obj, parameter_1, parameter_2, ci=0.90) {
-  beta_samples <- obj$chain
-  colnames(beta_samples) <- colnames(obj$model_data$design_fixed)
-  beta_diff <- beta_samples[, parameter_1] - beta_samples[, parameter_2]
-  beta_quant <- quantile(beta_diff, probs=c(0.5, 0.5 * (1 - ci), ci + 0.5 * (1 - ci)))
-  return(round(beta_quant, 3))
 }
 
 edge_transform <- function(obj) {
   edge_samples <- obj$edge_samples
-  if (obj$data_type == "binary") {
+  if (obj$model_type == "binary") {
     return(plogis(edge_samples))
   }
-  if (obj$data_type == "count") {
+  if (obj$model_type == "count") {
     return(exp(edge_samples))
-  }
-  if (obj$data_type == "duration") {
-    return(plogis(edge_samples))
   }
 }
 

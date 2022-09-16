@@ -1,0 +1,120 @@
+---
+title: "Using brms with BISoN"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using brms with BISoN}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+bisonR can fully integrate with the popular Bayesian modelling package `brms`. This means that any brms model can be fit to network data such as edge weights, node centrality, or even global metrics comparing networks. This is achieved by treating network posteriors as imputed data and running multiple Bayesian models on these imputed data. This function is implemented as `bison_brm` and uses largely the same arguments as brms. The function returns an object of type `brm_multiple`.
+
+bisonR uses a special notation to include network data in a brms formula. To specify network data, the wrapper `bison()` is used to tell the function that this variable should come from network data with uncertainty. Network properties can be calculated at three different levels: edge, node, and global. See the `network_metrics` vignette for information on available metrics. Depending on the type of analysis, you will need to specify node IDs or network IDs to ensure the data in your dataframe align with the network properties calculated in bisonR. This information is included as arguments to the network property in the formula.
+
+When running analyses comparing global properties of networks, multiple fitted edge models must be provided, corresponding to each network. `bisonR` introduces a preserved factor variable `bison_network` that can be used to reference the different networks. `bison_network` is an integer factor corresponding to the order that fitted edge models were provided to `bison_brm`.
+
+This sounds a little complex, but is much easier to understand with examples. The table below shows some examples of how the analysis would be conducted in brms (or lm/lmer/etc) compared to `bison_brm`.
+
+| Standard formula | bison_brm formula |
+| ----------- | ----------- |
+| `edge_weight ~ x` | `bison(edge_weight(node_1_id, node_2_id)) ~ x` |
+| `y ~ edge_weight` | `y ~ bison(edge_weight(node_1_id, node_2_id))` |
+| `strength ~ x` | `bison(strength(node_id)) ~ x` |
+| `y ~ strength` | `y ~ bison(strength(node_id))` |
+| `cv ~ x` | `global_cv(bison_network) ~ x`|
+| `y ~ cv` | `y ~ global_cv(bison_network) `|
+
+# Examples
+
+## Dyadic regression
+
+### Edge weight as response
+
+```r
+bison_brm(
+  bison(edge_weight(node_1_id, node_2_id)) ~ age_diff,
+  fit_edge,
+  df_edge
+)
+```
+
+### Edge weight as predictor
+
+```r
+bison_brm(
+  mass ~ bison(edge_weight(node_1_id, node_2_id)),
+  fit_edge,
+  df_edge
+)
+```
+
+### Edge weight as response with multiple networks
+
+When analysing multiple networks, we need to provide multiple fitted edge models and corresponding dataframes. If the network IDs are to be used, we can access them using the preserved variable `bison_network`.
+
+```r
+bison_brm(
+  bison(edge_weight(node_1_id, node_2_id)) ~ bison_network,
+  list(fit_edge_control, fit_edge_treatment),
+  list(df_edge_control, df_edge_treatment)
+)
+```
+
+## Nodal regression
+
+### Node metric as a predictor
+
+```r
+bison_brm(
+  trait ~ bison(node_eigen(node)),
+  fit_edge,
+  df_nodal
+)
+```
+
+### Node metric as a response
+
+```r
+bison_brm(
+  bison(node_eigen(node)) ~ trait,
+  fit_edge,
+  df_nodal
+)
+```
+
+### Node metric as a response, controlling for network ID
+
+If running an analysis across multiple networks, it might sometimes be necessary to control for network ID. This could be done using a random effect (varying intercept) as follows:
+
+```r
+bison_brm(
+  bison(node_eigen(node)) ~ trait + (1 | bison_network),
+  fit_edge_list,
+  df_nodal_list
+)
+```
+
+## Global regression
+
+### Global metric as a response
+
+When running regression on global metrics, the fitted edge models must again be provided as a list. However, the dataframes can be provided either as 1) a list where each dataframe has one row, describing its corresponding edge model or 2) a dataframe, where each row in the dataframe corresponds to an edge model (where ordering is maintained).
+
+```r
+bison_brm(
+  bison(global_cv(bison_network)) ~ bison_network,
+  list(fit_edge_1, fit_edge_2),
+  df_global
+)
+```
+
+## Conclusion
+
+This is just a small subset of all the possible types of model that can be fitted using the `bison_brm` function. For more information on the wide range of functionality available, check out the [brms documentation](https://paul-buerkner.github.io/brms/).

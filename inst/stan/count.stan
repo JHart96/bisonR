@@ -19,8 +19,12 @@ data {
   real prior_random_mean_mu; // Prior mean on centralisation of random effects
   real<lower=0> prior_random_mean_sigma; // Prior standard deviation on centralisation of random effects
   real<lower=0> prior_random_std_sigma; // Prior standard deviation on dispersion of random effects
+  real<lower=0> prior_zero_prob_alpha; // Prior alpha on zero inflation
+  real<lower=0> prior_zero_prob_beta; // Prior beta on zero inflation
 
   int<lower=0, upper=1> priors_only; // Whether to sample from only the priors
+  int<lower=0, upper=1> partial_pooling; // Whether to pool edge weight estimates
+  int<lower=0, upper=1> zero_inflated; // Whether to use zero-inflated edge model
 }
 
 parameters {
@@ -29,6 +33,8 @@ parameters {
   vector[num_random] beta_random; // Parameters for random effects.
   vector[num_random_groups] random_group_mu; // Hyperpriors for random effects (mean).
   vector<lower=0>[num_random_groups] random_group_sigma; // Hyperpriors for random effects (std. dev.).
+  vector<lower=0>[partial_pooling] edge_sigma; // Random effect for edge weight pooling.
+  vector<lower=0>[zero_inflated] zero_prob; // Zero inflated parameter for probability of zeroes.
 }
 
 transformed parameters {
@@ -48,11 +54,30 @@ transformed parameters {
 model {
   if (!priors_only) {
     // Main model
-    event ~ poisson(exp(predictor) .* divisor);
+    if (zero_inflated == 0) {
+      event ~ poisson(exp(predictor) .* divisor);
+    } else {
+      for (i in 1:num_rows) {
+        if (event[i] == 0) {
+          target += log_sum_exp(
+            bernoulli_lpmf(1 | zero_prob[1]),
+            bernoulli_lpmf(0 | zero_prob[1]) + poisson_lpmf(event[i] | exp(predictor[i]) .* divisor[i])
+          );
+        } else {
+          target += bernoulli_lpmf(0 | zero_prob[1]) + poisson_lpmf(event[i] | exp(predictor[i]) .* divisor[i]);
+        }
+      }
+      zero_prob ~ beta(prior_zero_prob_alpha, prior_zero_prob_beta);
+    }
   }
   // Priors
   if (num_edges > 0) {
-    edge_weight ~ normal(prior_edge_mu, prior_edge_sigma);
+    if (partial_pooling == 0) {
+      edge_weight ~ normal(prior_edge_mu, prior_edge_sigma);
+    } else {
+      edge_weight ~ normal(prior_edge_mu, edge_sigma[1]);
+      edge_sigma ~ normal(0, prior_edge_sigma);
+    }
   }
 
   if (num_fixed > 0) {

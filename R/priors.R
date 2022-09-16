@@ -2,7 +2,7 @@
 #'
 #' @param model_type A character specifying the type of model to retrieve priors for ("binary", "count", "duration", etc)
 #'
-#' @return A list of default priors that can be used in the `edge_model()` function.
+#' @return A list of default priors that can be used in the `bison_model()` function.
 #' @export
 get_default_priors <- function(model_type) {
   if (model_type == "binary") {
@@ -10,56 +10,33 @@ get_default_priors <- function(model_type) {
       edge="normal(0, 2.5)",
       fixed="normal(0, 2.5)",
       random_mean="normal(0, 1)",
-      random_std="half-normal(1)"
+      random_std="half-normal(1)",
+      zero_prob="beta(1, 1)"
     )
     return(priors)
   }
+
   if (model_type == "count") {
     priors <- list(
       edge="normal(0, 1)",
       fixed="normal(0, 2.5)",
       random_mean="normal(0, 1)",
-      random_std="half-normal(1)"
+      random_std="half-normal(1)",
+      zero_prob="beta(1, 1)"
     )
     return(priors)
   }
+
   if (model_type == "binary_conjugate") {
     priors <- list(
       edge="beta(1, 1)"
     )
     return(priors)
   }
+
   if (model_type == "count_conjugate") {
     priors <- list(
       edge="gamma(1, 1)"
-    )
-    return(priors)
-  }
-  if (model_type == "duration") {
-    priors <- list(
-      edge="normal(0, 2.5)",
-      fixed="normal(0, 2.5)",
-      random_mean="normal(0, 1)",
-      random_std="half-normal(1)"
-    )
-    return(priors)
-  }
-  if (model_type == "dyadic_regression") {
-    priors <- list(
-      fixed="normal(0, 1)",
-      random_mean="normal(0, 1)",
-      random_std="half-normal(1)",
-      multimembership="half-normal(1)",
-      error="half-normal(1)"
-    )
-    return(priors)
-  }
-  if (model_type == "nodal_regression") {
-    priors <- list(
-      fixed="normal(0, 1)",
-      random_mean="normal(0, 1)",
-      random_std="half-normal(1)",
-      error="half-normal(1)"
     )
     return(priors)
   }
@@ -143,6 +120,9 @@ get_density_fn <- function(parameter_name, model_type, distribution_name) {
     if (distribution_name == "half-normal") {
       return(function(x, ...) extraDistr::dhnorm(x, ...))
     }
+    if (distribution_name == "beta") {
+      return(function(x, ...) dbeta(x, ...))
+    }
   }
   return(NULL)
 }
@@ -176,6 +156,9 @@ get_quantile_fn <- function(parameter_name, model_type, distribution_name) {
     }
     if (distribution_name == "half-normal") {
       return(function(x, ...) extraDistr::qhnorm(x, ...))
+    }
+    if (distribution_name == "beta") {
+      return(function(x, ...) qbeta(x, ...))
     }
   }
 
