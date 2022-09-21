@@ -6,10 +6,11 @@
 #' @param param_names List of column names for network features (e.g. node_1_id, node_2_id or just node_id)
 #' @param target_name Name of network feature (edge, node, global)
 #' @param metric_name Name of network metric to calculate
+#' @param z_score Whether to Z-score bison variable or not.
 #'
 #' @return A mice mids object
 #' @export
-bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metric_name, num_draws=100) {
+bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metric_name, num_draws=100, z_score=FALSE) {
   if (target_name == "global" && class(data_list) == "data.frame") {
     data_list <- lapply(1:nrow(data_list), function(i) data_list[i, ])
     print(data_list)
@@ -66,7 +67,11 @@ bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metr
     # For each posterior draw, combine dataframes from different edge models and data
     new_data_list <- lapply(1:length(edgemodel_list), function(j) {
       new_data <- data_list[[j]]
-      new_data[new_bison_term] <- posterior_samples_list[[j]][i, ]
+      if (z_score) {
+        new_data[new_bison_term] <- posterior_samples_list[[j]][i, ]
+      } else {
+        new_data[new_bison_term] <- scale(posterior_samples_list[[j]][i, ])
+      }
       new_data["bison_network"] <- j
       new_data
     })
