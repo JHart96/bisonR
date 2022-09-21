@@ -63,5 +63,52 @@ To use probabilities over component membership for a given number of components,
 get_edge_component_probabilities(fit_mixture, 3)
 ```
 
+## Using component probabilities in downstream analysis
+
+Now say that we're interested in the number of strong vs weak partners. Specifically we want to know if the strength of connections only to strong partners predicts a node-level trait. This is a non-standard analysis so will require some manual data wrangling to fit the right kind of model.
+
+For demonstration purposes, we'll create a dataframe that might be used for this kind of analysis:
+
+```{r}
+df_nodal <- data.frame(node_id=as.factor(levels(df$node_1_id)), trait=rnorm(15))
+df_nodal
+```
+This dataframe will provide the information about traits that we need for the analysis. Next, we need to calculate strength using only individuals categorised as strong according to the mixture model. Since both component membership (strong or weak) *and* edge weights are probabilistic, we have to sample from both posteriors as we build a new posterior of mixture-based strength:
+
+```{r}
+# Set number of nodes and number of posterior samples
+num_nodes <- fit_edge$num_nodes
+num_draws <- 5 # Keep this short for demonstration purposes, but many more will be required for full analysis.
+
+# Create a list of igraph networks from edgemodel to represent network posterior
+nets <- bison_to_igraph(fit_edge, num_draws)
+
+# Create an empty matrix to hold strengths of top mixture component
+mix_strengths <- matrix(0, num_draws, num_nodes)
+
+# Create an empty list for imputed versions of the dataframe
+imputed_data <- list()
+
+# Loop through each posterior sample and calculate strength of top mixture.
+for (i in 1:num_draws) {
+  # Calculate edge components (1 if strong, 0 if weak)
+  edge_components <- fit_mixture$edge_component_samples[i, 2, ] - 1
+  
+  # If the edge is strong, don't change edge weight, but if it's weak then set to zero.
+  E(nets[[i]])$weight <- E(nets[[i]])$weight * edge_components
+  
+  # Change the metric values of the imputed data to be mixture-based strength
+  imputed_data[[i]] <- df_nodal
+  imputed_data[[i]]$mix_strength <- strength(nets[[i]])
+}
+imputed_data[[2]]
+```
+
+Now we have a set of imputed dataframes containing the posteriors of mixture-based node strength, we can fit the model using brm_multiple. 
+
+```{r}
+fit_brm <- brm_multiple(trait ~ mix_strength, imputed_data, silent=2, refresh=0)
+```
+
 This was a short tutorial on how to use `bison_mixture()` to fit mixture models in bisonR. If you have any questions please get in touch.
 

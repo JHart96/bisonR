@@ -10,13 +10,14 @@ bison_mice(
   param_names,
   target_name,
   metric_name,
-  num_draws = 100
+  num_draws = 100,
+  z_score = FALSE
 )
 }
 \arguments{
 \item{edgemodel_list}{A bisonR edge model (or a list of them)}
 
-\item{data_list}{A dataframe of regression variables compatible with a brms model (or a list of them)}
+\item{data_list}{A dataframe of regression variables compatible with a brms model (or a list of them).}
 
 \item{param_names}{List of column names for network features (e.g. node_1_id, node_2_id or just node_id)}
 
@@ -25,6 +26,8 @@ bison_mice(
 \item{metric_name}{Name of network metric to calculate}
 
 \item{num_draws}{Number of draws from the network posterior}
+
+\item{z_score}{Whether to Z-score bison variable or not.}
 }
 \value{
 A mice mids object

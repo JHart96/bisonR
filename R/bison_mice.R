@@ -68,9 +68,9 @@ bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metr
     new_data_list <- lapply(1:length(edgemodel_list), function(j) {
       new_data <- data_list[[j]]
       if (z_score) {
-        new_data[new_bison_term] <- posterior_samples_list[[j]][i, ]
+        new_data[new_bison_term] <- (posterior_samples_list[[j]][i, ] - mean(posterior_samples_list[[j]][i, ]))/sd(posterior_samples_list[[j]][i, ])
       } else {
-        new_data[new_bison_term] <- scale(posterior_samples_list[[j]][i, ])
+        new_data[new_bison_term] <- posterior_samples_list[[j]][i, ]
       }
       new_data["bison_network"] <- j
       new_data

@@ -133,12 +133,9 @@ get_edge_component_probabilities <- function(object, num_components) {
     function(x) names(object$edgemodel$node_to_idx)[object$edgemodel$dyad_to_idx[x, ]]
   )
 
-  print(node_names)
-
   if (num_components < length(object$edge_component_probabilities)) {
     df_names <- data.frame(t(node_names))
     df_components <- data.frame(object$edge_component_probabilities[[num_components]])
-    print(df_components)
     df <- cbind(df_names, df_components)
     colnames(df)[1:2] <- c("node_1", "node_2")
     colnames(df)[3:dim(df)[2]] <- sapply(1:num_components, function(i) paste0("P(K = ", i, ")"))

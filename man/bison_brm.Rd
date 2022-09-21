@@ -4,7 +4,14 @@
 \alias{bison_brm}
 \title{Fit a brms model on BISoN network data}
 \usage{
-bison_brm(formula, edgemodel_list, data_list, num_draws = 100, ...)
+bison_brm(
+  formula,
+  edgemodel_list,
+  data_list,
+  num_draws = 100,
+  z_score = FALSE,
+  ...
+)
 }
 \arguments{
 \item{formula}{A formula compatible with a brms model}
@@ -14,6 +21,8 @@ bison_brm(formula, edgemodel_list, data_list, num_draws = 100, ...)
 \item{data_list}{A dataframe of regression variables compatible with a brms model (or a list of them)}
 
 \item{num_draws}{Number of draws from the network posterior to use when fitting model}
+
+\item{z_score}{Whether to Z-score bison variable or not.}
 
 \item{...}{Additional arguments to be passed to brm(), such as family or priors}
 }

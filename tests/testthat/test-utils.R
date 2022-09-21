@@ -26,3 +26,14 @@ test_that("convert_gbi_to_bison with constraints/properties works", {
     regexp=NA
   )
 })
+
+test_that("convert duration to binary work", {
+  sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+  df <- sim_data$df_sim
+  df_true <- df
+  df$event <- abs(rnorm(nrow(df), df$event, 0.1))
+  df$duration <- abs(rnorm(nrow(df), df$duration, 0.1))
+  df_converted <- convert_duration_to_binary(df, "event", "duration", 1)
+  expect_true(all(df_true$event == df_converted$event))
+  expect_true(all(df_true$duration == df_converted$duration))
+})

@@ -1,6 +1,16 @@
+# bisonR 0.4.0
+* Support for Z-score bison data in bison_brms.
+* Example of using bison for multiple imputation.
+* Duration to binary conversion utility function.
+* bisonR to igraph posterior extraction utility function.
+* Bug fixes.
+
 # bisonR 0.3.0
-* Network data as a predictor in dyadic and nodal regression
-* Unit tests for dyadic and nodal regression
+* Integrated regressions with brms.
+* Extended unit tests.
+* Improved documentation.
+* Partial pooling.
+* Zero inflated models.
 
 # bisonR 0.2.0
 

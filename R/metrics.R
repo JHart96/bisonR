@@ -18,7 +18,7 @@ extract_metric <- function(obj, metric_string, num_draws=1000, standardise=FALSE
   }
 
   edgelist_samples <- draw_edgelist_samples(obj, num_draws)
-  net <- igraph::graph_from_edgelist(as.matrix(edgelist_samples[, 1:2]), directed = FALSE)
+  net <- igraph::graph_from_edgelist(as.matrix(edgelist_samples[, 1:2]), directed = obj$directed)
 
   metric_fn <- get_metric_fn(metric_string)
   target_name <- stringr::str_split(metric_string, "_")[[1]][1]
