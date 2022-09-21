@@ -21,6 +21,8 @@ Edge mixture models can be used to detect different types of social connections 
 ```{r}
 library(bisonR)
 library(dplyr)
+library(igraph)
+library(brms)
 ```
 
 In this example we simulate data from a binary edge model with 2 underlying clusters (also called components), with dyads belong to either cluster with equal probability:
