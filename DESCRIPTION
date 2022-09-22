@@ -31,8 +31,6 @@ Imports:
     testthat,
     covr,
     brms,
-    RcppEigen,
-    BH,
     mice
 Remotes: 
     stan-dev/cmdstanr
