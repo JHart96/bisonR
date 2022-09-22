@@ -37,3 +37,25 @@ test_that("convert duration to binary work", {
   expect_true(all(df_true$event == df_converted$event))
   expect_true(all(df_true$duration == df_converted$duration))
 })
+
+test_that("bison to igraph conversion works", {
+  sim_data <- bisonR::simulate_bison_model("binary", aggregated = TRUE)
+  df_sim <- sim_data$df_sim
+  levels(df_sim$node_1_id) <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J")
+  levels(df_sim$node_2_id) <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J")
+
+  fit_edge <- bison_model(
+    (event | duration) ~ dyad(node_1_id, node_2_id),
+    data=df_sim,
+    model_type="binary_conjugate",
+    priors=get_default_priors("binary_conjugate")
+  )
+
+  nets <- expect_warning(
+    bison_to_igraph(fit_edge, num_draws=10),
+    regexp=NA
+  )
+
+  expect_true(length(nets) == 10)
+  expect_true(class(nets[[1]]) == "igraph")
+})

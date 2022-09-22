@@ -65,7 +65,7 @@ To use probabilities over component membership for a given number of components,
 get_edge_component_probabilities(fit_mixture, 3)
 ```
 
-## Using component probabilities in downstream analysis
+# Using components in downstream analysis
 
 Now say that we're interested in the number of strong vs weak partners. Specifically we want to know if the strength of connections only to strong partners predicts a node-level trait. This is a non-standard analysis so will require some manual data wrangling to fit the right kind of model.
 
