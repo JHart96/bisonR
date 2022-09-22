@@ -5,6 +5,7 @@ vignette: >
   %\VignetteIndexEntry{Edge Mixture Models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  % \VignetteDepends{igraph, brms}
 ---
 
 ```{r, include = FALSE}
