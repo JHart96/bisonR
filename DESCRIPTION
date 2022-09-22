@@ -18,7 +18,7 @@ Depends:
 Imports:
     formula.tools,
     stats,
-    igraph (<=1.3.4),
+    igraph (<= 1.3.4),
     stringr,
     dplyr,
     mclust,
