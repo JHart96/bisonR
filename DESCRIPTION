@@ -31,7 +31,9 @@ Imports:
     testthat,
     covr,
     brms,
-    mice
+    mice,
+    BH,
+    RcppEigen
 Remotes: 
     stan-dev/cmdstanr
 VignetteBuilder: knitr
