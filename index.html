@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="BISoN R Package">
 <meta property="og:description" content="bisonR is an R package implementing the BISoN framework for conducting Bayesian analysis of social networks. BISoN estimates uncertainty over edge weights in social networks from empirical data (such as observations) and builds networks with uncertainty. The networks can then be visualised *with* uncertainty, and can also be analysed with a fully Bayesian methodology using standard tools such as regression.">
@@ -84,38 +84,29 @@
 </h1></div>
 <p><img src="reference/figures/hex.svg" width="160" align="right"></p>
 <!-- badges: start -->
-
-<p><strong>This package is still in continuous development and has not
-yet been fully tested. Please let us know if you encounter any
-unexpected behaviour.</strong></p>
-<p>bisonR is an R package implementing the BISoN framework for
-conducting Bayesian analysis of social networks. BISoN estimates
-uncertainty over edge weights in social networks from empirical data
-(such as observations) and builds networks with uncertainty. The
-networks can then be visualised <em>with</em> uncertainty and analysed
-with a fully Bayesian methodology.</p>
+<p><strong>This package is still in continuous development and has not yet been fully tested. Please let us know if you encounter any unexpected behaviour.</strong></p>
+<p>bisonR is an R package implementing the BISoN framework for conducting Bayesian analysis of social networks. BISoN estimates uncertainty over edge weights in social networks from empirical data (such as observations) and builds networks with uncertainty. The networks can then be visualised <em>with</em> uncertainty and analysed with a fully Bayesian methodology.</p>
 <div class="section level2">
 <h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
 <p>To get started with the package use the code below:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jhart96.github.io/bisonR">bisonR</a></span><span class="op">)</span>
-
-<span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_bison_model.html">simulate_bison_model</a></span><span class="op">(</span><span class="st">"binary"</span>, aggregated <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="va">df</span> <span class="op">&lt;-</span> <span class="va">sim_data</span><span class="op">$</span><span class="va">df_sim</span>
-
-<span class="va">priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_default_priors.html">get_default_priors</a></span><span class="op">(</span><span class="st">"binary"</span><span class="op">)</span>
-
-<span class="va">fit_edge</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bison_model.html">bison_model</a></span><span class="op">(</span>
-  <span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="va">duration</span><span class="op">)</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span><span class="op">)</span>, 
-  data<span class="op">=</span><span class="va">df</span>, 
-  model_type<span class="op">=</span><span class="st">"binary"</span>,
-  priors<span class="op">=</span><span class="va">priors</span>
-<span class="op">)</span>
-
-<span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/fit-method-summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_edge</span><span class="op">)</span></code></pre></div>
-<p>This will fit a basic edge model model to simulated data and generate
-an output like this below:</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jhart96.github.io/bisonR">bisonR</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_bison_model.html">simulate_bison_model</a></span><span class="op">(</span><span class="st">"binary"</span>, aggregated <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">sim_data</span><span class="op">$</span><span class="va">df_sim</span></span>
+<span></span>
+<span><span class="va">priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_default_priors.html">get_default_priors</a></span><span class="op">(</span><span class="st">"binary"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">fit_edge</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bison_model.html">bison_model</a></span><span class="op">(</span></span>
+<span>  <span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="va">duration</span><span class="op">)</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span><span class="op">)</span>, </span>
+<span>  data<span class="op">=</span><span class="va">df</span>, </span>
+<span>  model_type<span class="op">=</span><span class="st">"binary"</span>,</span>
+<span>  priors<span class="op">=</span><span class="va">priors</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_edge</span><span class="op">)</span></span></code></pre></div>
+<p>This will fit a basic edge model model to simulated data and generate an output like this below:</p>
 <pre><code>=== Fitted BISoN edge model ===
 Data type: binary
 Formula: (event | duration) ~ dyad(node_1_id, node_2_id)
@@ -128,8 +119,7 @@ Directed: FALSE
 1 &lt;-&gt; 3   0.702 0.219 0.973
 2 &lt;-&gt; 3   0.793 0.356 0.982
 ...</code></pre>
-<p>For a more detailed example check out the <em>Getting Started</em>
-page here: <a href="https://jhart96.github.io/bisonR/articles/getting_started.html" class="uri">https://jhart96.github.io/bisonR/articles/getting_started.html</a>.</p>
+<p>For a more detailed example check out the <em>Getting Started</em> page here: <a href="https://jhart96.github.io/bisonR/articles/getting_started.html" class="uri">https://jhart96.github.io/bisonR/articles/getting_started.html</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -137,38 +127,27 @@ page here: <a href="https://jhart96.github.io/bisonR/articles/getting_started.ht
 <div class="section level3">
 <h3 id="installing-cmdstanr">Installing CmdStanR<a class="anchor" aria-label="anchor" href="#installing-cmdstanr"></a>
 </h3>
-<p>The bisonR package is written in R, but uses the Stan programming
-language to fit Bayesian models. Stan is a separate program, and
-interfaces with bisonR using an R package called cmdstanR. Stan and
-cmdstanR are installed in a different way to standard R packages, so
-require a specific series of installation steps.</p>
-<p>On Windows, before proceeding you may need to install the version of
-Rtools appropriate for your version of R. Rtools can be found here: <a href="https://cran.r-project.org/bin/windows/Rtools/" class="external-link uri">https://cran.r-project.org/bin/windows/Rtools/</a>.</p>
-<p>The full instructions to install cmdstanR can be found at <a href="https://mc-stan.org/cmdstanr/" class="external-link uri">https://mc-stan.org/cmdstanr/</a>. We’ve found that the
-following steps often work, but depending on your operating system and
-version of R, the process may be more involved.</p>
+<p>The bisonR package is written in R, but uses the Stan programming language to fit Bayesian models. Stan is a separate program, and interfaces with bisonR using an R package called cmdstanR. Stan and cmdstanR are installed in a different way to standard R packages, so require a specific series of installation steps.</p>
+<p>On Windows, before proceeding you may need to install the version of Rtools appropriate for your version of R. Rtools can be found here: <a href="https://cran.r-project.org/bin/windows/Rtools/" class="external-link uri">https://cran.r-project.org/bin/windows/Rtools/</a>.</p>
+<p>The full instructions to install cmdstanR can be found at <a href="https://mc-stan.org/cmdstanr/" class="external-link uri">https://mc-stan.org/cmdstanr/</a>. We’ve found that the following steps often work, but depending on your operating system and version of R, the process may be more involved.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"cmdstanr"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://mc-stan.org/r-packages/"</span>, <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/cmdstanr/" class="external-link">cmdstanr</a></span><span class="op">)</span>
-<span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">check_cmdstan_toolchain</a></span><span class="op">(</span>fix <span class="op">=</span> <span class="cn">TRUE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">install_cmdstan</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># On networked PCs, specify a local directory here with the argument dir=path_to_local_directory</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"cmdstanr"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://mc-stan.org/r-packages/"</span>, <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/cmdstanr/" class="external-link">cmdstanr</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">check_cmdstan_toolchain</a></span><span class="op">(</span>fix <span class="op">=</span> <span class="cn">TRUE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">install_cmdstan</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># On networked PCs, specify a local directory here with the argument dir=path_to_local_directory</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="installing-bisonr">Installing bisonR<a class="anchor" aria-label="anchor" href="#installing-bisonr"></a>
 </h3>
-<p>bisonR isn’t currently on CRAN, but it can be installed from GitHub.
-To do this, make sure you have the <code>remotes</code> package
-installed. Then run the following command:</p>
+<p>bisonR isn’t currently on CRAN, but it can be installed from GitHub. To do this, make sure you have the <code>remotes</code> package installed. Then run the following command:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"JHart96/bisonR"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JHart96/bisonR"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="development-version">Development version<a class="anchor" aria-label="anchor" href="#development-version"></a>
 </h4>
-<p>If you want to install the latest development version, bugs and all,
-you can install from the development branch. This option is not
-recommended for standard users.</p>
+<p>If you want to install the latest development version, bugs and all, you can install from the development branch. This option is not recommended for standard users.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"JHart96/bisonR@dev"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JHart96/bisonR@dev"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 </div>
@@ -224,8 +203,7 @@ recommended for standard users.</p>
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
     </footer>
