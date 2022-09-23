@@ -1,5 +1,5 @@
-pandoc: 2.7.3
-pkgdown: 2.0.6
+pandoc: '2.18'
+pkgdown: 2.0.2
 pkgdown_sha: ~
 articles:
   bison_brms: bison_brms.html
@@ -7,7 +7,7 @@ articles:
   mixture_models: mixture_models.html
   network_metrics: network_metrics.html
   windows_installation: windows_installation.html
-last_built: 2022-09-16T11:30Z
+last_built: 2022-09-23T13:22Z
 urls:
   reference: https://jhart96.github.io/bisonR/reference
   article: https://jhart96.github.io/bisonR/articles
