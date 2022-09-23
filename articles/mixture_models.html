@@ -32,7 +32,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">bisonR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -144,12 +144,12 @@
 <span><span class="co">#&gt; <span style="color: #949494;"># Groups:   node_1_id [1]</span></span></span>
 <span><span class="co">#&gt;   node_1_id node_2_id event duration age_diff</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1         2             0       15        1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1         3             8        8        1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1         4            15       17        1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1         5             1       20        1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1         6             3       18        1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1         7             0        2        1</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1         2            18       18        1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1         3             0        5        1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1         4            16       18        1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1         5            20       20        1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1         6             1        9        1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1         7             1       13        1</span></span></code></pre></div>
 <p>Since the data are already aggregated (e.g. a single row for each dyad), we can use the binary conjugate model for speed:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_edge</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bison_model.html">bison_model</a></span><span class="op">(</span></span>
@@ -164,19 +164,19 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_mixture</span><span class="op">)</span></span>
 <span><span class="co">#&gt; === Fitted dyadic mixture model ===</span></span>
 <span><span class="co">#&gt; Maximum number of components: </span></span>
-<span><span class="co">#&gt; Best model: 1 components</span></span>
-<span><span class="co">#&gt; Probability of best model: 50.1%</span></span>
+<span><span class="co">#&gt; Best model: 2 components</span></span>
+<span><span class="co">#&gt; Probability of best model: 51.9%</span></span>
 <span><span class="co">#&gt; === Component probabilities ===</span></span>
-<span><span class="co">#&gt;            1     2     3     4     5</span></span>
-<span><span class="co">#&gt; P(K=k) 0.501 0.392 0.057 0.048 0.002</span></span>
-<span><span class="co">#&gt; === Edge component probabilities for best model (K = 1) ===</span></span>
-<span><span class="co">#&gt;         1</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 2 1</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 3 1</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 4 1</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 5 1</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 6 1</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 7 1</span></span>
+<span><span class="co">#&gt;            1     2   3     4     5</span></span>
+<span><span class="co">#&gt; P(K=k) 0.315 0.519 0.1 0.064 0.002</span></span>
+<span><span class="co">#&gt; === Edge component probabilities for best model (K = 2) ===</span></span>
+<span><span class="co">#&gt;             1     2</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 2 0.010 0.990</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 3 0.950 0.050</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 4 0.015 0.985</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 5 0.015 0.985</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 6 0.965 0.035</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 7 0.970 0.030</span></span>
 <span><span class="co">#&gt; ...</span></span></code></pre></div>
 <p>There’s quite a bit going on in the summary, so let’s break it down. The top section shows the model that fits best and the probability assigned to that model. The second section shows the probabilities of the models corresponding to each number of components (<span class="math inline">\(K = 1, 2, 3, ...\)</span>). You’ll notice the model with the highest probability is the same as the best fitting model from the section above. The final section shows the edge-level probabilities of component membership for the corresponding dyad. This can be interpreted as the probability a dyad belongs to a given component/cluster/social connection type.</p>
 <p>The information shown in the summary above can also be accessed using the functions <code><a href="../reference/get_network_component_probabilities.html">get_network_component_probabilities()</a></code> and <code><a href="../reference/get_edge_component_probabilities.html">get_edge_component_probabilities()</a></code>. These two functions make it possible to access the mixture model output programmatically for downstream analysis or plotting.</p>
@@ -184,120 +184,120 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_network_component_probabilities.html">get_network_component_probabilities</a></span><span class="op">(</span><span class="va">fit_mixture</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   num_components probability</span></span>
-<span><span class="co">#&gt; 1              1 0.500923753</span></span>
-<span><span class="co">#&gt; 2              2 0.391755510</span></span>
-<span><span class="co">#&gt; 3              3 0.056796422</span></span>
-<span><span class="co">#&gt; 4              4 0.048461472</span></span>
-<span><span class="co">#&gt; 5              5 0.002062843</span></span></code></pre></div>
+<span><span class="co">#&gt; 1              1 0.315208569</span></span>
+<span><span class="co">#&gt; 2              2 0.518901555</span></span>
+<span><span class="co">#&gt; 3              3 0.099629680</span></span>
+<span><span class="co">#&gt; 4              4 0.064068339</span></span>
+<span><span class="co">#&gt; 5              5 0.002191856</span></span></code></pre></div>
 <p>To use probabilities over component membership for a given number of components, we can use the <code><a href="../reference/get_edge_component_probabilities.html">get_edge_component_probabilities()</a></code> function, where <code>3</code> is the number of components we assume to exist in the network:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_edge_component_probabilities.html">get_edge_component_probabilities</a></span><span class="op">(</span><span class="va">fit_mixture</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     node_1 node_2 P(K = 1) P(K = 2) P(K = 3)</span></span>
-<span><span class="co">#&gt; 1        1      2    0.850    0.135    0.015</span></span>
-<span><span class="co">#&gt; 2        1      3    0.005    0.355    0.640</span></span>
-<span><span class="co">#&gt; 3        1      4    0.005    0.425    0.570</span></span>
-<span><span class="co">#&gt; 4        1      5    0.850    0.150    0.000</span></span>
-<span><span class="co">#&gt; 5        1      6    0.820    0.180    0.000</span></span>
-<span><span class="co">#&gt; 6        1      7    0.665    0.250    0.085</span></span>
-<span><span class="co">#&gt; 7        1      8    0.850    0.140    0.010</span></span>
-<span><span class="co">#&gt; 8        1      9    0.815    0.170    0.015</span></span>
-<span><span class="co">#&gt; 9        1     10    0.795    0.185    0.020</span></span>
-<span><span class="co">#&gt; 10       1     11    0.875    0.120    0.005</span></span>
-<span><span class="co">#&gt; 11       1     12    0.855    0.120    0.025</span></span>
-<span><span class="co">#&gt; 12       1     13    0.035    0.395    0.570</span></span>
-<span><span class="co">#&gt; 13       1     14    0.045    0.350    0.605</span></span>
-<span><span class="co">#&gt; 14       1     15    0.865    0.115    0.020</span></span>
-<span><span class="co">#&gt; 15       2      3    0.005    0.330    0.665</span></span>
-<span><span class="co">#&gt; 16       2      4    0.895    0.100    0.005</span></span>
-<span><span class="co">#&gt; 17       2      5    0.850    0.150    0.000</span></span>
-<span><span class="co">#&gt; 18       2      6    0.015    0.425    0.560</span></span>
-<span><span class="co">#&gt; 19       2      7    0.005    0.305    0.690</span></span>
-<span><span class="co">#&gt; 20       2      8    0.015    0.420    0.565</span></span>
-<span><span class="co">#&gt; 21       2      9    0.005    0.425    0.570</span></span>
-<span><span class="co">#&gt; 22       2     10    0.610    0.255    0.135</span></span>
-<span><span class="co">#&gt; 23       2     11    0.000    0.330    0.670</span></span>
-<span><span class="co">#&gt; 24       2     12    0.035    0.400    0.565</span></span>
-<span><span class="co">#&gt; 25       2     13    0.020    0.370    0.610</span></span>
-<span><span class="co">#&gt; 26       2     14    0.000    0.340    0.660</span></span>
-<span><span class="co">#&gt; 27       2     15    0.005    0.405    0.590</span></span>
-<span><span class="co">#&gt; 28       3      4    0.000    0.445    0.555</span></span>
-<span><span class="co">#&gt; 29       3      5    0.175    0.420    0.405</span></span>
-<span><span class="co">#&gt; 30       3      6    0.855    0.145    0.000</span></span>
-<span><span class="co">#&gt; 31       3      7    0.820    0.160    0.020</span></span>
-<span><span class="co">#&gt; 32       3      8    0.050    0.375    0.575</span></span>
-<span><span class="co">#&gt; 33       3      9    0.845    0.150    0.005</span></span>
-<span><span class="co">#&gt; 34       3     10    0.190    0.370    0.440</span></span>
-<span><span class="co">#&gt; 35       3     11    0.810    0.185    0.005</span></span>
-<span><span class="co">#&gt; 36       3     12    0.015    0.370    0.615</span></span>
-<span><span class="co">#&gt; 37       3     13    0.010    0.260    0.730</span></span>
-<span><span class="co">#&gt; 38       3     14    0.055    0.420    0.525</span></span>
-<span><span class="co">#&gt; 39       3     15    0.045    0.395    0.560</span></span>
-<span><span class="co">#&gt; 40       4      5    0.010    0.260    0.730</span></span>
-<span><span class="co">#&gt; 41       4      6    0.010    0.230    0.760</span></span>
-<span><span class="co">#&gt; 42       4      7    0.005    0.415    0.580</span></span>
-<span><span class="co">#&gt; 43       4      8    0.865    0.135    0.000</span></span>
-<span><span class="co">#&gt; 44       4      9    0.780    0.205    0.015</span></span>
-<span><span class="co">#&gt; 45       4     10    0.005    0.345    0.650</span></span>
-<span><span class="co">#&gt; 46       4     11    0.010    0.320    0.670</span></span>
-<span><span class="co">#&gt; 47       4     12    0.610    0.290    0.100</span></span>
-<span><span class="co">#&gt; 48       4     13    0.845    0.145    0.010</span></span>
-<span><span class="co">#&gt; 49       4     14    0.860    0.140    0.000</span></span>
-<span><span class="co">#&gt; 50       4     15    0.810    0.185    0.005</span></span>
-<span><span class="co">#&gt; 51       5      6    0.830    0.165    0.005</span></span>
-<span><span class="co">#&gt; 52       5      7    0.590    0.265    0.145</span></span>
-<span><span class="co">#&gt; 53       5      8    0.005    0.290    0.705</span></span>
-<span><span class="co">#&gt; 54       5      9    0.005    0.255    0.740</span></span>
-<span><span class="co">#&gt; 55       5     10    0.725    0.225    0.050</span></span>
-<span><span class="co">#&gt; 56       5     11    0.005    0.400    0.595</span></span>
-<span><span class="co">#&gt; 57       5     12    0.005    0.375    0.620</span></span>
-<span><span class="co">#&gt; 58       5     13    0.015    0.340    0.645</span></span>
-<span><span class="co">#&gt; 59       5     14    0.025    0.445    0.530</span></span>
-<span><span class="co">#&gt; 60       5     15    0.880    0.115    0.005</span></span>
-<span><span class="co">#&gt; 61       6      7    0.840    0.140    0.020</span></span>
-<span><span class="co">#&gt; 62       6      8    0.000    0.290    0.710</span></span>
-<span><span class="co">#&gt; 63       6      9    0.010    0.270    0.720</span></span>
-<span><span class="co">#&gt; 64       6     10    0.005    0.260    0.735</span></span>
-<span><span class="co">#&gt; 65       6     11    0.840    0.155    0.005</span></span>
-<span><span class="co">#&gt; 66       6     12    0.005    0.270    0.725</span></span>
-<span><span class="co">#&gt; 67       6     13    0.050    0.465    0.485</span></span>
-<span><span class="co">#&gt; 68       6     14    0.710    0.245    0.045</span></span>
-<span><span class="co">#&gt; 69       6     15    0.005    0.310    0.685</span></span>
-<span><span class="co">#&gt; 70       7      8    0.030    0.395    0.575</span></span>
-<span><span class="co">#&gt; 71       7      9    0.845    0.140    0.015</span></span>
-<span><span class="co">#&gt; 72       7     10    0.050    0.490    0.460</span></span>
-<span><span class="co">#&gt; 73       7     11    0.010    0.355    0.635</span></span>
-<span><span class="co">#&gt; 74       7     12    0.015    0.325    0.660</span></span>
-<span><span class="co">#&gt; 75       7     13    0.015    0.485    0.500</span></span>
-<span><span class="co">#&gt; 76       7     14    0.735    0.205    0.060</span></span>
-<span><span class="co">#&gt; 77       7     15    0.010    0.425    0.565</span></span>
-<span><span class="co">#&gt; 78       8      9    0.615    0.280    0.105</span></span>
-<span><span class="co">#&gt; 79       8     10    0.145    0.445    0.410</span></span>
-<span><span class="co">#&gt; 80       8     11    0.880    0.110    0.010</span></span>
-<span><span class="co">#&gt; 81       8     12    0.015    0.240    0.745</span></span>
-<span><span class="co">#&gt; 82       8     13    0.825    0.165    0.010</span></span>
-<span><span class="co">#&gt; 83       8     14    0.840    0.150    0.010</span></span>
-<span><span class="co">#&gt; 84       8     15    0.000    0.285    0.715</span></span>
-<span><span class="co">#&gt; 85       9     10    0.835    0.165    0.000</span></span>
-<span><span class="co">#&gt; 86       9     11    0.890    0.110    0.000</span></span>
-<span><span class="co">#&gt; 87       9     12    0.815    0.180    0.005</span></span>
-<span><span class="co">#&gt; 88       9     13    0.040    0.355    0.605</span></span>
-<span><span class="co">#&gt; 89       9     14    0.860    0.140    0.000</span></span>
-<span><span class="co">#&gt; 90       9     15    0.870    0.130    0.000</span></span>
-<span><span class="co">#&gt; 91      10     11    0.005    0.400    0.595</span></span>
-<span><span class="co">#&gt; 92      10     12    0.840    0.145    0.015</span></span>
-<span><span class="co">#&gt; 93      10     13    0.850    0.150    0.000</span></span>
-<span><span class="co">#&gt; 94      10     14    0.800    0.190    0.010</span></span>
-<span><span class="co">#&gt; 95      10     15    0.005    0.320    0.675</span></span>
-<span><span class="co">#&gt; 96      11     12    0.020    0.470    0.510</span></span>
-<span><span class="co">#&gt; 97      11     13    0.100    0.460    0.440</span></span>
-<span><span class="co">#&gt; 98      11     14    0.040    0.440    0.520</span></span>
-<span><span class="co">#&gt; 99      11     15    0.835    0.155    0.010</span></span>
-<span><span class="co">#&gt; 100     12     13    0.000    0.355    0.645</span></span>
-<span><span class="co">#&gt; 101     12     14    0.720    0.220    0.060</span></span>
-<span><span class="co">#&gt; 102     12     15    0.015    0.395    0.590</span></span>
-<span><span class="co">#&gt; 103     13     14    0.820    0.160    0.020</span></span>
-<span><span class="co">#&gt; 104     13     15    0.855    0.130    0.015</span></span>
-<span><span class="co">#&gt; 105     14     15    0.815    0.175    0.010</span></span></code></pre></div>
+<span><span class="co">#&gt; 1        1      2    0.005    0.220    0.775</span></span>
+<span><span class="co">#&gt; 2        1      3    0.850    0.140    0.010</span></span>
+<span><span class="co">#&gt; 3        1      4    0.000    0.330    0.670</span></span>
+<span><span class="co">#&gt; 4        1      5    0.005    0.205    0.790</span></span>
+<span><span class="co">#&gt; 5        1      6    0.845    0.150    0.005</span></span>
+<span><span class="co">#&gt; 6        1      7    0.865    0.135    0.000</span></span>
+<span><span class="co">#&gt; 7        1      8    0.000    0.265    0.735</span></span>
+<span><span class="co">#&gt; 8        1      9    0.055    0.380    0.565</span></span>
+<span><span class="co">#&gt; 9        1     10    0.605    0.270    0.125</span></span>
+<span><span class="co">#&gt; 10       1     11    0.010    0.360    0.630</span></span>
+<span><span class="co">#&gt; 11       1     12    0.880    0.120    0.000</span></span>
+<span><span class="co">#&gt; 12       1     13    0.000    0.260    0.740</span></span>
+<span><span class="co">#&gt; 13       1     14    0.865    0.135    0.000</span></span>
+<span><span class="co">#&gt; 14       1     15    0.005    0.335    0.660</span></span>
+<span><span class="co">#&gt; 15       2      3    0.765    0.200    0.035</span></span>
+<span><span class="co">#&gt; 16       2      4    0.020    0.355    0.625</span></span>
+<span><span class="co">#&gt; 17       2      5    0.035    0.350    0.615</span></span>
+<span><span class="co">#&gt; 18       2      6    0.860    0.135    0.005</span></span>
+<span><span class="co">#&gt; 19       2      7    0.885    0.115    0.000</span></span>
+<span><span class="co">#&gt; 20       2      8    0.850    0.145    0.005</span></span>
+<span><span class="co">#&gt; 21       2      9    0.805    0.175    0.020</span></span>
+<span><span class="co">#&gt; 22       2     10    0.850    0.145    0.005</span></span>
+<span><span class="co">#&gt; 23       2     11    0.000    0.370    0.630</span></span>
+<span><span class="co">#&gt; 24       2     12    0.000    0.325    0.675</span></span>
+<span><span class="co">#&gt; 25       2     13    0.115    0.320    0.565</span></span>
+<span><span class="co">#&gt; 26       2     14    0.010    0.185    0.805</span></span>
+<span><span class="co">#&gt; 27       2     15    0.090    0.365    0.545</span></span>
+<span><span class="co">#&gt; 28       3      4    0.910    0.090    0.000</span></span>
+<span><span class="co">#&gt; 29       3      5    0.810    0.170    0.020</span></span>
+<span><span class="co">#&gt; 30       3      6    0.805    0.185    0.010</span></span>
+<span><span class="co">#&gt; 31       3      7    0.025    0.295    0.680</span></span>
+<span><span class="co">#&gt; 32       3      8    0.005    0.350    0.645</span></span>
+<span><span class="co">#&gt; 33       3      9    0.005    0.215    0.780</span></span>
+<span><span class="co">#&gt; 34       3     10    0.745    0.185    0.070</span></span>
+<span><span class="co">#&gt; 35       3     11    0.855    0.145    0.000</span></span>
+<span><span class="co">#&gt; 36       3     12    0.825    0.165    0.010</span></span>
+<span><span class="co">#&gt; 37       3     13    0.010    0.250    0.740</span></span>
+<span><span class="co">#&gt; 38       3     14    0.900    0.095    0.005</span></span>
+<span><span class="co">#&gt; 39       3     15    0.000    0.330    0.670</span></span>
+<span><span class="co">#&gt; 40       4      5    0.025    0.410    0.565</span></span>
+<span><span class="co">#&gt; 41       4      6    0.000    0.345    0.655</span></span>
+<span><span class="co">#&gt; 42       4      7    0.730    0.230    0.040</span></span>
+<span><span class="co">#&gt; 43       4      8    0.000    0.295    0.705</span></span>
+<span><span class="co">#&gt; 44       4      9    0.210    0.340    0.450</span></span>
+<span><span class="co">#&gt; 45       4     10    0.005    0.360    0.635</span></span>
+<span><span class="co">#&gt; 46       4     11    0.845    0.155    0.000</span></span>
+<span><span class="co">#&gt; 47       4     12    0.900    0.095    0.005</span></span>
+<span><span class="co">#&gt; 48       4     13    0.010    0.240    0.750</span></span>
+<span><span class="co">#&gt; 49       4     14    0.005    0.215    0.780</span></span>
+<span><span class="co">#&gt; 50       4     15    0.085    0.365    0.550</span></span>
+<span><span class="co">#&gt; 51       5      6    0.865    0.130    0.005</span></span>
+<span><span class="co">#&gt; 52       5      7    0.875    0.120    0.005</span></span>
+<span><span class="co">#&gt; 53       5      8    0.000    0.305    0.695</span></span>
+<span><span class="co">#&gt; 54       5      9    0.855    0.145    0.000</span></span>
+<span><span class="co">#&gt; 55       5     10    0.005    0.335    0.660</span></span>
+<span><span class="co">#&gt; 56       5     11    0.000    0.320    0.680</span></span>
+<span><span class="co">#&gt; 57       5     12    0.040    0.385    0.575</span></span>
+<span><span class="co">#&gt; 58       5     13    0.880    0.120    0.000</span></span>
+<span><span class="co">#&gt; 59       5     14    0.215    0.355    0.430</span></span>
+<span><span class="co">#&gt; 60       5     15    0.880    0.120    0.000</span></span>
+<span><span class="co">#&gt; 61       6      7    0.025    0.340    0.635</span></span>
+<span><span class="co">#&gt; 62       6      8    0.435    0.310    0.255</span></span>
+<span><span class="co">#&gt; 63       6      9    0.050    0.340    0.610</span></span>
+<span><span class="co">#&gt; 64       6     10    0.875    0.120    0.005</span></span>
+<span><span class="co">#&gt; 65       6     11    0.790    0.175    0.035</span></span>
+<span><span class="co">#&gt; 66       6     12    0.245    0.395    0.360</span></span>
+<span><span class="co">#&gt; 67       6     13    0.005    0.210    0.785</span></span>
+<span><span class="co">#&gt; 68       6     14    0.005    0.340    0.655</span></span>
+<span><span class="co">#&gt; 69       6     15    0.880    0.115    0.005</span></span>
+<span><span class="co">#&gt; 70       7      8    0.865    0.135    0.000</span></span>
+<span><span class="co">#&gt; 71       7      9    0.905    0.090    0.005</span></span>
+<span><span class="co">#&gt; 72       7     10    0.630    0.220    0.150</span></span>
+<span><span class="co">#&gt; 73       7     11    0.110    0.380    0.510</span></span>
+<span><span class="co">#&gt; 74       7     12    0.875    0.125    0.000</span></span>
+<span><span class="co">#&gt; 75       7     13    0.850    0.150    0.000</span></span>
+<span><span class="co">#&gt; 76       7     14    0.000    0.400    0.600</span></span>
+<span><span class="co">#&gt; 77       7     15    0.890    0.110    0.000</span></span>
+<span><span class="co">#&gt; 78       8      9    0.000    0.315    0.685</span></span>
+<span><span class="co">#&gt; 79       8     10    0.000    0.315    0.685</span></span>
+<span><span class="co">#&gt; 80       8     11    0.885    0.115    0.000</span></span>
+<span><span class="co">#&gt; 81       8     12    0.010    0.290    0.700</span></span>
+<span><span class="co">#&gt; 82       8     13    0.880    0.120    0.000</span></span>
+<span><span class="co">#&gt; 83       8     14    0.005    0.335    0.660</span></span>
+<span><span class="co">#&gt; 84       8     15    0.025    0.315    0.660</span></span>
+<span><span class="co">#&gt; 85       9     10    0.000    0.290    0.710</span></span>
+<span><span class="co">#&gt; 86       9     11    0.000    0.240    0.760</span></span>
+<span><span class="co">#&gt; 87       9     12    0.885    0.115    0.000</span></span>
+<span><span class="co">#&gt; 88       9     13    0.890    0.110    0.000</span></span>
+<span><span class="co">#&gt; 89       9     14    0.000    0.275    0.725</span></span>
+<span><span class="co">#&gt; 90       9     15    0.010    0.270    0.720</span></span>
+<span><span class="co">#&gt; 91      10     11    0.875    0.120    0.005</span></span>
+<span><span class="co">#&gt; 92      10     12    0.905    0.090    0.005</span></span>
+<span><span class="co">#&gt; 93      10     13    0.835    0.145    0.020</span></span>
+<span><span class="co">#&gt; 94      10     14    0.005    0.380    0.615</span></span>
+<span><span class="co">#&gt; 95      10     15    0.680    0.230    0.090</span></span>
+<span><span class="co">#&gt; 96      11     12    0.005    0.315    0.680</span></span>
+<span><span class="co">#&gt; 97      11     13    0.005    0.300    0.695</span></span>
+<span><span class="co">#&gt; 98      11     14    0.830    0.150    0.020</span></span>
+<span><span class="co">#&gt; 99      11     15    0.025    0.335    0.640</span></span>
+<span><span class="co">#&gt; 100     12     13    0.190    0.315    0.495</span></span>
+<span><span class="co">#&gt; 101     12     14    0.880    0.120    0.000</span></span>
+<span><span class="co">#&gt; 102     12     15    0.595    0.285    0.120</span></span>
+<span><span class="co">#&gt; 103     13     14    0.885    0.110    0.005</span></span>
+<span><span class="co">#&gt; 104     13     15    0.000    0.340    0.660</span></span>
+<span><span class="co">#&gt; 105     14     15    0.845    0.155    0.000</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="using-components-in-downstream-analysis">Using components in downstream analysis<a class="anchor" aria-label="anchor" href="#using-components-in-downstream-analysis"></a>
@@ -308,21 +308,21 @@
 <code class="sourceCode R"><span><span class="va">df_nodal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>node_id<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">node_1_id</span><span class="op">)</span><span class="op">)</span>, trait<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">15</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">df_nodal</span></span>
 <span><span class="co">#&gt;    node_id       trait</span></span>
-<span><span class="co">#&gt; 1        1 -0.48793581</span></span>
-<span><span class="co">#&gt; 2        2 -1.77066658</span></span>
-<span><span class="co">#&gt; 3        3 -1.21632954</span></span>
-<span><span class="co">#&gt; 4        4  0.08599488</span></span>
-<span><span class="co">#&gt; 5        5  0.72708177</span></span>
-<span><span class="co">#&gt; 6        6  1.78423894</span></span>
-<span><span class="co">#&gt; 7        7  0.45549726</span></span>
-<span><span class="co">#&gt; 8        8  0.39288615</span></span>
-<span><span class="co">#&gt; 9        9  0.78760561</span></span>
-<span><span class="co">#&gt; 10      10  0.19779213</span></span>
-<span><span class="co">#&gt; 11      11  0.60409270</span></span>
-<span><span class="co">#&gt; 12      12 -0.26359600</span></span>
-<span><span class="co">#&gt; 13      13 -0.14015819</span></span>
-<span><span class="co">#&gt; 14      14 -0.18294719</span></span>
-<span><span class="co">#&gt; 15      15  0.45923237</span></span></code></pre></div>
+<span><span class="co">#&gt; 1        1 -0.67535518</span></span>
+<span><span class="co">#&gt; 2        2  1.37719552</span></span>
+<span><span class="co">#&gt; 3        3 -0.98175058</span></span>
+<span><span class="co">#&gt; 4        4  1.41454045</span></span>
+<span><span class="co">#&gt; 5        5  1.10635322</span></span>
+<span><span class="co">#&gt; 6        6  0.51615517</span></span>
+<span><span class="co">#&gt; 7        7  0.74170345</span></span>
+<span><span class="co">#&gt; 8        8  0.38834741</span></span>
+<span><span class="co">#&gt; 9        9 -0.23233558</span></span>
+<span><span class="co">#&gt; 10      10 -0.97413158</span></span>
+<span><span class="co">#&gt; 11      11 -0.03684346</span></span>
+<span><span class="co">#&gt; 12      12 -0.44870408</span></span>
+<span><span class="co">#&gt; 13      13  0.98640130</span></span>
+<span><span class="co">#&gt; 14      14  0.24377726</span></span>
+<span><span class="co">#&gt; 15      15  1.25264538</span></span></code></pre></div>
 <p>This dataframe will provide the information about traits that we need for the analysis. Next, we need to calculate strength using only individuals categorised as strong according to the mixture model. Since both component membership (strong or weak) <em>and</em> edge weights are probabilistic, we have to sample from both posteriors as we build a new posterior of mixture-based strength:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Set number of nodes and number of posterior samples</span></span>
@@ -352,21 +352,21 @@
 <span><span class="op">}</span></span>
 <span><span class="va">imputed_data</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="co">#&gt;    node_id       trait mix_strength</span></span>
-<span><span class="co">#&gt; 1        1 -0.48793581     3.472609</span></span>
-<span><span class="co">#&gt; 2        2 -1.77066658     8.889391</span></span>
-<span><span class="co">#&gt; 3        3 -1.21632954     7.833837</span></span>
-<span><span class="co">#&gt; 4        4  0.08599488     6.279980</span></span>
-<span><span class="co">#&gt; 5        5  0.72708177     7.424485</span></span>
-<span><span class="co">#&gt; 6        6  1.78423894     7.201738</span></span>
-<span><span class="co">#&gt; 7        7  0.45549726     6.732007</span></span>
-<span><span class="co">#&gt; 8        8  0.39288615     6.924294</span></span>
-<span><span class="co">#&gt; 9        9  0.78760561     3.529794</span></span>
-<span><span class="co">#&gt; 10      10  0.19779213     4.913780</span></span>
-<span><span class="co">#&gt; 11      11  0.60409270     6.405172</span></span>
-<span><span class="co">#&gt; 12      12 -0.26359600     8.161988</span></span>
-<span><span class="co">#&gt; 13      13 -0.14015819     7.261177</span></span>
-<span><span class="co">#&gt; 14      14 -0.18294719     4.270560</span></span>
-<span><span class="co">#&gt; 15      15  0.45923237     6.405685</span></span></code></pre></div>
+<span><span class="co">#&gt; 1        1 -0.67535518     7.466684</span></span>
+<span><span class="co">#&gt; 2        2  1.37719552     6.426507</span></span>
+<span><span class="co">#&gt; 3        3 -0.98175058     4.941428</span></span>
+<span><span class="co">#&gt; 4        4  1.41454045     8.087297</span></span>
+<span><span class="co">#&gt; 5        5  1.10635322     5.785468</span></span>
+<span><span class="co">#&gt; 6        6  0.51615517     5.677711</span></span>
+<span><span class="co">#&gt; 7        7  0.74170345     3.418725</span></span>
+<span><span class="co">#&gt; 8        8  0.38834741     8.887377</span></span>
+<span><span class="co">#&gt; 9        9 -0.23233558     7.042251</span></span>
+<span><span class="co">#&gt; 10      10 -0.97413158     4.869667</span></span>
+<span><span class="co">#&gt; 11      11 -0.03684346     6.865951</span></span>
+<span><span class="co">#&gt; 12      12 -0.44870408     5.543205</span></span>
+<span><span class="co">#&gt; 13      13  0.98640130     6.142207</span></span>
+<span><span class="co">#&gt; 14      14  0.24377726     6.583444</span></span>
+<span><span class="co">#&gt; 15      15  1.25264538     8.034853</span></span></code></pre></div>
 <p>Now we have a set of imputed dataframes containing the posteriors of mixture-based node strength, we can fit the model using brm_multiple.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_brm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/brms/man/brm_multiple.html" class="external-link">brm_multiple</a></span><span class="op">(</span><span class="va">trait</span> <span class="op">~</span> <span class="va">mix_strength</span>, <span class="va">imputed_data</span>, silent<span class="op">=</span><span class="fl">2</span>, refresh<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span></code></pre></div>
