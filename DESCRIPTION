@@ -1,6 +1,6 @@
 Package: bisonR
 Title: Bayesian Inference of Social Networks in R
-Version: 0.3.0
+Version: 0.4.0
 Authors@R: 
     person("Jordan", "Hart", , "jordan.da.hart@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4636-0760"))
@@ -31,7 +31,9 @@ Imports:
     testthat,
     covr,
     brms,
-    mice
+    mice,
+    BH,
+    RcppEigen
 Remotes: 
     stan-dev/cmdstanr
 VignetteBuilder: knitr

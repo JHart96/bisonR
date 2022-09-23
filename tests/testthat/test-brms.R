@@ -55,7 +55,8 @@ test_that("brms works", {
       df_nodal,
       num_draws=5,
       silent=2,
-      refresh=0
+      refresh=0,
+      z_score=TRUE
     )),
     regexp=NA
   )

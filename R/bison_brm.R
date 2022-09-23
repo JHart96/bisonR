@@ -8,11 +8,12 @@ utils::globalVariables(c(".imp"))
 #' @param edgemodel_list A bisonR edge model (or a list of them)
 #' @param data_list A dataframe of regression variables compatible with a brms model (or a list of them)
 #' @param num_draws Number of draws from the network posterior to use when fitting model
+#' @param z_score Whether to Z-score bison variable or not.
 #' @param ... Additional arguments to be passed to brm(), such as family or priors
 #'
 #' @return A fitted brms model
 #' @export
-bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, ...) {
+bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score=FALSE, ...) {
   # Parse formula
   parsed_formula <- parse_bison_brms_formula(formula)
   brms_formula <- parsed_formula$brms_formula
@@ -24,7 +25,8 @@ bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, ...) {
     parsed_formula$param_names,
     parsed_formula$target_name,
     parsed_formula$metric_name,
-    num_draws
+    num_draws,
+    z_score
   )
 
   # Run brms imputation.
