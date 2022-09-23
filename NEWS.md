@@ -1,3 +1,7 @@
+# bisonR 0.4.1
+* Fixed Github actions issues.
+* Fixed bug in mixture model.
+
 # bisonR 0.4.0
 * Support for Z-score bison data in bison_brms.
 * Example of using bison for multiple imputation.
