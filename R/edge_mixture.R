@@ -133,7 +133,7 @@ get_edge_component_probabilities <- function(object, num_components) {
     function(x) names(object$edgemodel$node_to_idx)[object$edgemodel$dyad_to_idx[x, ]]
   )
 
-  if (num_components < length(object$edge_component_probabilities)) {
+  if (num_components <= length(object$edge_component_probabilities)) {
     df_names <- data.frame(t(node_names))
     df_components <- data.frame(object$edge_component_probabilities[[num_components]])
     df <- cbind(df_names, df_components)
@@ -141,6 +141,7 @@ get_edge_component_probabilities <- function(object, num_components) {
     colnames(df)[3:dim(df)[2]] <- sapply(1:num_components, function(i) paste0("P(K = ", i, ")"))
     return(df)
   }
+  stop("This component does not exist.")
 }
 
 #' Get probabilities of component membership for the entire network
