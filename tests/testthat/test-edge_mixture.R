@@ -27,6 +27,11 @@ test_that("binary edge mixtures work", {
     get_network_component_probabilities(fit_mixture),
     regexp=NA
   )
+
+  expect_warning(
+    get_component_means(fit_mixture, 3),
+    regexp=NA
+  )
 })
 
 test_that("count edge mixtures work", {
@@ -56,6 +61,11 @@ test_that("count edge mixtures work", {
 
   expect_warning(
     get_network_component_probabilities(fit_mixture),
+    regexp=NA
+  )
+
+  expect_warning(
+    get_component_means(fit_mixture, 3),
     regexp=NA
   )
 })

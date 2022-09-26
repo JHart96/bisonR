@@ -66,10 +66,10 @@ To use probabilities over component membership for a given number of components,
 get_edge_component_probabilities(fit_mixture, 3)
 ```
 
-It's often useful to know where the mixture components are location, so we can get their posterior means using the `component_mean_samples` property for a given number of components. Here we'll calculate the median posterior means of the components for the mixture model with 3 components:
+It's often useful to know where the mixture components are location, so we can get their posterior means using the `get_component_means()` function for a given number of components. Here we'll calculate the posterior means of the components for the mixture model with 3 components:
 
 ```{r}
-apply(fit_mixture$component_mean_samples[[3]], 2, median)
+get_component_means(fit_mixture, 3)
 ```
 
 # Using components in downstream analysis

@@ -178,3 +178,33 @@ get_network_component_probabilities <- function(object) {
   df <- data.frame(num_components=1:num_components, probability=object$component_probabilities)
   return(df)
 }
+
+#' Get component means from edge mixture model
+#'
+#' @param object An S3 edge mixture model object
+#' @param num_components The number of components in the mixture model
+#' @param ci Credible interval for component mean estimates
+#'
+#' @return A dataframe describing the posteriors of the component means
+#' @export
+get_component_means <- function(object, num_components, ci=0.90) {
+  lb_prob <- 0.5 * (1 - ci)
+  ub_prob <- 1 - 0.5 * (1 - ci)
+  component_mean_samples <- object$component_mean_samples[[num_components]]
+  if (object$edgemodel$model_type == "binary") {
+    component_mean_samples <- plogis(component_mean_samples)
+  }
+  if (object$edgemodel$model_type == "count") {
+    component_mean_samples <- exp(component_mean_samples)
+  }
+  mu <- apply(component_mean_samples, 2, median)
+  lb <- apply(component_mean_samples, 2, function(x) quantile(x, probs=c(lb_prob)))
+  ub <- apply(component_mean_samples, 2, function(x) quantile(x, probs=c(ub_prob)))
+  summary_table <- matrix(0, num_components, 3)
+  rownames(summary_table) <- sapply(1:num_components, function(i) paste0("K = ", i))
+  colnames(summary_table) <- c("50%", paste0(lb_prob * 100, "%"), paste0(ub_prob * 100, "%"))
+  summary_table[, 1] <- mu
+  summary_table[, 2] <- lb
+  summary_table[, 3] <- ub
+  return(as.data.frame(summary_table))
+}
