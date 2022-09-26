@@ -24,6 +24,7 @@ bison_mixture <- function(edgemodel, num_components=5, verbose=TRUE) {
     pb <- txtProgressBar(max=num_samples, style=3)
   }
 
+  component_mean_samples <- list()
   # Fit mixture to each posterior draw of the networks
   for (i in 1:num_samples) {
     if (verbose) setTxtProgressBar(pb, i)
@@ -31,6 +32,10 @@ bison_mixture <- function(edgemodel, num_components=5, verbose=TRUE) {
     fit_mixtures <- list()
     for (k in component_range) {
       fit_mixtures[[k]] <- mclust::Mclust(edgemodel$edge_samples[i, ], G=k, verbose=FALSE)
+      if (i == 1) {
+        component_mean_samples[[k]] <- matrix(0, num_samples, k)
+      }
+      component_mean_samples[[k]][i, ] <- fit_mixtures[[k]]$parameters$mean
     }
 
     # Calculate model weights from BIC differences
@@ -62,6 +67,8 @@ bison_mixture <- function(edgemodel, num_components=5, verbose=TRUE) {
   obj$edgemodel <- edgemodel
   obj$component_range <- component_range
   obj$num_components <- length(component_range)
+  obj$fit_mixtures <- fit_mixtures
+  obj$component_mean_samples <- component_mean_samples
   class(obj) <- "bison_mixture"
   obj
 }
@@ -105,10 +112,26 @@ print.summary.bison_mixture <- function(x, digits=3, ...) {
     "Probability of best model: ", round(100 * x$component_probabilities[best_model], 1), "%\n"
   ))
   cat("=== Component probabilities ===\n")
-  cp <- matrix(round(x$component_probabilities, digits), nrow=1)
+  cp <- matrix(0, ncol=length(x$component_probabilities), nrow=1)
   rownames(cp) <- "P(K=k)"
   colnames(cp) <- 1:length(x$component_probabilities)
+  cp[1, ] <- round(x$component_probabilities, digits)
   print(cp)
+
+  component_means <- apply(x$bison_mixture_obj$component_mean_samples[[best_model]], 2, mean)
+  cat(paste0("=== Component means for best model (K = ", best_model, ") ===\n"))
+  cm <- matrix(0, ncol=length(component_means), nrow=1)
+  rownames(cm) <- "mean"
+  colnames(cm) <- 1:best_model
+  component_means <- round(component_means, digits)
+  if (x$bison_mixture_obj$edgemodel$model_type == "binary") {
+    component_means <- plogis(component_means)
+  } else if (x$bison_mixture_obj$edgemodel$model_type == "count") {
+    component_means <- exp(component_means)
+  }
+  cm[1, ] <- component_means
+  print(cm)
+
   cat(paste0("=== Edge component probabilities for best model (K = ", best_model, ") ===\n"))
   ecp <- x$edge_component_probabilities[[best_model]]
 
