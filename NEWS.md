@@ -1,3 +1,6 @@
+# bisonR 0.4.2
+* Calculates component means in mixture models.
+
 # bisonR 0.4.1
 * Fixed Github actions issues.
 * Fixed bug in mixture model.

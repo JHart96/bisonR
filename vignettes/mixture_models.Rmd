@@ -1,8 +1,8 @@
 ---
-title: "Edge Mixture Models"
+title: "Edge mixture models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Edge Mixture Models}
+  %\VignetteIndexEntry{Edge mixture models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   % \VignetteDepends{igraph, brms}
@@ -64,6 +64,12 @@ To use probabilities over component membership for a given number of components,
 
 ```{r}
 get_edge_component_probabilities(fit_mixture, 3)
+```
+
+It's often useful to know where the mixture components are location, so we can get their posterior means using the `get_component_means()` function for a given number of components. Here we'll calculate the posterior means of the components for the mixture model with 3 components:
+
+```{r}
+get_component_means(fit_mixture, 3)
 ```
 
 # Using components in downstream analysis

@@ -24,6 +24,7 @@ bison_mixture <- function(edgemodel, num_components=5, verbose=TRUE) {
     pb <- txtProgressBar(max=num_samples, style=3)
   }
 
+  component_mean_samples <- list()
   # Fit mixture to each posterior draw of the networks
   for (i in 1:num_samples) {
     if (verbose) setTxtProgressBar(pb, i)
@@ -31,6 +32,10 @@ bison_mixture <- function(edgemodel, num_components=5, verbose=TRUE) {
     fit_mixtures <- list()
     for (k in component_range) {
       fit_mixtures[[k]] <- mclust::Mclust(edgemodel$edge_samples[i, ], G=k, verbose=FALSE)
+      if (i == 1) {
+        component_mean_samples[[k]] <- matrix(0, num_samples, k)
+      }
+      component_mean_samples[[k]][i, ] <- fit_mixtures[[k]]$parameters$mean
     }
 
     # Calculate model weights from BIC differences
@@ -62,6 +67,8 @@ bison_mixture <- function(edgemodel, num_components=5, verbose=TRUE) {
   obj$edgemodel <- edgemodel
   obj$component_range <- component_range
   obj$num_components <- length(component_range)
+  obj$fit_mixtures <- fit_mixtures
+  obj$component_mean_samples <- component_mean_samples
   class(obj) <- "bison_mixture"
   obj
 }
@@ -105,10 +112,26 @@ print.summary.bison_mixture <- function(x, digits=3, ...) {
     "Probability of best model: ", round(100 * x$component_probabilities[best_model], 1), "%\n"
   ))
   cat("=== Component probabilities ===\n")
-  cp <- matrix(round(x$component_probabilities, digits), nrow=1)
+  cp <- matrix(0, ncol=length(x$component_probabilities), nrow=1)
   rownames(cp) <- "P(K=k)"
   colnames(cp) <- 1:length(x$component_probabilities)
+  cp[1, ] <- round(x$component_probabilities, digits)
   print(cp)
+
+  component_means <- apply(x$bison_mixture_obj$component_mean_samples[[best_model]], 2, mean)
+  cat(paste0("=== Component means for best model (K = ", best_model, ") ===\n"))
+  cm <- matrix(0, ncol=length(component_means), nrow=1)
+  rownames(cm) <- "mean"
+  colnames(cm) <- 1:best_model
+  component_means <- round(component_means, digits)
+  if (x$bison_mixture_obj$edgemodel$model_type == "binary") {
+    component_means <- plogis(component_means)
+  } else if (x$bison_mixture_obj$edgemodel$model_type == "count") {
+    component_means <- exp(component_means)
+  }
+  cm[1, ] <- component_means
+  print(cm)
+
   cat(paste0("=== Edge component probabilities for best model (K = ", best_model, ") ===\n"))
   ecp <- x$edge_component_probabilities[[best_model]]
 
@@ -154,4 +177,34 @@ get_network_component_probabilities <- function(object) {
   num_components <- length(object$component_probabilities)
   df <- data.frame(num_components=1:num_components, probability=object$component_probabilities)
   return(df)
+}
+
+#' Get component means from edge mixture model
+#'
+#' @param object An S3 edge mixture model object
+#' @param num_components The number of components in the mixture model
+#' @param ci Credible interval for component mean estimates
+#'
+#' @return A dataframe describing the posteriors of the component means
+#' @export
+get_component_means <- function(object, num_components, ci=0.90) {
+  lb_prob <- 0.5 * (1 - ci)
+  ub_prob <- 1 - 0.5 * (1 - ci)
+  component_mean_samples <- object$component_mean_samples[[num_components]]
+  if (object$edgemodel$model_type == "binary") {
+    component_mean_samples <- plogis(component_mean_samples)
+  }
+  if (object$edgemodel$model_type == "count") {
+    component_mean_samples <- exp(component_mean_samples)
+  }
+  mu <- apply(component_mean_samples, 2, median)
+  lb <- apply(component_mean_samples, 2, function(x) quantile(x, probs=c(lb_prob)))
+  ub <- apply(component_mean_samples, 2, function(x) quantile(x, probs=c(ub_prob)))
+  summary_table <- matrix(0, num_components, 3)
+  rownames(summary_table) <- sapply(1:num_components, function(i) paste0("K = ", i))
+  colnames(summary_table) <- c("50%", paste0(lb_prob * 100, "%"), paste0(ub_prob * 100, "%"))
+  summary_table[, 1] <- mu
+  summary_table[, 2] <- lb
+  summary_table[, 3] <- ub
+  return(as.data.frame(summary_table))
 }
