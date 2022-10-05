@@ -72,24 +72,6 @@ It's often useful to know where the mixture components are location, so we can g
 get_component_means(fit_mixture, 3)
 ```
 
-We can also visualise the mixture model for a given number of components using the `plot_mixture()` function
-
-```{r}
-p <- get_edge_component_probabilities(fit_mixture, 3)
-p <- as.matrix(p[, 3:ncol(p)])
-
-component_probs <- colMeans(p)
-
-plot(NULL, xlim=c(-10, 10), ylim=c(0, 1))
-num_samples <- 1000
-for (k in 1:3) {
-  num_comp_samples <- round(component_probs[k] * num_samples)
-  lines(density(fit_mixture$component_samples[[k]][sample(1:100, num_comp_samples, replace=T), k]))
-}
-
-plot(igraph::E(bison_to_igraph(fit_edge)[[1]])$weight, get_edgelist((fit_edge))$median)
-```
-
 # Using components in downstream analysis
 
 Now say that we're interested in the number of strong vs weak partners. Specifically we want to know if the strength of connections only to strong partners predicts a node-level trait. This is a non-standard analysis so will require some manual data wrangling to fit the right kind of model.
