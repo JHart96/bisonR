@@ -72,6 +72,24 @@ It's often useful to know where the mixture components are location, so we can g
 get_component_means(fit_mixture, 3)
 ```
 
+We can also visualise the mixture model for a given number of components using the `plot_mixture()` function
+
+```{r}
+p <- get_edge_component_probabilities(fit_mixture, 3)
+p <- as.matrix(p[, 3:ncol(p)])
+
+component_probs <- colMeans(p)
+
+plot(NULL, xlim=c(-10, 10), ylim=c(0, 1))
+num_samples <- 1000
+for (k in 1:3) {
+  num_comp_samples <- round(component_probs[k] * num_samples)
+  lines(density(fit_mixture$component_samples[[k]][sample(1:100, num_comp_samples, replace=T), k]))
+}
+
+plot(igraph::E(bison_to_igraph(fit_edge)[[1]])$weight, get_edgelist((fit_edge))$median)
+```
+
 # Using components in downstream analysis
 
 Now say that we're interested in the number of strong vs weak partners. Specifically we want to know if the strength of connections only to strong partners predicts a node-level trait. This is a non-standard analysis so will require some manual data wrangling to fit the right kind of model.
@@ -101,7 +119,7 @@ imputed_data <- list()
 # Loop through each posterior sample and calculate strength of top mixture.
 for (i in 1:num_draws) {
   # Calculate edge components (1 if strong, 0 if weak)
-  edge_components <- fit_mixture$edge_component_samples[i, 2, ] - 1
+  edge_components <- 1 * (fit_mixture$edge_component_samples[i, 2, ] == 2)
   
   # If the edge is strong, don't change edge weight, but if it's weak then set to zero.
   E(nets[[i]])$weight <- E(nets[[i]])$weight * edge_components
@@ -111,6 +129,46 @@ for (i in 1:num_draws) {
   imputed_data[[i]]$mix_strength <- strength(nets[[i]])
 }
 imputed_data[[2]]
+```
+
+```{r}
+# Generate igraph nets and choose one of them (1).
+nets <- bison_to_igraph(fit_edge, num_draws)
+net <- nets[[1]]
+
+# Calculate its strength using igraph
+x <- igraph::strength(net)
+
+# Take a sample of strength using bison (again just one sample)
+y <- extract_metric(fit_edge, "node_strength", num_draws=10)[1, ]
+
+# Plot them, they should be quite linear
+plot(x, y)
+
+# Get edge weight using SRI (X/D) and make sure it matches to mean bison estimates
+sri_edge_weight <- df$event/df$duration
+bison_edge_weight <- plogis(apply(fit_edge$edge_samples, 2, mean))
+plot(sri_edge_weight, bison_edge_weight)
+
+# Fit a mixture model on the SRI and create pruned edge weights
+sri_mixture <- mclust::Mclust(sri_edge_weight, G=2)
+sri_pruned <- sri_edge_weight
+sri_pruned[sri_mixture$classification != 2] = 0
+
+# Plot pruned edge weights against original edge weights to show low SRIs have been pruned
+plot(sri_pruned, sri_edge_weight)
+
+# Assign pruned edge weights as new edge weights in igraph object and calculate new strength
+E(net)$weight <- sri_pruned
+sri_mix_strength <- strength(net)
+
+# Plot new mixture-based strength against bison version from imputed_data
+plot(sri_mix_strength, imputed_data[[1]]$mix_strength)
+
+# Check that the order of edges in igraph is the same as in bison
+all(igraph::as_edgelist(nets[[1]])[, 1] == get_edgelist(fit_edge)$node_1)
+all(igraph::as_edgelist(nets[[1]])[, 2] == get_edgelist(fit_edge)$node_2)
+
 ```
 
 Now we have a set of imputed dataframes containing the posteriors of mixture-based node strength, we can fit the model using brm_multiple. 

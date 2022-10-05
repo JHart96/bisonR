@@ -58,4 +58,8 @@ test_that("bison to igraph conversion works", {
 
   expect_true(length(nets) == 10)
   expect_true(class(nets[[1]]) == "igraph")
+
+  expect_true(all(igraph::as_edgelist(nets[[1]])[, 1] == get_edgelist(fit_edge)$node_1))
+  expect_true(all(igraph::as_edgelist(nets[[1]])[, 2] == get_edgelist(fit_edge)$node_2))
+
 })
