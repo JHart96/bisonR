@@ -1,6 +1,6 @@
 ---
 title: "Edge mixture models"
-output: rmarkdown::html_vignette
+output: pdf_document
 vignette: >
   %\VignetteIndexEntry{Edge mixture models}
   %\VignetteEngine{knitr::rmarkdown}
@@ -11,7 +11,9 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  tidy.opts=list(width.cutoff=60),
+  tidy=TRUE
 )
 ```
 
@@ -24,6 +26,7 @@ library(bisonR)
 library(dplyr)
 library(igraph)
 library(brms)
+library(mclust)
 ```
 
 In this example we simulate data from a binary edge model with 2 underlying clusters (also called components), with dyads belong to either cluster with equal probability:
@@ -47,7 +50,8 @@ fit_edge <- bison_model(
 We won't conduct the usual checks for the sake of this tutorial, but at this point we'd recommend conducting diagnostic checks to ensure model fit. Once the model has fit well, we can use the `bison_mixture()` function to fit the edge mixture model:
 
 ```{r}
-fit_mixture <- bison_mixture(fit_edge, num_components=5, verbose=FALSE) # verbose=FALSE for tutorial purposes
+# verbose=FALSE for tutorial purposes
+fit_mixture <- bison_mixture(fit_edge, num_components=5, verbose=FALSE)
 summary(fit_mixture)
 ```
 
@@ -87,7 +91,7 @@ This dataframe will provide the information about traits that we need for the an
 ```{r}
 # Set number of nodes and number of posterior samples
 num_nodes <- fit_edge$num_nodes
-num_draws <- 5 # Keep this short for demonstration purposes, but many more will be required for full analysis.
+num_draws <- 5 # Keep short for demo purposes.
 
 # Create a list of igraph networks from edgemodel to represent network posterior
 nets <- bison_to_igraph(fit_edge, num_draws)
@@ -113,50 +117,11 @@ for (i in 1:num_draws) {
 imputed_data[[2]]
 ```
 
-```{r}
-# Generate igraph nets and choose one of them (1).
-nets <- bison_to_igraph(fit_edge, num_draws)
-net <- nets[[1]]
-
-# Calculate its strength using igraph
-x <- igraph::strength(net)
-
-# Take a sample of strength using bison (again just one sample)
-y <- extract_metric(fit_edge, "node_strength", num_draws=10)[1, ]
-
-# Plot them, they should be quite linear
-plot(x, y)
-
-# Get edge weight using SRI (X/D) and make sure it matches to mean bison estimates
-sri_edge_weight <- df$event/df$duration
-bison_edge_weight <- plogis(apply(fit_edge$edge_samples, 2, mean))
-plot(sri_edge_weight, bison_edge_weight)
-
-# Fit a mixture model on the SRI and create pruned edge weights
-sri_mixture <- mclust::Mclust(sri_edge_weight, G=2)
-sri_pruned <- sri_edge_weight
-sri_pruned[sri_mixture$classification != 2] = 0
-
-# Plot pruned edge weights against original edge weights to show low SRIs have been pruned
-plot(sri_pruned, sri_edge_weight)
-
-# Assign pruned edge weights as new edge weights in igraph object and calculate new strength
-E(net)$weight <- sri_pruned
-sri_mix_strength <- strength(net)
-
-# Plot new mixture-based strength against bison version from imputed_data
-plot(sri_mix_strength, imputed_data[[1]]$mix_strength)
-
-# Check that the order of edges in igraph is the same as in bison
-all(igraph::as_edgelist(nets[[1]])[, 1] == get_edgelist(fit_edge)$node_1)
-all(igraph::as_edgelist(nets[[1]])[, 2] == get_edgelist(fit_edge)$node_2)
-
-```
-
 Now we have a set of imputed dataframes containing the posteriors of mixture-based node strength, we can fit the model using brm_multiple. 
 
 ```{r}
 fit_brm <- brm_multiple(trait ~ mix_strength, imputed_data, silent=2, refresh=0)
+summary(fit_brm)
 ```
 
 This was a short tutorial on how to use `bison_mixture()` to fit mixture models in bisonR. If you have any questions please get in touch.

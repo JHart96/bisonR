@@ -6,3 +6,5 @@ inst/stan/*
 docs/*
 .Rhistory
 .VSCodeCounter*
+/doc/
+/Meta/

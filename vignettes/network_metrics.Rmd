@@ -1,6 +1,6 @@
 ---
 title: "Network metrics"
-output: rmarkdown::html_vignette
+output: pdf_document
 vignette: >
   %\VignetteIndexEntry{Network metrics}
   %\VignetteEngine{knitr::rmarkdown}
@@ -10,7 +10,9 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  tidy.opts=list(width.cutoff=80),
+  tidy=TRUE
 )
 ```
 

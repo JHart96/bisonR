@@ -1,6 +1,6 @@
 ---
 title: "Installing cmdstanR on Windows"
-output: rmarkdown::html_vignette
+output: pdf_document
 author: "Jordan Hart, Joe Wilde"
 vignette: >
   %\VignetteIndexEntry{Installing cmdstanR on Windows}
