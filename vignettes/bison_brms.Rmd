@@ -1,6 +1,6 @@
 ---
 title: "Using brms with BISoN"
-output: pdf_document
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Using brms with BISoN}
   %\VignetteEngine{knitr::rmarkdown}

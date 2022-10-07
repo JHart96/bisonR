@@ -1,6 +1,6 @@
 ---
 title: "Network metrics"
-output: pdf_document
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Network metrics}
   %\VignetteEngine{knitr::rmarkdown}

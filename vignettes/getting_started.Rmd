@@ -1,6 +1,6 @@
 ---
 title: "Getting started"
-output: pdf_document
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Getting started}
   %\VignetteEngine{knitr::rmarkdown}

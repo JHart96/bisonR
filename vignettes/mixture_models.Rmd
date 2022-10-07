@@ -1,6 +1,6 @@
 ---
 title: "Edge mixture models"
-output: pdf_document
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Edge mixture models}
   %\VignetteEngine{knitr::rmarkdown}
