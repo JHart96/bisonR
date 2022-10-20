@@ -11,7 +11,9 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  tidy.opts=list(width.cutoff=60),
+  tidy=TRUE
 )
 ```
 
@@ -24,6 +26,7 @@ library(bisonR)
 library(dplyr)
 library(igraph)
 library(brms)
+library(mclust)
 ```
 
 In this example we simulate data from a binary edge model with 2 underlying clusters (also called components), with dyads belong to either cluster with equal probability:
@@ -47,7 +50,8 @@ fit_edge <- bison_model(
 We won't conduct the usual checks for the sake of this tutorial, but at this point we'd recommend conducting diagnostic checks to ensure model fit. Once the model has fit well, we can use the `bison_mixture()` function to fit the edge mixture model:
 
 ```{r}
-fit_mixture <- bison_mixture(fit_edge, num_components=5, verbose=FALSE) # verbose=FALSE for tutorial purposes
+# verbose=FALSE for tutorial purposes
+fit_mixture <- bison_mixture(fit_edge, num_components=5, verbose=FALSE)
 summary(fit_mixture)
 ```
 
@@ -87,7 +91,7 @@ This dataframe will provide the information about traits that we need for the an
 ```{r}
 # Set number of nodes and number of posterior samples
 num_nodes <- fit_edge$num_nodes
-num_draws <- 5 # Keep this short for demonstration purposes, but many more will be required for full analysis.
+num_draws <- 5 # Keep short for demo purposes.
 
 # Create a list of igraph networks from edgemodel to represent network posterior
 nets <- bison_to_igraph(fit_edge, num_draws)
@@ -101,7 +105,7 @@ imputed_data <- list()
 # Loop through each posterior sample and calculate strength of top mixture.
 for (i in 1:num_draws) {
   # Calculate edge components (1 if strong, 0 if weak)
-  edge_components <- fit_mixture$edge_component_samples[i, 2, ] - 1
+  edge_components <- 1 * (fit_mixture$edge_component_samples[i, 2, ] == 2)
   
   # If the edge is strong, don't change edge weight, but if it's weak then set to zero.
   E(nets[[i]])$weight <- E(nets[[i]])$weight * edge_components
@@ -117,6 +121,7 @@ Now we have a set of imputed dataframes containing the posteriors of mixture-bas
 
 ```{r}
 fit_brm <- brm_multiple(trait ~ mix_strength, imputed_data, silent=2, refresh=0)
+summary(fit_brm)
 ```
 
 This was a short tutorial on how to use `bison_mixture()` to fit mixture models in bisonR. If you have any questions please get in touch.

@@ -2,12 +2,13 @@
 #'
 #' @param edgemodel A fitted edge weight model.
 #' @param num_components Maximum number of components to fit.
+#' @param criterion "ICL" or "BIC" describing the criterion to use for model comparison.
 #' @param verbose TRUE/FALSE indicating whether to output messages and progress when fitting.
 #'
 #' @return A bison_mixture object
 #'
 #' @export
-bison_mixture <- function(edgemodel, num_components=5, verbose=TRUE) {
+bison_mixture <- function(edgemodel, num_components=5, criterion="ICL", verbose=TRUE) {
   # Prepare for fitting mixtures over the posterior networks
   num_samples <- dim(edgemodel$edge_samples)[1]
   num_edges <- dim(edgemodel$edge_samples)[2]
@@ -15,6 +16,7 @@ bison_mixture <- function(edgemodel, num_components=5, verbose=TRUE) {
   num_samples <- 200
 
   mclustBIC <- mclust::mclustBIC
+  mclustICL <- mclust::mclustICL
 
   component_probability_samples <- matrix(0, num_samples, length(component_range))
   edge_component_samples <- array(0, c(num_samples, length(component_range), num_edges))
@@ -38,10 +40,10 @@ bison_mixture <- function(edgemodel, num_components=5, verbose=TRUE) {
       component_mean_samples[[k]][i, ] <- fit_mixtures[[k]]$parameters$mean
     }
 
-    # Calculate model weights from BIC differences
-    bics <- sapply(fit_mixtures, function(x) x$BIC[1])
-    bics_diff <- max(bics) - bics
-    half_exp_diffs <- exp(-0.5 * bics_diff)
+    # Calculate model weights from IC differences
+    ics <- sapply(fit_mixtures, function(x) x[[tolower(criterion)]])
+    ics_diff <- max(ics) - ics
+    half_exp_diffs <- exp(-0.5 * ics_diff)
     component_probability_samples[i, ] <- half_exp_diffs/sum(half_exp_diffs)
 
     # Draw samples of component memberships per posterior draw
@@ -150,7 +152,6 @@ print.summary.bison_mixture <- function(x, digits=3, ...) {
 #' @return Dataframe summarising edge component probabilities for each edge
 #' @export
 get_edge_component_probabilities <- function(object, num_components) {
-
   node_names <- sapply(
     1:nrow(object$edgemodel$dyad_to_idx),
     function(x) names(object$edgemodel$node_to_idx)[object$edgemodel$dyad_to_idx[x, ]]
