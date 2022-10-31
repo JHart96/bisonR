@@ -10,6 +10,8 @@
 extract_metric <- function(obj, metric_string, num_draws=1000, standardise=FALSE) {
   if (metric_string == "edge_weight") {
     metric_samples <- matrix(as.numeric(obj$edge_samples), ncol=obj$num_dyads)
+    draw_ids <- sample(1:dim(metric_samples)[1], num_draws)
+    metric_samples <- metric_samples[draw_ids, ]
     if (standardise) {
       return(metric_samples - mean(metric_samples))
     } else {

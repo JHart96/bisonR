@@ -10,9 +10,19 @@ test_that("network metrics work", {
   )
 
   x <- expect_warning(
-    extract_metric(fit_edge, "node_strength"),
+    extract_metric(fit_edge, "edge_weight", num_draws=10),
     regexp=NA
   )
+  expect_equal(dim(x)[1], 10)
+
+  x <- expect_warning(
+    extract_metric(fit_edge, "node_strength", num_draws=50),
+    regexp=NA
+  )
+  expect_equal(dim(x)[1], 50)
+
+  net <- bison_to_igraph(fit_edge, 2)[[1]]
+  expect_true(cor(igraph::strength(net), x[1, ]) > 0)
 
   x <- expect_error(
     extract_metric(fit_edge, "not_a_metric", standardise=TRUE)

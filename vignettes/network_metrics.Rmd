@@ -24,7 +24,7 @@ The following feature/metric pairs are currently supported in bisonR:
   * `weight` - Edge weight
 * `node` - Node-level properties
   * `strength` - Node strength
-  * `eigencentrality` - Node eigenvector centrality
+  * `eigen` - Node eigenvector centrality
   * `betweenness` - Node betweenness
   * `closeness` - Node closeness
 * `global` - Network-level properties

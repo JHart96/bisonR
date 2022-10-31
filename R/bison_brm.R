@@ -9,11 +9,13 @@ utils::globalVariables(c(".imp"))
 #' @param data_list A dataframe of regression variables compatible with a brms model (or a list of them)
 #' @param num_draws Number of draws from the network posterior to use when fitting model
 #' @param z_score Whether to Z-score bison variable or not.
+#' @param cores Number of computational cores to use.
+#' @param chains Number of chains to run per model.
 #' @param ... Additional arguments to be passed to brm(), such as family or priors
 #'
 #' @return A fitted brms model
 #' @export
-bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score=FALSE, ...) {
+bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score=FALSE, cores=4, chains=2, ...) {
   # Parse formula
   parsed_formula <- parse_bison_brms_formula(formula)
   brms_formula <- parsed_formula$brms_formula
@@ -30,7 +32,7 @@ bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score
   )
 
   # Run brms imputation.
-  brms::brm_multiple(brms_formula, mice_obj, backend="cmdstanr", ...)
+  brms::brm_multiple(brms_formula, mice_obj, backend="cmdstanr", cores=cores, chains=chains...)
 }
 
 #' Get priors for BISoN brm model
