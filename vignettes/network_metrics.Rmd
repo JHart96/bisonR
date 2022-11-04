@@ -29,7 +29,7 @@ The following feature/metric pairs are currently supported in bisonR:
   * `closeness` - Node closeness
 * `global` - Network-level properties
   * `density` - Weighted density
-  * `social_differentiation` - Coefficient of variation of edge weights - often called social differentiation
-  * `standard_deviation` - Standard deviation of edge weights
+  * `cv` - Coefficient of variation of edge weights - often called social differentiation
+  * `std` - Standard deviation of edge weights
 
 
