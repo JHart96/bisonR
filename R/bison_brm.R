@@ -59,7 +59,7 @@ bison_brm_get_prior <- function(formula, edgemodel_list, data_list, ...) {
     parsed_formula$param_names,
     parsed_formula$target_name,
     parsed_formula$metric_name,
-    1
+    num_draws=2
   )
 
   data <- mice::complete(mice_obj)

@@ -11,6 +11,14 @@ test_that("brms works", {
     priors=get_default_priors("binary_conjugate")
   )
 
+  priors <- expect_warning(bison_brm_get_prior(
+      age_diff ~ bison(edge_weight(node_1_id, node_2_id)),
+      list(fit_edge, fit_edge),
+      list(df_sim, df_sim)
+    ),
+    regexp=NA
+  )
+
   fit_brm <- expect_error (
     suppressWarnings(bison_brm(
       age_diff ~ bison(edge_weight(node_1_id, node_2_id)),
@@ -34,14 +42,6 @@ test_that("brms works", {
       sample_prior="only",
       prior=brms::prior(normal(0, 10), class="b")
     )),
-    regexp=NA
-  )
-
-  priors <- expect_warning(bison_brm_get_prior(
-      age_diff ~ bison(edge_weight(node_1_id, node_2_id)),
-      list(fit_edge, fit_edge),
-      list(df_sim, df_sim)
-    ),
     regexp=NA
   )
 
