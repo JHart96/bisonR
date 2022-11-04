@@ -1,4 +1,4 @@
-fit_conjugate_model <- function(model_type, model_data, num_samples=10000, priors_only=FALSE) {
+fit_conjugate_model <- function(model_type, model_data, num_samples, priors_only=FALSE) {
   if (model_type == "binary") {
     model <- fit_conjugate_model_binary(model_data, num_samples, priors_only)
   }

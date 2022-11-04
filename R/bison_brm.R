@@ -32,7 +32,7 @@ bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score
   )
 
   # Run brms imputation.
-  brms::brm_multiple(brms_formula, mice_obj, backend="cmdstanr", cores=cores, chains=chains...)
+  brms::brm_multiple(brms_formula, mice_obj, backend="cmdstanr", cores=cores, chains=chains, ...)
 }
 
 #' Get priors for BISoN brm model
