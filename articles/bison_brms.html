@@ -32,7 +32,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">bisonR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -93,10 +93,35 @@
 
     
     
-<p>bisonR can fully integrate with the popular Bayesian modelling package <code>brms</code>. This means that any brms model can be fit to network data such as edge weights, node centrality, or even global metrics comparing networks. This is achieved by treating network posteriors as imputed data and running multiple Bayesian models on these imputed data. This function is implemented as <code>bison_brm</code> and uses largely the same arguments as brms. The function returns an object of type <code>brm_multiple</code>.</p>
-<p>bisonR uses a special notation to include network data in a brms formula. To specify network data, the wrapper <code>bison()</code> is used to tell the function that this variable should come from network data with uncertainty. Network properties can be calculated at three different levels: edge, node, and global. See the <code>network_metrics</code> vignette for information on available metrics. Depending on the type of analysis, you will need to specify node IDs or network IDs to ensure the data in your dataframe align with the network properties calculated in bisonR. This information is included as arguments to the network property in the formula.</p>
-<p>When running analyses comparing global properties of networks, multiple fitted edge models must be provided, corresponding to each network. <code>bisonR</code> introduces a preserved factor variable <code>bison_network</code> that can be used to reference the different networks. <code>bison_network</code> is an integer factor corresponding to the order that fitted edge models were provided to <code>bison_brm</code>.</p>
-<p>This sounds a little complex, but is much easier to understand with examples. The table below shows some examples of how the analysis would be conducted in brms (or lm/lmer/etc) compared to <code>bison_brm</code>.</p>
+<p>bisonR can fully integrate with the popular Bayesian modelling
+package <code>brms</code>. This means that any brms model can be fit to
+network data such as edge weights, node centrality, or even global
+metrics comparing networks. This is achieved by treating network
+posteriors as imputed data and running multiple Bayesian models on these
+imputed data. This function is implemented as <code>bison_brm</code> and
+uses largely the same arguments as brms. The function returns an object
+of type <code>brm_multiple</code>.</p>
+<p>bisonR uses a special notation to include network data in a brms
+formula. To specify network data, the wrapper <code>bison()</code> is
+used to tell the function that this variable should come from network
+data with uncertainty. Network properties can be calculated at three
+different levels: edge, node, and global. See the
+<code>network_metrics</code> vignette for information on available
+metrics. Depending on the type of analysis, you will need to specify
+node IDs or network IDs to ensure the data in your dataframe align with
+the network properties calculated in bisonR. This information is
+included as arguments to the network property in the formula.</p>
+<p>When running analyses comparing global properties of networks,
+multiple fitted edge models must be provided, corresponding to each
+network. <code>bisonR</code> introduces a preserved factor variable
+<code>bison_network</code> that can be used to reference the different
+networks. <code>bison_network</code> is an integer factor corresponding
+to the order that fitted edge models were provided to
+<code>bison_brm</code>.</p>
+<p>This sounds a little complex, but is much easier to understand with
+examples. The table below shows some examples of how the analysis would
+be conducted in brms (or lm/lmer/etc) compared to
+<code>bison_brm</code>.</p>
 <table class="table">
 <thead><tr class="header">
 <th>Standard formula</th>
@@ -158,7 +183,10 @@
 <div class="section level4">
 <h4 id="edge-weight-as-response-with-multiple-networks">Edge weight as response with multiple networks<a class="anchor" aria-label="anchor" href="#edge-weight-as-response-with-multiple-networks"></a>
 </h4>
-<p>When analysing multiple networks, we need to provide multiple fitted edge models and corresponding dataframes. If the network IDs are to be used, we can access them using the preserved variable <code>bison_network</code>.</p>
+<p>When analysing multiple networks, we need to provide multiple fitted
+edge models and corresponding dataframes. If the network IDs are to be
+used, we can access them using the preserved variable
+<code>bison_network</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bison_brm.html">bison_brm</a></span><span class="op">(</span></span>
 <span>  <span class="fu">bison</span><span class="op">(</span><span class="fu">edge_weight</span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="va">bison_network</span>,</span>
@@ -193,7 +221,9 @@
 <div class="section level4">
 <h4 id="node-metric-as-a-response-controlling-for-network-id">Node metric as a response, controlling for network ID<a class="anchor" aria-label="anchor" href="#node-metric-as-a-response-controlling-for-network-id"></a>
 </h4>
-<p>If running an analysis across multiple networks, it might sometimes be necessary to control for network ID. This could be done using a random effect (varying intercept) as follows:</p>
+<p>If running an analysis across multiple networks, it might sometimes
+be necessary to control for network ID. This could be done using a
+random effect (varying intercept) as follows:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bison_brm.html">bison_brm</a></span><span class="op">(</span></span>
 <span>  <span class="fu">bison</span><span class="op">(</span><span class="fu">node_eigen</span><span class="op">(</span><span class="va">node</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="va">trait</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">bison_network</span><span class="op">)</span>,</span>
@@ -208,7 +238,12 @@
 <div class="section level4">
 <h4 id="global-metric-as-a-response">Global metric as a response<a class="anchor" aria-label="anchor" href="#global-metric-as-a-response"></a>
 </h4>
-<p>When running regression on global metrics, the fitted edge models must again be provided as a list. However, the dataframes can be provided either as 1) a list where each dataframe has one row, describing its corresponding edge model or 2) a dataframe, where each row in the dataframe corresponds to an edge model (where ordering is maintained).</p>
+<p>When running regression on global metrics, the fitted edge models
+must again be provided as a list. However, the dataframes can be
+provided either as 1) a list where each dataframe has one row,
+describing its corresponding edge model or 2) a dataframe, where each
+row in the dataframe corresponds to an edge model (where ordering is
+maintained).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bison_brm.html">bison_brm</a></span><span class="op">(</span></span>
 <span>  <span class="fu">bison</span><span class="op">(</span><span class="fu">global_cv</span><span class="op">(</span><span class="va">bison_network</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="va">bison_network</span>,</span>
@@ -218,9 +253,42 @@
 </div>
 </div>
 <div class="section level3">
+<h3 id="priors">Priors<a class="anchor" aria-label="anchor" href="#priors"></a>
+</h3>
+<p>The prior structure for a model (in the form of a
+<code>brmsprior</code> object) can be retrieved using the
+<code>bison_brm_get_prior</code> function:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">prior</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bison_brm_get_prior.html">bison_brm_get_prior</a></span><span class="op">(</span></span>
+<span>  <span class="fu">bison</span><span class="op">(</span><span class="fu">global_cv</span><span class="op">(</span><span class="va">bison_network</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="va">bison_network</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">fit_edge_1</span>, <span class="va">fit_edge_2</span><span class="op">)</span>,</span>
+<span>  <span class="va">df_global</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>This object is a <code>brmsprior</code> object from the brms package,
+and can be modified in exactly the same way. For example, from the brms
+documentation, population-level fixed effects could be set all at once
+using:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## define a prior on all population-level effects a once</span></span>
+<span><span class="va">prior</span><span class="op">$</span><span class="va">prior</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"normal(0,10)"</span></span></code></pre></div>
+<p>Once priors are set, they can be fed to the <code>bison_brm</code>
+function in the <code>prior=</code> argument, as follows:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/bison_brm.html">bison_brm</a></span><span class="op">(</span></span>
+<span>  <span class="fu">bison</span><span class="op">(</span><span class="fu">global_cv</span><span class="op">(</span><span class="va">bison_network</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="va">bison_network</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">fit_edge_1</span>, <span class="va">fit_edge_2</span><span class="op">)</span>,</span>
+<span>  <span class="va">df_global</span>,</span>
+<span>  prior<span class="op">=</span><span class="va">prior</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
 <h3 id="conclusion">Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"></a>
 </h3>
-<p>This is just a small subset of all the possible types of model that can be fitted using the <code>bison_brm</code> function. For more information on the wide range of functionality available, check out the <a href="https://paul-buerkner.github.io/brms/" class="external-link">brms documentation</a>.</p>
+<p>This is just a small subset of all the possible types of model that
+can be fitted using the <code>bison_brm</code> function. For more
+information on the wide range of functionality available, check out the
+<a href="https://paul-buerkner.github.io/brms/" class="external-link">brms
+documentation</a>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

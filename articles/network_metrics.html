@@ -32,7 +32,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">bisonR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -93,8 +93,13 @@
 
     
     
-<p>Network metrics can be extracted using the function <code>extract_metric(bison_model, metric_name)</code>. The <code>metric_name</code> variable is made up of two parts: the network feature and the network metric. For example, <code>node_eigen</code> will calculate the eigenvector centrality of each node.</p>
-<p>The following feature/metric pairs are currently supported in bisonR:</p>
+<p>Network metrics can be extracted using the function
+<code>extract_metric(bison_model, metric_name)</code>. The
+<code>metric_name</code> variable is made up of two parts: the network
+feature and the network metric. For example, <code>node_eigen</code>
+will calculate the eigenvector centrality of each node.</p>
+<p>The following feature/metric pairs are currently supported in
+bisonR:</p>
 <ul>
 <li>
 <code>edge</code> - Edge-level properties
@@ -109,7 +114,7 @@
 <li>
 <code>strength</code> - Node strength</li>
 <li>
-<code>eigencentrality</code> - Node eigenvector centrality</li>
+<code>eigen</code> - Node eigenvector centrality</li>
 <li>
 <code>betweenness</code> - Node betweenness</li>
 <li>
@@ -122,9 +127,10 @@
 <li>
 <code>density</code> - Weighted density</li>
 <li>
-<code>social_differentiation</code> - Coefficient of variation of edge weights - often called social differentiation</li>
+<code>cv</code> - Coefficient of variation of edge weights - often
+called social differentiation</li>
 <li>
-<code>standard_deviation</code> - Standard deviation of edge weights</li>
+<code>std</code> - Standard deviation of edge weights</li>
 </ul>
 </li>
 </ul></main>
