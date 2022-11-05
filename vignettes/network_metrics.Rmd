@@ -24,12 +24,12 @@ The following feature/metric pairs are currently supported in bisonR:
   * `weight` - Edge weight
 * `node` - Node-level properties
   * `strength` - Node strength
-  * `eigencentrality` - Node eigenvector centrality
+  * `eigen` - Node eigenvector centrality
   * `betweenness` - Node betweenness
   * `closeness` - Node closeness
 * `global` - Network-level properties
   * `density` - Weighted density
-  * `social_differentiation` - Coefficient of variation of edge weights - often called social differentiation
-  * `standard_deviation` - Standard deviation of edge weights
+  * `cv` - Coefficient of variation of edge weights - often called social differentiation
+  * `std` - Standard deviation of edge weights
 
 

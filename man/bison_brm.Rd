@@ -10,6 +10,8 @@ bison_brm(
   data_list,
   num_draws = 100,
   z_score = FALSE,
+  cores = 4,
+  chains = 2,
   ...
 )
 }
@@ -23,6 +25,10 @@ bison_brm(
 \item{num_draws}{Number of draws from the network posterior to use when fitting model}
 
 \item{z_score}{Whether to Z-score bison variable or not.}
+
+\item{cores}{Number of computational cores to use.}
+
+\item{chains}{Number of chains to run per model.}
 
 \item{...}{Additional arguments to be passed to brm(), such as family or priors}
 }

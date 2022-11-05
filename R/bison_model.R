@@ -65,7 +65,7 @@ bison_model <- function(formula, data, model_type=c("binary", "count"),
   # Select sampling method
   if (use_conjugate_model) {
     # Fit conjugate model
-    model <- fit_conjugate_model(model_type, model_data, priors_only=priors_only)
+    model <- fit_conjugate_model(model_type, model_data, num_samples=iter_sampling*mc_cores, priors_only=priors_only)
     chain <- model$chain
     event_preds <- model$event_preds
     fit <- NULL
@@ -309,8 +309,8 @@ plot_network <- function(obj, ci=0.9, lwd=2) {
   lb <- edgelist[, 3]
   ub <- edgelist[, 5]
   coords <- igraph::layout_nicely(net)
-  igraph::plot.igraph(net, edge.width=ub * lwd, layout=coords, vertex.label.color="white", vertex.color=bison_colors[1], edge.color=rgb(0.1, 0.1, 0.1, 0.9), edge.arrow.size=0)
-  igraph::plot.igraph(net, edge.width=lb * lwd, layout=coords, vertex.label.color="white", vertex.color=bison_colors[1], edge.color=rgb(0.9, 0.9, 0.9, 0.9), edge.arrow.size=0, add=TRUE)
+  igraph::plot.igraph(net, edge.width=lb * lwd, layout=coords, vertex.label.color="white", vertex.color=bison_colors[1], edge.color=rgb(0, 0, 0, 1), edge.arrow.size=0)
+  igraph::plot.igraph(net, edge.width=ub * lwd, layout=coords, vertex.label.color="white", vertex.color=bison_colors[1], edge.color=rgb(0, 0, 0, 0.3), edge.arrow.size=0, add=TRUE)
   if (obj$directed) {
     igraph::plot.igraph(net, edge.width=lb * 0, layout=coords, vertex.label.color="white", vertex.color=bison_colors[1], edge.color=rgb(0.5, 0.5, 0.5), add=TRUE)
   }

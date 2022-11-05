@@ -117,6 +117,33 @@ bison_brm(
 )
 ```
 
+## Priors
+
+The prior structure for a model (in the form of a `brmsprior` object) can be retrieved using the `bison_brm_get_prior` function:
+```r
+prior <- bison_brm_get_prior(
+  bison(global_cv(bison_network)) ~ bison_network,
+  list(fit_edge_1, fit_edge_2),
+  df_global
+)
+```
+
+This object is a `brmsprior` object from the brms package, and can be modified in exactly the same way. For example, from the brms documentation, population-level fixed effects could be set all at once using:
+```r
+## define a prior on all population-level effects a once
+prior$prior[1] <- "normal(0,10)"
+```
+
+Once priors are set, they can be fed to the `bison_brm` function in the `prior=` argument, as follows:
+```r
+bison_brm(
+  bison(global_cv(bison_network)) ~ bison_network,
+  list(fit_edge_1, fit_edge_2),
+  df_global,
+  prior=prior
+)
+```
+
 ## Conclusion
 
 This is just a small subset of all the possible types of model that can be fitted using the `bison_brm` function. For more information on the wide range of functionality available, check out the [brms documentation](https://paul-buerkner.github.io/brms/).

@@ -160,17 +160,17 @@ summary(fit_dyadic)
 
 # Network Metrics
 
-As well as the types of statistical analysis we've already covered, network metrics can also be extracted for use in other quantitative or qualitative analyses. This can be done with the `draw_network_metric_samples()` function for network-level metrics (also known as global metrics) or  `draw_node_metric_samples()` for node-level metrics. Let's try this out for social differentiation:
+As well as the types of statistical analysis we've already covered, network metrics can also be extracted for use in other quantitative or qualitative analyses. This can be done with the `draw_network_metric_samples()` function for network-level metrics (also known as global metrics) or  `draw_node_metric_samples()` for node-level metrics. Let's try this out for the coefficient of variation (CV) in edge weights, also known as social differentiation:
 
 ```{r}
-social_differentiation_samples <- extract_metric(fit_edge, "edge_weight")
-head(social_differentiation_samples)
+cv_samples <- extract_metric(fit_edge, "global_cv")
+head(cv_samples)
 ```
 
 We can visualise the posterior distribution of social differentiation by 
 
 ```{r}
-plot(social_differentiation_samples)
+plot(density(cv_samples))
 ```
 
 The posterior samples can now be used descriptively, to compare networks, or in other downstream analyses.
