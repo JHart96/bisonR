@@ -1,3 +1,7 @@
+# bisonR 0.4.4
+* Added argument pass-through in model_comparison.
+* Fixed bug with degree computation.
+
 # bisonR 0.4.3
 * Various arguments to improve user control.
 * Changed network plots.
