@@ -25,18 +25,17 @@ extract_metric <- function(obj, metric_string, num_draws=1000, standardise=FALSE
   metric_fn <- get_metric_fn(metric_string)
   target_name <- stringr::str_split(metric_string, "_")[[1]][1]
 
-  metric_samples <- matrix(0, num_draws, num_targets)
-
   if (target_name == "edge") {
     num_targets <- obj$num_dyads
   }
   if (target_name == "node") {
     num_targets <- obj$num_nodes
-    colnames(metric_samples) <- names(igraph::V(net))
   }
   if (target_name == "global") {
     num_targets <- 1
   }
+
+  metric_samples <- matrix(0, num_draws, num_targets)
 
   for (i in 1:num_draws) {
     if (obj$model_type == "binary") {
