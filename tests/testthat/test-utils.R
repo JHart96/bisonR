@@ -2,10 +2,6 @@ test_that("convert_gbi_to_bison works", {
   gbi <- matrix(rbinom(200 * 10, 1, 0.25), 200, 10)
   df <- convert_gbi_to_bison(gbi)
 
-  start_time <- Sys.time()
-  df <- convert_gbi_to_bison(gbi)
-  Sys.time() - start_time
-
   # Entries are correct
   results <- rep(0, nrow(df))
   for (i in 1:nrow(df)) {
