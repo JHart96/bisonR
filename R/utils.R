@@ -132,9 +132,9 @@ convert_gbi_to_bison <- function(gbi, group_properties=NULL, individual_properti
 
   # For each group in the GBI matrix, calculate all possible dyadic events.
   for (row_idx in 1:nrow(gbi)) {
-    for (i in 1:ncol(gbi)) {
+    for (i in which(gbi[row_idx, ] == 1)) {
       for (j in 1:ncol(gbi)) {
-        if (i < j && individual_constraints[i] == individual_constraints[j]) {
+        if (i != j && individual_constraints[i] == individual_constraints[j]) {
           event = gbi[row_idx, i] * gbi[row_idx, j]
           new_row <- list(
             node_1=node_names[i],

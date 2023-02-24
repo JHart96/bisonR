@@ -4,10 +4,12 @@
 \alias{model_comparison}
 \title{Run leave-one-out model comparison}
 \usage{
-model_comparison(models)
+model_comparison(models, ...)
 }
 \arguments{
 \item{models}{List of fitted models to compare}
+
+\item{...}{Additional arguments to be passed to \code{loo::loo_model_weights}}
 }
 \value{
 The output of the \code{loo_compare} function for the fitted models.
