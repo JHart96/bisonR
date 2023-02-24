@@ -95,7 +95,7 @@ get_metric_fn <- function(metric_string) {
     if (!is.na(stringr::str_match(metric_name, "^degree\\[.*\\]$"))) {
       threshold <- as.numeric(str_split(metric_name, "\\[|\\]")[[1]][2])
       return(function(x) {
-        return(igraph::strength(x, weights=1 * (igraph::E(x)$weight < threshold)))
+        return(igraph::strength(x, weights=1 * (igraph::E(x)$weight > threshold)))
       })
     }
   }

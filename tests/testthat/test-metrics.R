@@ -44,7 +44,7 @@ test_that("network metrics work", {
   )
 
   x <- expect_warning(
-    extract_metric(fit_edge, "node_degree[-0.2]"),
+    extract_metric(fit_edge, "node_degree[0.2]"),
     regexp=NA
   )
 

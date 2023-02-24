@@ -301,11 +301,16 @@ plot_predictions.bison_model <- function(obj, num_draws=20, type=c("density", "p
 #' @param obj An S3 edge model object to be summarised.
 #' @param ci Credible interval to use in plot, based on quantiles.
 #' @param lwd Line width scaling for edge weights
+#' @param threshold Edge weights below this will be removed from the visualisation (for plotting purposes only). NULL if no threshold should be applied.
 #'
 #' @export
-plot_network <- function(obj, ci=0.9, lwd=2) {
+plot_network <- function(obj, ci=0.9, lwd=2, threshold=NULL) {
   edgelist <- get_edgelist(obj, ci=ci, transform=TRUE)
-  net <- igraph::graph_from_edgelist(as.matrix(edgelist[, 1:2]), directed=obj$directed)
+  threshold_ids <- rep(TRUE, nrow(edgelist))
+  if (!is.null(threshold)) {
+    threshold_ids <- edgelist[, 4] >= threshold
+  }
+  net <- igraph::graph_from_edgelist(as.matrix(edgelist[threshold_ids, 1:2]), directed=obj$directed)
   lb <- edgelist[, 3]
   ub <- edgelist[, 5]
   coords <- igraph::layout_nicely(net)

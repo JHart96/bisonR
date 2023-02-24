@@ -76,7 +76,7 @@ test_that("Binary edge model parameter estimation", {
 
   # Check that plots don't produce warnings
   expect_warning(plot_predictions(fit_edge), regexp=NA)
-  expect_warning(plot_network(fit_edge, lwd=10), regexp=NA)
+  expect_warning(plot_network(fit_edge, lwd=10, threshold=0.1), regexp=NA)
   expect_warning(plot_trace(fit_edge, par_ids=1), regexp=NA)
   expect_output(print(summary(fit_edge)))
 })
