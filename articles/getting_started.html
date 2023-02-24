@@ -138,13 +138,13 @@ included.</p>
 <code class="sourceCode R"><span><span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_bison_model.html">simulate_bison_model</a></span><span class="op">(</span><span class="st">"binary"</span>, aggregated <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">sim_data</span><span class="op">$</span><span class="va">df_sim</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   event node_1_id node_2_id age_diff    age_1    age_2 location duration</span></span>
-<span><span class="co">#&gt; 1     0         1         2 5.130810 22.14951 17.01870        2        1</span></span>
-<span><span class="co">#&gt; 2     1         1         2 5.130810 22.14951 17.01870        3        1</span></span>
-<span><span class="co">#&gt; 3     1         1         3 6.016792 22.14951 16.13271        4        1</span></span>
-<span><span class="co">#&gt; 4     1         1         4 3.184330 22.14951 18.96518        1        1</span></span>
-<span><span class="co">#&gt; 5     1         1         4 3.184330 22.14951 18.96518        1        1</span></span>
-<span><span class="co">#&gt; 6     1         1         4 3.184330 22.14951 18.96518        5        1</span></span></code></pre></div>
+<span><span class="co">#&gt;   event node_1_id node_2_id   age_diff    age_1    age_2 location duration</span></span>
+<span><span class="co">#&gt; 1     0         1         2 -2.0225596 22.84674 24.86930        1        1</span></span>
+<span><span class="co">#&gt; 2     0         1         2 -2.0225596 22.84674 24.86930        1        1</span></span>
+<span><span class="co">#&gt; 3     0         1         2 -2.0225596 22.84674 24.86930        1        1</span></span>
+<span><span class="co">#&gt; 4     1         1         3  0.6619573 22.84674 22.18478        2        1</span></span>
+<span><span class="co">#&gt; 5     1         1         4  2.8641136 22.84674 19.98262        4        1</span></span>
+<span><span class="co">#&gt; 6     0         1         5  0.2613776 22.84674 22.58536        4        1</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="edge-models">Edge Models<a class="anchor" aria-label="anchor" href="#edge-models"></a>
@@ -239,14 +239,14 @@ weight model:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Running MCMC with 4 parallel chains...</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Chain 1 finished in 0.8 seconds.</span></span>
-<span><span class="co">#&gt; Chain 2 finished in 0.9 seconds.</span></span>
-<span><span class="co">#&gt; Chain 3 finished in 0.9 seconds.</span></span>
-<span><span class="co">#&gt; Chain 4 finished in 0.9 seconds.</span></span>
+<span><span class="co">#&gt; Chain 1 finished in 1.0 seconds.</span></span>
+<span><span class="co">#&gt; Chain 4 finished in 1.0 seconds.</span></span>
+<span><span class="co">#&gt; Chain 2 finished in 1.1 seconds.</span></span>
+<span><span class="co">#&gt; Chain 3 finished in 1.1 seconds.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; All 4 chains finished successfully.</span></span>
-<span><span class="co">#&gt; Mean chain execution time: 0.9 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 1.2 seconds.</span></span></code></pre></div>
+<span><span class="co">#&gt; Mean chain execution time: 1.1 seconds.</span></span>
+<span><span class="co">#&gt; Total execution time: 1.4 seconds.</span></span></code></pre></div>
 <p>Depending on your dataset this can take anywhere between a few tenths
 of a second and several hours. In particular if you have a large dataset
 and no observation-level predictors, it’s probably a good idea to use
@@ -309,51 +309,51 @@ edge weights and their credible intervals, we can use the
 <span><span class="co">#&gt; Directed: FALSE</span></span>
 <span><span class="co">#&gt; === Edge list summary ===</span></span>
 <span><span class="co">#&gt;          median    5%   95%</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 2   0.432 0.064 0.878</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 3   0.732 0.131 0.985</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 4   0.883 0.478 0.992</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 5   0.913 0.578 0.994</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 6   0.758 0.401 0.953</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 7   0.726 0.127 0.984</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 8   0.883 0.488 0.991</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 9   0.760 0.399 0.953</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 10  0.839 0.354 0.990</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 3   0.882 0.476 0.992</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 4   0.374 0.100 0.729</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 5   0.185 0.029 0.528</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 6   0.057 0.003 0.373</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 7   0.107 0.003 0.673</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 8   0.885 0.469 0.993</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 9   0.427 0.067 0.867</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 10  0.696 0.315 0.941</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 4   0.068 0.003 0.492</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 5   0.047 0.002 0.326</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 6   0.054 0.002 0.384</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 7   0.113 0.004 0.683</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 8   0.760 0.416 0.954</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 9   0.103 0.003 0.684</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 10  0.568 0.237 0.856</span></span>
-<span><span class="co">#&gt; 4 &lt;-&gt; 5   0.755 0.402 0.950</span></span>
-<span><span class="co">#&gt; 4 &lt;-&gt; 6   0.102 0.003 0.677</span></span>
-<span><span class="co">#&gt; 4 &lt;-&gt; 7   0.427 0.068 0.869</span></span>
-<span><span class="co">#&gt; 4 &lt;-&gt; 8   0.839 0.325 0.990</span></span>
-<span><span class="co">#&gt; 4 &lt;-&gt; 9   0.434 0.065 0.869</span></span>
-<span><span class="co">#&gt; 4 &lt;-&gt; 10  0.736 0.144 0.985</span></span>
-<span><span class="co">#&gt; 5 &lt;-&gt; 6   0.299 0.050 0.718</span></span>
-<span><span class="co">#&gt; 5 &lt;-&gt; 7   0.757 0.389 0.954</span></span>
-<span><span class="co">#&gt; 5 &lt;-&gt; 8   0.884 0.460 0.993</span></span>
-<span><span class="co">#&gt; 5 &lt;-&gt; 9   0.906 0.587 0.993</span></span>
-<span><span class="co">#&gt; 5 &lt;-&gt; 10  0.568 0.235 0.867</span></span>
-<span><span class="co">#&gt; 6 &lt;-&gt; 7   0.704 0.319 0.944</span></span>
-<span><span class="co">#&gt; 6 &lt;-&gt; 8   0.912 0.574 0.994</span></span>
-<span><span class="co">#&gt; 6 &lt;-&gt; 9   0.735 0.149 0.986</span></span>
-<span><span class="co">#&gt; 6 &lt;-&gt; 10  0.835 0.342 0.990</span></span>
-<span><span class="co">#&gt; 7 &lt;-&gt; 8   0.846 0.350 0.991</span></span>
-<span><span class="co">#&gt; 7 &lt;-&gt; 9   0.040 0.002 0.270</span></span>
-<span><span class="co">#&gt; 7 &lt;-&gt; 10  0.885 0.501 0.991</span></span>
-<span><span class="co">#&gt; 8 &lt;-&gt; 9   0.068 0.002 0.481</span></span>
-<span><span class="co">#&gt; 8 &lt;-&gt; 10  0.847 0.337 0.990</span></span>
-<span><span class="co">#&gt; 9 &lt;-&gt; 10  0.761 0.413 0.951</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 &lt;-&gt; 2   0.057 0.002 0.376</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 3   0.723 0.125 0.984</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 4   0.733 0.137 0.985</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 5   0.296 0.044 0.731</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 6   0.889 0.470 0.992</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 7   0.734 0.132 0.987</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 8   0.428 0.073 0.868</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 9   0.734 0.151 0.985</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 10  0.735 0.141 0.983</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 3   0.844 0.364 0.989</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 4   0.838 0.331 0.990</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 5   0.739 0.140 0.986</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 6   0.421 0.064 0.870</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 7   0.883 0.488 0.992</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 8   0.755 0.393 0.953</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 9   0.459 0.144 0.808</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 10  0.923 0.649 0.994</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 4   0.887 0.487 0.993</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 5   0.607 0.194 0.919</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 6   0.299 0.046 0.722</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 7   0.887 0.505 0.992</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 8   0.189 0.030 0.518</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 9   0.224 0.035 0.619</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 10  0.905 0.584 0.993</span></span>
+<span><span class="co">#&gt; 4 &lt;-&gt; 5   0.701 0.319 0.939</span></span>
+<span><span class="co">#&gt; 4 &lt;-&gt; 6   0.229 0.035 0.607</span></span>
+<span><span class="co">#&gt; 4 &lt;-&gt; 7   0.745 0.143 0.984</span></span>
+<span><span class="co">#&gt; 4 &lt;-&gt; 8   0.055 0.002 0.382</span></span>
+<span><span class="co">#&gt; 4 &lt;-&gt; 9   0.186 0.026 0.536</span></span>
+<span><span class="co">#&gt; 4 &lt;-&gt; 10  0.887 0.461 0.993</span></span>
+<span><span class="co">#&gt; 5 &lt;-&gt; 6   0.606 0.189 0.918</span></span>
+<span><span class="co">#&gt; 5 &lt;-&gt; 7   0.845 0.354 0.991</span></span>
+<span><span class="co">#&gt; 5 &lt;-&gt; 8   0.040 0.002 0.274</span></span>
+<span><span class="co">#&gt; 5 &lt;-&gt; 9   0.056 0.002 0.372</span></span>
+<span><span class="co">#&gt; 5 &lt;-&gt; 10  0.881 0.484 0.993</span></span>
+<span><span class="co">#&gt; 6 &lt;-&gt; 7   0.732 0.150 0.986</span></span>
+<span><span class="co">#&gt; 6 &lt;-&gt; 8   0.040 0.002 0.269</span></span>
+<span><span class="co">#&gt; 6 &lt;-&gt; 9   0.739 0.143 0.986</span></span>
+<span><span class="co">#&gt; 6 &lt;-&gt; 10  0.887 0.483 0.992</span></span>
+<span><span class="co">#&gt; 7 &lt;-&gt; 8   0.054 0.002 0.363</span></span>
+<span><span class="co">#&gt; 7 &lt;-&gt; 9   0.058 0.003 0.376</span></span>
+<span><span class="co">#&gt; 7 &lt;-&gt; 10  0.058 0.002 0.373</span></span>
+<span><span class="co">#&gt; 8 &lt;-&gt; 9   0.046 0.002 0.328</span></span>
+<span><span class="co">#&gt; 8 &lt;-&gt; 10  0.842 0.335 0.991</span></span>
+<span><span class="co">#&gt; 9 &lt;-&gt; 10  0.912 0.592 0.993</span></span></code></pre></div>
 <p>It can be hard to get an intuitive idea for what’s going on looking
 only at a summary table, so this is where it can be useful to visualise
 the network too. The <code><a href="../reference/plot_network.html">plot_network()</a></code> function does this for
@@ -384,22 +384,22 @@ probabilities of the full edge weight model against the null model:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Running MCMC with 4 parallel chains...</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Chain 1 finished in 0.5 seconds.</span></span>
-<span><span class="co">#&gt; Chain 2 finished in 0.5 seconds.</span></span>
-<span><span class="co">#&gt; Chain 3 finished in 0.5 seconds.</span></span>
-<span><span class="co">#&gt; Chain 4 finished in 0.5 seconds.</span></span>
+<span><span class="co">#&gt; Chain 1 finished in 0.6 seconds.</span></span>
+<span><span class="co">#&gt; Chain 2 finished in 0.6 seconds.</span></span>
+<span><span class="co">#&gt; Chain 3 finished in 0.6 seconds.</span></span>
+<span><span class="co">#&gt; Chain 4 finished in 0.6 seconds.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; All 4 chains finished successfully.</span></span>
-<span><span class="co">#&gt; Mean chain execution time: 0.5 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 0.6 seconds.</span></span>
+<span><span class="co">#&gt; Mean chain execution time: 0.6 seconds.</span></span>
+<span><span class="co">#&gt; Total execution time: 0.8 seconds.</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/model_comparison.html">model_comparison</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>non_random_model<span class="op">=</span><span class="va">fit_edge</span>, random_model<span class="op">=</span><span class="va">fit_null</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.</span></span>
 <span><span class="co">#&gt; Method: stacking</span></span>
 <span><span class="co">#&gt; ------</span></span>
 <span><span class="co">#&gt;                  weight</span></span>
-<span><span class="co">#&gt; non_random_model 0.779 </span></span>
-<span><span class="co">#&gt; random_model     0.221</span></span></code></pre></div>
+<span><span class="co">#&gt; non_random_model 0.950 </span></span>
+<span><span class="co">#&gt; random_model     0.050</span></span></code></pre></div>
 <p>This shows the relative probabilities of the models in the
 comparison. In our case the results are conclusive, the network seems to
 be non-random. It’s likely that this is the case in almost all networks,
@@ -417,52 +417,52 @@ of edge weight.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span>, <span class="va">age_diff</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">df_dyadic</span></span>
-<span><span class="co">#&gt;    node_1_id node_2_id    age_diff</span></span>
-<span><span class="co">#&gt; 1          1         2  5.13080986</span></span>
-<span><span class="co">#&gt; 2          1         3  6.01679215</span></span>
-<span><span class="co">#&gt; 3          1         4  3.18433000</span></span>
-<span><span class="co">#&gt; 4          1         5  2.94589673</span></span>
-<span><span class="co">#&gt; 5          1         6  0.23271276</span></span>
-<span><span class="co">#&gt; 6          1         7  4.51326972</span></span>
-<span><span class="co">#&gt; 7          1         8  6.51511198</span></span>
-<span><span class="co">#&gt; 8          1         9  3.19773683</span></span>
-<span><span class="co">#&gt; 9          1        10  6.76463431</span></span>
-<span><span class="co">#&gt; 10         2         3  0.88598228</span></span>
-<span><span class="co">#&gt; 11         2         4 -1.94647987</span></span>
-<span><span class="co">#&gt; 12         2         5 -2.18491314</span></span>
-<span><span class="co">#&gt; 13         2         6 -4.89809711</span></span>
-<span><span class="co">#&gt; 14         2         7 -0.61754015</span></span>
-<span><span class="co">#&gt; 15         2         8  1.38430212</span></span>
-<span><span class="co">#&gt; 16         2         9 -1.93307303</span></span>
-<span><span class="co">#&gt; 17         2        10  1.63382444</span></span>
-<span><span class="co">#&gt; 18         3         4 -2.83246215</span></span>
-<span><span class="co">#&gt; 19         3         5 -3.07089542</span></span>
-<span><span class="co">#&gt; 20         3         6 -5.78407939</span></span>
-<span><span class="co">#&gt; 21         3         7 -1.50352243</span></span>
-<span><span class="co">#&gt; 22         3         8  0.49831983</span></span>
-<span><span class="co">#&gt; 23         3         9 -2.81905532</span></span>
-<span><span class="co">#&gt; 24         3        10  0.74784216</span></span>
-<span><span class="co">#&gt; 25         4         5 -0.23843327</span></span>
-<span><span class="co">#&gt; 26         4         6 -2.95161724</span></span>
-<span><span class="co">#&gt; 27         4         7  1.32893972</span></span>
-<span><span class="co">#&gt; 28         4         8  3.33078198</span></span>
-<span><span class="co">#&gt; 29         4         9  0.01340683</span></span>
-<span><span class="co">#&gt; 30         4        10  3.58030431</span></span>
-<span><span class="co">#&gt; 31         5         6 -2.71318397</span></span>
-<span><span class="co">#&gt; 32         5         7  1.56737299</span></span>
-<span><span class="co">#&gt; 33         5         8  3.56921525</span></span>
-<span><span class="co">#&gt; 34         5         9  0.25184010</span></span>
-<span><span class="co">#&gt; 35         5        10  3.81873758</span></span>
-<span><span class="co">#&gt; 36         6         7  4.28055696</span></span>
-<span><span class="co">#&gt; 37         6         8  6.28239922</span></span>
-<span><span class="co">#&gt; 38         6         9  2.96502407</span></span>
-<span><span class="co">#&gt; 39         6        10  6.53192155</span></span>
-<span><span class="co">#&gt; 40         7         8  2.00184226</span></span>
-<span><span class="co">#&gt; 41         7         9 -1.31553289</span></span>
-<span><span class="co">#&gt; 42         7        10  2.25136459</span></span>
-<span><span class="co">#&gt; 43         8         9 -3.31737515</span></span>
-<span><span class="co">#&gt; 44         8        10  0.24952233</span></span>
-<span><span class="co">#&gt; 45         9        10  3.56689748</span></span></code></pre></div>
+<span><span class="co">#&gt;    node_1_id node_2_id   age_diff</span></span>
+<span><span class="co">#&gt; 1          1         2 -2.0225596</span></span>
+<span><span class="co">#&gt; 2          1         3  0.6619573</span></span>
+<span><span class="co">#&gt; 3          1         4  2.8641136</span></span>
+<span><span class="co">#&gt; 4          1         5  0.2613776</span></span>
+<span><span class="co">#&gt; 5          1         6  2.0445251</span></span>
+<span><span class="co">#&gt; 6          1         7  5.4002480</span></span>
+<span><span class="co">#&gt; 7          1         8 -0.2698300</span></span>
+<span><span class="co">#&gt; 8          1         9 -0.8103297</span></span>
+<span><span class="co">#&gt; 9          1        10  5.6284468</span></span>
+<span><span class="co">#&gt; 10         2         3  2.6845169</span></span>
+<span><span class="co">#&gt; 11         2         4  4.8866732</span></span>
+<span><span class="co">#&gt; 12         2         5  2.2839371</span></span>
+<span><span class="co">#&gt; 13         2         6  4.0670846</span></span>
+<span><span class="co">#&gt; 14         2         7  7.4228076</span></span>
+<span><span class="co">#&gt; 15         2         8  1.7527296</span></span>
+<span><span class="co">#&gt; 16         2         9  1.2122299</span></span>
+<span><span class="co">#&gt; 17         2        10  7.6510064</span></span>
+<span><span class="co">#&gt; 18         3         4  2.2021563</span></span>
+<span><span class="co">#&gt; 19         3         5 -0.4005798</span></span>
+<span><span class="co">#&gt; 20         3         6  1.3825677</span></span>
+<span><span class="co">#&gt; 21         3         7  4.7382907</span></span>
+<span><span class="co">#&gt; 22         3         8 -0.9317873</span></span>
+<span><span class="co">#&gt; 23         3         9 -1.4722870</span></span>
+<span><span class="co">#&gt; 24         3        10  4.9664895</span></span>
+<span><span class="co">#&gt; 25         4         5 -2.6027361</span></span>
+<span><span class="co">#&gt; 26         4         6 -0.8195886</span></span>
+<span><span class="co">#&gt; 27         4         7  2.5361344</span></span>
+<span><span class="co">#&gt; 28         4         8 -3.1339436</span></span>
+<span><span class="co">#&gt; 29         4         9 -3.6744433</span></span>
+<span><span class="co">#&gt; 30         4        10  2.7643332</span></span>
+<span><span class="co">#&gt; 31         5         6  1.7831475</span></span>
+<span><span class="co">#&gt; 32         5         7  5.1388705</span></span>
+<span><span class="co">#&gt; 33         5         8 -0.5312076</span></span>
+<span><span class="co">#&gt; 34         5         9 -1.0717072</span></span>
+<span><span class="co">#&gt; 35         5        10  5.3670692</span></span>
+<span><span class="co">#&gt; 36         6         7  3.3557230</span></span>
+<span><span class="co">#&gt; 37         6         8 -2.3143551</span></span>
+<span><span class="co">#&gt; 38         6         9 -2.8548547</span></span>
+<span><span class="co">#&gt; 39         6        10  3.5839217</span></span>
+<span><span class="co">#&gt; 40         7         8 -5.6700780</span></span>
+<span><span class="co">#&gt; 41         7         9 -6.2105777</span></span>
+<span><span class="co">#&gt; 42         7        10  0.2281988</span></span>
+<span><span class="co">#&gt; 43         8         9 -0.5404997</span></span>
+<span><span class="co">#&gt; 44         8        10  5.8982768</span></span>
+<span><span class="co">#&gt; 45         9        10  6.4387765</span></span></code></pre></div>
 <p>bisonR uses the popular Bayesian regression framework
 <code>brms</code> to run regressions models inside a wrapper function
 <code><a href="../reference/bison_brm.html">bison_brm()</a></code>. The core syntax and arguments to
@@ -506,7 +506,7 @@ difference as a predictor of edge weight, so we can run:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Both chains finished successfully.</span></span>
 <span><span class="co">#&gt; Mean chain execution time: 0.0 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 0.1 seconds.</span></span>
+<span><span class="co">#&gt; Total execution time: 0.2 seconds.</span></span>
 <span><span class="co">#&gt; Start sampling</span></span>
 <span><span class="co">#&gt; Fitting imputed model 2</span></span>
 <span><span class="co">#&gt; Running MCMC with 2 chains, at most 4 in parallel...</span></span>
@@ -516,7 +516,7 @@ difference as a predictor of edge weight, so we can run:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Both chains finished successfully.</span></span>
 <span><span class="co">#&gt; Mean chain execution time: 0.0 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 0.1 seconds.</span></span>
+<span><span class="co">#&gt; Total execution time: 0.2 seconds.</span></span>
 <span><span class="co">#&gt; Start sampling</span></span>
 <span><span class="co">#&gt; Fitting imputed model 3</span></span>
 <span><span class="co">#&gt; Running MCMC with 2 chains, at most 4 in parallel...</span></span>
@@ -526,7 +526,7 @@ difference as a predictor of edge weight, so we can run:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Both chains finished successfully.</span></span>
 <span><span class="co">#&gt; Mean chain execution time: 0.0 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 0.1 seconds.</span></span>
+<span><span class="co">#&gt; Total execution time: 0.2 seconds.</span></span>
 <span><span class="co">#&gt; Start sampling</span></span>
 <span><span class="co">#&gt; Fitting imputed model 4</span></span>
 <span><span class="co">#&gt; Running MCMC with 2 chains, at most 4 in parallel...</span></span>
@@ -536,7 +536,7 @@ difference as a predictor of edge weight, so we can run:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Both chains finished successfully.</span></span>
 <span><span class="co">#&gt; Mean chain execution time: 0.0 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 0.1 seconds.</span></span>
+<span><span class="co">#&gt; Total execution time: 0.2 seconds.</span></span>
 <span><span class="co">#&gt; Start sampling</span></span>
 <span><span class="co">#&gt; Fitting imputed model 5</span></span>
 <span><span class="co">#&gt; Running MCMC with 2 chains, at most 4 in parallel...</span></span>
@@ -546,7 +546,7 @@ difference as a predictor of edge weight, so we can run:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Both chains finished successfully.</span></span>
 <span><span class="co">#&gt; Mean chain execution time: 0.0 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 0.1 seconds.</span></span>
+<span><span class="co">#&gt; Total execution time: 0.2 seconds.</span></span>
 <span><span class="co">#&gt; Start sampling</span></span></code></pre></div>
 <p>The default output of <code><a href="../reference/bison_brm.html">bison_brm()</a></code> is a
 <code>brmsfit_multiple</code> object that can be analysed in much the
@@ -566,12 +566,12 @@ follows:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Population-Level Effects: </span></span>
 <span><span class="co">#&gt;           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS</span></span>
-<span><span class="co">#&gt; Intercept    -0.23      0.46    -1.07     0.67 1.48       19      103</span></span>
-<span><span class="co">#&gt; age_diff      0.47      0.13     0.22     0.71 1.41       21       93</span></span>
+<span><span class="co">#&gt; Intercept    -0.59      0.43    -1.42     0.22 1.32       24      148</span></span>
+<span><span class="co">#&gt; age_diff      0.44      0.10     0.24     0.64 1.16       41      154</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Family Specific Parameters: </span></span>
 <span><span class="co">#&gt;       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS</span></span>
-<span><span class="co">#&gt; sigma     1.98      0.26     1.56     2.55 1.16       42      189</span></span>
+<span><span class="co">#&gt; sigma     1.98      0.29     1.47     2.62 1.36       22       78</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Draws were sampled using sample(hmc). For each parameter, Bulk_ESS</span></span>
 <span><span class="co">#&gt; and Tail_ESS are effective sample size measures, and Rhat is the potential</span></span>
@@ -592,12 +592,12 @@ known as social differentiation:</p>
 <code class="sourceCode R"><span><span class="va">cv_samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"global_cv"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cv_samples</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           [,1]</span></span>
-<span><span class="co">#&gt; [1,] 0.6126727</span></span>
-<span><span class="co">#&gt; [2,] 0.7042045</span></span>
-<span><span class="co">#&gt; [3,] 0.6097876</span></span>
-<span><span class="co">#&gt; [4,] 0.6997323</span></span>
-<span><span class="co">#&gt; [5,] 0.5902520</span></span>
-<span><span class="co">#&gt; [6,] 0.5950752</span></span></code></pre></div>
+<span><span class="co">#&gt; [1,] 0.6557740</span></span>
+<span><span class="co">#&gt; [2,] 0.6761601</span></span>
+<span><span class="co">#&gt; [3,] 0.5883785</span></span>
+<span><span class="co">#&gt; [4,] 0.5587289</span></span>
+<span><span class="co">#&gt; [5,] 0.6852066</span></span>
+<span><span class="co">#&gt; [6,] 0.6978844</span></span></code></pre></div>
 <p>We can visualise the posterior distribution of social differentiation
 by</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
