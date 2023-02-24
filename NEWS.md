@@ -1,3 +1,6 @@
+# bisonR 0.4.5
+* Improved GBI conversion algorithm.
+
 # bisonR 0.4.4
 * Added argument pass-through in model_comparison.
 * Fixed bug with degree computation.
