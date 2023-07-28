@@ -98,6 +98,17 @@ get_metric_fn <- function(metric_string) {
         return(igraph::strength(x, weights=1 * (igraph::E(x)$weight > threshold)))
       })
     }
+    if (!is.na(stringr::str_match(metric_name, "^clustering\\[.*\\]$"))) {
+      threshold <- as.numeric(str_split(metric_name, "\\[|\\]")[[1]][2])
+      return(function(x) {
+        x_binary <- x
+        edges_to_remove <- which(igraph::E(x)$weight < threshold)
+        x_binary <- igraph::delete_edges(x_binary, edges_to_remove)
+        clustering <- igraph::transitivity(x_binary, type="local")
+        clustering[is.nan(clustering)] <- 0
+        return(clustering)
+      })
+    }
   }
   if (target_name == "global") {
     if (metric_name == "density") {
@@ -108,6 +119,20 @@ get_metric_fn <- function(metric_string) {
     }
     if (metric_name == "std") {
       return(function(net) sd(igraph::E(net)$weight))
+    }
+    if (metric_name == "diameter") {
+      return(function(net) igraph::diameter(net))
+    }
+    if (!is.na(stringr::str_match(metric_name, "^clustering\\[.*\\]$"))) {
+      threshold <- as.numeric(str_split(metric_name, "\\[|\\]")[[1]][2])
+      return(function(x) {
+        x_binary <- x
+        edges_to_remove <- which(igraph::E(x)$weight < threshold)
+        x_binary <- igraph::delete_edges(x_binary, edges_to_remove)
+        clustering <- igraph::transitivity(x_binary, type="global")
+        # clustering[is.nan(clustering)] <- 0
+        return(clustering)
+      })
     }
   }
   stop(paste0("Network metric ", metric_string, " does not exist."))

@@ -23,13 +23,126 @@ The following feature/metric pairs are currently supported in bisonR:
 * `edge` - Edge-level properties
   * `weight` - Edge weight
 * `node` - Node-level properties
+  * `degree[t]` - Node degree (where t is the binary threshold for an edge)
   * `strength` - Node strength
   * `eigen` - Node eigenvector centrality
   * `betweenness` - Node betweenness
   * `closeness` - Node closeness
+  * `clustering` - Node-level clustering coefficient
 * `global` - Network-level properties
   * `density` - Weighted density
-  * `cv` - Coefficient of variation of edge weights - often called social differentiation
+  * `cv` - Coefficient of variation of edge weights - also known as social differentiation
   * `std` - Standard deviation of edge weights
+  * `diameter` - Diameter of the network
+  * `clustering` - Clustering coefficient of the network - also known as transitivity
+  
+# Examples
 
+See below for examples of how to generate the network metrics listed above.
+  
+```{r}
+library(bisonR)
+library(dplyr)
+```
+  
+```{r}
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+df <- sim_data$df_sim
 
+fit_edge <- bison_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id),
+  data=df,
+  model_type="binary_conjugate",
+  priors=get_default_priors("binary_conjugate")
+)
+```
+
+## Edge
+
+### Edge weight
+
+```{r}
+metrics <- extract_metric(fit_edge, "edge_weight", num_draws=10)
+metrics[1:6, 1:5] # Preview first few samples and edges
+```
+
+## Node
+
+### Node degree
+
+```{r}
+metrics <- extract_metric(fit_edge, "node_degree[0.2]")
+metrics[1:6, 1:5] # Preview first few samples and nodes
+```
+
+### Node strength
+
+```{r}
+metrics <- extract_metric(fit_edge, "node_strength", num_draws=10)
+metrics[1:6, 1:5] # Preview first few samples and nodes
+```
+
+### Node eigenvector centrality
+
+```{r}
+metrics <- extract_metric(fit_edge, "node_eigen")
+metrics[1:6, 1:5] # Preview first few samples and nodes
+```
+
+### Node betweenness
+
+```{r}
+metrics <- extract_metric(fit_edge, "node_betweenness")
+metrics[1:6, 1:5] # Preview first few samples and nodes
+```
+
+### Node closeness
+
+```{r}
+metrics <- extract_metric(fit_edge, "node_closeness")
+metrics[1:6, 1:5] # Preview first few samples and nodes
+```
+
+### Node-level clustering coefficient
+
+```{r}
+metrics <- extract_metric(fit_edge, "node_clustering[0.2]")
+metrics[1:6, 1:5] # Preview first few samples and nodes
+```
+
+## Global
+
+### Global coefficient of variation
+
+```{r}
+metrics <- extract_metric(fit_edge, "global_cv")
+metrics[1:6] # Preview first few samples
+```
+
+### Global density
+
+```{r}
+metrics <- extract_metric(fit_edge, "global_density")
+metrics[1:6] # Preview first few samples
+```
+
+### Global standard deviation of edge weights
+
+```{r}
+metrics <- extract_metric(fit_edge, "global_std")
+metrics[1:6] # Preview first few samples
+```
+
+### Global diameter
+
+```{r}
+metrics <- extract_metric(fit_edge, "global_diameter")
+metrics[1:6] # Preview first few samples
+```
+
+### Global clustering coefficient
+
+```{r}
+metrics <- extract_metric(fit_edge, "global_clustering[0.2]")
+metrics[1:6] # Preview first few samples
+```
