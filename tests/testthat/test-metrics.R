@@ -49,6 +49,11 @@ test_that("network metrics work", {
   )
 
   x <- expect_warning(
+    extract_metric(fit_edge, "node_clustering[0.2]"),
+    regexp=NA
+  )
+
+  x <- expect_warning(
     extract_metric(fit_edge, "global_cv"),
     regexp=NA
   )
@@ -60,6 +65,16 @@ test_that("network metrics work", {
 
   x <- expect_warning(
     extract_metric(fit_edge, "global_std"),
+    regexp=NA
+  )
+
+  x <- expect_warning(
+    extract_metric(fit_edge, "global_diameter"),
+    regexp=NA
+  )
+
+  x <- expect_warning(
+    extract_metric(fit_edge, "global_clustering[0.2]"),
     regexp=NA
   )
 

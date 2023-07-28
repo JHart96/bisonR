@@ -1,3 +1,8 @@
+# bisonR 0.4.6
+* Added node_clustering network metric.
+* Added global_clustering network metric.
+* Added global_diameter network metric.
+
 # bisonR 0.4.5
 * Improved GBI conversion algorithm.
 
