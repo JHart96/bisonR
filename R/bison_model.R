@@ -311,8 +311,8 @@ plot_network <- function(obj, ci=0.9, lwd=2, threshold=NULL) {
     threshold_ids <- edgelist[, 4] >= threshold
   }
   net <- igraph::graph_from_edgelist(as.matrix(edgelist[threshold_ids, 1:2]), directed=obj$directed)
-  lb <- edgelist[, 3]
-  ub <- edgelist[, 5]
+  lb <- edgelist[threshold_ids, 4]
+  ub <- edgelist[threshold_ids, 5]
   coords <- igraph::layout_nicely(net)
   igraph::plot.igraph(net, edge.width=lb * lwd, layout=coords, vertex.label.color="white", vertex.color=bison_colors[1], edge.color=rgb(0, 0, 0, 1), edge.arrow.size=0)
   igraph::plot.igraph(net, edge.width=ub * lwd, layout=coords, vertex.label.color="white", vertex.color=bison_colors[1], edge.color=rgb(0, 0, 0, 0.3), edge.arrow.size=0, add=TRUE)
