@@ -1,129 +1,45 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://jhart96.github.io/bisonR/404.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/articles/bison_brms.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/articles/getting_started.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/articles/mixture_models.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/articles/network_metrics.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/articles/windows_installation.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/index.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/bisonR-package.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/bison_brm.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/bison_brm_get_prior.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/bison_mice.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/bison_mixture.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/bison_model.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/bison_to_igraph.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/convert_duration_to_binary.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/convert_gbi_to_bison.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/draw_edgelist_samples.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/extract_metric.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/get_component_means.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/get_default_priors.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/get_edge_component_probabilities.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/get_edgelist.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/get_network_component_probabilities.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/model_comparison.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/plot_metric.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/plot_network.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/plot_predictions.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/plot_trace.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/print.summary.bison_mixture.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/print.summary.bison_model.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/prior_check.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/prior_predictive_check.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/simulate_bison_model.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/simulate_bison_model_mixture.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/summary.bison_mixture.html</loc>
-  </url>
-  <url>
-    <loc>https://jhart96.github.io/bisonR/reference/summary.bison_model.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://jhart96.github.io/bisonR/404.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/LICENSE-text.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/LICENSE.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/articles/bison_brms.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/articles/getting_started.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/articles/index.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/articles/mixture_models.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/articles/network_metrics.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/articles/windows_installation.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/authors.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/index.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/news/index.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/bisonR-package.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/bison_brm.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/bison_brm_get_prior.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/bison_mice.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/bison_mixture.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/bison_model.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/bison_to_igraph.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/convert_duration_to_binary.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/convert_gbi_to_bison.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/draw_edgelist_samples.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/extract_metric.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/get_component_means.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/get_default_priors.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/get_edge_component_probabilities.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/get_edgelist.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/get_network_component_probabilities.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/index.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/model_comparison.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/plot_metric.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/plot_network.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/plot_predictions.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/plot_trace.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/print.summary.bison_mixture.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/print.summary.bison_model.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/prior_check.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/prior_predictive_check.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/simulate_bison_model.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/simulate_bison_model_mixture.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/summary.bison_mixture.html</loc></url>
+<url><loc>https://jhart96.github.io/bisonR/reference/summary.bison_model.html</loc></url>
 </urlset>
+
