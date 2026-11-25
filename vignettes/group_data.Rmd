@@ -1,5 +1,7 @@
 ---
 title: "Group-based observations"
+description: >
+  Gambit-of-the-group data: converting group-by-individual matrices, group-level effects and pairs that could not have been seen together.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Group-based observations}

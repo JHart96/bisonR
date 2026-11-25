@@ -1,5 +1,7 @@
 ---
 title: "Comparing networks"
+description: >
+  Comparing two or more networks using global metrics, global regressions and edges present in both networks.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Comparing networks}

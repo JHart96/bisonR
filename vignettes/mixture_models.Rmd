@@ -1,5 +1,7 @@
 ---
 title: "Edge mixture models"
+description: >
+  Looking for different types of social relationship with edge mixture models.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Edge mixture models}

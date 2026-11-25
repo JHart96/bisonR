@@ -1,5 +1,7 @@
 ---
 title: "Directed networks"
+description: >
+  Fitting, plotting and analysing directed networks, including in- and out-strength and dyadic regression.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Directed networks}

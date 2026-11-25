@@ -1,5 +1,7 @@
 ---
 title: "Network metrics"
+description: >
+  Definitions of the node, edge and global metrics available in bisonR, and how to extract their posterior distributions.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Network metrics}

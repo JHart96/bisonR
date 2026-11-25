@@ -1,5 +1,7 @@
 ---
 title: "Edge models with additional effects"
+description: >
+  Fixed effects, random effects and partial pooling in edge weight models, and how they change the interpretation of edge weights.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Edge models with additional effects}

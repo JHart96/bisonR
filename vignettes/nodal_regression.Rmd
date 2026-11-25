@@ -1,5 +1,7 @@
 ---
 title: "Nodal regression"
+description: >
+  A worked nodal regression relating an individual trait to centrality, with the metric as response or predictor.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Nodal regression}

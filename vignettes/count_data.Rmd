@@ -1,5 +1,7 @@
 ---
 title: "Count data and continuous observation effort"
+description: >
+  Counts of interactions with continuous observation time, such as focal follows, and the interpretation of edge weights as rates.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Count data and continuous observation effort}

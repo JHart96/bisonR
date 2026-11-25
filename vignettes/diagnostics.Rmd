@@ -1,5 +1,7 @@
 ---
 title: "Model diagnostics"
+description: >
+  MCMC diagnostics and posterior predictive checks, with a worked example of excess zeros.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Model diagnostics}
@@ -185,7 +187,7 @@ plot_predictions(fit_standard, num_draws = 100, type = "stats")
 
 The observed proportion of dyads with no events (the red line) is higher than in any of the simulated datasets: the model predicts too few dyads with no events. The other three statistics are within the range of the simulated values. This problem is not visible in the MCMC diagnostics, which only concern the sampler.
 
-A zero-inflated model (`zero_inflated = TRUE`) adds a parameter, `zero_prob`, the probability that an observation is a structural zero: a row that has no events regardless of the edge weight. Zero inflation applies to rows of the data. Here there is one row per dyad, so a structural zero is a dyad that is never seen together. With disaggregated data it would be a single sampling period or observation session. The prior for `zero_prob` is set by the `zero_prob` entry of the priors (`beta(1, 1)` by default).
+A zero-inflated model (`zero_inflated = TRUE`) adds a parameter, `zero_prob`, the probability that an observation is a structural zero: a row that has no events regardless of the edge weight. Zero inflation applies to rows of the data. Here there is one row per dyad, so a structural zero is a dyad that is never seen together. With disaggregated data it would be a single sampling period or observation session. For binary data with one sampling period per row, a structural zero can't be distinguished from a lower edge weight, so zero inflation should only be used with aggregated binary data, and `bison_model()` gives a warning otherwise. The prior for `zero_prob` is set by the `zero_prob` entry of the priors (`beta(1, 1)` by default).
 
 ```{r}
 fit_zero <- bison_model(

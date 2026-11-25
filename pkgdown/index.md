@@ -31,6 +31,45 @@
 </div>
 </div>
 
+## Guides
+
+<div class="bison-guides">
+<div>
+<h3>Getting started</h3>
+<ul>
+<li><a href="articles/getting_started.html">A first analysis</a></li>
+<li><a href="articles/preparing_data.html">Preparing your data</a></li>
+</ul>
+</div>
+<div>
+<h3>Fitting models</h3>
+<ul>
+<li><a href="articles/priors.html">Choosing and checking priors</a></li>
+<li><a href="articles/diagnostics.html">Model diagnostics</a></li>
+<li><a href="articles/edge_model_effects.html">Additional effects</a></li>
+</ul>
+</div>
+<div>
+<h3>Types of data</h3>
+<ul>
+<li><a href="articles/directed_networks.html">Directed networks</a></li>
+<li><a href="articles/group_data.html">Group-based observations</a></li>
+<li><a href="articles/count_data.html">Count data</a></li>
+</ul>
+</div>
+<div>
+<h3>Analyses</h3>
+<ul>
+<li><a href="articles/network_metrics.html">Network metrics</a></li>
+<li><a href="articles/bison_brms.html">Regression with brms</a></li>
+<li><a href="articles/nodal_regression.html">Nodal regression</a></li>
+<li><a href="articles/comparing_networks.html">Comparing networks</a></li>
+<li><a href="articles/mixture_models.html">Edge mixture models</a></li>
+<li><a href="articles/posterior_networks.html">Posterior networks</a></li>
+</ul>
+</div>
+</div>
+
 ## A first model
 
 ```r

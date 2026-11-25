@@ -1,5 +1,7 @@
 ---
 title: "Choosing and checking priors"
+description: >
+  What each prior controls, the link scales, and checking priors with prior_check() and prior predictive checks.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Choosing and checking priors}

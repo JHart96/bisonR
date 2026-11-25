@@ -1,5 +1,7 @@
 ---
 title: "Preparing your data"
+description: >
+  The data format used by bisonR: events and observation effort, aggregation, directed data, unobserved dyads and group-by-individual matrices.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Preparing your data}

@@ -1,5 +1,7 @@
 ---
 title: "Installing cmdstanR on Windows"
+description: >
+  Solutions to common problems when installing cmdstanr and CmdStan on Windows.
 output: rmarkdown::html_vignette
 author: "Jordan Hart, Joe Wilde"
 vignette: >

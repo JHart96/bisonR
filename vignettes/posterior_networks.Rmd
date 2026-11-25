@@ -1,5 +1,7 @@
 ---
 title: "Working with posterior networks"
+description: >
+  Using posterior draws directly: igraph networks, metrics not provided by bisonR, community detection, edge contrasts and saving models.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Working with posterior networks}

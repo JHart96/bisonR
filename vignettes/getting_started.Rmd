@@ -1,5 +1,7 @@
 ---
 title: "Getting started"
+description: >
+  A first analysis: fitting an edge weight model, checking it, plotting the network, and using it in regressions and network metrics.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Getting started}

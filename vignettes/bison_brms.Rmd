@@ -1,5 +1,7 @@
 ---
 title: "Regression with brms"
+description: >
+  Dyadic, nodal and global regressions with bison_brm(), including formula syntax, scaling and priors.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Regression with brms}

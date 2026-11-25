@@ -165,3 +165,58 @@ main img {
   .bison-hero-figure img { filter: invert(1) hue-rotate(180deg) !important; background: none !important; padding: 0 !important; }
   .navbar .version, .navbar .nav-text.text-muted { background: rgba(120, 199, 194, 0.12); color: #78c7c2 !important; }
 }
+
+// ---- Articles index ---------------------------------------------------------
+
+.bison-articles-index {
+  main h3 {
+    margin-top: 2.25rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--bs-border-color);
+  }
+  .section-desc p { color: var(--bs-secondary-color); margin-bottom: 0.9rem; }
+}
+
+.bison-article-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0;
+}
+
+.bison-article-card {
+  position: relative;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.75rem;
+  padding: 1rem 1.1rem 0.9rem;
+  background: var(--bs-body-bg);
+  dt { margin: 0 0 0.35rem; font-family: $headings-font-family; font-size: 1.1rem; font-weight: 600; }
+  dt a { text-decoration: none; }
+  // Make the whole card clickable.
+  dt a::after { content: ""; position: absolute; inset: 0; }
+  dd { margin: 0 !important; padding: 0 !important; color: var(--bs-secondary-color); font-size: 0.93rem; }
+  dd p { margin: 0; }
+  &:hover { border-color: rgba($bison-teal, 0.6); }
+}
+
+@media (max-width: 767.98px) {
+  .bison-article-grid { grid-template-columns: 1fr; }
+}
+
+// ---- Home page guides ---------------------------------------------------------
+
+.bison-guides {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin: 0.5rem 0 2.5rem;
+  h3 { font-size: 1.05rem; margin-bottom: 0.5rem; }
+  ul { list-style: none; padding: 0; margin: 0; }
+  li { margin: 0 0 0.35rem; font-size: 0.95rem; }
+  a { text-decoration: none; }
+  a:hover { text-decoration: underline; }
+}
+
+@media (max-width: 991.98px) {
+  .bison-guides { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
