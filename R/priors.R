@@ -40,7 +40,7 @@ get_default_priors <- function(model_type) {
     )
     return(priors)
   }
-  warning("Model type ", model_type, " not supported.")
+  stop("Model type \"", model_type, "\" not supported. Use \"binary\", \"count\", \"binary_conjugate\" or \"count_conjugate\".", call. = FALSE)
 }
 
 #' Prior checks
@@ -199,4 +199,48 @@ extract_distribution <- function(prior_string) {
   parameter_values <- parameter_split[2:(length(parameter_split) - 1)]
   parameter_values <- as.numeric(parameter_values)
   return(list(distribution_name=distribution_name, parameter_values=parameter_values))
+}
+
+# Check that a list of priors is suitable for a model type, filling in any
+# missing entries from the defaults.
+validate_priors <- function(priors, model_type) {
+  if (!is.list(priors) || is.null(names(priors)) || any(names(priors) == "")) {
+    stop("`priors` must be a named list, like the output of get_default_priors().", call. = FALSE)
+  }
+  defaults <- get_default_priors(model_type)
+  unknown <- setdiff(names(priors), names(defaults))
+  if (length(unknown) > 0) {
+    stop(
+      "Prior(s) ", paste0("`", unknown, "`", collapse = ", "), " aren't used by \"", model_type,
+      "\" models. Expected: ", paste(names(defaults), collapse = ", "),
+      ". Use get_default_priors(\"", model_type, "\") as a starting point.",
+      call. = FALSE
+    )
+  }
+  for (name in setdiff(names(defaults), names(priors))) {
+    priors[[name]] <- defaults[[name]]
+  }
+
+  allowed <- list(
+    edge = switch(model_type, binary_conjugate = "beta", count_conjugate = "gamma", "normal"),
+    fixed = "normal",
+    random_mean = "normal",
+    random_std = "half-normal",
+    zero_prob = "beta"
+  )
+  for (name in names(priors)) {
+    dist <- extract_distribution(priors[[name]])
+    if (!identical(dist$distribution_name, allowed[[name]])) {
+      stop(
+        "The `", name, "` prior for \"", model_type, "\" models must be a ", allowed[[name]],
+        " distribution, e.g. \"", defaults[[name]], "\", but got \"", priors[[name]], "\".",
+        call. = FALSE
+      )
+    }
+    expected_params <- if (allowed[[name]] == "half-normal") 1 else 2
+    if (length(dist$parameter_values) != expected_params || anyNA(dist$parameter_values)) {
+      stop("Couldn't read the parameters of the `", name, "` prior \"", priors[[name]], "\".", call. = FALSE)
+    }
+  }
+  priors[names(defaults)]
 }

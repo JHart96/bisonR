@@ -33,7 +33,7 @@ simulate_bison_model <- function(model_type, aggregated, location_effect=TRUE, a
           location_id <- sample.int(num_locations, 1)
           predictor <- edge_weights[i, j]
           if (age_diff_effect) {
-            predictor <- predictor + age_diff
+            predictor <- predictor + 0.2 * age_diff
           }
           if (location_effect) {
             predictor <- predictor + locations[location_id]
@@ -44,7 +44,7 @@ simulate_bison_model <- function(model_type, aggregated, location_effect=TRUE, a
           }
           if (model_type == "count") {
             duration <- runif(1, 1, max_obs)
-            event <- rpois(1, exp(0.01 * predictor) * duration)
+            event <- rpois(1, exp(predictor) * duration)
             df_sim[nrow(df_sim) + 1, ] <- list(event=event, node_1_id=i, node_2_id=j, age_diff=age_diff, age_1=ages[i], age_2=ages[j], location=location_id, duration=duration)
           }
         }
@@ -98,7 +98,7 @@ simulate_bison_model_mixture <- function(model_type, num_components, component_w
           }
           if (model_type == "count") {
             duration <- runif(1, 1, max_obs)
-            event <- rpois(1, exp(0.01 * predictor) * duration)
+            event <- rpois(1, exp(predictor) * duration)
             df_sim[nrow(df_sim) + 1, ] <- list(event=event, node_1_id=i, node_2_id=j, duration=duration)
           }
         }
