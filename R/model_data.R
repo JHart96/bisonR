@@ -127,9 +127,10 @@ as_node_name <- function(x) {
     return(unname(names[match(x, values)]))
   }
   x <- as.character(x)
-  # Numbers stored as text or factor labels in scientific notation (e.g. from
-  # factor(1e5), which has the label "1e+05") are written in full.
-  scientific <- !is.na(x) & grepl("^[-+]?[0-9]*\\.?[0-9]+[eE][-+]?[0-9]+$", x)
+  # Labels that R itself wrote in scientific notation (e.g. factor(1e5) has the
+  # label "1e+05") are written in full. Only R's own format is converted, so
+  # IDs such as "2E1" or "3e4" are left as they are.
+  scientific <- !is.na(x) & grepl("^-?[0-9](\\.[0-9]+)?e[+-][0-9]+$", x)
   if (any(scientific)) {
     x[scientific] <- as_node_name(as.numeric(x[scientific]))
   }

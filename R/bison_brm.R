@@ -55,7 +55,7 @@ bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score
   data_list <- subset_bison_data(data_list, substitute(subset), parent.frame(), parsed_formula$target_name)
 
   num_models <- if (inherits(edgemodel_list, "bison_model")) 1 else length(edgemodel_list)
-  check_network_scaling(scale, num_models, parsed_formula$target_name, brms_formula)
+  check_network_scaling(if (isTRUE(z_score)) "z" else scale, num_models, parsed_formula$target_name, brms_formula)
 
   if (parsed_formula$target_name == "edge" && !grepl("mm\\(", brms_formula)) {
     warning(

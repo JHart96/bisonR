@@ -169,6 +169,8 @@ test_that("a leading -1 removes the intercept without a warning", {
 test_that("node IDs from factors, text and numbers give the same names", {
   expect_equal(as_node_name(factor(c(1e5, 2e5))), c("100000", "200000"))
   expect_equal(as_node_name(c("1e+05", "A1", "007")), c("100000", "A1", "007"))
+  # Text IDs that only look like scientific notation are left alone
+  expect_equal(as_node_name(c("2E1", "3e4", "1E2")), c("2E1", "3e4", "1E2"))
   # Each value is formatted on its own, so other values don't change its name
   expect_equal(as_node_name(c(123456789.3, 0.000001234))[1], as_node_name(123456789.3))
   df <- data.frame(n1 = factor(c(1e5, 1e5, 3e5)), n2 = c(2e5, 3e5, 2e5), event = 1, effort = 2)

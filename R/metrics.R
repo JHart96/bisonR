@@ -166,7 +166,7 @@ get_metric_fn <- function(metric_string) {
       return(igraph::strength)
     }
     if (metric_name == "eigen") {
-      return(function(x) igraph::eigen_centrality(x)$vector)
+      return(function(x) igraph::eigen_centrality(x, directed = FALSE)$vector)
     }
     if (metric_name == "betweenness") {
       return(function(x) igraph::betweenness(x, weights=1/igraph::E(x)$weight))
