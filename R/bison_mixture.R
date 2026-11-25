@@ -158,7 +158,7 @@ print.summary.bison_mixture <- function(x, digits=3, ...) {
     "=== Fitted dyadic mixture model ===\n",
     "Maximum number of components: ", x$num_components, "\n",
     "Most probable number of components: ", best_model, "\n",
-    "Probability of best model: ", round(100 * x$component_probabilities[best_model], 1), "%\n"
+    "Posterior probability: ", round(100 * x$component_probabilities[best_model], 1), "%\n"
   ))
   cat("=== Component probabilities ===\n")
   cp <- matrix(0, ncol=length(x$component_probabilities), nrow=1)
@@ -171,14 +171,14 @@ print.summary.bison_mixture <- function(x, digits=3, ...) {
     mixture_transform(x$bison_mixture_obj, x$bison_mixture_obj$component_mean_samples[[best_model]]),
     2, stats::median, na.rm = TRUE
   )
-  cat(paste0("=== Component means for best model (K = ", best_model, ") ===\n"))
+  cat(paste0("=== Component means (K = ", best_model, ") ===\n"))
   cm <- matrix(0, ncol=length(component_means), nrow=1)
   rownames(cm) <- "median"
   colnames(cm) <- 1:best_model
   cm[1, ] <- round(component_means, digits)
   print(cm)
 
-  cat(paste0("=== Edge component probabilities for best model (K = ", best_model, ") ===\n"))
+  cat(paste0("=== Edge component probabilities (K = ", best_model, ") ===\n"))
   ecp <- x$edge_component_probabilities[[best_model]]
 
   rownames(ecp) <- x$bison_mixture_obj$edgemodel$dyad_names
@@ -227,7 +227,7 @@ get_edge_component_probabilities <- function(object, num_components) {
     df_components <- data.frame(object$edge_component_probabilities[[num_components]])
     df <- cbind(df_names, df_components)
     colnames(df)[1:2] <- c("node_1", "node_2")
-    colnames(df)[3:dim(df)[2]] <- sapply(1:num_components, function(i) paste0("P(K = ", i, ")"))
+    colnames(df)[3:dim(df)[2]] <- sapply(1:num_components, function(i) paste0("P(component ", i, ")"))
     return(df)
   }
   stop("This component does not exist.")

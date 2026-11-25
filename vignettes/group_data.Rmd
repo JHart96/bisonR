@@ -123,7 +123,8 @@ fit_group <- bison_model(
   data = df,
   model_type = "binary",
   priors = get_default_priors("binary"),
-  seed = 1
+  seed = 1,
+  show_exceptions = FALSE
 )
 ```
 

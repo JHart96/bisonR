@@ -101,7 +101,7 @@ Node strength is the sum of a node's edge weights on the natural scale, so here 
 
 ### Standardising the metric
 
-With `z_score = TRUE`, the metric is standardised within each posterior draw, by subtracting the mean across nodes and dividing by the standard deviation across nodes:
+With `scale = "z"`, the metric is standardised within each posterior draw, by subtracting the mean across nodes and dividing by the standard deviation across nodes:
 
 ```{r}
 fit_strength_z <- bison_brm(
@@ -109,7 +109,7 @@ fit_strength_z <- bison_brm(
   fit_edge,
   df_nodal,
   num_draws = 5, # Small for demonstration; use 100 or more in practice
-  z_score = TRUE,
+  scale = "z",
   refresh = 0,
   silent = 2
 )
@@ -143,7 +143,7 @@ The metric should follow from the biological question. Some common choices are:
 * `node_strength`: how much an individual associates in total. Strength depends on the number of other individuals in the network, so it is not directly comparable between networks of different sizes.
 * `node_eigen`: eigenvector centrality, which is high when an individual has strong connections to individuals that are themselves well connected.
 * `node_betweenness` and `node_closeness`: positions on paths through the network, which may be relevant to questions about transmission.
-* Thresholded metrics such as `node_degree[0.3]`: the number of edges with a weight above the threshold (here 0.3), calculated in each posterior draw.
+* Thresholded metrics such as `node_degree[0.3]`: the number of edges with a weight at or above the threshold (here 0.3), calculated in each posterior draw.
 
 Thresholded metrics are written in the same way, with the threshold in square brackets:
 
@@ -192,4 +192,4 @@ fit_strength_prior <- bison_brm(
 brms::prior_summary(fit_strength_prior)
 ```
 
-Priors should be chosen on the scale of the response. For example, a prior on the effect of age on strength depends on the units of age and on the range of strength values, which is one reason that `z_score = TRUE` can make priors easier to set.
+Priors should be chosen on the scale of the response. For example, a prior on the effect of age on strength depends on the units of age and on the range of strength values, which is one reason that `scale = "z"` can make priors easier to set.

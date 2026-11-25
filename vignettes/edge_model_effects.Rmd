@@ -47,7 +47,7 @@ df$location <- factor(df$location)
 
 ## A model without additional effects
 
-For comparison, a model with only edge weights is fitted first. In the fits below, `seed` makes the results reproducible and `show_messages = FALSE` hides Stan's progress messages.
+For comparison, a model with only edge weights is fitted first. In the fits below, `seed` makes the results reproducible, and `show_messages = FALSE` and `show_exceptions = FALSE` hide Stan's progress and informational messages.
 
 ```{r}
 priors <- get_default_priors("binary")
@@ -59,7 +59,8 @@ fit_dyad <- bison_model(
   priors = priors,
   iter_sampling = 500,
   seed = 1,
-  show_messages = FALSE
+  show_messages = FALSE,
+  show_exceptions = FALSE
 )
 ```
 
@@ -75,7 +76,8 @@ fit_fixed <- bison_model(
   priors = priors,
   iter_sampling = 500,
   seed = 1,
-  show_messages = FALSE
+  show_messages = FALSE,
+  show_exceptions = FALSE
 )
 ```
 
@@ -104,7 +106,8 @@ fit_random <- bison_model(
   priors = priors,
   iter_sampling = 500,
   seed = 1,
-  show_messages = FALSE
+  show_messages = FALSE,
+  show_exceptions = FALSE
 )
 ```
 
@@ -116,8 +119,6 @@ In a model without a `dyad()` term or factor fixed effect, an intercept is neede
 colnames(fit_random$model_data$design_random)
 fit_random$fit$summary(c("beta_random", "random_group_sigma"))
 ```
-
-Stan may print an informational message that a proposal was rejected, usually during warmup. This is not a problem if it happens only occasionally, as here.
 
 The location effects are similar to those of the fixed effect model: their medians range from -1.24 to 1.42, compared with -1.57 to 1.39. The median of the standard deviation between locations, `random_group_sigma`, is 1.12. The random effects are centred on 0 a priori, but with only five levels their estimated values need not average 0; here the medians average about -0.4.
 
@@ -186,7 +187,7 @@ cor(mean_edge, mean_location)
 
 The correlation is strongly negative: in posterior draws in which the location effects are higher, the edge weights are lower. The general increase in the edge weights in the first plot is partly a shift of this kind. The location effects are mostly negative, and the edge weights are higher to compensate.
 
-The same applies to an intercept added with `1`. Random effects do not have this problem in models with a `dyad()` term, because they are centred on 0. As a result, the absolute values of the edge weights in models with factor fixed effects or an intercept should be interpreted with care. The reported probability `plogis(edge_ij)` corresponds to an observation with all effects equal to 0, which may not correspond to any real observation. Differences between dyads, and analyses that depend on them, are better determined by the data.
+The same applies to an intercept added with `1`. Random effects are less affected because they are centred on 0, but with few levels their estimated values need not average 0 (as in the example above), so some trade-off remains. As a result, the absolute values of the edge weights in models with factor fixed effects or an intercept should be interpreted with care. The reported probability `plogis(edge_ij)` corresponds to an observation with all effects equal to 0, which may not correspond to any real observation. Differences between dyads, and analyses that depend on them, are better determined by the data.
 
 ### Dyad-level predictors
 
@@ -205,7 +206,8 @@ fit_pooled <- bison_model(
   partial_pooling = TRUE,
   iter_sampling = 500,
   seed = 1,
-  show_messages = FALSE
+  show_messages = FALSE,
+  show_exceptions = FALSE
 )
 fit_pooled$fit$summary(c("edge_sigma", "beta_fixed"))
 ```

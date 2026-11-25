@@ -6,7 +6,6 @@
 ^_pkgdown\.yml$
 ^bisonR\.Rproj$
 ^codecov\.yml$
-^dev$
 ^doc$
 ^docs$
 ^pkgdown$

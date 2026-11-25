@@ -21,7 +21,7 @@ for (model_type in c("binary", "count")) {
     expect_lt(component_means[1, 1], component_means[2, 1])
 
     edge_probs <- get_edge_component_probabilities(fit_mixture, 2)
-    expect_equal(colnames(edge_probs), c("node_1", "node_2", "P(K = 1)", "P(K = 2)"))
+    expect_equal(colnames(edge_probs), c("node_1", "node_2", "P(component 1)", "P(component 2)"))
     expect_equal(unname(rowSums(edge_probs[, 3:4])), rep(1, nrow(edge_probs)))
 
     expect_output(print(summary(fit_mixture)), "Maximum number of components: 3")

@@ -223,7 +223,7 @@ fit_dyadic <- bison_brm(
 summary(fit_dyadic)
 ```
 
-In `bison_brm()`, edge weights are on the logit scale for binary models and the log scale for count models. A model is fitted to each of `num_draws` networks drawn from the posterior and the results are combined, so warnings about R-hat values are expected. See `vignette("bison_brms")` for other types of regression.
+In `bison_brm()`, edge weights are on the logit scale for binary models and the log scale for count models. A model is fitted to each of `num_draws` networks drawn from the posterior and the results are combined, so brms may give convergence warnings for the combined fit, and doesn't report R-hat values. See `vignette("bison_brms")` for other types of regression.
 
 ## Network metrics
 

@@ -216,6 +216,8 @@ main img {
   dd { margin: 0 !important; padding: 0 !important; color: var(--bs-secondary-color); font-size: 0.93rem; }
   dd p { margin: 0; }
   &:hover { border-color: rgba($bison-teal, 0.6); }
+  &:focus-within { outline: 2px solid $bison-teal; outline-offset: 2px; }
+  dt a:focus { outline: none; }
 }
 
 @media (max-width: 767.98px) {

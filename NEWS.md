@@ -12,20 +12,24 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 * `extract_metric(standardise = TRUE)` now centres within each posterior draw, as documented.
 * Mixture model components are now ordered by their means in each posterior draw, to avoid label switching.
 * `global_diameter` now uses 1/weight as the edge length, consistent with betweenness and closeness.
+* `global_clustering[t]` is 0 when there are no connected triples, consistent with `node_clustering[t]`.
 * `prior_check()` now shows the correct density for binary edge priors on the probability scale.
 * `node_degree[t]` now counts edges with weight at or above `t`, as documented.
-* `model_comparison()` now works when models have different numbers of posterior draws.
+* `model_comparison()` now works when models have different numbers of posterior draws, and accounts for autocorrelation in MCMC draws.
 
 ## Breaking changes
 
+* bisonR now requires R 4.1.0 or later.
 * cmdstanr is no longer attached by `library(bisonR)`.
-* brms and mice have moved to Suggests and are only needed for `bison_brm()`.
+* brms and mice have moved to Suggests and are only needed for `bison_brm()`, `bison_brm_get_prior()` and `bison_mice()`.
 * For undirected networks, `node_1` in `get_edgelist()` is now the node that comes first in the node levels.
-* When node columns aren't factors with the same levels, nodes are ordered numerically if all names are numbers, and otherwise alphabetically in a locale-independent order (upper case before lower case), so results are the same on every computer. If only one node column is a factor, its unused levels are now kept.
+* Numeric node IDs are written in full (never in scientific notation), so integer and decimal columns with the same IDs give the same nodes. When node columns aren't factors with the same levels, nodes are ordered numerically if all names are numbers, and otherwise alphabetically in a locale-independent order (upper case before lower case), so results are the same on every computer. If only one node column is a factor, its unused levels are now kept.
 * `extract_metric(obj, "edge_weight")` returns edge weights on the natural scale by default. Use `transform = FALSE` for the link scale. `bison_brm()` still uses the link scale.
 * Conjugate models now give an error if the formula includes fixed effects, random effects or an intercept.
 * Random effects are now centred on 0, and the `random_mean` prior has been removed (prior lists that include it give a warning). Previously each random effect had an estimated mean, which overlapped with the edge weights so that their overall level depended on the priors. Models with random effects but no `dyad()` term or factor fixed effect need an explicit intercept, e.g. `(event | effort) ~ 1 + (1 | group)`, and give a warning without one.
-* `bison_save()` writes a single `.rds` file.
+* `bison_save()` writes a single `.rds` file, and its `filename` argument is now `file`. `bison_load()` can still load models saved by earlier versions.
+* `convert_gbi_to_bison()` uses the column names of the GBI matrix as node names, if it has them, rather than column numbers.
+* `get_edge_component_probabilities()` columns are named `P(component 1)`, `P(component 2)`, ..., and `get_component_means()` rows `Component 1`, `Component 2`, ....
 * `simulate_bison_model()` count data have more variation between edges, and a smaller age-difference effect.
 * Simulated data now have an `effort` column for observation effort, and the documentation uses `(event | effort)`. The `duration` column is kept as a copy of `effort`, so existing code still works (#64).
 
@@ -40,7 +44,8 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 * Compiled Stan models are cached between sessions.
 * Conjugate models now return predictions and log-likelihoods, so they work with `plot_predictions()`, `prior_predictive_check()` and `model_comparison()`.
 * New `print()` method for fitted models.
-* `bison_model()` warns if any MCMC chains fail.
+* `bison_model()` warns if any MCMC chains fail, and if `partial_pooling = TRUE` is used without a `dyad()` term.
+* `extract_metric()` warns when nodes have no dyads in the data (their values are fixed rather than estimated), and when eigenvector centrality or closeness is calculated on a network with more than one component. Malformed thresholds give an error.
 * For undirected models, `bison_model()` gives a message when the data have rows for the same pair in both orders, which are combined into one edge (#71).
 * `prior_predictive_check()` gains a `num_draws` argument.
 
@@ -51,6 +56,7 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 * `plot_trace()` shows each edge in a separate panel.
 * `plot_metric()` uses bar charts for discrete metrics (#57).
 * New `plot_mixture()` to plot the components of an edge mixture model (#55). The mixture models article now compares the ICL and BIC criteria (#54).
+* `bison_mixture()` gains `num_draws` (default 200) and records the posterior draws it used in `draw_ids`. `criterion` is no longer case-sensitive.
 
 ## `bison_brm()`
 
@@ -60,6 +66,7 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 * New `subset` argument to select rows of the regression data, e.g. `subset = sex == "F"` (#58).
 * New `scale` argument (`"none"`, `"centre"` or `"z"`) to transform the network variable within each posterior draw (#72). `z_score = TRUE` is equivalent to `scale = "z"`. Global metrics are scaled across networks.
 * Global regressions check that there is one row of data per edge model, and that any `bison_network` column matches the order of the edge models.
+* Gives an error if a network variable isn't finite (for example, closeness of a node with no dyads).
 * `bison_brm_get_prior()` gains `scale`, `subset` and `z_score` arguments.
 
 ## Other changes

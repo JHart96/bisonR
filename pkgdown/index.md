@@ -77,4 +77,4 @@ On Windows you may need [Rtools](https://cran.r-project.org/bin/windows/Rtools/)
 
 ## Getting help
 
-Ask questions in [Discussions](https://github.com/JHart96/bisonR/discussions) and report bugs in [Issues](https://github.com/JHart96/bisonR/issues). Contributions are very welcome; see the [contributing guide](https://github.com/JHart96/bisonR/blob/main/.github/CONTRIBUTING.md).
+Ask questions in [Discussions](https://github.com/JHart96/bisonR/discussions) and report bugs in [Issues](https://github.com/JHart96/bisonR/issues). Contributions are welcome; see the [contributing guide](https://github.com/JHart96/bisonR/blob/main/.github/CONTRIBUTING.md).

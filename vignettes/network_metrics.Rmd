@@ -49,7 +49,7 @@ The result has one row per posterior draw and one column per target: one column 
 t(apply(strength, 2, quantile, probs = c(0.05, 0.5, 0.95)))
 ```
 
-`plot_metric()` plots the posterior distribution of a metric. Discrete metrics, such as degree, are shown as bar charts:
+`plot_metric()` plots the posterior distribution of a metric. Continuous metrics are shown as densities, and discrete metrics, such as degree, as bar charts (see the examples below):
 
 ```{r}
 plot_metric(strength[, 1:2], "Strength of node")
@@ -112,14 +112,14 @@ quantile(clustering, c(0.05, 0.5, 0.95))
 
 ## Using other network tools
 
-Other metrics can be calculated with `bison_to_igraph()`, which returns a list of `igraph` networks drawn from the posterior, with edge weights on the natural scale. Calculating a metric for each network gives its posterior distribution:
+Other metrics can be calculated with `bison_to_igraph()`, which returns a list of `igraph` networks drawn from the posterior, with edge weights on the natural scale. Calculating a metric for each network gives its posterior distribution. For example, the mean shortest path length, using 1/weight as the length of each edge:
 
 ```{r}
 nets <- bison_to_igraph(fit_edge, num_draws = 200)
-weighted_clustering <- sapply(nets, function(net) {
-  mean(igraph::transitivity(net, type = "barrat"), na.rm = TRUE)
+mean_path_length <- sapply(nets, function(net) {
+  igraph::mean_distance(net, weights = 1 / igraph::E(net)$weight)
 })
-quantile(weighted_clustering, c(0.05, 0.5, 0.95))
+quantile(mean_path_length, c(0.05, 0.5, 0.95))
 ```
 
 Note that some igraph functions ignore edge weights (for example `igraph::assortativity()`). Because every dyad in the model is an edge in every posterior network, these functions give the same value for every draw, so check that a function uses the `weight` edge attribute before applying it to posterior networks.
