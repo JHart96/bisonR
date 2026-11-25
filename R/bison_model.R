@@ -1,6 +1,3 @@
-require(igraph)
-require(dplyr)
-require(stringr)
 
 #' Fit an edge model to data
 #'

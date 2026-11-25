@@ -11,14 +11,14 @@
 #' @return A mice mids object
 #' @export
 bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metric_name, num_draws=100, z_score=FALSE) {
-  if (target_name == "global" && class(data_list) == "data.frame") {
-    data_list <- lapply(1:nrow(data_list), function(i) data_list[i, ])
-    print(data_list)
+  check_suggested("mice", "bison_mice")
+  if (target_name == "global" && is.data.frame(data_list)) {
+    data_list <- lapply(seq_len(nrow(data_list)), function(i) data_list[i, , drop = FALSE])
   }
 
   # If the data aren't lists yet, convert them
-  if (class(edgemodel_list)[1] != "list") edgemodel_list <- list(edgemodel_list)
-  if (class(data_list)[1] != "list") data_list <- list(data_list)
+  if (inherits(edgemodel_list, "bison_model")) edgemodel_list <- list(edgemodel_list)
+  if (is.data.frame(data_list)) data_list <- list(data_list)
 
   new_bison_term <- paste0("bison_", target_name, "_", metric_name)
 

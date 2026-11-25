@@ -1,4 +1,3 @@
-require(brms)
 
 utils::globalVariables(c(".imp"))
 
@@ -16,6 +15,8 @@ utils::globalVariables(c(".imp"))
 #' @return A fitted brms model
 #' @export
 bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score=FALSE, cores=4, chains=2, ...) {
+  check_suggested("brms", "bison_brm")
+  check_suggested("mice", "bison_brm")
   # Parse formula
   parsed_formula <- parse_bison_brms_formula(formula)
   brms_formula <- parsed_formula$brms_formula
@@ -48,6 +49,8 @@ bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score
 #'
 #' @export
 bison_brm_get_prior <- function(formula, edgemodel_list, data_list, ...) {
+  check_suggested("brms", "bison_brm_get_prior")
+  check_suggested("mice", "bison_brm_get_prior")
   # Parse formula
   parsed_formula <- parse_bison_brms_formula(formula)
   brms_formula <- parsed_formula$brms_formula

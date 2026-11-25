@@ -2,19 +2,14 @@
 #'
 #' @description An R package for Bayesian Inference of Social Networks
 #'
-#' @docType package
+#' @keywords internal
 #' @name bisonR-package
 #' @aliases bisonR
-#' @import methods
 #' @import stats
 #' @import stringr
-#' @import cmdstanr
-#' @import mclust
 #' @import utils
 #' @import grDevices
 #' @import graphics
-#' @import formula.tools
-#'
-#'
-#'
-NULL
+#' @importFrom methods is
+#' @importFrom mclust Mclust mclustBIC mclustICL
+"_PACKAGE"

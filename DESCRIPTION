@@ -1,6 +1,6 @@
 Package: bisonR
 Title: Bayesian Inference of Social Networks in R
-Version: 0.4.6
+Version: 0.5.0
 Authors@R: 
     person("Jordan", "Hart", , "jordan.da.hart@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4636-0760"))
@@ -10,33 +10,34 @@ BugReports: https://github.com/JHart96/bisonR/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
-Biarch: true
-Depends: 
-    R (>= 4.0.0),
-    cmdstanr,
-    methods
+Depends:
+    R (>= 4.1.0)
 Imports:
-    formula.tools,
-    stats,
-    igraph,
-    stringr,
+    cmdstanr (>= 0.5.0),
     dplyr,
-    mclust,
     extraDistr,
-    loo,
+    graphics,
+    grDevices,
+    igraph,
     logspline,
-    tidyverse,
-    knitr,
-    rmarkdown,
-    testthat,
-    covr,
+    loo,
+    mclust,
+    methods,
+    stats,
+    stringr,
+    utils
+Suggests:
     brms,
+    knitr,
     mice,
-    BH,
-    RcppEigen
+    rmarkdown,
+    testthat (>= 3.0.0),
+    covr,
+    vdiffr,
+    withr
+Additional_repositories: https://stan-dev.r-universe.dev
 Remotes: 
     stan-dev/cmdstanr
 VignetteBuilder: knitr
-LazyData: true
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0

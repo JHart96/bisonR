@@ -182,3 +182,14 @@ col2rgba <- function(col, alpha) {
 }
 
 
+# Stop with an informative message if an optional (Suggests) package is missing.
+check_suggested <- function(pkg, fn) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    stop(
+      "Package '", pkg, "' is needed for ", fn, "() but is not installed. ",
+      "Install it with install.packages(\"", pkg, "\").",
+      call. = FALSE
+    )
+  }
+  invisible(TRUE)
+}
