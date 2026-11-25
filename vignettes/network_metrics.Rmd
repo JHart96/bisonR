@@ -79,7 +79,7 @@ Some metrics are only defined for networks where edges are either present or abs
 | `node_degree[t]` | Number of edges with weight at or above `t`. |
 | `node_eigen` | Eigenvector centrality: high when a node has strong edges to nodes that are themselves central. Scaled so the most central node has a value of 1. |
 | `node_betweenness` | Betweenness: the number of shortest paths between other pairs of nodes that pass through the node, using 1/weight as the length of each edge (so strong edges are short). |
-| `node_closeness` | Closeness: the inverse of the average shortest-path distance from the node to all others, using 1/weight as edge lengths. |
+| `node_closeness` | Closeness: the inverse of the sum of shortest-path distances from the node to all other reachable nodes, using 1/weight as edge lengths. |
 | `node_clustering[t]` | Local clustering coefficient of the network thresholded at `t`: the proportion of pairs of the node's associates that are also associates of each other. Nodes with fewer than two associates get 0. |
 
 ### Global metrics

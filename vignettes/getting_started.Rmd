@@ -122,7 +122,7 @@ fit_edge <- bison_model(
 )
 ```
 
-Fitting time depends on the size of the dataset. The Stan models are compiled the first time they are used and then cached. If there are no observation-level effects, aggregating the data to one row per dyad, or using a conjugate model, is faster and gives the same edge weights.
+Fitting time depends on the size of the dataset. The Stan models are compiled the first time they are used and then cached. If there are no observation-level effects, aggregating the data to one row per dyad is faster and gives the same edge weights, and a conjugate model is faster still, with similar edge weights under a different prior.
 
 ## Checking the model
 
