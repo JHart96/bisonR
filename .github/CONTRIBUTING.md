@@ -16,7 +16,7 @@ GitHub Actions runs these checks on every PR. All except `test-coverage` must pa
 |---|---|
 | `R-CMD-check` | `R CMD check` on macOS, Windows and Linux, including the tests and examples. Articles are not rebuilt here (the `pkgdown` check renders them), and the brms tests only run on Linux. |
 | `test-coverage` | Measures test coverage and reports it to Codecov. |
-| `pkgdown` | Builds the documentation site, so broken examples or articles are caught before merging. The site at [bisonr.org](https://bisonr.org) is only deployed from `main`. |
+| `pkgdown` | Builds the documentation site, so broken examples or articles are caught before merging. The site at [bisonr.org](https://bisonr.org) is only deployed from pushes to `main` and from published releases. |
 | `version-check` | PRs into `main` must increase the `Version` in `DESCRIPTION` and add a matching `# bisonR <version>` heading at the top of `NEWS.md`. |
 
 ## Versions
