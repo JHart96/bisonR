@@ -165,7 +165,8 @@ test_that("zero-inflated log-likelihoods match a calculation by hand", {
   by_hand <- ifelse(ev == 0,
                     log(zp + (1 - zp) * dbinom(0, n, p)),
                     log(1 - zp) + dbinom(ev, n, p, log = TRUE))
-  expect_equal(as.numeric(draws[d, grep("^log_lik", colnames(draws))]), by_hand, tolerance = 1e-6)
+  # CmdStan stores draws to 6 significant figures, so allow for rounding.
+  expect_equal(as.numeric(draws[d, grep("^log_lik", colnames(draws))]), by_hand, tolerance = 1e-4)
 })
 
 test_that("zero inflation with one sampling period per row gives a warning", {
