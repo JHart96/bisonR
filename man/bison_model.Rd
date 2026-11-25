@@ -80,7 +80,10 @@ observation effort for each dyad.
 columns hold node names or IDs. If they are both factors with the same
 levels, nodes that never appear in the data are kept.
 \item \code{x}: a fixed effect of column \code{x}. Factors get one parameter per level.
-\item \code{(1 | g)}: a random intercept for each level of column \code{g}.
+\item \code{(1 | g)}: a random intercept for each level of column \code{g}, centred on 0.
+In a model with no \code{dyad()} term, intercept or factor fixed effect, the
+first random effect instead has an estimated mean (with the \code{random_mean}
+prior), which sets the overall level.
 \item \code{1} or \code{0}: include or exclude a global intercept (excluded by default).
 }
 

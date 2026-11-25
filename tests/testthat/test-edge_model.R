@@ -129,3 +129,23 @@ test_that("models can be saved and loaded", {
   expect_equal(get_edgelist(reloaded), get_edgelist(fit))
   expect_equal(dim(reloaded$fit$draws("edge_weight")), dim(fit$fit$draws("edge_weight")))
 })
+
+test_that("random effects are centred on zero when the model has edge weights", {
+  skip_if_no_cmdstan()
+  skip_on_cran()
+  set.seed(8)
+  sim <- simulate_bison_model("binary", aggregated = FALSE, max_obs = 10)
+  df <- sim$df_sim
+  df$location <- factor(df$location)
+  fit_dyad <- quiet(bison_model((event | duration) ~ dyad(node_1_id, node_2_id) + (1 | location), df, "binary",
+                                priors = get_default_priors("binary"), iter_sampling = 300, seed = 1))
+  expect_equal(fit_dyad$model_data$num_random_mean, 0)
+  expect_false(any(grepl("^random_group_mu", colnames(fit_dyad$fit$draws(format = "matrix")))))
+
+  # A model with only a random effect still estimates the overall level
+  fit_random <- quiet(bison_model((event | duration) ~ (1 | location), df, "binary",
+                                  priors = get_default_priors("binary"), iter_sampling = 300, seed = 1))
+  mu <- fit_random$fit$draws("random_group_mu", format = "matrix")
+  expect_equal(ncol(mu), 1)
+  expect_equal(plogis(median(mu)), mean(df$event), tolerance = 0.15)
+})

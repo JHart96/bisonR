@@ -268,6 +268,7 @@ get_bison_model_data <- function(formula, observations, directed, model_type) {
   fixed_names <- character(0)
   random_names <- character(0)
   random_group_index <- character(0)
+  has_factor_fixed <- FALSE
 
   if (model_spec$intercept) {
     design_fixed <- cbind(design_fixed, 1)
@@ -280,6 +281,7 @@ get_bison_model_data <- function(formula, observations, directed, model_type) {
       values <- factor(values)
     }
     if (is.factor(values)) {
+      has_factor_fixed <- TRUE
       # One column per level, as in earlier versions of bisonR.
       for (term_level in levels(values)) {
         design_fixed <- cbind(design_fixed, 1 * (values == term_level))
@@ -319,7 +321,14 @@ get_bison_model_data <- function(formula, observations, directed, model_type) {
     num_fixed = ncol(design_fixed),
     num_random = ncol(design_random),
     num_random_groups = length(unique(random_group_index)),
-    random_group_index = as.integer(factor(random_group_index, levels = unique(random_group_index)))
+    random_group_index = as.integer(factor(random_group_index, levels = unique(random_group_index))),
+    # Random effects are centred on 0, except that the first random effect has an
+    # estimated mean when no other term sets the overall level of the predictor
+    # (no dyad() term, no intercept and no factor fixed effects).
+    num_random_mean = as.integer(
+      length(model_spec$random) > 0 && is.null(model_spec$node_1_name) &&
+        !model_spec$intercept && !has_factor_fixed
+    )
   )
   if (model_type == "binary") {
     model_data$divisor <- as.integer(round(divisor))

@@ -131,14 +131,14 @@ The edge weights are now estimated after accounting for the season and for diffe
 head(get_edgelist(fit_group))
 ```
 
-`summary()` and `get_edgelist()` only report edge weights. The estimates of the other parameters can be obtained from the underlying cmdstanr fit, stored as `fit_group$fit`. `beta_fixed` is the effect of `wet` on the logit scale, and `random_group_mu` and `random_group_sigma` are the mean and standard deviation of the group random effects:
+`summary()` and `get_edgelist()` only report edge weights. The estimates of the other parameters can be obtained from the underlying cmdstanr fit, stored as `fit_group$fit`. `beta_fixed` is the effect of `wet` on the logit scale, and `random_group_sigma` is the standard deviation of the group random effects. Because the model has edge weights, the group random effects are centred on 0:
 
 ```{r}
-params <- fit_group$fit$summary(c("beta_fixed", "random_group_mu", "random_group_sigma"))
+params <- fit_group$fit$summary(c("beta_fixed", "random_group_sigma"))
 as.data.frame(params[, c("variable", "median", "q5", "q95")])
 ```
 
-The effect of `wet` is positive, so pairs were more likely to be seen together in wet-season groups. The mean of the group random effects is estimated as negative. The edge weights describe a group with a random effect of 0, which is above the average group, and this is why they are higher than in the conjugate model. The mean of the random effects and the edge weights are only separated by their priors, so the absolute values of the edge weights in this model depend on the priors.
+The effect of `wet` is positive (median 0.49 on the logit scale), so pairs were more likely to be seen together in wet-season groups, and the standard deviation of the group effects is about 0.32. The edge weights describe a dry-season group (`wet = 0`) with an average group effect, so they are lower than those of the conjugate model, which does not separate the seasons. For example, the median edge weight of Ada and Bea is 0.20 in this model and 0.27 in the conjugate model.
 
 `plot_network()` works in the same way as for the conjugate model:
 

@@ -95,3 +95,18 @@ test_that("priors are validated against the model type", {
   expect_equal(filled$fixed, get_default_priors("binary")$fixed)
   expect_error(get_default_priors("duration"), "not supported")
 })
+
+test_that("random effects only have an estimated mean when nothing else sets the overall level", {
+  df <- data.frame(
+    n1 = c("A", "A", "B", "A"), n2 = c("B", "C", "C", "B"), event = c(1, 0, 1, 1), duration = 1,
+    g = c("x", "y", "x", "y"), h = c("p", "p", "q", "q"), sex = c("F", "M", "F", "M"), age = 1:4
+  )
+  mean_flag <- function(f) get_bison_model_data(f, df, FALSE, "binary")$model_data$num_random_mean
+  expect_equal(mean_flag((event | duration) ~ (1 | g)), 1)
+  expect_equal(mean_flag((event | duration) ~ (1 | g) + (1 | h)), 1) # first random effect only
+  expect_equal(mean_flag((event | duration) ~ age + (1 | g)), 1)     # numeric fixed effects don't set the level
+  expect_equal(mean_flag((event | duration) ~ dyad(n1, n2) + (1 | g)), 0)
+  expect_equal(mean_flag((event | duration) ~ 1 + (1 | g)), 0)
+  expect_equal(mean_flag((event | duration) ~ sex + (1 | g)), 0)
+  expect_equal(mean_flag((event | duration) ~ dyad(n1, n2)), 0)
+})

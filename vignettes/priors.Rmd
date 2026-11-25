@@ -41,11 +41,11 @@ Binary and count models have the same five priors:
 |---|---|---|
 | `edge` | Edge weight of each dyad, on the link scale | Normal |
 | `fixed` | Each fixed effect parameter (`+ x` in the formula), on the link scale | Normal |
-| `random_mean` | Mean of each group of random effects (`+ (1 | g)`) | Normal |
+| `random_mean` | Mean of the first random effect, in models with no `dyad()` term, intercept or factor fixed effect | Normal |
 | `random_std` | Standard deviation of each group of random effects | Half-normal |
 | `zero_prob` | Probability that an observation is a structural zero, in zero-inflated models | Beta |
 
-Priors for parameters that are not in the model are ignored. For example, `random_mean` and `random_std` only matter if the formula contains a random effect, and `zero_prob` only matters if `zero_inflated = TRUE`.
+Priors for parameters that are not in the model are ignored. For example, `random_std` only matters if the formula contains a random effect, `random_mean` only matters for a random effect in a model with no `dyad()` term, intercept or factor fixed effect (otherwise random effects are centred on 0), and `zero_prob` only matters if `zero_inflated = TRUE`.
 
 The default `edge` prior differs between the two model types: `normal(0, 2.5)` for binary models and `normal(0, 1)` for count models. The other defaults are the same.
 

@@ -36,7 +36,10 @@
 #'   columns hold node names or IDs. If they are both factors with the same
 #'   levels, nodes that never appear in the data are kept.
 #' * `x`: a fixed effect of column `x`. Factors get one parameter per level.
-#' * `(1 | g)`: a random intercept for each level of column `g`.
+#' * `(1 | g)`: a random intercept for each level of column `g`, centred on 0.
+#'   In a model with no `dyad()` term, intercept or factor fixed effect, the
+#'   first random effect instead has an estimated mean (with the `random_mean`
+#'   prior), which sets the overall level.
 #' * `1` or `0`: include or exclude a global intercept (excluded by default).
 #'
 #' Including other terms changes the interpretation of the edge weights, which
