@@ -26,6 +26,7 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 * Random effects are now centred on 0, and the `random_mean` prior has been removed (prior lists that include it give a warning). Previously each random effect had an estimated mean, which overlapped with the edge weights so that their overall level depended on the priors. Models with random effects but no `dyad()` term or factor fixed effect need an explicit intercept, e.g. `(event | effort) ~ 1 + (1 | group)`, and give a warning without one.
 * `bison_save()` writes a single `.rds` file.
 * `simulate_bison_model()` count data have more variation between edges, and a smaller age-difference effect.
+* Simulated data now have an `effort` column for observation effort, and the documentation uses `(event | effort)`. The `duration` column is kept as a copy of `effort`, so existing code still works (#64).
 
 ## Model fitting
 
@@ -37,6 +38,7 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 * Conjugate models now return predictions and log-likelihoods, so they work with `plot_predictions()`, `prior_predictive_check()` and `model_comparison()`.
 * New `print()` method for fitted models.
 * `bison_model()` warns if any MCMC chains fail.
+* For undirected models, `bison_model()` gives a message when the data have rows for the same pair in both orders, which are combined into one edge (#71).
 * `prior_predictive_check()` gains a `num_draws` argument.
 
 ## Plots
@@ -45,12 +47,15 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 * `plot_network()` shows all nodes, gains a `threshold_on` argument, rescales edge widths for count models, and adds a caption explaining the line widths (#93). Thanks to @cebus-imitator for the threshold fixes (#94, #95).
 * `plot_trace()` shows each edge in a separate panel.
 * `plot_metric()` uses bar charts for discrete metrics (#57).
+* New `plot_mixture()` to plot the components of an edge mixture model (#55). The mixture models article now compares the ICL and BIC criteria (#54).
 
 ## `bison_brm()`
 
 * Warns when a dyadic regression doesn't include a multi-membership term.
 * Gives clearer errors when the data contain nodes or dyads that aren't in the edge model (#68).
 * Supports thresholded metrics such as `node_degree[0.5]`.
+* New `subset` argument to select rows of the regression data, e.g. `subset = sex == "F"` (#58).
+* New `scale` argument (`"none"`, `"centre"` or `"z"`) to transform the network variable within each posterior draw (#72). `z_score = TRUE` is equivalent to `scale = "z"`.
 
 ## Other changes
 

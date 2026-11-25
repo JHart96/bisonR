@@ -33,7 +33,7 @@ sim_data <- simulate_bison_model("binary", aggregated = TRUE, max_obs = 20)
 df <- sim_data$df_sim
 
 fit_edge <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df,
   model_type = "binary",
   priors = get_default_priors("binary"),

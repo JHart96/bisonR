@@ -51,7 +51,7 @@ For comparison, a model with only edge weights is fitted first. In the fits belo
 priors <- get_default_priors("binary")
 
 fit_dyad <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df,
   model_type = "binary",
   priors = priors,
@@ -67,7 +67,7 @@ A fixed effect is added with `+` followed by a column name:
 
 ```{r}
 fit_fixed <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id) + location,
+  (event | effort) ~ dyad(node_1_id, node_2_id) + location,
   data = df,
   model_type = "binary",
   priors = priors,
@@ -88,7 +88,7 @@ The parameters are on the link scale (log-odds for binary models), and each has 
 
 ## Intercepts
 
-Edge models have no global intercept by default. `1` in the formula adds one, and `0` excludes it explicitly. In a model with a `dyad()` term an intercept is usually not needed, because the edge weights already include the overall rate of events. An intercept is used in models without a `dyad()` term, such as the null model `(event | duration) ~ 1` in `vignette("getting_started")`, in which every dyad has the same rate.
+Edge models have no global intercept by default. `1` in the formula adds one, and `0` excludes it explicitly. In a model with a `dyad()` term an intercept is usually not needed, because the edge weights already include the overall rate of events. An intercept is used in models without a `dyad()` term, such as the null model `(event | effort) ~ 1` in `vignette("getting_started")`, in which every dyad has the same rate.
 
 ## Random effects
 
@@ -96,7 +96,7 @@ A random intercept is added with `(1 | g)`:
 
 ```{r}
 fit_random <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id) + (1 | location),
+  (event | effort) ~ dyad(node_1_id, node_2_id) + (1 | location),
   data = df,
   model_type = "binary",
   priors = priors,
@@ -108,7 +108,7 @@ fit_random <- bison_model(
 
 As with fixed effects, there is one parameter for each level, stored in `beta_random`. The difference is that the levels are drawn from a common normal distribution with mean 0 and standard deviation `random_group_sigma`, which is estimated from the data with the `random_std` prior. Because the levels are centred on 0, the overall rate of events is described by the edge weights, and the random effects describe how each location differs from it.
 
-In a model without a `dyad()` term or factor fixed effect, an intercept is needed to set the overall rate, for example `(event | duration) ~ 1 + (1 | location)`. `bison_model()` gives a warning if it is missing.
+In a model without a `dyad()` term or factor fixed effect, an intercept is needed to set the overall rate, for example `(event | effort) ~ 1 + (1 | location)`. `bison_model()` gives a warning if it is missing.
 
 ```{r}
 colnames(fit_random$model_data$design_random)
@@ -196,7 +196,7 @@ By default each edge weight has an independent prior, the `edge` prior. With `pa
 
 ```{r}
 fit_pooled <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id) + location,
+  (event | effort) ~ dyad(node_1_id, node_2_id) + location,
   data = df,
   model_type = "binary",
   priors = priors,

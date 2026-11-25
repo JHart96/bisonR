@@ -97,7 +97,7 @@ df <- sim_data$df_sim
 
 # Fast conjugate model, no MCMC needed
 fit_edge <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df,
   model_type = "binary_conjugate",
   priors = get_default_priors("binary_conjugate")
@@ -106,7 +106,7 @@ summary(fit_edge)
 
 # Full model fitted with Stan, which allows extra effects
 fit_edge <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df,
   model_type = "binary",
   priors = get_default_priors("binary")

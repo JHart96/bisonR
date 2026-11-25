@@ -27,7 +27,7 @@
 #'   "binary", num_components = 2, component_weights = c(0.5, 0.5)
 #' )
 #' fit_edge <- bison_model(
-#'   (event | duration) ~ dyad(node_1_id, node_2_id),
+#'   (event | effort) ~ dyad(node_1_id, node_2_id),
 #'   data = sim_data$df_sim,
 #'   model_type = "binary_conjugate",
 #'   priors = get_default_priors("binary_conjugate")
@@ -115,7 +115,7 @@ bison_mixture <- function(edgemodel, num_components = 5, criterion = c("ICL", "B
 #'   "count", num_components = 2, component_weights = c(0.5, 0.5)
 #' )
 #' fit_edge <- bison_model(
-#'   (event | duration) ~ dyad(node_1_id, node_2_id),
+#'   (event | effort) ~ dyad(node_1_id, node_2_id),
 #'   data = sim_data$df_sim,
 #'   model_type = "count_conjugate",
 #'   priors = get_default_priors("count_conjugate")
@@ -205,7 +205,7 @@ mixture_transform <- function(object, samples) {
 #'   "count", num_components = 2, component_weights = c(0.5, 0.5)
 #' )
 #' fit_edge <- bison_model(
-#'   (event | duration) ~ dyad(node_1_id, node_2_id),
+#'   (event | effort) ~ dyad(node_1_id, node_2_id),
 #'   data = sim_data$df_sim,
 #'   model_type = "count_conjugate",
 #'   priors = get_default_priors("count_conjugate")
@@ -240,7 +240,7 @@ get_edge_component_probabilities <- function(object, num_components) {
 #'   "count", num_components = 2, component_weights = c(0.5, 0.5)
 #' )
 #' fit_edge <- bison_model(
-#'   (event | duration) ~ dyad(node_1_id, node_2_id),
+#'   (event | effort) ~ dyad(node_1_id, node_2_id),
 #'   data = sim_data$df_sim,
 #'   model_type = "count_conjugate",
 #'   priors = get_default_priors("count_conjugate")
@@ -266,7 +266,7 @@ get_network_component_probabilities <- function(object) {
 #'   "count", num_components = 2, component_weights = c(0.5, 0.5)
 #' )
 #' fit_edge <- bison_model(
-#'   (event | duration) ~ dyad(node_1_id, node_2_id),
+#'   (event | effort) ~ dyad(node_1_id, node_2_id),
 #'   data = sim_data$df_sim,
 #'   model_type = "count_conjugate",
 #'   priors = get_default_priors("count_conjugate")
@@ -288,4 +288,87 @@ get_component_means <- function(object, num_components, ci=0.90) {
   summary_table[, 2] <- lb
   summary_table[, 3] <- ub
   return(as.data.frame(summary_table))
+}
+
+#' Plot the components of an edge mixture model
+#'
+#' Shows the distribution of posterior median edge weights (on the natural
+#' scale) as a histogram, with each edge coloured by the component it most
+#' probably belongs to. The posterior median and credible interval of each
+#' component's mean are shown as a vertical line and shaded band.
+#'
+#' @param object A `bison_mixture` object from [bison_mixture()].
+#' @param num_components Number of components to show. Defaults to the number
+#'   with the highest posterior probability.
+#' @param ci Width of the credible interval for the component means.
+#' @param breaks Number of histogram bins (passed to [graphics::hist()]).
+#'
+#' @return The data used for the plot, invisibly: a data frame with each dyad,
+#'   its posterior median edge weight and its most probable component.
+#'
+#' @examples
+#' sim_data <- simulate_bison_model_mixture(
+#'   "count", num_components = 2, component_weights = c(0.5, 0.5)
+#' )
+#' fit_edge <- bison_model(
+#'   (event | effort) ~ dyad(node_1_id, node_2_id),
+#'   data = sim_data$df_sim,
+#'   model_type = "count_conjugate",
+#'   priors = get_default_priors("count_conjugate")
+#' )
+#' fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
+#' plot_mixture(fit_mixture)
+#' @export
+plot_mixture <- function(object, num_components = NULL, ci = 0.9, breaks = 30) {
+  if (!inherits(object, "bison_mixture")) {
+    stop("`object` must be a fitted mixture model from bison_mixture().", call. = FALSE)
+  }
+  if (is.null(num_components)) {
+    num_components <- which.max(object$component_probabilities)
+  }
+  if (num_components < 1 || num_components > object$num_components) {
+    stop("`num_components` must be between 1 and ", object$num_components, ".", call. = FALSE)
+  }
+
+  edge_medians <- apply(edge_transform(object$edgemodel), 2, stats::median)
+  probs <- matrix(object$edge_component_probabilities[[num_components]], ncol = num_components)
+  assignment <- apply(probs, 1, which.max)
+  component_means <- get_component_means(object, num_components, ci = ci)
+  colours <- grDevices::colorRampPalette(c("#2b7a78", "#e0a458", "#c4453c", "#5b5f97", "#7a8f3b"))(max(num_components, 2))
+
+  h <- graphics::hist(edge_medians, breaks = breaks, plot = FALSE)
+  counts <- sapply(seq_len(num_components), function(k) {
+    graphics::hist(edge_medians[assignment == k], breaks = h$breaks, plot = FALSE)$counts
+  })
+  counts <- matrix(counts, ncol = num_components)
+
+  xlab <- if (object$edgemodel$model_type == "binary") "Edge weight (posterior median probability)" else "Edge weight (posterior median rate)"
+  graphics::plot(
+    NULL, xlim = range(c(h$breaks, unlist(component_means))), ylim = c(0, max(rowSums(counts)) * 1.3),
+    xlab = xlab, ylab = "Number of edges",
+    main = paste0(num_components, " component", if (num_components > 1) "s", " (posterior probability ",
+                  round(object$component_probabilities[num_components], 2), ")")
+  )
+  for (k in seq_len(num_components)) {
+    graphics::rect(component_means[k, 2], 0, component_means[k, 3], max(rowSums(counts)) * 1.15,
+                   col = col2rgba(colours[k], 0.15), border = NA)
+  }
+  bottoms <- rep(0, nrow(counts))
+  for (k in seq_len(num_components)) {
+    graphics::rect(h$breaks[-length(h$breaks)], bottoms, h$breaks[-1], bottoms + counts[, k],
+                   col = col2rgba(colours[k], 0.8), border = "white")
+    bottoms <- bottoms + counts[, k]
+  }
+  graphics::abline(v = component_means[, 1], col = colours[seq_len(num_components)], lwd = 2)
+  graphics::legend(
+    "top", horiz = TRUE, bty = "n", fill = colours[seq_len(num_components)], border = NA,
+    legend = paste("Component", seq_len(num_components))
+  )
+
+  invisible(data.frame(
+    dyad = object$edgemodel$dyad_names,
+    median = edge_medians,
+    component = assignment,
+    row.names = NULL
+  ))
 }

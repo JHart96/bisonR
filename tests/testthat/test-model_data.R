@@ -33,7 +33,7 @@ test_that("malformed formulas give clear errors or warnings", {
 
 test_that("undirected A-B and B-A rows refer to the same dyad", {
   df <- data.frame(n1 = c("A", "B", "A"), n2 = c("B", "A", "C"), event = c(1, 0, 1), duration = 1)
-  info <- get_bison_model_data((event | duration) ~ dyad(n1, n2), df, FALSE, "binary")
+  info <- suppressMessages(get_bison_model_data((event | duration) ~ dyad(n1, n2), df, FALSE, "binary"))
   expect_equal(info$num_dyads, 2)
   expect_equal(info$row_dyad_ids, c(1, 1, 2))
   expect_equal(info$dyad_names, c("A <-> B", "A <-> C"))
@@ -113,4 +113,11 @@ test_that("old prior lists with random_mean still work, with a warning", {
   priors <- c(get_default_priors("binary"), random_mean = "normal(0, 1)")
   expect_warning(validated <- validate_priors(priors, "binary"), "no longer used")
   expect_false("random_mean" %in% names(validated))
+})
+
+test_that("undirected data with rows in both orders give a message", {
+  df <- data.frame(n1 = c("A", "B", "A"), n2 = c("B", "A", "C"), event = c(1, 0, 1), effort = 1)
+  expect_message(get_bison_model_data((event | effort) ~ dyad(n1, n2), df, FALSE, "binary"), "1 dyad\\(s\\) have rows in both orders")
+  expect_silent(get_bison_model_data((event | effort) ~ dyad(n1, n2), df, TRUE, "binary"))
+  expect_silent(get_bison_model_data((event | effort) ~ dyad(n1, n2), df[c(1, 3), ], FALSE, "binary"))
 })

@@ -21,7 +21,7 @@ chains should overlap and show no trends.
 \examples{
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 fit_edge <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = sim_data$df_sim, model_type = "binary",
   priors = get_default_priors("binary")
 )

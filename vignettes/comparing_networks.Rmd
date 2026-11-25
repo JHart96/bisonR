@@ -35,12 +35,12 @@ simulate_period <- function(edge_sd, num_nodes = 12) {
   nodes <- LETTERS[1:num_nodes]
   dyads <- t(combn(num_nodes, 2))
   logit_weight <- rnorm(nrow(dyads), mean = -1.5, sd = edge_sd)
-  duration <- sample(10:40, nrow(dyads), replace = TRUE)
+  effort <- sample(10:40, nrow(dyads), replace = TRUE)
   data.frame(
     node_1_id = factor(nodes[dyads[, 1]], levels = nodes),
     node_2_id = factor(nodes[dyads[, 2]], levels = nodes),
-    event = rbinom(nrow(dyads), duration, plogis(logit_weight)),
-    duration = duration
+    event = rbinom(nrow(dyads), effort, plogis(logit_weight)),
+    effort = effort
   )
 }
 
@@ -57,13 +57,13 @@ An edge model is fitted to each dataset separately. There are no observation-lev
 priors <- get_default_priors("binary_conjugate")
 
 fit_1 <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df_1,
   model_type = "binary_conjugate",
   priors = priors
 )
 fit_2 <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df_2,
   model_type = "binary_conjugate",
   priors = priors

@@ -28,3 +28,18 @@ for (model_type in c("binary", "count")) {
     expect_error(get_edge_component_probabilities(fit_mixture, 4), "does not exist")
   })
 }
+
+test_that("plot_mixture draws the components and returns the assignments", {
+  set.seed(21)
+  sim <- simulate_bison_model_mixture("count", num_components = 2, component_weights = c(0.5, 0.5))
+  fit_edge <- bison_model((event | effort) ~ dyad(node_1_id, node_2_id), sim$df_sim,
+                          "count_conjugate", priors = conjugate_priors("count"))
+  fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE, num_draws = 30)
+  pdf(NULL)
+  on.exit(dev.off())
+  out <- plot_mixture(fit_mixture, num_components = 2)
+  expect_equal(nrow(out), fit_edge$num_dyads)
+  expect_true(all(out$component %in% 1:2))
+  expect_silent(plot_mixture(fit_mixture))
+  expect_error(plot_mixture(fit_mixture, num_components = 4), "between 1 and 3")
+})

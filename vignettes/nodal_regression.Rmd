@@ -44,18 +44,18 @@ sociality <- 0.15 * (df_nodal$age - mean(df_nodal$age)) + rnorm(num_nodes, 0, 0.
 dyads <- t(combn(num_nodes, 2))
 logit_weight <- -2 + sociality[dyads[, 1]] + sociality[dyads[, 2]] +
   rnorm(nrow(dyads), 0, 0.5)
-duration <- sample(5:30, nrow(dyads), replace = TRUE)
+effort <- sample(5:30, nrow(dyads), replace = TRUE)
 
 df_obs <- data.frame(
   node_1_id = factor(nodes[dyads[, 1]], levels = nodes),
   node_2_id = factor(nodes[dyads[, 2]], levels = nodes),
-  event = rbinom(nrow(dyads), duration, plogis(logit_weight)),
-  duration = duration
+  event = rbinom(nrow(dyads), effort, plogis(logit_weight)),
+  effort = effort
 )
 head(df_obs)
 ```
 
-`df_obs` contains the observations, one row per dyad with the number of sampling periods in which the pair was seen together (`event`) and the number of sampling periods in which they were observed (`duration`). `df_nodal` has one row per individual.
+`df_obs` contains the observations, one row per dyad with the number of sampling periods in which the pair was seen together (`event`) and the number of sampling periods in which they were observed (`effort`). `df_nodal` has one row per individual.
 
 ## Fitting the edge model
 
@@ -63,7 +63,7 @@ The edge model is fitted in the same way as for any other analysis. There are no
 
 ```{r}
 fit_edge <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df_obs,
   model_type = "binary_conjugate",
   priors = get_default_priors("binary_conjugate")

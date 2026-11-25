@@ -39,7 +39,7 @@ Since the data are already aggregated (e.g. a single row for each dyad), we can 
 
 ```{r}
 fit_edge <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df,
   model_type = "binary_conjugate",
   priors = get_default_priors("binary_conjugate")
@@ -76,6 +76,24 @@ It's often useful to know where the mixture components are location, so we can g
 ```{r}
 get_component_means(fit_mixture, 3)
 ```
+
+`plot_mixture()` shows the distribution of posterior median edge weights, with each edge coloured by its most probable component, and the posterior median and 90% interval of each component mean. By default it shows the number of components with the highest posterior probability; here the two-component model is shown:
+
+```{r}
+plot_mixture(fit_mixture, num_components = 2)
+```
+
+## Choosing the information criterion
+
+The posterior probability of each number of components is based on an information criterion, set with `criterion`. The default, `"ICL"`, adds a penalty for components that overlap, so it favours fewer, well-separated components. `"BIC"` does not include this penalty and can support more components when they overlap. Because edge weights are estimated with uncertainty, components often overlap, so the two criteria can give different results:
+
+```{r}
+fit_mixture_bic <- bison_mixture(fit_edge, num_components = 5, criterion = "BIC", verbose = FALSE)
+get_network_component_probabilities(fit_mixture)
+get_network_component_probabilities(fit_mixture_bic)
+```
+
+The data were simulated with two components. Here ICL gives the highest probability to one component and BIC to two. Where the two criteria disagree, the number of components should be interpreted with caution.
 
 # Using components in downstream analysis
 

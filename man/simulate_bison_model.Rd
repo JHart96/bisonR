@@ -14,7 +14,7 @@ simulate_bison_model(
 )
 }
 \arguments{
-\item{model_type}{Type of data to simulate, one of "binary", "count", and "duration".}
+\item{model_type}{Type of data to simulate, \code{"binary"} or \code{"count"}.}
 
 \item{aggregated}{TRUE/FALSE indicating whether to aggregate over dyads or not.}
 
@@ -27,7 +27,11 @@ simulate_bison_model(
 \item{max_obs}{Maximum number of observations per dyad. Each dyad gets between 1 and \code{max_obs}.}
 }
 \value{
-A dataframe of the format accepted by edge weight models.
+A list with \code{df_sim}, the simulated observations, and \code{df_true}, the
+true edge weights on the link scale. \code{df_sim} has columns \code{node_1_id},
+\code{node_2_id}, \code{event} and \code{effort} (observation effort), and predictors. It
+also has a \code{duration} column, identical to \code{effort}, for code written for
+earlier versions; new code should use \code{effort}.
 }
 \description{
 Simulates data

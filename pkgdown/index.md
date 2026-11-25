@@ -39,7 +39,7 @@ library(bisonR)
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 
 fit_edge <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = sim_data$df_sim,
   model_type = "binary",
   priors = get_default_priors("binary")
@@ -50,7 +50,7 @@ plot_network(fit_edge, lwd = 5)                  # Sociogram showing uncertainty
 extract_metric(fit_edge, "node_strength")        # Posterior of each node's strength
 ```
 
-The left-hand side of the formula, `(event | duration)`, says how many social events were seen and how much each dyad was observed. The right-hand side, `dyad(node_1_id, node_2_id)`, asks for an edge weight for every pair. The [Getting started](articles/getting_started.html) article explains each step.
+The left-hand side of the formula, `(event | effort)`, says how many social events were seen and how much each dyad was observed. The right-hand side, `dyad(node_1_id, node_2_id)`, asks for an edge weight for every pair. The [Getting started](articles/getting_started.html) article explains each step.
 
 ## Installation
 

@@ -14,7 +14,11 @@ simulate_bison_model_mixture(model_type, num_components, component_weights)
 \item{component_weights}{Vector of component weightings for each component. Must sum to 1.}
 }
 \value{
-A dataframe of the format accepted by edge weight models.
+A list with \code{df_sim}, the simulated observations, and \code{df_true}, the
+true edge weights on the link scale. \code{df_sim} has columns \code{node_1_id},
+\code{node_2_id}, \code{event} and \code{effort} (observation effort), and predictors. It
+also has a \code{duration} column, identical to \code{effort}, for code written for
+earlier versions; new code should use \code{effort}.
 }
 \description{
 Simulate data for an edge model with mixture components

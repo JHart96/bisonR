@@ -61,7 +61,7 @@ get_default_priors("count_conjugate")
 
 ```{r, error = TRUE}
 bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = simulate_bison_model("binary", aggregated = TRUE)$df_sim,
   model_type = "binary_conjugate",
   priors = list(edge = "normal(0, 1)")
@@ -132,7 +132,7 @@ With `plot_type = "density"`, the plot shows the distribution of event rates acr
 ```{r, message = FALSE}
 priors <- get_default_priors("binary")
 prior_predictive_check(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df,
   model_type = "binary",
   priors = priors,
@@ -147,7 +147,7 @@ With `plot_type = "stats"`, the plot shows histograms of four summary statistics
 
 ```{r, fig.height = 5, message = FALSE}
 prior_predictive_check(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df,
   model_type = "binary",
   priors = priors,
@@ -170,7 +170,7 @@ Suppose that previous studies of the population suggest that most dyads are seen
 priors_low <- get_default_priors("binary")
 priors_low$edge <- "normal(-2, 1)"
 prior_predictive_check(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df,
   model_type = "binary",
   priors = priors_low,
@@ -183,7 +183,7 @@ prior_predictive_check(
 
 ```{r, fig.height = 5, message = FALSE}
 prior_predictive_check(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df,
   model_type = "binary",
   priors = priors_low,
@@ -202,7 +202,7 @@ The same checks can be run for conjugate models, which are faster because no sam
 
 ```{r, message = FALSE}
 prior_predictive_check(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df,
   model_type = "binary_conjugate",
   priors = list(edge = "beta(1, 4)"),
@@ -218,13 +218,13 @@ To show this, the same data are fitted with conjugate models using two different
 
 ```{r}
 fit_flat <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df,
   model_type = "binary_conjugate",
   priors = list(edge = "beta(1, 1)")
 )
 fit_low <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df,
   model_type = "binary_conjugate",
   priors = list(edge = "beta(1, 9)")
@@ -239,7 +239,7 @@ edges_low <- get_edgelist(fit_low)
 comparison <- data.frame(
   dyad = paste(edges_flat$node_1, edges_flat$node_2, sep = "-"),
   events = df$event,
-  effort = df$duration,
+  effort = df$effort,
   median_flat = edges_flat$median,
   median_low = edges_low$median
 )

@@ -21,3 +21,9 @@ test_that("mixture simulations work", {
     expect_equal(nrow(sim$df_true), 105)
   }
 })
+
+test_that("simulated data have an effort column, with duration kept for older code", {
+  sim <- simulate_bison_model("count", aggregated = TRUE)
+  expect_equal(sim$df_sim$effort, sim$df_sim$duration)
+  expect_equal(colnames(sim$df_sim)[1:4], c("node_1_id", "node_2_id", "event", "effort"))
+})

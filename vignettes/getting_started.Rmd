@@ -58,7 +58,7 @@ df <- sim_data$df_sim
 head(df)
 ```
 
-Each row is one sampling period for one dyad: `event` is 1 if the pair were seen together, and `duration` is the effort for that row (one sampling period).
+Each row is one sampling period for one dyad: `event` is 1 if the pair were seen together, and `effort` is the observation effort for that row (one sampling period). The `duration` column is a copy of `effort` kept for older code.
 
 ## Fitting the edge weight model
 
@@ -101,10 +101,10 @@ Priors should be chosen for the study system, and the defaults checked before us
 Edge models are specified with a formula, like those used by `lm()` and `brms`:
 
 ```r
-(event | duration) ~ dyad(node_1_id, node_2_id)
+(event | effort) ~ dyad(node_1_id, node_2_id)
 ```
 
-* The left-hand side, `(event | duration)`, gives the event and effort columns.
+* The left-hand side, `(event | effort)`, gives the event and effort columns.
 * The right-hand side gives the terms in the model. `dyad(node_1_id, node_2_id)` estimates an edge weight for each dyad.
 
 Other effects can be added to the right-hand side, such as `+ location` (a fixed effect) or `+ (1 | location)` (a random effect), to account for factors that affect how often social events are observed. Including them changes the interpretation of the edge weights, which then represent each dyad's tendency to associate after controlling for those effects.
@@ -113,7 +113,7 @@ Now we can fit the model:
 
 ```{r}
 fit_edge <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df,
   model_type = "binary",
   priors = priors
@@ -182,7 +182,7 @@ A test for non-random association can be carried out by comparing the edge model
 
 ```{r}
 fit_null <- bison_model(
-  (event | duration) ~ 1,
+  (event | effort) ~ 1,
   data = df,
   model_type = "binary",
   priors = priors

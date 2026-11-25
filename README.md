@@ -18,12 +18,12 @@ Documentation, tutorials and the function reference are at **<https://bisonr.org
 library(bisonR)
 
 # Simulated observations: one row per dyad, with the number of sampling
-# periods each pair was seen together (event) out of those observed (duration).
+# periods each pair was seen together (event) out of those observed (effort).
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 df <- sim_data$df_sim
 
 fit_edge <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df,
   model_type = "binary",
   priors = get_default_priors("binary")
@@ -36,7 +36,7 @@ plot_network(fit_edge) # Sociogram showing uncertainty in each edge
 ```
 === Fitted BISoN edge model ===
 Data type: binary
-Formula: (event | duration) ~ dyad(node_1_id, node_2_id)
+Formula: (event | effort) ~ dyad(node_1_id, node_2_id)
 Number of nodes: 10
 Number of dyads: 45
 Directed: FALSE

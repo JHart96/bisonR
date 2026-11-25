@@ -32,7 +32,7 @@ get_bison_model_spec <- function(formula) {
   if (!inherits(formula, "formula") || length(formula) != 3) {
     stop(
       "`formula` must be a two-sided formula such as ",
-      "(event | duration) ~ dyad(node_1, node_2).",
+      "(event | effort) ~ dyad(node_1, node_2).",
       call. = FALSE
     )
   }
@@ -53,7 +53,7 @@ get_bison_model_spec <- function(formula) {
   if (!is.call(lhs) || !identical(lhs[[1]], as.name("|")) || length(lhs) != 3) {
     stop(
       "The left-hand side of the formula must have the form (event | effort), ",
-      "for example (event | duration) ~ dyad(node_1, node_2).",
+      "for example (event | effort) ~ dyad(node_1, node_2).",
       call. = FALSE
     )
   }
@@ -241,6 +241,18 @@ get_bison_model_data <- function(formula, observations, directed, model_type) {
       dyad_a <- pmin(node_1_idx, node_2_idx)
       dyad_b <- pmax(node_1_idx, node_2_idx)
       sep <- " <-> "
+      # Tell the user if the data list pairs in both orders, which can mean the
+      # data are directed (e.g. actor and receiver).
+      ordered_keys <- unique(paste(node_1_idx, node_2_idx, sep = "_"))
+      reversed_keys <- paste(node_2_idx, node_1_idx, sep = "_")
+      num_both <- length(intersect(ordered_keys, unique(reversed_keys))) / 2
+      if (num_both > 0) {
+        message(
+          num_both, " dyad(s) have rows in both orders (e.g. A, B and B, A). Because ",
+          "directed = FALSE, both orders are combined into one edge. If node_1 and node_2 ",
+          "are an actor and a receiver, use directed = TRUE."
+        )
+      }
     }
     row_keys <- paste(dyad_a, dyad_b, sep = "_")
     unique_keys <- unique(row_keys)

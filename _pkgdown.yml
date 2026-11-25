@@ -140,6 +140,7 @@ reference:
   - get_network_component_probabilities
   - get_edge_component_probabilities
   - get_component_means
+  - plot_mixture
 - title: Preparing data
   contents:
   - convert_gbi_to_bison

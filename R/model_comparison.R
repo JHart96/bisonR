@@ -19,9 +19,9 @@
 #' # against a null model where every dyad has the same rate of events.
 #' sim_data <- simulate_bison_model("binary", aggregated = FALSE)
 #' priors <- get_default_priors("binary")
-#' fit_edge <- bison_model((event | duration) ~ dyad(node_1_id, node_2_id),
+#' fit_edge <- bison_model((event | effort) ~ dyad(node_1_id, node_2_id),
 #'                         data = sim_data$df_sim, model_type = "binary", priors = priors)
-#' fit_null <- bison_model((event | duration) ~ 1,
+#' fit_null <- bison_model((event | effort) ~ 1,
 #'                         data = sim_data$df_sim, model_type = "binary", priors = priors)
 #' model_comparison(list(non_random = fit_edge, random = fit_null))
 #' @export

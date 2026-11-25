@@ -7,7 +7,7 @@
 get_default_priors(model_type)
 }
 \arguments{
-\item{model_type}{A character specifying the type of model to retrieve priors for ("binary", "count", "duration", etc)}
+\item{model_type}{The type of model: \code{"binary"}, \code{"count"}, \code{"binary_conjugate"} or \code{"count_conjugate"}.}
 }
 \value{
 A list of default priors that can be used in the \code{bison_model()} function.

@@ -3,14 +3,18 @@ utils::globalVariables(c("num_locations", "age_diff", "locations", "age_1", "age
 
 #' Simulates data
 #'
-#' @param model_type Type of data to simulate, one of "binary", "count", and "duration".
+#' @param model_type Type of data to simulate, `"binary"` or `"count"`.
 #' @param aggregated TRUE/FALSE indicating whether to aggregate over dyads or not.
 #' @param location_effect TRUE/FALSE indicating whether there is an effect of location on observations.
 #' @param age_diff_effect TRUE/FALSE indicating whether there is an effect of age difference on observations.
 #' @param num_nodes Number of nodes in the simulated network.
 #' @param max_obs Maximum number of observations per dyad. Each dyad gets between 1 and `max_obs`.
 #'
-#' @return A dataframe of the format accepted by edge weight models.
+#' @return A list with `df_sim`, the simulated observations, and `df_true`, the
+#'   true edge weights on the link scale. `df_sim` has columns `node_1_id`,
+#'   `node_2_id`, `event` and `effort` (observation effort), and predictors. It
+#'   also has a `duration` column, identical to `effort`, for code written for
+#'   earlier versions; new code should use `effort`.
 #' @examples
 #' sim_data <- simulate_bison_model("binary", aggregated = FALSE)
 #' head(sim_data$df_sim)  # Observations
@@ -68,7 +72,7 @@ simulate_bison_model <- function(model_type, aggregated, location_effect=TRUE, a
   df_true$node_2_id <- factor(df_true$node_2_id, levels=1:num_nodes)
   if (model_type %in% c("binary", "count")) {
 
-    return(list(df_sim=df_sim, df_true=df_true))
+    return(list(df_sim=add_effort_column(df_sim), df_true=df_true))
   }
 }
 
@@ -77,7 +81,11 @@ simulate_bison_model <- function(model_type, aggregated, location_effect=TRUE, a
 #' @param model_type Type of data to simulate, either "binary" or "count".
 #' @param num_components Number of mixture components in the simulation (>=2).
 #' @param component_weights Vector of component weightings for each component. Must sum to 1.
-#' @return A dataframe of the format accepted by edge weight models.
+#' @return A list with `df_sim`, the simulated observations, and `df_true`, the
+#'   true edge weights on the link scale. `df_sim` has columns `node_1_id`,
+#'   `node_2_id`, `event` and `effort` (observation effort), and predictors. It
+#'   also has a `duration` column, identical to `effort`, for code written for
+#'   earlier versions; new code should use `effort`.
 #' @examples
 #' sim_data <- simulate_bison_model_mixture(
 #'   "binary", num_components = 2, component_weights = c(0.5, 0.5)
@@ -123,6 +131,16 @@ simulate_bison_model_mixture <- function(model_type, num_components, component_w
   df_sim$node_2_id <- factor(df_sim$node_2_id, levels=1:num_nodes)
   df_true$node_1_id <- factor(df_true$node_1_id, levels=1:num_nodes)
   df_true$node_2_id <- factor(df_true$node_2_id, levels=1:num_nodes)
-  return(list(df_sim=df_sim, df_true=df_true))
+  return(list(df_sim=add_effort_column(df_sim), df_true=df_true))
 }
 
+
+# Add an `effort` column (observation effort) and keep `duration` as a copy for
+# code written for earlier versions.
+add_effort_column <- function(df_sim) {
+  df_sim <- as.data.frame(df_sim)
+  df_sim$effort <- df_sim$duration
+  other <- setdiff(colnames(df_sim), c("event", "effort", "duration"))
+  df_sim[, c(other[other %in% c("node_1_id", "node_2_id")], "event", "effort",
+             other[!other %in% c("node_1_id", "node_2_id")], "duration")]
+}

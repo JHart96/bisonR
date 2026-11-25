@@ -38,17 +38,17 @@ group <- rep(c("north", "south"), each = 6)
 dyads <- t(combn(num_nodes, 2))
 same_group <- group[dyads[, 1]] == group[dyads[, 2]]
 logit_weight <- ifelse(same_group, -0.5, -2.5) + rnorm(nrow(dyads), 0, 0.5)
-duration <- sample(3:20, nrow(dyads), replace = TRUE)
+effort <- sample(3:20, nrow(dyads), replace = TRUE)
 
 df <- data.frame(
   node_1_id = factor(nodes[dyads[, 1]], levels = nodes),
   node_2_id = factor(nodes[dyads[, 2]], levels = nodes),
-  event = rbinom(nrow(dyads), duration, plogis(logit_weight)),
-  duration = duration
+  event = rbinom(nrow(dyads), effort, plogis(logit_weight)),
+  effort = effort
 )
 
 fit_edge <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df,
   model_type = "binary_conjugate",
   priors = get_default_priors("binary_conjugate")
