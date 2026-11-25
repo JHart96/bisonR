@@ -9,7 +9,7 @@
 </div>
 </div>
 <div class="bison-hero-figure">
-<img src="hero-network.png" alt="A network plotted with plot_network(). Each edge has a dark line for the lower bound of its credible interval and a lighter band for the upper bound." />
+<img src="hero-network.png" alt="A social network plotted with plot_network(), in which the width of each edge shows the uncertainty in its weight." />
 </div>
 </div>
 

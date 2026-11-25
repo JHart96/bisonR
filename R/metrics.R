@@ -140,9 +140,8 @@ plot_metric <- function(x, metric_name = "Network Metric", ...) {
       next
     }
     if (all(values == round(values)) || length(unique(values)) < 3) {
-      counts <- table(factor(values, levels = seq(min(values), max(values))))
       graphics::barplot(
-        counts / sum(counts), col = bison_colors[1], border = "white",
+        discrete_distribution(values), col = bison_colors[1], border = "white",
         xlab = label, ylab = "Probability", main = "", ...
       )
     } else {
@@ -261,4 +260,13 @@ check_metric_network <- function(obj, net, metric_string, target_name) {
     )
   }
   invisible(NULL)
+}
+
+# Proportion of draws taking each value of a discrete metric. Whole-number
+# metrics get a bar for every value in their range; other discrete values
+# (e.g. clustering of 0 or 1/3) get a bar for each value seen.
+discrete_distribution <- function(values) {
+  bar_levels <- if (all(values == round(values))) seq(min(values), max(values)) else sort(unique(values))
+  counts <- table(factor(values, levels = bar_levels))
+  counts / sum(counts)
 }

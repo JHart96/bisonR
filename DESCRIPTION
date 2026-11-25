@@ -22,7 +22,6 @@ Imports:
     logspline,
     loo,
     mclust,
-    methods,
     stats,
     stringr,
     utils

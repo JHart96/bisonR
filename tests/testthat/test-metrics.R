@@ -103,3 +103,9 @@ test_that("nodes without dyads and disconnected networks give warnings", {
   expect_warning(extract_metric(two_parts, "node_eigen", num_draws = 2), "more than one connected component")
   expect_silent(extract_metric(fit <- fake_bison_model(nodes, dyads, weights), "node_eigen", num_draws = 2))
 })
+
+test_that("plot_metric bar charts keep non-integer discrete values", {
+  heights <- discrete_distribution(c(rep(0, 3), rep(1 / 3, 7)))
+  expect_equal(as.numeric(heights), c(0.3, 0.7))
+  expect_equal(as.numeric(discrete_distribution(c(1, 1, 3))), c(2, 0, 1) / 3)
+})
