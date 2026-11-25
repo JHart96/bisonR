@@ -105,3 +105,12 @@ test_that("models saved by bisonR 0.4.x can be loaded", {
   loaded <- bison_load(file.path(dir, "model.RDS"))
   expect_true(loaded$fit$fake_fit)
 })
+
+test_that("plot_network draws edges for very small rates", {
+  df <- data.frame(n1 = c("A", "A", "B"), n2 = c("B", "C", "C"), event = c(3, 1, 2), effort = c(36000, 40000, 30000))
+  fit <- bison_model((event | effort) ~ dyad(n1, n2), df, "count_conjugate", priors = list(edge = "gamma(1, 1)"))
+  pdf(NULL)
+  on.exit(dev.off())
+  expect_silent(layout <- plot_network(fit, threshold = 1e-5))
+  expect_equal(nrow(layout), 3)
+})

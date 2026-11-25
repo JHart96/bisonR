@@ -49,7 +49,8 @@ model_comparison <- function(models, ...) {
     if (isTRUE(model$conjugate) || is.null(model$fit)) {
       return(NA)
     }
-    num_chains <- tryCatch(model$fit$num_chains(), error = function(e) NA)
+    # Count the chains that returned draws (failed chains are dropped).
+    num_chains <- tryCatch(dim(model$fit$draws("lp__"))[2], error = function(e) NA)
     if (is.na(num_chains) || nrow(model$log_lik) %% num_chains != 0) {
       return(NA)
     }
@@ -65,6 +66,8 @@ model_comparison <- function(models, ...) {
       "), so ", common, " draws from each are used."
     )
     log_liks <- lapply(log_liks, function(x) x[sort(sample.int(nrow(x), common)), , drop = FALSE])
+    # Randomly thinned draws are close to independent.
+    r_effs <- lapply(r_effs, function(r) NA)
   }
 
   loos <- lapply(seq_along(log_liks), function(i) loo::loo(log_liks[[i]], r_eff = r_effs[[i]]))

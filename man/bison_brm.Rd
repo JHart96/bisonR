@@ -37,8 +37,9 @@ posterior draw. Equivalent to \code{scale = "z"}.}
 draw: \code{"none"} (default), \code{"centre"} (subtract the mean) or \code{"z"} (subtract
 the mean and divide by the standard deviation). For edge and node metrics,
 transformations are applied across the rows used in the model, separately
-for each network. Global metrics have one value per network, so they are
-transformed across the networks.}
+for each network, which removes differences in the average level between
+networks; use \code{"none"} to compare levels between networks. Global metrics
+have one value per network, so they are transformed across the networks.}
 
 \item{subset}{An optional logical expression, evaluated in each data frame,
 selecting the rows to use, e.g. \code{subset = sex == "F"}. Network metrics are

@@ -212,6 +212,17 @@ check_chains <- function(fit) {
     return(invisible(TRUE))
   }
   failed <- which(return_codes != 0)
+  # cmdstanr can report a crashed chain as successful, so also compare the
+  # number of chains that returned draws with the number requested.
+  chains_with_draws <- tryCatch(dim(fit$draws("lp__"))[2], error = function(e) length(return_codes))
+  if (length(failed) == 0 && chains_with_draws < length(return_codes)) {
+    warning(
+      length(return_codes) - chains_with_draws, " of ", length(return_codes),
+      " MCMC chains failed and were dropped; results use the remaining chains.",
+      call. = FALSE
+    )
+    return(invisible(FALSE))
+  }
   if (length(failed) == 0) {
     return(invisible(TRUE))
   }
@@ -353,7 +364,7 @@ get_edgelist <- function(obj, ci = 0.9, transform = TRUE) {
     edge_samples <- edge_transform(obj)
   }
 
-  quantiles <- apply(edge_samples, 2, quantile, probs = c(0.5, lb, ub), names = FALSE)
+  quantiles <- edge_quantiles(edge_samples, ci)
 
   edgelist <- data.frame(
     node_1 = node_names[obj$dyad_to_idx[, 1]],
@@ -366,6 +377,13 @@ get_edgelist <- function(obj, ci = 0.9, transform = TRUE) {
   colnames(edgelist)[4] <- paste0(format_percent(lb), "%")
   colnames(edgelist)[5] <- paste0(format_percent(ub), "%")
   edgelist
+}
+
+# Posterior median and credible interval bounds of each edge (columns of
+# edge_samples), unrounded: a 3 x num_edges matrix.
+edge_quantiles <- function(edge_samples, ci) {
+  lb <- 0.5 * (1 - ci)
+  apply(edge_samples, 2, stats::quantile, probs = c(0.5, lb, 1 - lb), names = FALSE)
 }
 
 check_ci <- function(ci) {

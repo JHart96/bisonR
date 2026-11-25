@@ -38,7 +38,7 @@ When a list of edge models is given, a factor `bison_network` is added to the da
 Some notes:
 
 * **Scale of edge weights.** In `bison_brm()`, edge weights are on the link scale: log-odds (logit) for binary models and log rates for count models. Node and global metrics are calculated from edge weights on the natural scale.
-* **Scaling.** `scale = "z"` standardises the network variable within each posterior draw (subtracting the mean and dividing by the standard deviation), and `scale = "centre"` only subtracts the mean. Standardising can make priors easier to set. For global metrics, scaling is done across networks.
+* **Scaling.** `scale = "z"` standardises the network variable within each posterior draw (subtracting the mean and dividing by the standard deviation), and `scale = "centre"` only subtracts the mean. Standardising can make priors easier to set. For edge and node metrics, scaling is done separately within each network, which removes differences in the average level between networks, so use `scale = "none"` when comparing levels between networks. For global metrics, scaling is done across networks.
 * **Selecting rows.** `subset` selects rows of the data with a logical expression, e.g. `subset = sex == "F"`. Network metrics are still calculated from the whole network.
 * **Number of draws.** `num_draws` sets the number of networks drawn. A model is fitted to each, so more draws take longer. We suggest at least 100 for final analyses.
 * **R-hat warnings.** Because the results of separate models are combined, brms may warn about high R-hat values. This is expected, and convergence of the individual models can be checked with `fit$rhats`.

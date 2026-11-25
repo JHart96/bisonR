@@ -39,9 +39,13 @@ jobs:
           extra-packages: any::pkgdown, local::.
           needs: website
 
-      - name: Set R user cache directory
+      # The runner image version is part of the cache keys, so CmdStan and the
+      # compiled models are rebuilt when GitHub updates the compilers.
+      - name: Set cache directory and image version
         shell: bash
-        run: echo "R_USER_CACHE_DIR=$RUNNER_TEMP/r-user-cache" >> "$GITHUB_ENV"
+        run: |
+          echo "R_USER_CACHE_DIR=$RUNNER_TEMP/r-user-cache" >> "$GITHUB_ENV"
+          echo "IMAGE_VERSION=${ImageVersion:-unknown}" >> "$GITHUB_ENV"
 
       # CmdStan and the compiled bisonR models are cached separately. CmdStan is
       # saved straight after a successful install; models only after a
@@ -51,14 +55,14 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ~/.cmdstan
-          key: cmdstan-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-release
+          key: cmdstan-v2-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ env.IMAGE_VERSION }}-release
 
       - name: Restore compiled models
         id: model-cache
         uses: actions/cache/restore@v4
         with:
           path: ${{ runner.temp }}/r-user-cache
-          key: models-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-release-${{ hashFiles('inst/stan/*.stan') }}
+          key: models-v2-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ env.IMAGE_VERSION }}-release-${{ hashFiles('inst/stan/*.stan') }}
 
       - name: Install CmdStan
         id: install-cmdstan
@@ -73,7 +77,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ~/.cmdstan
-          key: cmdstan-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-release
+          key: cmdstan-v2-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ env.IMAGE_VERSION }}-release
 
       - name: Build site
         shell: Rscript {0}
@@ -84,7 +88,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ${{ runner.temp }}/r-user-cache
-          key: models-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-release-${{ hashFiles('inst/stan/*.stan') }}
+          key: models-v2-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ env.IMAGE_VERSION }}-release-${{ hashFiles('inst/stan/*.stan') }}
       - name: Deploy to GitHub Pages
         if: github.event_name == 'release' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
         uses: JamesIves/github-pages-deploy-action@v4.6.4

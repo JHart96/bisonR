@@ -2,7 +2,7 @@
 #
 # Runs on pull requests, and on pushes to main and feature/fix branches.
 # Release branches are checked through their pull request rather than on every
-# push, so the matrix doesn't run twice per commit.
+# push.
 #
 # Articles (vignettes) are not rebuilt here: the pkgdown workflow renders every
 # article on each pull request. brms-based tests run on Linux (release) only.
@@ -60,9 +60,13 @@ jobs:
 
       # Compiled bisonR Stan models are stored in tools::R_user_dir(), which
       # follows R_USER_CACHE_DIR, so they can be cached between runs.
-      - name: Set R user cache directory
+      # The runner image version is part of the cache keys, so CmdStan and the
+      # compiled models are rebuilt when GitHub updates the compilers.
+      - name: Set cache directory and image version
         shell: bash
-        run: echo "R_USER_CACHE_DIR=$RUNNER_TEMP/r-user-cache" >> "$GITHUB_ENV"
+        run: |
+          echo "R_USER_CACHE_DIR=$RUNNER_TEMP/r-user-cache" >> "$GITHUB_ENV"
+          echo "IMAGE_VERSION=${ImageVersion:-unknown}" >> "$GITHUB_ENV"
 
       # CmdStan and the compiled bisonR models are cached separately. CmdStan is
       # saved straight after a successful install; models only after a
@@ -72,14 +76,14 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ~/.cmdstan
-          key: cmdstan-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ matrix.config.r }}
+          key: cmdstan-v2-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ env.IMAGE_VERSION }}-${{ matrix.config.r }}
 
       - name: Restore compiled models
         id: model-cache
         uses: actions/cache/restore@v4
         with:
           path: ${{ runner.temp }}/r-user-cache
-          key: models-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ matrix.config.r }}-${{ hashFiles('inst/stan/*.stan') }}
+          key: models-v2-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ env.IMAGE_VERSION }}-${{ matrix.config.r }}-${{ hashFiles('inst/stan/*.stan') }}
 
       - name: Install CmdStan
         id: install-cmdstan
@@ -95,7 +99,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: ~/.cmdstan
-          key: cmdstan-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ matrix.config.r }}
+          key: cmdstan-v2-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ env.IMAGE_VERSION }}-${{ matrix.config.r }}
 
       - uses: r-lib/actions/check-r-package@v2
         with:
@@ -103,11 +107,9 @@ jobs:
           build_args: 'c("--no-manual", "--no-build-vignettes")'
           args: 'c("--no-manual", "--as-cran", "--ignore-vignettes")'
 
-      # Saved even if the check fails or is cancelled, so later runs don't have
-      # to rebuild CmdStan or recompile the models.
       - name: Save compiled models
         if: success() && steps.model-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: ${{ runner.temp }}/r-user-cache
-          key: models-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ matrix.config.r }}-${{ hashFiles('inst/stan/*.stan') }}
+          key: models-v2-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ env.IMAGE_VERSION }}-${{ matrix.config.r }}-${{ hashFiles('inst/stan/*.stan') }}

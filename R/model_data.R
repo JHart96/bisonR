@@ -118,15 +118,22 @@ get_bison_model_spec <- function(formula) {
 # scientific notation) and without trailing zeros, so that integer and double
 # columns holding the same IDs (e.g. 100000L and 1e5) give the same name.
 as_node_name <- function(x) {
-  if (is.factor(x)) {
-    return(as.character(x))
-  }
   if (is.numeric(x)) {
-    out <- format(x, scientific = FALSE, trim = TRUE, digits = 15, drop0trailing = TRUE)
-    out[is.na(x)] <- NA_character_
-    return(out)
+    # Format each distinct value on its own: format() on a whole vector uses a
+    # common number of digits, which could give one ID different names.
+    values <- unique(x[!is.na(x)])
+    names <- vapply(values, format, character(1), scientific = FALSE, trim = TRUE,
+                    digits = 15, drop0trailing = TRUE)
+    return(unname(names[match(x, values)]))
   }
-  as.character(x)
+  x <- as.character(x)
+  # Numbers stored as text or factor labels in scientific notation (e.g. from
+  # factor(1e5), which has the label "1e+05") are written in full.
+  scientific <- !is.na(x) & grepl("^[-+]?[0-9]*\\.?[0-9]+[eE][-+]?[0-9]+$", x)
+  if (any(scientific)) {
+    x[scientific] <- as_node_name(as.numeric(x[scientific]))
+  }
+  x
 }
 
 # Sort node names: numerically if every name is a number (so 2 comes before 10),
@@ -249,12 +256,12 @@ get_bison_model_data <- function(formula, observations, directed, model_type) {
     # observed names, sorted with sort_node_names().
     if (is.factor(node_1_names) && is.factor(node_2_names) &&
         identical(levels(node_1_names), levels(node_2_names))) {
-      node_levels <- levels(node_1_names)
+      node_levels <- unique(as_node_name(levels(node_1_names)))
     } else {
-      factor_levels <- c(
+      factor_levels <- as_node_name(c(
         if (is.factor(node_1_names)) levels(node_1_names),
         if (is.factor(node_2_names)) levels(node_2_names)
-      )
+      ))
       node_levels <- sort_node_names(unique(c(
         factor_levels, as_node_name(node_1_names), as_node_name(node_2_names)
       )))

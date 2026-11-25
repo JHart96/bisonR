@@ -266,18 +266,23 @@ plot_network <- function(obj, ci = 0.9, lwd = 2, threshold = NULL,
                          threshold_on = c("median", "lower"), show_all_nodes = TRUE,
                          layout = NULL, ...) {
   threshold_on <- match.arg(threshold_on)
-  edgelist <- get_edgelist(obj, ci = ci, transform = TRUE)
-  keep <- rep(TRUE, nrow(edgelist))
+  check_ci(ci)
+  if (is.null(obj$dyad_to_idx)) {
+    stop("This model has no edge weights (it has no dyad() term).", call. = FALSE)
+  }
+  # Unrounded quantiles, so small rates (e.g. per second) are drawn correctly.
+  quantiles <- edge_quantiles(edge_transform(obj), ci)
+  keep <- rep(TRUE, ncol(quantiles))
   if (!is.null(threshold)) {
-    keep <- edgelist[, if (threshold_on == "median") 3 else 4] >= threshold
+    keep <- quantiles[if (threshold_on == "median") 1 else 2, ] >= threshold
   }
 
   net <- bison_base_igraph(obj, dyad_rows = which(keep))
   if (!show_all_nodes) {
     net <- igraph::delete_vertices(net, which(igraph::degree(net) == 0))
   }
-  lb <- edgelist[keep, 4]
-  ub <- edgelist[keep, 5]
+  lb <- quantiles[2, keep]
+  ub <- quantiles[3, keep]
 
   # Probabilities are already on a 0-1 scale; rates are rescaled so the widest edge has width lwd.
   scale <- if (obj$model_type == "binary" || length(ub) == 0) 1 else 1 / max(ub)

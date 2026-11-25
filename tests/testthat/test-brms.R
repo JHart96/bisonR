@@ -152,3 +152,12 @@ test_that("non-finite network variables and conflicting scale arguments are caug
   expect_true(any(grepl("overrides", warnings)))
   expect_error(parse_bison_brms_formula(y ~ (bison(node_strength(node)))), "without surrounding brackets")
 })
+
+test_that("scaling edge or node metrics within networks warns when bison_network is a predictor", {
+  formula <- "bison_node_strength ~ bison_network"
+  expect_warning(check_network_scaling("z", 2, "node", formula), "removes differences in its average")
+  expect_silent(check_network_scaling("none", 2, "node", formula))
+  expect_silent(check_network_scaling("z", 1, "node", formula))
+  expect_silent(check_network_scaling("z", 2, "global", "bison_global_cv ~ bison_network"))
+  expect_silent(check_network_scaling("z", 2, "node", "bison_node_strength ~ age"))
+})

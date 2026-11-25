@@ -15,8 +15,9 @@ utils::globalVariables(c(".imp"))
 #'   draw: `"none"` (default), `"centre"` (subtract the mean) or `"z"` (subtract
 #'   the mean and divide by the standard deviation). For edge and node metrics,
 #'   transformations are applied across the rows used in the model, separately
-#'   for each network. Global metrics have one value per network, so they are
-#'   transformed across the networks.
+#'   for each network, which removes differences in the average level between
+#'   networks; use `"none"` to compare levels between networks. Global metrics
+#'   have one value per network, so they are transformed across the networks.
 #' @param subset An optional logical expression, evaluated in each data frame,
 #'   selecting the rows to use, e.g. `subset = sex == "F"`. Network metrics are
 #'   still calculated from the whole network; only the rows of the regression
@@ -52,6 +53,9 @@ bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score
   parsed_formula <- parse_bison_brms_formula(formula)
   brms_formula <- parsed_formula$brms_formula
   data_list <- subset_bison_data(data_list, substitute(subset), parent.frame(), parsed_formula$target_name)
+
+  num_models <- if (inherits(edgemodel_list, "bison_model")) 1 else length(edgemodel_list)
+  check_network_scaling(scale, num_models, parsed_formula$target_name, brms_formula)
 
   if (parsed_formula$target_name == "edge" && !grepl("mm\\(", brms_formula)) {
     warning(
@@ -232,4 +236,19 @@ subset_bison_data <- function(data_list, subset_expr, env, target_name) {
     return(select_rows(data_list))
   }
   lapply(data_list, select_rows)
+}
+
+# Scaling edge or node metrics within each network removes differences in
+# their average level between networks, so warn if networks are compared.
+check_network_scaling <- function(scale, num_models, target_name, brms_formula) {
+  if (scale != "none" && num_models > 1 && target_name != "global" &&
+      grepl("bison_network", brms_formula, fixed = TRUE)) {
+    warning(
+      "With scale = \"", scale, "\", the network variable is scaled separately within each network, ",
+      "which removes differences in its average between networks, so the effect of bison_network ",
+      "on its level will be close to 0. Use scale = \"none\" to compare levels between networks.",
+      call. = FALSE
+    )
+  }
+  invisible(NULL)
 }
