@@ -13,7 +13,7 @@ authors:
 articles:
 - title: bisonR
   navbar: bisonR
-  contents: [getting_started, bison_brms, mixture_models, network_metrics]
+  contents: [getting_started, preparing_data, bison_brms, network_metrics, mixture_models]
 - title: Help
   navbar: Help
   contents: [windows_installation]

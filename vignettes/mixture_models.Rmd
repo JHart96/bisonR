@@ -39,9 +39,10 @@ Since the data are already aggregated (e.g. a single row for each dyad), we can 
 
 ```{r}
 fit_edge <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id), 
-  data=df, 
-  model_type="binary_conjugate"
+  (event | duration) ~ dyad(node_1_id, node_2_id),
+  data = df,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
 )
 ```
 
@@ -49,9 +50,11 @@ We won't conduct the usual checks for the sake of this tutorial, but at this poi
 
 ```{r}
 # verbose=FALSE for tutorial purposes
-fit_mixture <- bison_mixture(fit_edge, num_components=5, verbose=FALSE)
+fit_mixture <- bison_mixture(fit_edge, num_components = 5, verbose = FALSE)
 summary(fit_mixture)
 ```
+
+Components are always numbered in order of their mean edge weight, so component 1 is the weakest type of relationship and the highest-numbered component is the strongest.
 
 There's quite a bit going on in the summary, so let's break it down. The top section shows the model that fits best and the probability assigned to that model. The second section shows the probabilities of the models corresponding to each number of components ($K = 1, 2, 3, ...$). You'll notice the model with the highest probability is the same as the best fitting model from the section above. The final section shows the edge-level probabilities of component membership for the corresponding dyad. This can be interpreted as the probability a dyad belongs to a given component/cluster/social connection type.
 
@@ -102,7 +105,8 @@ imputed_data <- list()
 
 # Loop through each posterior sample and calculate strength of top mixture.
 for (i in 1:num_draws) {
-  # Calculate edge components (1 if strong, 0 if weak)
+  # Calculate edge components in the 2-component model (1 if strong, 0 if weak).
+  # Components are ordered by their means, so component 2 is the strong one.
   edge_components <- 1 * (fit_mixture$edge_component_samples[i, 2, ] == 2)
   
   # If the edge is strong, don't change edge weight, but if it's weak then set to zero.

@@ -18,7 +18,7 @@ The installation of cmdstanR can be troublesome on Windows computers, even more 
 
 If you're using a computer on a network (i.e. in most universities and businesses), there's a good chance that your `HOME` environment variable will be a network location. This will cause many problems with installation and even if it did work, would likely be much slower too. The easiest solution to this problem is to create a local directory (i.e. somewhere in your C drive that isn't indexed by network backups etc) called "cmdstan". This will be the install location for cmdstan, and you can specify this directory when using `install_cmdstan()`:
 ```r
-install_cmdstan(dir="C:/path/to/directory/cmdstan")
+cmdstanr::install_cmdstan(dir = "C:/path/to/directory/cmdstan")
 ```
 
 ## RTools 4.x was not found but is required to run CmdStan with R version 4.x.
@@ -32,7 +32,7 @@ This occurs after running the sampler. We don't know the source of this problem,
 remotes::install_github("stan-dev/cmdstanr")
 ```
 
-If this doesn't work, make sure you're using the latest version of R (R 4.2.1) at the time of writing.
+If this doesn't work, make sure you're using the latest release of R.
 
 ## Error: CmdStan path has not been set yet.
 

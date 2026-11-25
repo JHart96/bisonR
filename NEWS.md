@@ -21,7 +21,7 @@ bisonR 0.5.0 is a correctness and reliability release. Several bugs could give w
 * `extract_metric(obj, "edge_weight")` now returns natural-scale edge weights by default (probabilities or rates), consistent with `get_edgelist()`. Use `transform = FALSE` for the link scale. `bison_brm()` still uses link-scale edge weights.
 * Conjugate models reject formulas with fixed or random effects or intercepts, which were previously ignored silently.
 * `bison_save()` now writes a single `.rds` file (`bison_save(fit, "model.rds")`).
-* Count data from `simulate_bison_model()` now have realistic variation between edges.
+* Count data from `simulate_bison_model()` now have realistic variation between edges, and the age-difference effect is smaller (0.2 per year on the link scale).
 
 ## Model fitting
 
@@ -52,7 +52,9 @@ bisonR 0.5.0 is a correctness and reliability release. Several bugs could give w
 * `bison_to_igraph()` works with `num_draws = 1` (#73).
 * `convert_gbi_to_bison()` is faster and uses column names of the GBI matrix as node names.
 * `draw_edgelist_samples()` gains a `transform` argument (#60).
+* `simulate_bison_model()` gains `num_nodes` and `max_obs` arguments.
 * Every exported function has runnable examples.
+* Documentation: rewritten *Getting started* article (addressing the feedback in #84 to #93), a new *Preparing your data* article covering effort, aggregation, directed networks and group-by-individual data (#42, #74, #81), definitions of every network metric (#83), and corrected brms examples that include multi-membership terms.
 * Tests now check results numerically (e.g. against analytic posteriors and simulated true values) instead of only checking that functions run.
 
 ## Project

@@ -7,6 +7,8 @@ utils::globalVariables(c("num_locations", "age_diff", "locations", "age_1", "age
 #' @param aggregated TRUE/FALSE indicating whether to aggregate over dyads or not.
 #' @param location_effect TRUE/FALSE indicating whether there is an effect of location on observations.
 #' @param age_diff_effect TRUE/FALSE indicating whether there is an effect of age difference on observations.
+#' @param num_nodes Number of nodes in the simulated network.
+#' @param max_obs Maximum number of observations per dyad. Each dyad gets between 1 and `max_obs`.
 #'
 #' @return A dataframe of the format accepted by edge weight models.
 #' @examples
@@ -14,10 +16,9 @@ utils::globalVariables(c("num_locations", "age_diff", "locations", "age_1", "age
 #' head(sim_data$df_sim)  # Observations
 #' head(sim_data$df_true) # True edge weights (on the logit scale)
 #' @export
-simulate_bison_model <- function(model_type, aggregated, location_effect=TRUE, age_diff_effect=TRUE) {
-  num_nodes <- 10
+simulate_bison_model <- function(model_type, aggregated, location_effect=TRUE, age_diff_effect=TRUE,
+                                 num_nodes = 10, max_obs = 5) {
   num_locations <- 5
-  max_obs <- 5
   edge_weights <- matrix(rnorm(num_nodes^2, 0, 1), num_nodes, num_nodes)
   edge_weights <- edge_weights * upper.tri(edge_weights)
   ages <- rnorm(num_nodes, 20, 3)

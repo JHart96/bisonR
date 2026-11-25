@@ -10,137 +10,112 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4,
+  out.width = "100%"
 )
+set.seed(1)
 ```
 
-Network metrics can be extracted using the function `extract_metric(bison_model, metric_name)`. The `metric_name` variable is made up of two parts: the network feature and the network metric. For example, `node_eigen` will calculate the eigenvector centrality of each node.
+Network metrics summarise the structure of a network, either for each individual (node metrics) or for the whole network (global metrics). In bisonR, metrics are calculated for many networks drawn from the posterior distribution of the edge model, so each metric comes with a posterior distribution that reflects how certain the network is.
 
-The following feature/metric pairs are currently supported in bisonR:
-
-* `edge` - Edge-level properties
-  * `weight` - Edge weight
-* `node` - Node-level properties
-  * `degree[t]` - Node degree (where t is the binary threshold for an edge)
-  * `strength` - Node strength
-  * `eigen` - Node eigenvector centrality
-  * `betweenness` - Node betweenness
-  * `closeness` - Node closeness
-  * `clustering` - Node-level clustering coefficient
-* `global` - Network-level properties
-  * `density` - Weighted density
-  * `cv` - Coefficient of variation of edge weights - also known as social differentiation
-  * `std` - Standard deviation of edge weights
-  * `diameter` - Diameter of the network
-  * `clustering` - Clustering coefficient of the network - also known as transitivity
-  
-# Examples
-
-See below for examples of how to generate the network metrics listed above.
-  
-```{r}
+```{r setup}
 library(bisonR)
-library(dplyr)
-```
-  
-```{r}
-sim_data <- simulate_bison_model("binary", aggregated = TRUE)
-df <- sim_data$df_sim
 
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 fit_edge <- bison_model(
   (event | duration) ~ dyad(node_1_id, node_2_id),
-  data=df,
-  model_type="binary_conjugate",
-  priors=get_default_priors("binary_conjugate")
+  data = sim_data$df_sim,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
 )
 ```
 
-## Edge
+## Extracting metrics
 
-### Edge weight
+Metrics are calculated with `extract_metric(fit, metric_name)`. The name has two parts: the *target* (`edge`, `node` or `global`) and the *metric*, joined by an underscore, such as `node_strength` or `global_cv`.
 
 ```{r}
-metrics <- extract_metric(fit_edge, "edge_weight", num_draws=10)
-metrics[1:6, 1:5] # Preview first few samples and edges
+strength <- extract_metric(fit_edge, "node_strength", num_draws = 1000)
+dim(strength)
 ```
 
-## Node
-
-### Node degree
+The result has one row per posterior draw and one column per target: one column per node for node metrics (named after the nodes, in the order of the node levels), one per dyad for edge metrics, and a single column for global metrics. Summarise it like any set of posterior samples:
 
 ```{r}
-metrics <- extract_metric(fit_edge, "node_degree[0.2]")
-metrics[1:6, 1:5] # Preview first few samples and nodes
+t(apply(strength, 2, quantile, probs = c(0.05, 0.5, 0.95)))
 ```
 
-### Node strength
+`plot_metric()` plots the posterior distribution of a metric. Discrete metrics, such as degree, are shown as bar charts:
 
 ```{r}
-metrics <- extract_metric(fit_edge, "node_strength", num_draws=10)
-metrics[1:6, 1:5] # Preview first few samples and nodes
+plot_metric(strength[, 1:2], "Strength of node")
 ```
 
-### Node eigenvector centrality
+To use metrics as predictors or responses in regressions while keeping their uncertainty, use `bison_brm()` (see `vignette("bison_brms")`) rather than summarising them first.
+
+## Weighted and thresholded metrics
+
+Unless stated otherwise, all metrics are calculated on the **weighted** network, using edge weights on the natural scale (probabilities for binary models, rates for count models). For example, `node_strength` is the weighted version of degree.
+
+Some metrics are only defined for networks where edges are either present or absent. These take a **threshold** in square brackets, such as `node_degree[0.2]`: in each posterior draw, edges with a weight above the threshold count as present and the rest as absent. For an unweighted version of a weighted metric (such as unweighted density), threshold the network in the same way. The results can depend strongly on the threshold, so choose it for a biological reason and check that conclusions don't change with nearby values.
+
+## Available metrics
+
+### Edge metrics
+
+| Name | Definition |
+|---|---|
+| `edge_weight` | The edge weight of each dyad. Natural scale by default; use `transform = FALSE` for the logit (binary) or log (count) scale. |
+
+### Node metrics
+
+| Name | Definition |
+|---|---|
+| `node_strength` | Sum of the weights of the node's edges. How much a node associates in total. |
+| `node_degree[t]` | Number of edges with weight above `t`. How many associates a node has. |
+| `node_eigen` | Eigenvector centrality: high when a node has strong edges to nodes that are themselves central. Scaled so the most central node has a value of 1. |
+| `node_betweenness` | Betweenness: the number of shortest paths between other pairs of nodes that pass through the node, using 1/weight as the length of each edge (so strong edges are short). |
+| `node_closeness` | Closeness: the inverse of the average shortest-path distance from the node to all others, using 1/weight as edge lengths. |
+| `node_clustering[t]` | Local clustering coefficient of the network thresholded at `t`: the proportion of pairs of the node's associates that are also associates of each other. Nodes with fewer than two associates get 0. |
+
+### Global metrics
+
+| Name | Definition |
+|---|---|
+| `global_density` | Mean edge weight across all dyads in the model (weighted density). |
+| `global_cv` | Coefficient of variation (SD / mean) of edge weights, also called social differentiation. High values mean relationships vary a lot in strength. |
+| `global_std` | Standard deviation of edge weights. |
+| `global_diameter` | Length of the longest shortest path between any two nodes, using 1/weight as edge lengths. |
+| `global_clustering[t]` | Global clustering coefficient (transitivity) of the network thresholded at `t`: the proportion of connected triples that are closed triangles. |
+
+Global metrics are calculated from the dyads in the model. Dyads with no data (not in the data frame) aren't included.
+
+## Examples
 
 ```{r}
-metrics <- extract_metric(fit_edge, "node_eigen")
-metrics[1:6, 1:5] # Preview first few samples and nodes
+degree <- extract_metric(fit_edge, "node_degree[0.5]", num_draws = 500)
+plot_metric(degree[, 1], "Degree (threshold 0.5) of node 1")
+
+eigen <- extract_metric(fit_edge, "node_eigen", num_draws = 500)
+round(apply(eigen, 2, median), 2)
+
+cv <- extract_metric(fit_edge, "global_cv", num_draws = 1000)
+plot_metric(cv, "Social differentiation (CV)")
+
+clustering <- extract_metric(fit_edge, "global_clustering[0.3]", num_draws = 500)
+quantile(clustering, c(0.05, 0.5, 0.95))
 ```
 
-### Node betweenness
+## Using other network tools
+
+For metrics bisonR doesn't provide, `bison_to_igraph()` returns a list of `igraph` networks drawn from the posterior, with edge weights on the natural scale. Calculate the metric on each one to get its posterior distribution:
 
 ```{r}
-metrics <- extract_metric(fit_edge, "node_betweenness")
-metrics[1:6, 1:5] # Preview first few samples and nodes
-```
-
-### Node closeness
-
-```{r}
-metrics <- extract_metric(fit_edge, "node_closeness")
-metrics[1:6, 1:5] # Preview first few samples and nodes
-```
-
-### Node-level clustering coefficient
-
-```{r}
-metrics <- extract_metric(fit_edge, "node_clustering[0.2]")
-metrics[1:6, 1:5] # Preview first few samples and nodes
-```
-
-## Global
-
-### Global coefficient of variation
-
-```{r}
-metrics <- extract_metric(fit_edge, "global_cv")
-metrics[1:6] # Preview first few samples
-```
-
-### Global density
-
-```{r}
-metrics <- extract_metric(fit_edge, "global_density")
-metrics[1:6] # Preview first few samples
-```
-
-### Global standard deviation of edge weights
-
-```{r}
-metrics <- extract_metric(fit_edge, "global_std")
-metrics[1:6] # Preview first few samples
-```
-
-### Global diameter
-
-```{r}
-metrics <- extract_metric(fit_edge, "global_diameter")
-metrics[1:6] # Preview first few samples
-```
-
-### Global clustering coefficient
-
-```{r}
-metrics <- extract_metric(fit_edge, "global_clustering[0.2]")
-metrics[1:6] # Preview first few samples
+nets <- bison_to_igraph(fit_edge, num_draws = 200)
+assortativity <- sapply(nets, function(net) {
+  igraph::assortativity(net, values = igraph::strength(net))
+})
+quantile(assortativity, c(0.05, 0.5, 0.95))
 ```

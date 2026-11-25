@@ -1,0 +1,180 @@
+---
+title: "Preparing your data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Preparing your data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4.5,
+  out.width = "100%"
+)
+set.seed(1)
+```
+
+```{r setup}
+library(bisonR)
+```
+
+This article explains the data format bisonR expects and how to get common types of field data into it.
+
+## The basic format
+
+`bison_model()` takes a data frame where each row describes observations of one pair of individuals (a dyad). It's similar to an edge list, but instead of an edge weight it records the raw observations the edge weight will be estimated from:
+
+| Column | Meaning |
+|---|---|
+| Node 1, node 2 | The two individuals in the dyad. Names or IDs. |
+| Event | How many social events were seen: 0/1 for binary data, or a count. |
+| Effort | How much the dyad was observed: number of sampling periods, hours of observation, etc. |
+| Anything else | Optional predictors, such as location, observer or individual traits. |
+
+```{r}
+df <- data.frame(
+  node_1 = c("Ada", "Ada", "Ada", "Bea", "Bea", "Cat"),
+  node_2 = c("Bea", "Cat", "Dot", "Cat", "Dot", "Dot"),
+  together = c(8, 1, 0, 5, 2, 9),
+  periods = c(10, 10, 4, 10, 4, 12)
+)
+df
+```
+
+Here `together` is the number of sampling periods in which each pair were seen together, out of `periods` sampling periods in which they could have been. The formula names these columns on its left-hand side:
+
+```{r}
+fit <- bison_model(
+  (together | periods) ~ dyad(node_1, node_2),
+  data = df,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+summary(fit)
+```
+
+Notice that Ada and Dot were only observed in 4 periods, so their edge weight is much less certain than Cat and Dot's, even though both pairs have similar point estimates.
+
+### What "effort" means
+
+Effort is the amount of *opportunity* there was to see the dyad interacting: how many scans included both individuals, or how many hours they were both under observation. It is not the length of the interactions themselves. Getting effort right matters, because it's what tells BISoN how certain each edge weight is.
+
+If every row has the same effort, it can be written as a number instead of a column: `(event | 1) ~ dyad(node_1, node_2)`.
+
+### Node names
+
+Node names can be characters, numbers or factors. If both node columns are factors with the same levels, every level is treated as a node, even if it never appears in the data. That's useful for keeping individuals who were never seen with anyone. Otherwise, the nodes are the names that appear in the data.
+
+## Binary or count data?
+
+* Use a **binary** model (`model_type = "binary"`) when each sampling period records whether a social event happened or not, such as being seen in the same group during a scan. The edge weight is the probability of an event in a sampling period. Events can't exceed effort.
+* Use a **count** model (`model_type = "count"`) when you count interactions, such as the number of grooming bouts during focal follows. The edge weight is the rate of events per unit effort (for example, per hour). Effort doesn't need to be a whole number.
+
+```{r}
+df_counts <- data.frame(
+  node_1 = c("Ada", "Ada", "Bea"),
+  node_2 = c("Bea", "Cat", "Cat"),
+  grooming_bouts = c(12, 0, 3),
+  hours_observed = c(5.5, 2, 6.25)
+)
+fit_counts <- bison_model(
+  (grooming_bouts | hours_observed) ~ dyad(node_1, node_2),
+  data = df_counts,
+  model_type = "count_conjugate",
+  priors = get_default_priors("count_conjugate")
+)
+get_edgelist(fit_counts)
+```
+
+If you only have total durations of interactions (e.g. minutes spent grooming), `convert_duration_to_binary()` gives a rough conversion to binary data by splitting time into fixed-length periods. It's a simple approximation, so use it with caution.
+
+## Aggregated or disaggregated?
+
+Data can have one row per observation (*disaggregated*) or one row per dyad with events and effort summed (*aggregated*). Both give the same edge weights. The difference is what else you can include in the model:
+
+* Observation-level predictors, such as the location or time of day of each sampling period, need disaggregated data, since they vary between rows of the same dyad.
+* Aggregated data are much faster to fit, and work with the conjugate models.
+
+A good rule is to aggregate to the coarsest level that still keeps the predictors you need. For example, if location is the only observation-level predictor, aggregate to one row per dyad per location:
+
+```{r}
+sim <- simulate_bison_model("binary", aggregated = FALSE)
+df_obs <- sim$df_sim
+nrow(df_obs)
+
+df_by_location <- aggregate(cbind(event, duration) ~ node_1_id + node_2_id + location, data = df_obs, FUN = sum)
+nrow(df_by_location)
+head(df_by_location)
+```
+
+## Undirected and directed networks
+
+By default, networks are **undirected**: the edge between A and B is the same as the edge between B and A, and rows can list the pair in either order.
+
+```{r}
+df_undirected <- data.frame(
+  node_1 = c("Ada", "Bea"), node_2 = c("Bea", "Ada"), event = c(3, 2), effort = c(5, 5)
+)
+fit_undirected <- bison_model(
+  (event | effort) ~ dyad(node_1, node_2), data = df_undirected,
+  model_type = "binary_conjugate", priors = get_default_priors("binary_conjugate")
+)
+get_edgelist(fit_undirected) # One edge, using all 5 events in 10 periods
+```
+
+For behaviours with an actor and a receiver, such as grooming or aggression, use `directed = TRUE`. Then `node_1` is the actor and `node_2` the receiver, and A → B and B → A are separate edges with their own weights:
+
+```{r}
+fit_directed <- bison_model(
+  (event | effort) ~ dyad(node_1, node_2), data = df_undirected, directed = TRUE,
+  model_type = "binary_conjugate", priors = get_default_priors("binary_conjugate")
+)
+get_edgelist(fit_directed)
+```
+
+Make sure the effort for each direction is the amount of time in which that behaviour could have been observed. In directed networks, dyads only get an edge in the directions that appear in the data, so include rows with 0 events for directions that were observed but never seen.
+
+## Dyads that were never observed
+
+If a dyad has no rows at all, it isn't in the model and has no edge weight. If it should be in the network (both individuals were present but never seen together), include a row with 0 events and the effort for which they could have been seen. If they could never have met, leave them out.
+
+## Group-by-individual data
+
+Gambit-of-the-group data are often stored as a group-by-individual (GBI) matrix, where each row is a group or sampling event and each column an individual, with 1 if the individual was present:
+
+```{r}
+gbi <- matrix(rbinom(30 * 6, 1, 0.4), nrow = 30, ncol = 6,
+              dimnames = list(NULL, c("Ada", "Bea", "Cat", "Dot", "Eve", "Fay")))
+head(gbi)
+```
+
+`convert_gbi_to_bison()` turns this into bisonR format. For each pair of individuals and each group in which **at least one** of the pair was seen, it adds a row with `event = 1` if both were present and `event = 0` if only one was. Groups where neither was present don't say anything about that pair, so they're left out. Each row is one sampling period, so the effort is 1:
+
+```{r}
+df_gbi <- convert_gbi_to_bison(gbi)
+head(df_gbi)
+
+fit_gbi <- bison_model(
+  (event | 1) ~ dyad(node_1, node_2),
+  data = df_gbi,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+```
+
+Group-level information (such as location) can be added with `group_properties`, and individual traits with `individual_properties`. If some pairs could never have been seen together, for example because they lived in the study area at different times, give each individual a value in `individual_constraints`: only pairs with the same value are included.
+
+Because rows from the same group aren't independent, a random effect of group can be added to a full (non-conjugate) model with `+ (1 | group_id)`.
+
+## Common errors
+
+bisonR checks the data before fitting and tries to explain what's wrong. The most common problems are:
+
+* **Columns not found**: the names in the formula must exactly match columns in the data.
+* **Missing values**: remove or impute rows with `NA` in any column used by the model.
+* **More events than sampling periods**: in binary models, events count sampling periods with an event, so can't exceed effort. Use a count model for counts of interactions.
+* **Self-loops**: rows where both nodes are the same individual aren't allowed.

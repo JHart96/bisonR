@@ -8,7 +8,9 @@ simulate_bison_model(
   model_type,
   aggregated,
   location_effect = TRUE,
-  age_diff_effect = TRUE
+  age_diff_effect = TRUE,
+  num_nodes = 10,
+  max_obs = 5
 )
 }
 \arguments{
@@ -19,6 +21,10 @@ simulate_bison_model(
 \item{location_effect}{TRUE/FALSE indicating whether there is an effect of location on observations.}
 
 \item{age_diff_effect}{TRUE/FALSE indicating whether there is an effect of age difference on observations.}
+
+\item{num_nodes}{Number of nodes in the simulated network.}
+
+\item{max_obs}{Maximum number of observations per dyad. Each dyad gets between 1 and \code{max_obs}.}
 }
 \value{
 A dataframe of the format accepted by edge weight models.
