@@ -63,7 +63,7 @@ for prior predictive checks).}
 \link[cmdstanr:CmdStanModel]{cmdstanr::CmdStanModel}, such as \code{seed} or \code{adapt_delta}.}
 }
 \value{
-A \code{bison_model} object. Use \code{\link[=summary]{summary()}} or \code{\link[=get_edgelist]{get_edgelist()}} to see the
+A \code{bison_model} object. Use \code{\link[=summary.bison_model]{summary.bison_model()}} or \code{\link[=get_edgelist]{get_edgelist()}} to see the
 edge weights, \code{\link[=plot_network]{plot_network()}} to visualise them, \code{\link[=plot_trace]{plot_trace()}} and
 \code{\link[=plot_predictions]{plot_predictions()}} for diagnostics, and \code{\link[=extract_metric]{extract_metric()}} or \code{\link[=bison_brm]{bison_brm()}}
 for downstream analyses.

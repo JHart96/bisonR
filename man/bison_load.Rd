@@ -15,6 +15,20 @@ The fitted model object.
 \description{
 Load a bisonR model saved with \code{bison_save()}
 }
+\examples{
+\donttest{
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+fit_edge <- bison_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id),
+  data = sim_data$df_sim,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+path <- tempfile(fileext = ".rds")
+bison_save(fit_edge, path)
+fit_reloaded <- bison_load(path)
+}
+}
 \seealso{
 \code{\link[=bison_save]{bison_save()}}
 }

@@ -248,6 +248,8 @@ summary.bison_model <- function(object, ci = 0.90, transform = TRUE, ...) {
 #' @param x A `summary.bison_model` object.
 #' @param ... Additional arguments passed to [print()].
 #'
+#' @seealso [summary.bison_model()]
+#' @keywords internal
 #' @export
 print.summary.bison_model <- function(x, ...) {
   cat(x$description)

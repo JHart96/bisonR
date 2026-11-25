@@ -3,6 +3,11 @@
 #' @param model_type A character specifying the type of model to retrieve priors for ("binary", "count", "duration", etc)
 #'
 #' @return A list of default priors that can be used in the `bison_model()` function.
+#' @examples
+#' priors <- get_default_priors("binary")
+#' priors
+#' # Priors are strings describing distributions, and can be changed:
+#' priors$edge <- "normal(-1, 1.5)"
 #' @export
 get_default_priors <- function(model_type) {
   if (model_type == "binary") {
@@ -54,6 +59,9 @@ get_default_priors <- function(model_type) {
 #' will run a prior predictive plot, where predictions from the model are generated using only
 #' prior probabilities (the model when not updated from the data).
 #'
+#' @examples
+#' priors <- get_default_priors("binary")
+#' prior_check(priors, "binary")
 #' @export
 prior_check <- function(priors, model_type, type="density") {
   if (type == "density") {

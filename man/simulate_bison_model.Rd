@@ -26,3 +26,8 @@ A dataframe of the format accepted by edge weight models.
 \description{
 Simulates data
 }
+\examples{
+sim_data <- simulate_bison_model("binary", aggregated = FALSE)
+head(sim_data$df_sim)  # Observations
+head(sim_data$df_true) # True edge weights (on the logit scale)
+}

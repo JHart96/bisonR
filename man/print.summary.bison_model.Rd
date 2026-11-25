@@ -14,3 +14,7 @@
 \description{
 Print an edge model summary
 }
+\seealso{
+\code{\link[=summary.bison_model]{summary.bison_model()}}
+}
+\keyword{internal}

@@ -16,3 +16,7 @@
 \description{
 Print information about an edge mixture model
 }
+\seealso{
+\code{\link[=summary.bison_mixture]{summary.bison_mixture()}}
+}
+\keyword{internal}

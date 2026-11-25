@@ -13,6 +13,26 @@ utils::globalVariables(c(".imp"))
 #' @param ... Additional arguments to be passed to brm(), such as family or priors
 #'
 #' @return A fitted brms model
+#' @examples
+#' \donttest{
+#' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+#' df <- sim_data$df_sim
+#' fit_edge <- bison_model(
+#'   (event | duration) ~ dyad(node_1_id, node_2_id),
+#'   data = df,
+#'   model_type = "binary_conjugate",
+#'   priors = get_default_priors("binary_conjugate")
+#' )
+#' # Does age difference predict edge weight? The multi-membership term accounts
+#' # for edges that share a node not being independent.
+#' fit_dyadic <- bison_brm(
+#'   bison(edge_weight(node_1_id, node_2_id)) ~ age_diff + (1 | mm(node_1_id, node_2_id)),
+#'   fit_edge,
+#'   df,
+#'   num_draws = 5 # Use more (e.g. 100) in a real analysis
+#' )
+#' summary(fit_dyadic)
+#' }
 #' @export
 bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score=FALSE, cores=4, chains=2, ...) {
   check_suggested("brms", "bison_brm")
@@ -56,6 +76,22 @@ bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score
 #'
 #' @return The output from brms::get_prior()
 #'
+#' @examples
+#' \donttest{
+#' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+#' df <- sim_data$df_sim
+#' fit_edge <- bison_model(
+#'   (event | duration) ~ dyad(node_1_id, node_2_id),
+#'   data = df,
+#'   model_type = "binary_conjugate",
+#'   priors = get_default_priors("binary_conjugate")
+#' )
+#' bison_brm_get_prior(
+#'   bison(edge_weight(node_1_id, node_2_id)) ~ age_diff + (1 | mm(node_1_id, node_2_id)),
+#'   fit_edge,
+#'   df
+#' )
+#' }
 #' @export
 bison_brm_get_prior <- function(formula, edgemodel_list, data_list, ...) {
   check_suggested("brms", "bison_brm_get_prior")

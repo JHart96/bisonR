@@ -50,6 +50,7 @@ bison_save <- function(bisonobj, file) {
 #'
 #' @return The fitted model object.
 #' @seealso [bison_save()]
+#' @inherit bison_save examples
 #' @export
 bison_load <- function(file) {
   if (!file.exists(file) && file.exists(paste0(file, ".rds"))) {

@@ -110,6 +110,18 @@ bison_mixture <- function(edgemodel, num_components = 5, criterion = c("ICL", "B
 #' @param ... Additional arguments to be passed to summary calculations.
 #'
 #' @return Returns a summary object of an edge mixture model.
+#' @examples
+#' \donttest{
+#' sim_data <- simulate_bison_model_mixture("count", num_components = 2, component_weights = c(0.5, 0.5))
+#' fit_edge <- bison_model(
+#'   (event | duration) ~ dyad(node_1_id, node_2_id),
+#'   data = sim_data$df_sim,
+#'   model_type = "count_conjugate",
+#'   priors = get_default_priors("count_conjugate")
+#' )
+#' fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
+#' summary(fit_mixture)
+#' }
 #' @export
 summary.bison_mixture <- function(object, ...) {
   summary_obj <- list()
@@ -133,6 +145,8 @@ summary.bison_mixture <- function(object, ...) {
 #' @param digits Number of digits to round summary values to.
 #' @param ... Additional arguments to be passed to print functions.
 #'
+#' @seealso [summary.bison_mixture()]
+#' @keywords internal
 #' @export
 print.summary.bison_mixture <- function(x, digits=3, ...) {
   best_model <- which.max(x$component_probabilities)
@@ -186,6 +200,18 @@ mixture_transform <- function(object, samples) {
 #' @param num_components The number of components in the mixture model
 #'
 #' @return Dataframe summarising edge component probabilities for each edge
+#' @examples
+#' \donttest{
+#' sim_data <- simulate_bison_model_mixture("count", num_components = 2, component_weights = c(0.5, 0.5))
+#' fit_edge <- bison_model(
+#'   (event | duration) ~ dyad(node_1_id, node_2_id),
+#'   data = sim_data$df_sim,
+#'   model_type = "count_conjugate",
+#'   priors = get_default_priors("count_conjugate")
+#' )
+#' fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
+#' head(get_edge_component_probabilities(fit_mixture, 2))
+#' }
 #' @export
 get_edge_component_probabilities <- function(object, num_components) {
   node_names <- names(object$edgemodel$node_to_idx)
@@ -209,6 +235,18 @@ get_edge_component_probabilities <- function(object, num_components) {
 #' @param object An S3 edge mixture model object
 #'
 #' @return A dataframe of probabilities of numbers of components over the entire network
+#' @examples
+#' \donttest{
+#' sim_data <- simulate_bison_model_mixture("count", num_components = 2, component_weights = c(0.5, 0.5))
+#' fit_edge <- bison_model(
+#'   (event | duration) ~ dyad(node_1_id, node_2_id),
+#'   data = sim_data$df_sim,
+#'   model_type = "count_conjugate",
+#'   priors = get_default_priors("count_conjugate")
+#' )
+#' fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
+#' get_network_component_probabilities(fit_mixture)
+#' }
 #' @export
 get_network_component_probabilities <- function(object) {
   num_components <- length(object$component_probabilities)
@@ -223,6 +261,18 @@ get_network_component_probabilities <- function(object) {
 #' @param ci Credible interval for component mean estimates
 #'
 #' @return A dataframe describing the posteriors of the component means
+#' @examples
+#' \donttest{
+#' sim_data <- simulate_bison_model_mixture("count", num_components = 2, component_weights = c(0.5, 0.5))
+#' fit_edge <- bison_model(
+#'   (event | duration) ~ dyad(node_1_id, node_2_id),
+#'   data = sim_data$df_sim,
+#'   model_type = "count_conjugate",
+#'   priors = get_default_priors("count_conjugate")
+#' )
+#' fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
+#' get_component_means(fit_mixture, 2)
+#' }
 #' @export
 get_component_means <- function(object, num_components, ci=0.90) {
   lb_prob <- 0.5 * (1 - ci)

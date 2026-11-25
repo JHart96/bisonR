@@ -9,6 +9,10 @@ utils::globalVariables(c("num_locations", "age_diff", "locations", "age_1", "age
 #' @param age_diff_effect TRUE/FALSE indicating whether there is an effect of age difference on observations.
 #'
 #' @return A dataframe of the format accepted by edge weight models.
+#' @examples
+#' sim_data <- simulate_bison_model("binary", aggregated = FALSE)
+#' head(sim_data$df_sim)  # Observations
+#' head(sim_data$df_true) # True edge weights (on the logit scale)
 #' @export
 simulate_bison_model <- function(model_type, aggregated, location_effect=TRUE, age_diff_effect=TRUE) {
   num_nodes <- 10
@@ -73,6 +77,9 @@ simulate_bison_model <- function(model_type, aggregated, location_effect=TRUE, a
 #' @param num_components Number of mixture components in the simulation (>=2).
 #' @param component_weights Vector of component weightings for each component. Must sum to 1.
 #' @return A dataframe of the format accepted by edge weight models.
+#' @examples
+#' sim_data <- simulate_bison_model_mixture("binary", num_components = 2, component_weights = c(0.5, 0.5))
+#' head(sim_data$df_sim)
 #' @export
 simulate_bison_model_mixture <- function(model_type, num_components, component_weights) {
   num_nodes <- 15

@@ -22,3 +22,7 @@ plot the prior probability over the parameter value on the original scale. \code
 will run a prior predictive plot, where predictions from the model are generated using only
 prior probabilities (the model when not updated from the data).
 }
+\examples{
+priors <- get_default_priors("binary")
+prior_check(priors, "binary")
+}

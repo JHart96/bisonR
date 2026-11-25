@@ -17,3 +17,16 @@ Dataframe summarising edge component probabilities for each edge
 \description{
 Get probabilities of component membership for each edge
 }
+\examples{
+\donttest{
+sim_data <- simulate_bison_model_mixture("count", num_components = 2, component_weights = c(0.5, 0.5))
+fit_edge <- bison_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id),
+  data = sim_data$df_sim,
+  model_type = "count_conjugate",
+  priors = get_default_priors("count_conjugate")
+)
+fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
+head(get_edge_component_probabilities(fit_mixture, 2))
+}
+}

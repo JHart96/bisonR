@@ -1,40 +1,37 @@
-# bisonR - An R package for Bayesian Inference of Social Networks
-
-<img src="man/figures/hex.svg" width=160 align="right" />
+# bisonR <img src="man/figures/hex.svg" width="140" align="right" alt="bisonR hex logo" />
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/JHart96/bisonR/workflows/R-CMD-check/badge.svg)](https://github.com/JHart96/bisonR/actions)
-[![pkgdown](https://github.com/JHart96/bisonR/workflows/pkgdown/badge.svg)](https://github.com/JHart96/bisonR/actions)
+[![R-CMD-check](https://github.com/JHart96/bisonR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/JHart96/bisonR/actions/workflows/R-CMD-check.yaml)
+[![pkgdown](https://github.com/JHart96/bisonR/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/JHart96/bisonR/actions/workflows/pkgdown.yaml)
 [![Codecov test coverage](https://codecov.io/gh/JHart96/bisonR/branch/main/graph/badge.svg)](https://app.codecov.io/gh/JHart96/bisonR?branch=main)
 <!-- badges: end -->
 
-**This package is still in continuous development and has not yet been fully tested. Please let us know if you encounter any unexpected behaviour.**
+**Bayesian Inference of Social Networks in R.**
 
-bisonR is an R package implementing the BISoN framework for conducting Bayesian analysis of social networks. BISoN estimates uncertainty over edge weights in social networks from empirical data (such as observations) and builds networks with uncertainty. The networks can then be visualised *with* uncertainty and analysed with a fully Bayesian methodology.
+bisonR implements the BISoN framework for analysing animal social networks. Instead of treating edge weights as fixed numbers, BISoN estimates each edge weight *with uncertainty* from the observation data (how often a pair was seen interacting, and how much they were observed). That uncertainty is then carried through everything downstream: network plots, network metrics, regressions, and comparisons between networks.
 
-## Quick Start
+Documentation, tutorials and the function reference are at **<https://bisonr.org>**.
 
-To get started with the package use the code below:
+## Quick start
 
 ```r
 library(bisonR)
 
+# Simulated observations: one row per dyad, with the number of sampling
+# periods each pair was seen together (event) out of those observed (duration).
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 df <- sim_data$df_sim
 
-priors <- get_default_priors("binary")
-
 fit_edge <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id), 
-  data=df, 
-  model_type="binary",
-  priors=priors
+  (event | duration) ~ dyad(node_1_id, node_2_id),
+  data = df,
+  model_type = "binary",
+  priors = get_default_priors("binary")
 )
 
-summary(fit_edge)
+summary(fit_edge)      # Edge weights with credible intervals
+plot_network(fit_edge) # Sociogram showing uncertainty in each edge
 ```
-
-This will fit a basic edge model model to simulated data and generate an output like this below:
 
 ```
 === Fitted BISoN edge model ===
@@ -47,41 +44,58 @@ Directed: FALSE
          median    5%   95%
 1 <-> 2   0.156 0.014 0.530
 1 <-> 3   0.702 0.219 0.973
-2 <-> 3   0.793 0.356 0.982
 ...
 ```
 
-For a more detailed example check out the *Getting Started* page here: https://bisonr.org/articles/getting_started.html.
+The [Getting started](https://bisonr.org/articles/getting_started.html) article walks through a complete analysis.
 
 ## Installation
 
-### Installing CmdStanR
+bisonR uses [Stan](https://mc-stan.org/) through the [cmdstanr](https://mc-stan.org/cmdstanr/) package to fit models, so you need cmdstanr and CmdStan before installing bisonR.
 
-The bisonR package is written in R, but uses the Stan programming language to fit Bayesian models. Stan is a separate program, and interfaces with bisonR using an R package called cmdstanR. Stan and cmdstanR are installed in a different way to standard R packages, so require a specific series of installation steps. 
+### 1. Install cmdstanr and CmdStan
 
-On Windows, before proceeding you may need to install the version of Rtools appropriate for your version of R. Rtools can be found here: https://cran.r-project.org/bin/windows/Rtools/.
-
-The full instructions to install cmdstanR can be found at https://mc-stan.org/cmdstanr/. We've found that the following steps often work, but depending on your operating system and version of R, the process may be more involved.
+On Windows you may first need [Rtools](https://cran.r-project.org/bin/windows/Rtools/) for your version of R (see the [Windows installation](https://bisonr.org/articles/windows_installation.html) article).
 
 ```r
-install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
-library(cmdstanr)
-check_cmdstan_toolchain(fix = TRUE, quiet = TRUE)
-install_cmdstan() # On networked PCs, specify a local directory here with the argument dir=path_to_local_directory
+install.packages("cmdstanr", repos = c("https://stan-dev.r-universe.dev", getOption("repos")))
+cmdstanr::check_cmdstan_toolchain(fix = TRUE)
+cmdstanr::install_cmdstan() # On networked PCs, set dir = "a/local/folder"
 ```
 
-### Installing bisonR
+The full instructions are in the [cmdstanr documentation](https://mc-stan.org/cmdstanr/articles/cmdstanr.html).
 
-bisonR isn't currently on CRAN, but it can be installed from GitHub. To do this, make sure you have the `remotes` package installed. Then run the following command:
+### 2. Install bisonR
+
+bisonR isn't on CRAN. Install the latest release from GitHub with:
 
 ```r
+# install.packages("remotes")
 remotes::install_github("JHart96/bisonR")
 ```
 
-#### Development version
+The first time you fit a model, bisonR compiles its Stan models, which takes a minute or two. Compiled models are cached, so this only happens again when bisonR or CmdStan is updated.
 
-If you want to install the latest development version, bugs and all, you can install from the development branch. This option is not recommended for standard users.
+### Development versions
+
+The `main` branch always holds the latest release. Work on the next release happens on a `release/<version>` branch (for example `release/0.5.0`) and is merged into `main` when it's ready. To try an upcoming release before it's finished, bugs and all, install from its branch:
 
 ```r
-remotes::install_github("JHart96/bisonR@dev")
+remotes::install_github("JHart96/bisonR@release/0.5.0")
 ```
+
+You can see which release branches exist on the [branches page](https://github.com/JHart96/bisonR/branches). Development versions aren't recommended for published analyses.
+
+## Getting help and contributing
+
+* Questions and ideas: [GitHub Discussions](https://github.com/JHart96/bisonR/discussions)
+* Bugs and feature requests: [GitHub Issues](https://github.com/JHart96/bisonR/issues)
+* Contributing code or documentation: see the [contributing guide](.github/CONTRIBUTING.md)
+
+## Citing bisonR
+
+If you use bisonR in published work, please cite the BISoN paper:
+
+> Hart, J. D. A., Weiss, M. N., Franks, D. W., & Brent, L. J. N. (2023). BISoN: A Bayesian framework for inference of social networks. *Methods in Ecology and Evolution*, 14(9), 2411–2420. <https://doi.org/10.1111/2041-210X.14171>
+
+Run `citation("bisonR")` in R for the citation in BibTeX format.

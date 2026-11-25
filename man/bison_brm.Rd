@@ -38,3 +38,24 @@ A fitted brms model
 \description{
 Fit a brms model on BISoN network data
 }
+\examples{
+\donttest{
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+df <- sim_data$df_sim
+fit_edge <- bison_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id),
+  data = df,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+# Does age difference predict edge weight? The multi-membership term accounts
+# for edges that share a node not being independent.
+fit_dyadic <- bison_brm(
+  bison(edge_weight(node_1_id, node_2_id)) ~ age_diff + (1 | mm(node_1_id, node_2_id)),
+  fit_edge,
+  df,
+  num_draws = 5 # Use more (e.g. 100) in a real analysis
+)
+summary(fit_dyadic)
+}
+}

@@ -15,3 +15,9 @@ A list of default priors that can be used in the \code{bison_model()} function.
 \description{
 Return default priors for a given model
 }
+\examples{
+priors <- get_default_priors("binary")
+priors
+# Priors are strings describing distributions, and can be changed:
+priors$edge <- "normal(-1, 1.5)"
+}
