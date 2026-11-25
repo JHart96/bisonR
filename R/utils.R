@@ -180,3 +180,5 @@ col2rgba <- function(col, alpha) {
   rgba[4] <- alpha
   return(do.call(rgb, as.list(c(rgba))))
 }
+
+
