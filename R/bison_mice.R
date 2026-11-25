@@ -30,7 +30,12 @@
 bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metric_name, num_draws=100, z_score=FALSE,
                        scale = c("none", "centre", "z")) {
   scale <- match.arg(scale)
-  if (isTRUE(z_score)) scale <- "z"
+  if (isTRUE(z_score)) {
+    if (!scale %in% c("none", "z")) {
+      warning("`z_score = TRUE` overrides `scale = \"", scale, "\"`; using scale = \"z\".", call. = FALSE)
+    }
+    scale <- "z"
+  }
   check_suggested("mice", "bison_mice")
   if (target_name == "global" && is.data.frame(data_list)) {
     data_list <- lapply(seq_len(nrow(data_list)), function(i) data_list[i, , drop = FALSE])
@@ -63,7 +68,7 @@ bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metr
   # this name in the data must agree with that order.
   for (j in seq_along(data_list)) {
     if ("bison_network" %in% colnames(data_list[[j]]) &&
-        any(as.character(data_list[[j]]$bison_network) != as.character(j))) {
+        any(as_node_name(data_list[[j]]$bison_network) != as.character(j))) {
       stop(
         "The `bison_network` column in data frame ", j, " doesn't match the position of its edge ",
         "model (", j, "). `bison_network` is set from the order of the edge models, so put the ",
@@ -100,6 +105,14 @@ bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metr
       posterior_samples <- extract_metric(model, metric_string, num_draws)
     } else {
       stop("Network feature \"", target_name, "\" not supported. Use edge, node or global.", call. = FALSE)
+    }
+
+    if (any(!is.finite(posterior_samples))) {
+      stop(
+        "The network variable ", metric_string, " isn't finite for some rows of data frame ", i,
+        " (for example, closeness of a node with no dyads). Remove those rows or use another metric.",
+        call. = FALSE
+      )
     }
 
     # Make sure posterior samples are in matrix format (for num_draws=1).
@@ -163,7 +176,7 @@ lookup_node_ids <- function(model, data, column, model_number) {
   if (!column %in% colnames(data)) {
     stop("Column `", column, "` not found in data frame ", model_number, ".", call. = FALSE)
   }
-  node_names <- as.character(data[[column]])
+  node_names <- as_node_name(data[[column]])
   ids <- match(node_names, names(model$node_to_idx))
   if (anyNA(ids)) {
     missing <- unique(node_names[is.na(ids)])

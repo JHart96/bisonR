@@ -21,7 +21,7 @@ utils::globalVariables(c(".imp"))
 #'   selecting the rows to use, e.g. `subset = sex == "F"`. Network metrics are
 #'   still calculated from the whole network; only the rows of the regression
 #'   are selected. Not available for global metrics.
-#' @param ... Additional arguments to be passed to brm(), such as family or priors
+#' @param ... Additional arguments to be passed to brm(), such as `family` or `prior`.
 #'
 #' @return A fitted brms model
 #' @examplesIf requireNamespace("brms", quietly = TRUE) && requireNamespace("mice", quietly = TRUE) && !identical(Sys.getenv("BISONR_TEST_BRMS"), "false")
@@ -116,7 +116,12 @@ bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score
 bison_brm_get_prior <- function(formula, edgemodel_list, data_list, scale = c("none", "centre", "z"),
                                 subset = NULL, z_score = FALSE, ...) {
   scale <- match.arg(scale)
-  if (isTRUE(z_score)) scale <- "z"
+  if (isTRUE(z_score)) {
+    if (!scale %in% c("none", "z")) {
+      warning("`z_score = TRUE` overrides `scale = \"", scale, "\"`; using scale = \"z\".", call. = FALSE)
+    }
+    scale <- "z"
+  }
   check_suggested("brms", "bison_brm_get_prior")
   check_suggested("mice", "bison_brm_get_prior")
   # Parse formula
@@ -178,6 +183,13 @@ parse_bison_brms_formula <- function(formula) {
   # Generate bison term for brms model.
   new_bison_term <- bison_term_name(target_name, metric_name)
   brms_formula <- paste0(formula_string_pre, new_bison_term, formula_string_post)
+  if (inherits(tryCatch(stats::as.formula(brms_formula), error = function(e) e), "error")) {
+    stop(
+      "Couldn't read the bison() term in the formula. Write it without surrounding brackets, ",
+      "e.g. y ~ bison(node_strength(node)) + x.",
+      call. = FALSE
+    )
+  }
 
   return(list(
     param_names=param_names,

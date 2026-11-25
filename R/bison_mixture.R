@@ -18,7 +18,9 @@
 #' @param num_draws Number of posterior draws to fit mixtures to (at most the
 #'   number available).
 #'
-#' @return A `bison_mixture` object.
+#' @return A `bison_mixture` object. Its `draw_ids` element gives the rows of
+#'   `edgemodel$edge_samples` used for each mixture draw, so component
+#'   assignments can be matched to the edge weights of the same draw.
 #' @seealso [get_network_component_probabilities()],
 #'   [get_edge_component_probabilities()], [get_component_means()]
 #'
@@ -37,7 +39,7 @@
 #' @export
 bison_mixture <- function(edgemodel, num_components = 5, criterion = c("ICL", "BIC"),
                           verbose = TRUE, num_draws = 200) {
-  criterion <- match.arg(criterion)
+  criterion <- match.arg(toupper(criterion[1]), c("ICL", "BIC"))
   if (is.null(edgemodel$edge_samples)) {
     stop("This model has no edge weights (it has no dyad() term).", call. = FALSE)
   }
@@ -98,7 +100,8 @@ bison_mixture <- function(edgemodel, num_components = 5, criterion = c("ICL", "B
     component_range = component_range,
     num_components = num_components,
     component_mean_samples = component_mean_samples,
-    criterion = criterion
+    criterion = criterion,
+    draw_ids = draw_ids
   )
   class(obj) <- "bison_mixture"
   obj
@@ -154,7 +157,7 @@ print.summary.bison_mixture <- function(x, digits=3, ...) {
   cat(paste0(
     "=== Fitted dyadic mixture model ===\n",
     "Maximum number of components: ", x$num_components, "\n",
-    "Best model: ", best_model, " components\n",
+    "Most probable number of components: ", best_model, "\n",
     "Probability of best model: ", round(100 * x$component_probabilities[best_model], 1), "%\n"
   ))
   cat("=== Component probabilities ===\n")
@@ -282,8 +285,8 @@ get_component_means <- function(object, num_components, ci=0.90) {
   lb <- apply(component_mean_samples, 2, stats::quantile, probs = lb_prob, na.rm = TRUE)
   ub <- apply(component_mean_samples, 2, stats::quantile, probs = ub_prob, na.rm = TRUE)
   summary_table <- matrix(0, num_components, 3)
-  rownames(summary_table) <- sapply(1:num_components, function(i) paste0("K = ", i))
-  colnames(summary_table) <- c("50%", paste0(lb_prob * 100, "%"), paste0(ub_prob * 100, "%"))
+  rownames(summary_table) <- paste("Component", seq_len(num_components))
+  colnames(summary_table) <- c("50%", paste0(format_percent(lb_prob), "%"), paste0(format_percent(ub_prob), "%"))
   summary_table[, 1] <- mu
   summary_table[, 2] <- lb
   summary_table[, 3] <- ub

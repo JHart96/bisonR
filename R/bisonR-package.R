@@ -10,6 +10,5 @@
 #' @import utils
 #' @import grDevices
 #' @import graphics
-#' @importFrom methods is
 #' @importFrom mclust Mclust mclustBIC mclustICL
 "_PACKAGE"

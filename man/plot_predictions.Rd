@@ -40,7 +40,7 @@ because counts largely reflect observation effort.
 \item \code{"stats"}: summary statistics of the per-dyad rates in each simulated
 dataset (proportion of dyads with no events, mean, standard deviation and
 maximum), with the observed value shown as a vertical line. These can show
-excess zeroes or over- or under-dispersion between dyads.
+excess zeros or over- or under-dispersion between dyads.
 \item \code{"point"}: posterior medians and intervals of the edge weights plotted against
 simple point estimates (events / effort). This is not a predictive check,
 but shows how estimates are pulled towards the prior when there are few

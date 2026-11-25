@@ -45,7 +45,7 @@ selecting the rows to use, e.g. \code{subset = sex == "F"}. Network metrics are
 still calculated from the whole network; only the rows of the regression
 are selected. Not available for global metrics.}
 
-\item{...}{Additional arguments to be passed to brm(), such as family or priors}
+\item{...}{Additional arguments to be passed to brm(), such as \code{family} or \code{prior}.}
 }
 \value{
 A fitted brms model

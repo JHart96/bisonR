@@ -43,3 +43,14 @@ test_that("plot_mixture draws the components and returns the assignments", {
   expect_silent(plot_mixture(fit_mixture))
   expect_error(plot_mixture(fit_mixture, num_components = 4), "between 1 and 3")
 })
+
+test_that("the mixture criterion is not case sensitive and draws are recorded", {
+  set.seed(22)
+  sim <- simulate_bison_model_mixture("count", num_components = 2, component_weights = c(0.5, 0.5))
+  fit_edge <- bison_model((event | effort) ~ dyad(node_1_id, node_2_id), sim$df_sim,
+                          "count_conjugate", priors = conjugate_priors("count"))
+  fit_mixture <- bison_mixture(fit_edge, num_components = 2, criterion = "icl", verbose = FALSE, num_draws = 10)
+  expect_equal(fit_mixture$criterion, "ICL")
+  expect_length(fit_mixture$draw_ids, 10)
+  expect_equal(rownames(get_component_means(fit_mixture, 2)), c("Component 1", "Component 2"))
+})

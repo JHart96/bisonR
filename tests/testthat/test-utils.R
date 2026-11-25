@@ -48,7 +48,8 @@ test_that("draw_edgelist_samples returns the requested draws", {
                      priors = conjugate_priors("binary"))
   draws <- draw_edgelist_samples(fit, num_draws = 3)
   expect_equal(colnames(draws), c("node_1", "node_2", "draw.1", "draw.2", "draw.3"))
-  expect_true(all(draws$draw.1 < 0 | draws$draw.1 >= 0))
+  expect_true(all(is.finite(draws$draw.1)))
+  expect_true(any(draws$draw.1 < 0) || any(draws$draw.1 > 0)) # link scale, not probabilities
   natural <- draw_edgelist_samples(fit, num_draws = 2, transform = TRUE)
   expect_true(all(natural$draw.1 > 0 & natural$draw.1 < 1))
 })
@@ -72,4 +73,35 @@ test_that("save and load round-trips a conjugate model", {
   saved <- bison_save(fit, path)
   expect_true(file.exists(saved))
   expect_equal(bison_load(path)$edge_samples, fit$edge_samples)
+})
+
+test_that("plot_network checks a reused layout against the nodes", {
+  sim <- simulate_bison_model("binary", aggregated = TRUE)
+  fit <- bison_model((event | effort) ~ dyad(node_1_id, node_2_id), sim$df_sim, "binary_conjugate",
+                     priors = conjugate_priors("binary"))
+  pdf(NULL)
+  on.exit(dev.off())
+  expect_error(plot_network(fit, layout = matrix(0, 3, 2)), "has 3 rows but the plot has 10 nodes")
+})
+
+test_that("prior_check restores the graphics settings", {
+  pdf(NULL)
+  on.exit(dev.off())
+  before <- par("mar")
+  prior_check(get_default_priors("binary"), "binary")
+  expect_equal(par("mar"), before)
+})
+
+test_that("models saved by bisonR 0.4.x can be loaded", {
+  sim <- simulate_bison_model("binary", aggregated = TRUE)
+  fit <- bison_model((event | effort) ~ dyad(node_1_id, node_2_id), sim$df_sim, "binary_conjugate",
+                     priors = conjugate_priors("binary"))
+  dir <- withr::local_tempdir()
+  old <- fit
+  old$fit <- NULL
+  old$bisonR_version <- NULL
+  saveRDS(old, file.path(dir, "model.RDS"))
+  saveRDS(list(fake_fit = TRUE), file.path(dir, "model_cmdstanfit.RDS"))
+  loaded <- bison_load(file.path(dir, "model.RDS"))
+  expect_true(loaded$fit$fake_fit)
 })

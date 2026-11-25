@@ -74,7 +74,7 @@ plot_trace <- function(obj, par_ids = 1:5, ...) {
 #' * `"stats"`: summary statistics of the per-dyad rates in each simulated
 #'   dataset (proportion of dyads with no events, mean, standard deviation and
 #'   maximum), with the observed value shown as a vertical line. These can show
-#'   excess zeroes or over- or under-dispersion between dyads.
+#'   excess zeros or over- or under-dispersion between dyads.
 #' * `"point"`: posterior medians and intervals of the edge weights plotted against
 #'   simple point estimates (events / effort). This is not a predictive check,
 #'   but shows how estimates are pulled towards the prior when there are few
@@ -284,6 +284,12 @@ plot_network <- function(obj, ci = 0.9, lwd = 2, threshold = NULL,
 
   if (is.null(layout)) {
     layout <- igraph::layout_nicely(net)
+  } else if (nrow(layout) != igraph::vcount(net)) {
+    stop(
+      "`layout` has ", nrow(layout), " rows but the plot has ", igraph::vcount(net), " nodes. ",
+      "Reuse a layout only for networks with the same nodes (and the same `show_all_nodes`).",
+      call. = FALSE
+    )
   }
   curved <- if (obj$directed) 0.15 else 0
   common <- list(

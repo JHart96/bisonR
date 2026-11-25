@@ -20,6 +20,11 @@ natural scale (probabilities for binary models, rates for count models); other
 priors are shown on the scale on which they are defined. To see the data
 implied by the priors together, use \code{\link[=prior_predictive_check]{prior_predictive_check()}}.
 }
+\details{
+With \code{partial_pooling = TRUE} in \code{\link[=bison_model]{bison_model()}}, the second value of
+the edge prior is the scale of a half-normal prior on the spread of the edge
+weights, so the edge prior shown here is not the implied prior on each edge.
+}
 \examples{
 priors <- get_default_priors("binary")
 prior_check(priors, "binary")

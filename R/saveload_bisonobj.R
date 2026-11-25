@@ -51,8 +51,14 @@ bison_save <- function(bisonobj, file) {
 #' @inherit bison_save examples
 #' @export
 bison_load <- function(file) {
+  old_fit_file <- paste0(sub("\\.rds$", "", file, ignore.case = TRUE), "_cmdstanfit.RDS")
   if (!file.exists(file) && file.exists(paste0(file, ".rds"))) {
     file <- paste0(file, ".rds")
   }
-  readRDS(file)
+  obj <- readRDS(file)
+  # Models saved by bisonR 0.4.x kept the Stan fit in a separate file.
+  if (is.null(obj$fit) && is.null(obj$bisonR_version) && file.exists(old_fit_file)) {
+    obj$fit <- readRDS(old_fit_file)
+  }
+  obj
 }

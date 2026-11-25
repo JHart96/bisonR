@@ -131,3 +131,24 @@ test_that("global metrics are scaled across networks and must match the edge mod
     "doesn't match the position"
   )
 })
+
+test_that("non-finite network variables and conflicting scale arguments are caught", {
+  skip_if_not_installed("mice")
+  fit <- fake_bison_model(c("A", "B", "C", "D"), rbind(c("A", "B"), c("B", "C")), c(0.5, 0.6))
+  df_nodal <- data.frame(node = c("A", "B", "C", "D"))
+  expect_error(
+    suppressWarnings(bison_mice(fit, df_nodal, "node", "node", "closeness", num_draws = 2)),
+    "isn't finite"
+  )
+  warnings <- character(0)
+  withCallingHandlers(
+    bison_mice(fit, df_nodal[1:3, , drop = FALSE], "node", "node", "strength",
+               num_draws = 2, z_score = TRUE, scale = "centre"),
+    warning = function(w) {
+      warnings <<- c(warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_true(any(grepl("overrides", warnings)))
+  expect_error(parse_bison_brms_formula(y ~ (bison(node_strength(node)))), "without surrounding brackets")
+})

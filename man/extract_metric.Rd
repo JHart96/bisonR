@@ -54,15 +54,27 @@ combined in directed networks).
 \item \code{node_degree[t]}: number of edges with weight at or above \code{t}.
 \item \code{node_eigen}: eigenvector centrality. Edge direction is ignored in directed
 networks.
-\item \code{node_betweenness}: betweenness, using 1/weight as the distance.
-\item \code{node_closeness}: closeness, using 1/weight as the distance.
+\item \code{node_betweenness}: betweenness, using 1/weight as the distance (directed
+paths in directed networks).
+\item \code{node_closeness}: closeness, using 1/weight as the distance (paths leaving
+the node in directed networks).
 \item \code{node_clustering[t]}: local clustering coefficient of the thresholded network.
-\item \code{global_density}: mean edge weight.
+\item \code{global_density}: mean edge weight of the dyads in the model.
 \item \code{global_cv}: coefficient of variation of edge weights (social differentiation).
 \item \code{global_std}: standard deviation of edge weights.
 \item \code{global_diameter}: diameter of the network.
-\item \code{global_clustering[t]}: global clustering coefficient of the thresholded network.
+\item \code{global_clustering[t]}: global clustering coefficient of the thresholded
+network (0 if there are no connected triples).
 }
+}
+
+\section{Nodes and dyads without data}{
+
+Metrics are calculated from the dyads in the model. Dyads that aren't in the
+data have no edge, so they don't contribute to strength or degree and act as
+infinitely long paths for betweenness and closeness. Nodes with no dyads at
+all (kept from factor levels) therefore have fixed values, such as 0 strength
+or \code{NaN} closeness, and a warning is given.
 }
 
 \examples{

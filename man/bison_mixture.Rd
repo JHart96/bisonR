@@ -26,7 +26,9 @@ the different numbers of components.}
 number available).}
 }
 \value{
-A \code{bison_mixture} object.
+A \code{bison_mixture} object. Its \code{draw_ids} element gives the rows of
+\code{edgemodel$edge_samples} used for each mixture draw, so component
+assignments can be matched to the edge weights of the same draw.
 }
 \description{
 Looks for clusters (components) in the edge weights, which can be interpreted

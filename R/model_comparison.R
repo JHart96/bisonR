@@ -43,6 +43,20 @@ model_comparison <- function(models, ...) {
     )
   }
 
+  # Relative efficiency of the draws for each observation, which accounts for
+  # autocorrelation in MCMC chains. Conjugate draws are independent.
+  r_effs <- lapply(models, function(model) {
+    if (isTRUE(model$conjugate) || is.null(model$fit)) {
+      return(NA)
+    }
+    num_chains <- tryCatch(model$fit$num_chains(), error = function(e) NA)
+    if (is.na(num_chains) || nrow(model$log_lik) %% num_chains != 0) {
+      return(NA)
+    }
+    chain_id <- rep(seq_len(num_chains), each = nrow(model$log_lik) / num_chains)
+    loo::relative_eff(exp(model$log_lik), chain_id = chain_id)
+  })
+
   num_draws <- vapply(log_liks, nrow, integer(1))
   if (length(unique(num_draws)) > 1) {
     common <- min(num_draws)
@@ -53,7 +67,7 @@ model_comparison <- function(models, ...) {
     log_liks <- lapply(log_liks, function(x) x[sort(sample.int(nrow(x), common)), , drop = FALSE])
   }
 
-  loos <- lapply(log_liks, function(x) loo::loo(x, r_eff = NA))
+  loos <- lapply(seq_along(log_liks), function(i) loo::loo(log_liks[[i]], r_eff = r_effs[[i]]))
   results <- loo::loo_model_weights(loos, ...)
   if (!is.null(names(models))) {
     names(results) <- names(models)

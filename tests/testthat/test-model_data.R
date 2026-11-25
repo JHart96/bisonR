@@ -151,3 +151,17 @@ test_that("prior parameters that must be positive are checked", {
   expect_error(validate_priors(list(random_std = "half-normal(0)"), "binary"), "must be positive")
   expect_silent(validate_priors(list(edge = "normal(-3, 1)"), "binary"))
 })
+
+test_that("integer and double node IDs give the same node names", {
+  expect_equal(as_node_name(c(100000L, 2L)), c("100000", "2"))
+  expect_equal(as_node_name(c(1e5, 2.5, 123456789012)), c("100000", "2.5", "123456789012"))
+  df <- data.frame(a = c(100000L, 100000L, 300000L), b = c(200000, 300000, 100000), event = 1, effort = 2)
+  info <- suppressMessages(get_bison_model_data((event | effort) ~ dyad(a, b), df, FALSE, "binary"))
+  expect_equal(names(info$node_to_idx), c("100000", "200000", "300000"))
+  expect_equal(format_percent(c(0.0005, 0.05, 0.055)), c("0.05", "5", "5.5"))
+})
+
+test_that("a leading -1 removes the intercept without a warning", {
+  expect_silent(spec <- get_bison_model_spec((event | effort) ~ -1 + dyad(a, b)))
+  expect_false(spec$intercept)
+})

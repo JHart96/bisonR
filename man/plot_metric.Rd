@@ -15,7 +15,7 @@ plot_metric(x, metric_name = "Network Metric", ...)
 }
 \description{
 Continuous metrics are shown as smoothed densities; metrics that only take
-whole-number values (such as degree or diameter) are shown as bar charts.
+whole-number values (such as degree) are shown as bar charts.
 }
 \examples{
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)

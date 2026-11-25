@@ -58,6 +58,10 @@ get_default_priors <- function(model_type) {
 #'   [get_default_priors()].
 #' @param type Type of plot. Only `"density"` is currently available.
 #'
+#' @details With `partial_pooling = TRUE` in [bison_model()], the second value of
+#'   the edge prior is the scale of a half-normal prior on the spread of the edge
+#'   weights, so the edge prior shown here is not the implied prior on each edge.
+#'
 #' @examples
 #' priors <- get_default_priors("binary")
 #' prior_check(priors, "binary")
@@ -71,7 +75,8 @@ prior_check <- function(priors, model_type, type = "density") {
       num_cols = 1
     }
     num_rows = ceiling(length(priors)/num_cols)
-    par(mfrow=c(num_rows, num_cols), mar=c(4, 4, 1, 1))
+    old_par <- par(mfrow = c(num_rows, num_cols), mar = c(4, 4, 1, 1))
+    on.exit(par(old_par))
     for (parameter_name in names(priors)) {
       prior_distribution <- extract_distribution(priors[parameter_name])
       distribution_name <- prior_distribution$distribution_name
@@ -95,7 +100,6 @@ prior_check <- function(priors, model_type, type = "density") {
       )
       plot(x_values, y_values, type="l", col=bison_colors[1], lwd=2, xlab=parameter_name, ylab="Prior probability")
     }
-    par(mfrow=c(1, 1))
   }
 }
 

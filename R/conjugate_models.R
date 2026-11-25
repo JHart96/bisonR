@@ -46,6 +46,9 @@ fit_conjugate_model_binary <- function(model_data, num_samples, priors_only) {
   event_preds <- matrix(stats::rbinom(length(p_rows), divisor_rows, p_rows), num_samples, model_data$num_rows)
   log_lik <- matrix(stats::dbinom(event_rows, divisor_rows, p_rows, log = TRUE), num_samples, model_data$num_rows)
 
+  # Keep draws away from exactly 0 or 1, which can occur with very small prior
+  # shapes, so the link-scale values are finite.
+  p <- pmin(pmax(p, .Machine$double.eps), 1 - .Machine$double.eps)
   list(chain = stats::qlogis(p), event_preds = event_preds, log_lik = log_lik)
 }
 
@@ -71,5 +74,5 @@ fit_conjugate_model_count <- function(model_data, num_samples, priors_only) {
   event_preds <- matrix(stats::rpois(length(mu), mu), num_samples, model_data$num_rows)
   log_lik <- matrix(stats::dpois(event_rows, mu, log = TRUE), num_samples, model_data$num_rows)
 
-  list(chain = log(lambda), event_preds = event_preds, log_lik = log_lik)
+  list(chain = log(pmax(lambda, .Machine$double.xmin)), event_preds = event_preds, log_lik = log_lik)
 }

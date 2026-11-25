@@ -29,14 +29,24 @@
 #' * `node_degree[t]`: number of edges with weight at or above `t`.
 #' * `node_eigen`: eigenvector centrality. Edge direction is ignored in directed
 #'   networks.
-#' * `node_betweenness`: betweenness, using 1/weight as the distance.
-#' * `node_closeness`: closeness, using 1/weight as the distance.
+#' * `node_betweenness`: betweenness, using 1/weight as the distance (directed
+#'   paths in directed networks).
+#' * `node_closeness`: closeness, using 1/weight as the distance (paths leaving
+#'   the node in directed networks).
 #' * `node_clustering[t]`: local clustering coefficient of the thresholded network.
-#' * `global_density`: mean edge weight.
+#' * `global_density`: mean edge weight of the dyads in the model.
 #' * `global_cv`: coefficient of variation of edge weights (social differentiation).
 #' * `global_std`: standard deviation of edge weights.
 #' * `global_diameter`: diameter of the network.
-#' * `global_clustering[t]`: global clustering coefficient of the thresholded network.
+#' * `global_clustering[t]`: global clustering coefficient of the thresholded
+#'   network (0 if there are no connected triples).
+#'
+#' @section Nodes and dyads without data:
+#' Metrics are calculated from the dyads in the model. Dyads that aren't in the
+#' data have no edge, so they don't contribute to strength or degree and act as
+#' infinitely long paths for betweenness and closeness. Nodes with no dyads at
+#' all (kept from factor levels) therefore have fixed values, such as 0 strength
+#' or `NaN` closeness, and a warning is given.
 #'
 #' @return A matrix with one row per posterior draw and one column per target:
 #'   per dyad (in the order of [get_edgelist()]) for edge metrics, per node (in
@@ -73,6 +83,7 @@ extract_metric <- function(obj, metric_string, num_draws = 1000, standardise = F
     num_targets <- switch(target_name, edge = obj$num_dyads, node = obj$num_nodes, global = 1)
 
     net <- bison_base_igraph(obj)
+    check_metric_network(obj, net, metric_string, target_name)
     edge_samples <- edge_transform(obj)
     metric_samples <- matrix(0, num_draws, num_targets)
     for (i in seq_len(num_draws)) {
@@ -100,7 +111,7 @@ extract_metric <- function(obj, metric_string, num_draws = 1000, standardise = F
 #' Plot the posterior distribution of a network metric
 #'
 #' Continuous metrics are shown as smoothed densities; metrics that only take
-#' whole-number values (such as degree or diameter) are shown as bar charts.
+#' whole-number values (such as degree) are shown as bar charts.
 #'
 #' @param x A matrix of metric samples from [extract_metric()].
 #' @param metric_name Label for the x axis.
@@ -165,13 +176,13 @@ get_metric_fn <- function(metric_string) {
       return(function(x) igraph::closeness(x, weights=1/igraph::E(x)$weight))
     }
     if (!is.na(stringr::str_match(metric_name, "^degree\\[.*\\]$"))) {
-      threshold <- as.numeric(str_split(metric_name, "\\[|\\]")[[1]][2])
+      threshold <- parse_threshold(metric_string)
       return(function(x) {
         return(igraph::strength(x, weights = 1 * (igraph::E(x)$weight >= threshold)))
       })
     }
     if (!is.na(stringr::str_match(metric_name, "^clustering\\[.*\\]$"))) {
-      threshold <- as.numeric(str_split(metric_name, "\\[|\\]")[[1]][2])
+      threshold <- parse_threshold(metric_string)
       return(function(x) {
         x_binary <- x
         edges_to_remove <- which(igraph::E(x)$weight < threshold)
@@ -196,16 +207,58 @@ get_metric_fn <- function(metric_string) {
       return(function(net) igraph::diameter(net, weights = 1 / igraph::E(net)$weight))
     }
     if (!is.na(stringr::str_match(metric_name, "^clustering\\[.*\\]$"))) {
-      threshold <- as.numeric(str_split(metric_name, "\\[|\\]")[[1]][2])
+      threshold <- parse_threshold(metric_string)
       return(function(x) {
         x_binary <- x
         edges_to_remove <- which(igraph::E(x)$weight < threshold)
         x_binary <- igraph::delete_edges(x_binary, edges_to_remove)
         clustering <- igraph::transitivity(x_binary, type="global")
-        # clustering[is.nan(clustering)] <- 0
+        if (is.nan(clustering)) clustering <- 0
         return(clustering)
       })
     }
   }
   stop(paste0("Network metric ", metric_string, " does not exist."))
+}
+
+# Read the threshold from metric names such as "node_degree[0.2]".
+parse_threshold <- function(metric_string) {
+  value <- regmatches(metric_string, regexpr("\\[[^]]*\\]", metric_string))
+  threshold <- suppressWarnings(as.numeric(gsub("\\[|\\]", "", value)))
+  if (length(threshold) != 1 || is.na(threshold)) {
+    stop(
+      "Couldn't read the threshold in \"", metric_string, "\". Give a number in square brackets, ",
+      "e.g. \"node_degree[0.2]\".",
+      call. = FALSE
+    )
+  }
+  threshold
+}
+
+# Warn about network structures that make some metrics hard to interpret.
+check_metric_network <- function(obj, net, metric_string, target_name) {
+  if (target_name != "node") {
+    return(invisible(NULL))
+  }
+  isolated <- names(obj$node_to_idx)[igraph::degree(net) == 0]
+  if (length(isolated) > 0) {
+    warning(
+      length(isolated), " node(s) have no dyads in the data (", paste(utils::head(isolated, 5), collapse = ", "),
+      if (length(isolated) > 5) ", ..." else "", "), so their values of ", metric_string,
+      " are fixed (e.g. 0 strength, or NaN closeness) rather than estimated.",
+      call. = FALSE
+    )
+  }
+  if (metric_string %in% c("node_eigen", "node_closeness") && igraph::components(net)$no > 1) {
+    warning(
+      "The network has more than one connected component. ",
+      if (metric_string == "node_eigen") {
+        "Eigenvector centrality is then concentrated in one component, which can change between draws."
+      } else {
+        "Closeness is calculated within each component, so values can't be compared across components."
+      },
+      call. = FALSE
+    )
+  }
+  invisible(NULL)
 }

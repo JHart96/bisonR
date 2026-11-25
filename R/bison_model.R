@@ -19,7 +19,7 @@
 #'   undirected networks, rows for A-B and B-A refer to the same dyad.
 #' @param partial_pooling Whether to estimate the spread of edge weights from the
 #'   data, so that information is shared between edges.
-#' @param zero_inflated Whether to use a zero-inflated model for excess zeroes.
+#' @param zero_inflated Whether to use a zero-inflated model for excess zeros.
 #'   Zero inflation applies to each row of the data: each row has probability
 #'   `zero_prob` of being a structural zero. For binary data with one sampling
 #'   period per row this can't be separated from the edge weights, so aggregate
@@ -103,6 +103,11 @@ bison_model <- function(formula, data,
 
   model_info <- get_bison_model_data(formula, data, directed, model_type)
   model_spec <- model_info$model_spec
+
+  if (partial_pooling && is.null(model_spec$node_1_name)) {
+    warning("`partial_pooling` only applies to models with a dyad() term, so it is ignored.", call. = FALSE)
+    partial_pooling <- FALSE
+  }
 
   if (use_conjugate_model) {
     if (is.null(model_spec$node_1_name)) {
@@ -370,7 +375,7 @@ check_ci <- function(ci) {
 }
 
 format_percent <- function(p) {
-  as.character(round(p * 100, 2))
+  format(round(p * 100, 2), scientific = FALSE, trim = TRUE, drop0trailing = TRUE)
 }
 
 #' Draw samples of the edge list from the posterior

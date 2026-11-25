@@ -42,7 +42,7 @@ undirected networks, rows for A-B and B-A refer to the same dyad.}
 \item{partial_pooling}{Whether to estimate the spread of edge weights from the
 data, so that information is shared between edges.}
 
-\item{zero_inflated}{Whether to use a zero-inflated model for excess zeroes.
+\item{zero_inflated}{Whether to use a zero-inflated model for excess zeros.
 Zero inflation applies to each row of the data: each row has probability
 \code{zero_prob} of being a structural zero. For binary data with one sampling
 period per row this can't be separated from the edge weights, so aggregate

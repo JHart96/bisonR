@@ -33,7 +33,6 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0),
     covr,
-    vdiffr,
     withr
 Additional_repositories: https://stan-dev.r-universe.dev
 Remotes: 
