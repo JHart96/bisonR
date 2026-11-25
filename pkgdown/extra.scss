@@ -14,7 +14,9 @@ h1, h2, h3, .h1, .h2, .h3 {
 .navbar {
   border-bottom: 1px solid var(--bs-border-color);
   .navbar-brand { font-family: $headings-font-family; font-weight: 600; font-size: 1.15rem; }
-  .nav-link { font-size: 0.9rem; font-weight: 400; }
+  .nav-link { font-size: 0.9rem; font-weight: 400; border-radius: 0.4rem; }
+  // Space between items, so the hover and active highlights don't touch.
+  .navbar-nav { gap: 0.25rem; }
   .form-control { font-size: 0.875rem; }
 }
 
