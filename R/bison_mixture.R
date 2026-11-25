@@ -24,7 +24,9 @@
 #'
 #' @examples
 #' \donttest{
-#' sim_data <- simulate_bison_model_mixture("binary", num_components = 2, component_weights = c(0.5, 0.5))
+#' sim_data <- simulate_bison_model_mixture(
+#'   "binary", num_components = 2, component_weights = c(0.5, 0.5)
+#' )
 #' fit_edge <- bison_model(
 #'   (event | duration) ~ dyad(node_1_id, node_2_id),
 #'   data = sim_data$df_sim,
@@ -112,7 +114,9 @@ bison_mixture <- function(edgemodel, num_components = 5, criterion = c("ICL", "B
 #' @return Returns a summary object of an edge mixture model.
 #' @examples
 #' \donttest{
-#' sim_data <- simulate_bison_model_mixture("count", num_components = 2, component_weights = c(0.5, 0.5))
+#' sim_data <- simulate_bison_model_mixture(
+#'   "count", num_components = 2, component_weights = c(0.5, 0.5)
+#' )
 #' fit_edge <- bison_model(
 #'   (event | duration) ~ dyad(node_1_id, node_2_id),
 #'   data = sim_data$df_sim,
@@ -202,7 +206,9 @@ mixture_transform <- function(object, samples) {
 #' @return Dataframe summarising edge component probabilities for each edge
 #' @examples
 #' \donttest{
-#' sim_data <- simulate_bison_model_mixture("count", num_components = 2, component_weights = c(0.5, 0.5))
+#' sim_data <- simulate_bison_model_mixture(
+#'   "count", num_components = 2, component_weights = c(0.5, 0.5)
+#' )
 #' fit_edge <- bison_model(
 #'   (event | duration) ~ dyad(node_1_id, node_2_id),
 #'   data = sim_data$df_sim,
@@ -237,7 +243,9 @@ get_edge_component_probabilities <- function(object, num_components) {
 #' @return A dataframe of probabilities of numbers of components over the entire network
 #' @examples
 #' \donttest{
-#' sim_data <- simulate_bison_model_mixture("count", num_components = 2, component_weights = c(0.5, 0.5))
+#' sim_data <- simulate_bison_model_mixture(
+#'   "count", num_components = 2, component_weights = c(0.5, 0.5)
+#' )
 #' fit_edge <- bison_model(
 #'   (event | duration) ~ dyad(node_1_id, node_2_id),
 #'   data = sim_data$df_sim,
@@ -263,7 +271,9 @@ get_network_component_probabilities <- function(object) {
 #' @return A dataframe describing the posteriors of the component means
 #' @examples
 #' \donttest{
-#' sim_data <- simulate_bison_model_mixture("count", num_components = 2, component_weights = c(0.5, 0.5))
+#' sim_data <- simulate_bison_model_mixture(
+#'   "count", num_components = 2, component_weights = c(0.5, 0.5)
+#' )
 #' fit_edge <- bison_model(
 #'   (event | duration) ~ dyad(node_1_id, node_2_id),
 #'   data = sim_data$df_sim,

@@ -31,6 +31,9 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      # bisonR isn't on CRAN and depends on cmdstanr (also not on CRAN), so skip
+      # the CRAN submission checks, which would otherwise always warn.
+      _R_CHECK_CRAN_INCOMING_: false
       CMDSTAN_VERSION: "2.36.0"
 
     steps:

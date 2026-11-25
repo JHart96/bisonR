@@ -78,7 +78,9 @@ simulate_bison_model <- function(model_type, aggregated, location_effect=TRUE, a
 #' @param component_weights Vector of component weightings for each component. Must sum to 1.
 #' @return A dataframe of the format accepted by edge weight models.
 #' @examples
-#' sim_data <- simulate_bison_model_mixture("binary", num_components = 2, component_weights = c(0.5, 0.5))
+#' sim_data <- simulate_bison_model_mixture(
+#'   "binary", num_components = 2, component_weights = c(0.5, 0.5)
+#' )
 #' head(sim_data$df_sim)
 #' @export
 simulate_bison_model_mixture <- function(model_type, num_components, component_weights) {
