@@ -2,20 +2,34 @@
 % Please edit documentation in R/bison_model.R
 \name{get_edgelist}
 \alias{get_edgelist}
-\title{Retrieves an edgelist with uncertainty for a fitted edge weight model object}
+\title{Get the edge list with uncertainty}
 \usage{
 get_edgelist(obj, ci = 0.9, transform = TRUE)
 }
 \arguments{
-\item{obj}{An S3 edge model object.}
+\item{obj}{A fitted \code{bison_model} object.}
 
-\item{ci}{Credible interval to use in summary, based on quantiles.}
+\item{ci}{Width of the credible interval, e.g. \code{0.9} for a 90\% interval.}
 
-\item{transform}{\code{TRUE} or \code{FALSE} specifying whether to transform the edge weights from the internal link function scale.}
+\item{transform}{If \code{TRUE} (the default), edge weights are on the natural
+scale (probabilities for binary models, rates for count models). If \code{FALSE},
+they're on the internal link scale (logit or log).}
 }
 \value{
-A \code{data.frame} object with columns of node IDs, median, lower, and upper bounds.
+A data frame with one row per dyad and columns \code{node_1}, \code{node_2},
+\code{median}, and the lower and upper bounds of the credible interval (named
+after their quantiles, e.g. \verb{5\%} and \verb{95\%}).
 }
 \description{
-Retrieves an edgelist with uncertainty for a fitted edge weight model object
+Get the edge list with uncertainty
+}
+\examples{
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+fit_edge <- bison_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id),
+  data = sim_data$df_sim,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+head(get_edgelist(fit_edge))
 }

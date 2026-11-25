@@ -2,17 +2,28 @@
 % Please edit documentation in R/metrics.R
 \name{plot_metric}
 \alias{plot_metric}
-\title{Plot metric samples}
+\title{Plot the posterior distribution of a network metric}
 \usage{
 plot_metric(x, metric_name = "Network Metric", ...)
 }
 \arguments{
-\item{x}{Network metric samples object}
+\item{x}{A matrix of metric samples from \code{\link[=extract_metric]{extract_metric()}}.}
 
-\item{metric_name}{Metric name to use for plot axis label}
+\item{metric_name}{Label for the x axis.}
 
-\item{...}{Additional parameters to be passed to plot function}
+\item{...}{Additional arguments passed to the plotting function.}
 }
 \description{
-Plot metric samples
+Continuous metrics are shown as smoothed densities; metrics that only take
+whole-number values (such as degree or diameter) are shown as bar charts.
+}
+\examples{
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+fit_edge <- bison_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id),
+  data = sim_data$df_sim,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+plot_metric(extract_metric(fit_edge, "global_cv", num_draws = 200), "CV of edge weights")
 }

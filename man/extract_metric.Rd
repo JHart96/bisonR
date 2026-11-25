@@ -2,22 +2,76 @@
 % Please edit documentation in R/metrics.R
 \name{extract_metric}
 \alias{extract_metric}
-\title{Extract samples from posterior metrics for a fitted edge weight model}
+\title{Extract posterior samples of network metrics}
 \usage{
-extract_metric(obj, metric_string, num_draws = 1000, standardise = FALSE)
+extract_metric(
+  obj,
+  metric_string,
+  num_draws = 1000,
+  standardise = FALSE,
+  transform = TRUE
+)
 }
 \arguments{
-\item{obj}{Fitted S3 edge weight model.}
+\item{obj}{A fitted \code{bison_model} object.}
 
-\item{metric_string}{Character name of metric function (e.g. node_strength).}
+\item{metric_string}{Name of the metric, made of a target and a metric
+separated by an underscore, e.g. \code{"node_strength"} or \code{"global_cv"}. See
+\emph{Available metrics}.}
 
 \item{num_draws}{Number of posterior draws to use.}
 
-\item{standardise}{TRUE/FALSE indicating whether to mean-center the metrics within sample.}
+\item{standardise}{If \code{TRUE}, metrics are mean-centred within each posterior
+draw (so each row has mean 0).}
+
+\item{transform}{Only used for \code{"edge_weight"}. If \code{TRUE} (default), edge
+weights are on the natural scale (probabilities or rates); if \code{FALSE} they're
+on the link scale (logit or log). All other metrics are always calculated
+from natural-scale edge weights.}
 }
 \value{
-A matrix of metric samples where each column corresponds to a node, and each row corresponds to a posterior draw.
+A matrix with one row per posterior draw and one column per target:
+per dyad (in the order of \code{\link[=get_edgelist]{get_edgelist()}}) for edge metrics, per node (in
+the order of the node factor levels, with nodes as column names) for node
+metrics, and a single column for global metrics.
 }
 \description{
-Extract samples from posterior metrics for a fitted edge weight model
+Draws networks from the posterior of a fitted edge model and calculates a
+network metric for each one, giving a posterior distribution of the metric
+that carries the uncertainty in the edge weights.
+}
+\section{Available metrics}{
+
+All metrics are calculated on the \emph{weighted} network unless they take a
+threshold \verb{[t]}, in which case edges with weight at or above \code{t} count as
+present and the rest as absent.
+\itemize{
+\item \code{edge_weight}: the edge weights themselves.
+\item \code{node_strength}: sum of the weights of a node's edges.
+\item \code{node_degree[t]}: number of edges with weight at or above \code{t}.
+\item \code{node_eigen}: eigenvector centrality.
+\item \code{node_betweenness}: betweenness, using 1/weight as the distance.
+\item \code{node_closeness}: closeness, using 1/weight as the distance.
+\item \code{node_clustering[t]}: local clustering coefficient of the thresholded network.
+\item \code{global_density}: mean edge weight.
+\item \code{global_cv}: coefficient of variation of edge weights (social differentiation).
+\item \code{global_std}: standard deviation of edge weights.
+\item \code{global_diameter}: diameter of the network.
+\item \code{global_clustering[t]}: global clustering coefficient of the thresholded network.
+}
+}
+
+\examples{
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+fit_edge <- bison_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id),
+  data = sim_data$df_sim,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+strength <- extract_metric(fit_edge, "node_strength", num_draws = 100)
+apply(strength, 2, quantile, probs = c(0.05, 0.5, 0.95))
+
+cv <- extract_metric(fit_edge, "global_cv", num_draws = 100)
+plot_metric(cv, "Social differentiation")
 }

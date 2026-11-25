@@ -2,15 +2,15 @@
 % Please edit documentation in R/bison_model.R
 \name{print.summary.bison_model}
 \alias{print.summary.bison_model}
-\title{Prints out an edge model summary object.}
+\title{Print an edge model summary}
 \usage{
 \method{print}{summary.bison_model}(x, ...)
 }
 \arguments{
-\item{x}{An S3 edge model object.}
+\item{x}{A \code{summary.bison_model} object.}
 
-\item{...}{Additional parameters to be passed to print function.}
+\item{...}{Additional arguments passed to \code{\link[=print]{print()}}.}
 }
 \description{
-Prints out an edge model summary object.
+Print an edge model summary
 }

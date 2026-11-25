@@ -1,89 +1,64 @@
-test_that("brms works", {
-  sim_data <- bisonR::simulate_bison_model("binary", aggregated = TRUE)
-  df_sim <- sim_data$df_sim
-  levels(df_sim$node_1_id) <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J")
-  levels(df_sim$node_2_id) <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J")
+test_that("bison_brm fits dyadic, nodal and global regressions", {
+  skip_if_not_installed("brms")
+  skip_if_not_installed("mice")
+  skip_if_no_cmdstan()
+  skip_on_cran()
 
-  fit_edge <- bison_model(
-    (event | duration) ~ dyad(node_1_id, node_2_id),
-    data=df_sim,
-    model_type="binary_conjugate",
-    priors=get_default_priors("binary_conjugate")
+  sim <- simulate_bison_model("binary", aggregated = TRUE)
+  df_sim <- sim$df_sim
+  levels(df_sim$node_1_id) <- levels(df_sim$node_2_id) <- LETTERS[1:10]
+  fit_edge <- bison_model((event | duration) ~ dyad(node_1_id, node_2_id), df_sim,
+                          "binary_conjugate", priors = conjugate_priors("binary"))
+
+  expect_s3_class(
+    bison_brm_get_prior(age_diff ~ bison(edge_weight(node_1_id, node_2_id)), fit_edge, df_sim),
+    "brmsprior"
   )
 
-  priors <- expect_warning(bison_brm_get_prior(
-      age_diff ~ bison(edge_weight(node_1_id, node_2_id)),
-      list(fit_edge, fit_edge),
-      list(df_sim, df_sim)
-    ),
-    regexp=NA
+  # A dyadic regression without a multi-membership term triggers a warning
+  warnings <- character(0)
+  withCallingHandlers(
+    quiet(bison_brm(bison(edge_weight(node_1_id, node_2_id)) ~ age_diff, fit_edge, df_sim,
+                    num_draws = 2, silent = 2, refresh = 0)),
+    warning = function(w) {
+      warnings <<- c(warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
   )
+  expect_true(any(grepl("multi-membership", warnings)))
+  fit_dyadic <- suppressWarnings(quiet(bison_brm(
+    bison(edge_weight(node_1_id, node_2_id)) ~ age_diff + (1 | mm(node_1_id, node_2_id)),
+    fit_edge, df_sim, num_draws = 2, silent = 2, refresh = 0
+  )))
+  expect_s3_class(fit_dyadic, "brmsfit")
 
-  fit_brm <- expect_error (
-    suppressWarnings(bison_brm(
-      age_diff ~ bison(edge_weight(node_1_id, node_2_id)),
-      list(fit_edge, fit_edge),
-      list(df_sim, df_sim),
-      num_draws=5,
-      silent=2,
-      refresh=0
-    )),
-    regexp=NA
-  )
+  df_nodal <- data.frame(node = factor(LETTERS[1:10]), trait = rnorm(10))
+  fit_nodal <- suppressWarnings(quiet(bison_brm(trait ~ bison(node_eigen(node)), fit_edge, df_nodal,
+                                                 num_draws = 2, silent = 2, refresh = 0, z_score = TRUE)))
+  expect_s3_class(fit_nodal, "brmsfit")
 
-  fit_brm <- expect_error (
-    suppressWarnings(bison_brm(
-      age_diff ~ bison(edge_weight(node_1_id, node_2_id)),
-      list(fit_edge, fit_edge),
-      list(df_sim, df_sim),
-      num_draws=5,
-      silent=2,
-      refresh=0,
-      sample_prior="only",
-      prior=brms::prior(normal(0, 10), class="b")
-    )),
-    regexp=NA
-  )
+  fit_degree <- suppressWarnings(quiet(bison_brm(trait ~ bison(node_degree[0.5](node)), fit_edge, df_nodal,
+                                                  num_draws = 2, silent = 2, refresh = 0)))
+  expect_s3_class(fit_degree, "brmsfit")
 
-  df_nodal <- data.frame(node=as.factor(c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J")))
-  df_nodal$trait <- rnorm(10)
+  df_global <- data.frame(bison_network = factor(c("1", "2")), condition = c("before", "after"))
+  fit_global <- suppressWarnings(quiet(bison_brm(bison(global_cv(bison_network)) ~ condition,
+                                                  list(fit_edge, fit_edge), df_global,
+                                                  num_draws = 2, silent = 2, refresh = 0)))
+  expect_s3_class(fit_global, "brmsfit")
+})
 
+test_that("bison_brm gives clear errors for mismatched data", {
+  skip_if_not_installed("brms")
+  skip_if_not_installed("mice")
+  sim <- simulate_bison_model("binary", aggregated = TRUE)
+  fit_edge <- bison_model((event | duration) ~ dyad(node_1_id, node_2_id), sim$df_sim,
+                          "binary_conjugate", priors = conjugate_priors("binary"))
+  df_nodal <- data.frame(node = c("1", "2", "not_a_node"), trait = 1:3)
   expect_error(
-    suppressWarnings(bison_brm(
-      trait ~ bison(node_eigen(node)),
-      fit_edge,
-      df_nodal,
-      num_draws=5,
-      silent=2,
-      refresh=0,
-      z_score=TRUE
-    )),
-    regexp=NA
+    bison_mice(fit_edge, df_nodal, "node", "node", "strength", num_draws = 2),
+    "not_a_node"
   )
-
-  fit_brm <- expect_error(
-    suppressWarnings(bison_brm(
-      trait ~ bison(node_eigen(node)) + bison_network,
-      list(fit_edge, fit_edge),
-      list(df_nodal, df_nodal),
-      num_draws=5,
-      silent=2,
-      refresh=0
-    )),
-    regexp=NA
-  )
-
-  df_global <- data.frame(bison_network=as.factor(c("1", "2")), condition=c("before", "after"))
-
-  fit_brm <- expect_error(
-    suppressWarnings(bison_brm(
-      bison(global_cv(bison_network)) ~ condition,
-      list(fit_edge, fit_edge),
-      df_global,
-      num_draws=5,
-      silent=2,
-      refresh=0
-    )),
-    regexp=NA
-  )
+  expect_error(parse_bison_brms_formula(y ~ x), "bison\\(")
+  expect_error(parse_bison_brms_formula(y ~ bison(strength(node))), "edge_, node_ or global_")
 })

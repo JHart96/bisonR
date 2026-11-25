@@ -2,12 +2,12 @@
 % Please edit documentation in R/bison_model.R
 \name{bison_model}
 \alias{bison_model}
-\title{Fit an edge model to data}
+\title{Fit an edge weight model}
 \usage{
 bison_model(
   formula,
   data,
-  model_type = c("binary", "count"),
+  model_type = c("binary", "count", "binary_conjugate", "count_conjugate"),
   directed = FALSE,
   partial_pooling = FALSE,
   zero_inflated = FALSE,
@@ -16,45 +16,101 @@ bison_model(
   mc_cores = 4,
   iter_sampling = 1000,
   iter_warmup = 1000,
-  priors_only = FALSE
+  priors_only = FALSE,
+  chains = 4,
+  ...
 )
 }
 \arguments{
-\item{formula}{Formula specifying social events and sampling effort on the LHS and edge weights, fixed, and random effects on the RHS.}
+\item{formula}{A formula of the form \code{(event | effort) ~ dyad(node_1, node_2)}.
+The left-hand side gives the column of social events (0/1 or counts) and the
+observation effort (a column, or a single number), and the right-hand side
+gives the terms that explain the events. See \emph{Formula syntax} below.}
 
-\item{data}{Aggregated or disaggregated dataframe of dyadic observations.}
+\item{data}{A data frame with one row per observation (disaggregated) or one
+row per dyad (aggregated).}
 
-\item{model_type}{"binary" or "count", specifying the type of edge weight model to use.}
+\item{model_type}{The type of edge model: \code{"binary"} (events are present/absent
+in each sampling period, edge weights are probabilities), \code{"count"} (events
+are counts, edge weights are rates per unit effort), or the fast conjugate
+versions \code{"binary_conjugate"} and \code{"count_conjugate"}, which only support a
+\code{dyad()} term.}
 
-\item{directed}{\code{TRUE} or \code{FALSE} specifying whether the network is directed or not.}
+\item{directed}{\code{TRUE} or \code{FALSE}: whether the network is directed. For
+undirected networks, rows for A-B and B-A refer to the same dyad.}
 
-\item{partial_pooling}{Whether to pool edge weights so that information is shared between edges.}
+\item{partial_pooling}{Whether to estimate the spread of edge weights from the
+data, so that information is shared between edges.}
 
-\item{zero_inflated}{Whether to use a zero-inflated model to model excess zeroes.}
+\item{zero_inflated}{Whether to use a zero-inflated model for excess zeroes.}
 
-\item{priors}{List of priors in the format supplied by \code{get_default_priors()}.}
+\item{priors}{A list of priors, in the format returned by \code{\link[=get_default_priors]{get_default_priors()}}.}
 
-\item{refresh}{Frequency of messages printed while running the sampler.}
+\item{refresh}{How often the sampler prints progress (0 for silent).}
 
-\item{mc_cores}{Number of cores to use when running the sampler.}
+\item{mc_cores}{Number of chains to run in parallel.}
 
-\item{iter_sampling}{Number of iterations to use for posterior samples.}
+\item{iter_sampling}{Number of post-warmup draws per chain.}
 
-\item{iter_warmup}{Number of iterations to use for warmup (will not be used for samples).}
+\item{iter_warmup}{Number of warmup iterations per chain.}
 
-\item{priors_only}{Whether to use priors as posteriors or to allow the posteriors to be updated by data.}
+\item{priors_only}{If \code{TRUE}, ignore the data and sample from the priors (used
+for prior predictive checks).}
+
+\item{chains}{Number of MCMC chains.}
+
+\item{...}{Further arguments passed to the \verb{$sample()} method of
+\link[cmdstanr:CmdStanModel]{cmdstanr::CmdStanModel}, such as \code{seed} or \code{adapt_delta}.}
 }
 \value{
-An S3 edge model object containing edge samples and processed data.
+A \code{bison_model} object. Use \code{\link[=summary]{summary()}} or \code{\link[=get_edgelist]{get_edgelist()}} to see the
+edge weights, \code{\link[=plot_network]{plot_network()}} to visualise them, \code{\link[=plot_trace]{plot_trace()}} and
+\code{\link[=plot_predictions]{plot_predictions()}} for diagnostics, and \code{\link[=extract_metric]{extract_metric()}} or \code{\link[=bison_brm]{bison_brm()}}
+for downstream analyses.
 }
 \description{
-Fit an edge model to data
+Fits a BISoN edge weight model, which estimates the strength of the social
+connection between each pair of nodes (dyad) \emph{with uncertainty}, from
+observations of social events and the effort spent observing each dyad.
 }
-\details{
-Fits a BISoN edge weight model to a user-provided dataframe. The function supports either aggregated (at the
-dyad-level) or disaggregated (at the observation-level) dataframes. Node names or IDs need to be formatted
-as factors with the same levels.
+\section{Formula syntax}{
 
-The type of edge model and the interpretation of edge weights used depends on \code{model_type}, and will change
-the interpretation of the edge weights.
+\itemize{
+\item \code{dyad(node_1, node_2)}: estimate an edge weight for each dyad. The two
+columns hold node names or IDs. If they are both factors with the same
+levels, nodes that never appear in the data are kept.
+\item \code{x}: a fixed effect of column \code{x}. Factors get one parameter per level.
+\item \code{(1 | g)}: a random intercept for each level of column \code{g}.
+\item \code{1} or \code{0}: include or exclude a global intercept (excluded by default).
+}
+
+Including extra terms changes what the edge weights mean: they become the
+dyad's tendency to interact \emph{after} accounting for those effects.
+}
+
+\examples{
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+df <- sim_data$df_sim
+
+# Fast conjugate model, no MCMC needed
+fit_edge <- bison_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id),
+  data = df,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+summary(fit_edge)
+
+\donttest{
+# Full model fitted with Stan, which allows extra effects
+fit_edge <- bison_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id),
+  data = df,
+  model_type = "binary",
+  priors = get_default_priors("binary")
+)
+}
+}
+\seealso{
+\code{\link[=get_default_priors]{get_default_priors()}}, \code{\link[=prior_check]{prior_check()}}, \code{\link[=summary.bison_model]{summary.bison_model()}}
 }

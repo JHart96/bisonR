@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{convert_gbi_to_bison}
 \alias{convert_gbi_to_bison}
-\title{Convert group-by-individual matrix to bisonR format}
+\title{Convert a group-by-individual matrix to bisonR format}
 \usage{
 convert_gbi_to_bison(
   gbi,
@@ -12,17 +12,36 @@ convert_gbi_to_bison(
 )
 }
 \arguments{
-\item{gbi}{Group-by-individual (R x C) matrix corresponding to R groups of C individuals.}
+\item{gbi}{A matrix with R rows (groups) and C columns (individuals) of 0s and
+1s. If it has column names they are used as node names; otherwise nodes are
+numbered \code{1:C}.}
 
-\item{group_properties}{A vector of length R describing properties of the groups to be added to the dataframe.}
+\item{group_properties}{Optional vector of length R with a property of each
+group (e.g. location), added as column \code{group_property}.}
 
-\item{individual_properties}{A vector of length C describing properties of the individuals to be added to the dataframe.}
+\item{individual_properties}{Optional vector of length C with a property of
+each individual, added as columns \code{node_1_property} and \code{node_2_property}.}
 
-\item{individual_constraints}{A vector of length C describing constraints of the individuals.}
+\item{individual_constraints}{Optional vector of length C. Only pairs of
+individuals with the same value are included (for example, individuals that
+could have been seen together because they were in the study area at the
+same time).}
 }
 \value{
-A dataframe for use in bisonR, where each row corresponds to a possible social event between two individuals.
+A data frame with columns \code{node_1}, \code{node_2}, \code{event} and \code{group_id},
+plus any property columns, ready for use with a binary \code{\link[=bison_model]{bison_model()}} with
+an effort of 1, e.g. \code{(event | 1) ~ dyad(node_1, node_2)}.
 }
 \description{
-Convert group-by-individual matrix to bisonR format
+Group-by-individual (GBI) data record which individuals were seen together in
+each group or sampling event. This function produces one row for each group
+and each pair of individuals where \emph{at least one} of the pair was present.
+The \code{event} column is 1 if both were present and 0 if only one was. Groups
+where neither individual was seen carry no information about the pair and are
+left out.
+}
+\examples{
+gbi <- matrix(rbinom(20 * 5, 1, 0.4), 20, 5, dimnames = list(NULL, LETTERS[1:5]))
+df <- convert_gbi_to_bison(gbi)
+head(df)
 }

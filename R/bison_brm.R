@@ -21,6 +21,15 @@ bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score
   parsed_formula <- parse_bison_brms_formula(formula)
   brms_formula <- parsed_formula$brms_formula
 
+  if (parsed_formula$target_name == "edge" && !grepl("mm\\(", brms_formula)) {
+    warning(
+      "Dyadic regressions should normally account for the non-independence of edges that share ",
+      "a node, for example by adding a multi-membership term: + (1 | mm(",
+      parsed_formula$param_names[1], ", ", parsed_formula$param_names[2], ")).",
+      call. = FALSE
+    )
+  }
+
   # Generate mice object
   mice_obj <- bison_mice(
     edgemodel_list,
@@ -75,13 +84,16 @@ parse_bison_brms_formula <- function(formula) {
   formula_string <- deparse1(formula)[1]
 
   # Locate bison(...) term
-  locs <- stringr::str_locate(formula_string, "bison\\([a-zA-Z0-9_,\\(\\)\\s]*\\)")
+  locs <- stringr::str_locate(formula_string, "bison\\([a-zA-Z0-9_.,\\[\\]\\(\\)\\s]*\\)")
+  if (is.na(locs[1])) {
+    stop("The formula must contain a bison(...) term, e.g. bison(node_strength(node_id)).", call. = FALSE)
+  }
   formula_string_pre <- substr(formula_string, 1, locs[1] - 1)
   formula_string_post <- substr(formula_string, locs[2] + 1, nchar(formula_string))
 
   # Extract bison(...) term
-  bison_term <- stringr::str_extract(formula_string, "bison\\([a-zA-Z0-9_,\\(\\)\\s]*\\)")
-  bison_term <- stringr::str_replace(bison_term, " ", "")
+  bison_term <- stringr::str_extract(formula_string, "bison\\([a-zA-Z0-9_.,\\[\\]\\(\\)\\s]*\\)")
+  bison_term <- stringr::str_replace_all(bison_term, "\\s", "")
 
   # Extract function name and arguments
   bison_term_split <- stringr::str_split(bison_term, "bison\\(|\\(|\\)")[[1]]
@@ -91,11 +103,19 @@ parse_bison_brms_formula <- function(formula) {
 
   # Extract parameter names
   param_names <- stringr::str_split(params, ",")[[1]]
-  target_name <- stringr::str_split(metric_name, "_")[[1]][1]
-  metric_name <- stringr::str_split(metric_name, "_")[[1]][2]
+  metric_parts <- stringr::str_split(metric_name, "_", n = 2)[[1]]
+  if (length(metric_parts) != 2 || !metric_parts[1] %in% c("edge", "node", "global")) {
+    stop(
+      "Network metrics in bison() must start with edge_, node_ or global_, e.g. ",
+      "bison(node_strength(node_id)), but got \"", metric_name, "\".",
+      call. = FALSE
+    )
+  }
+  target_name <- metric_parts[1]
+  metric_name <- metric_parts[2]
 
   # Generate bison term for brms model.
-  new_bison_term <- paste0("bison_", target_name, "_", metric_name)
+  new_bison_term <- bison_term_name(target_name, metric_name)
   brms_formula <- paste0(formula_string_pre, new_bison_term, formula_string_post)
 
   return(list(
@@ -105,4 +125,12 @@ parse_bison_brms_formula <- function(formula) {
     new_bison_term=new_bison_term,
     brms_formula=brms_formula
   ))
+}
+
+# Name of the data column holding a network metric in bison_brm() models, e.g.
+# "bison_node_strength" or "bison_node_degree_0_5" for node_degree[0.5].
+bison_term_name <- function(target_name, metric_name) {
+  name <- paste0("bison_", target_name, "_", metric_name)
+  name <- gsub("[^A-Za-z0-9_]+", "_", name)
+  sub("_+$", "", name)
 }

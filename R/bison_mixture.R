@@ -1,76 +1,105 @@
-#' Fit a dyadic mixture model
+#' Fit an edge mixture model
 #'
-#' @param edgemodel A fitted edge weight model.
-#' @param num_components Maximum number of components to fit.
-#' @param criterion "ICL" or "BIC" describing the criterion to use for model comparison.
-#' @param verbose TRUE/FALSE indicating whether to output messages and progress when fitting.
+#' Looks for clusters (components) in the edge weights, which can be interpreted
+#' as different types of social relationship. A Gaussian mixture model is fitted
+#' to the edge weights (on the link scale) in each of `num_draws` posterior
+#' draws, for every number of components from 1 to `num_components`. This gives
+#' the posterior probability of each number of components, and of each edge
+#' belonging to each component.
 #'
-#' @return A bison_mixture object
+#' Components are labelled in increasing order of their mean, so component 1 is
+#' always the weakest type of edge.
 #'
+#' @param edgemodel A fitted `bison_model` object.
+#' @param num_components Maximum number of components to consider.
+#' @param criterion `"ICL"` or `"BIC"`: the information criterion used to weigh
+#'   the different numbers of components.
+#' @param verbose Whether to show a progress bar.
+#' @param num_draws Number of posterior draws to fit mixtures to (at most the
+#'   number available).
+#'
+#' @return A `bison_mixture` object.
+#' @seealso [get_network_component_probabilities()],
+#'   [get_edge_component_probabilities()], [get_component_means()]
+#'
+#' @examples
+#' \donttest{
+#' sim_data <- simulate_bison_model_mixture("binary", num_components = 2, component_weights = c(0.5, 0.5))
+#' fit_edge <- bison_model(
+#'   (event | duration) ~ dyad(node_1_id, node_2_id),
+#'   data = sim_data$df_sim,
+#'   model_type = "binary_conjugate",
+#'   priors = get_default_priors("binary_conjugate")
+#' )
+#' fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
+#' summary(fit_mixture)
+#' }
 #' @export
-bison_mixture <- function(edgemodel, num_components=5, criterion="ICL", verbose=TRUE) {
-  # Prepare for fitting mixtures over the posterior networks
-  num_samples <- dim(edgemodel$edge_samples)[1]
-  num_edges <- dim(edgemodel$edge_samples)[2]
-  component_range <- 1:num_components
-  num_samples <- 200
+bison_mixture <- function(edgemodel, num_components = 5, criterion = c("ICL", "BIC"),
+                          verbose = TRUE, num_draws = 200) {
+  criterion <- match.arg(criterion)
+  if (is.null(edgemodel$edge_samples)) {
+    stop("This model has no edge weights (it has no dyad() term).", call. = FALSE)
+  }
+  num_edges <- ncol(edgemodel$edge_samples)
+  num_samples <- min(num_draws, nrow(edgemodel$edge_samples))
+  draw_ids <- sample.int(nrow(edgemodel$edge_samples), num_samples)
+  component_range <- seq_len(num_components)
 
-  mclustBIC <- mclust::mclustBIC
-  mclustICL <- mclust::mclustICL
-
-  component_probability_samples <- matrix(0, num_samples, length(component_range))
-  edge_component_samples <- array(0, c(num_samples, length(component_range), num_edges))
+  component_probability_samples <- matrix(0, num_samples, num_components)
+  edge_component_samples <- array(NA_integer_, c(num_samples, num_components, num_edges))
+  component_mean_samples <- lapply(component_range, function(k) matrix(NA_real_, num_samples, k))
 
   if (verbose) {
-    message(paste0("Fitting ", length(component_range), " mixture model(s) to edge weights..."))
-    pb <- txtProgressBar(max=num_samples, style=3)
+    message("Fitting ", num_components, " mixture model(s) to edge weights...")
+    pb <- utils::txtProgressBar(max = num_samples, style = 3)
   }
 
-  component_mean_samples <- list()
-  # Fit mixture to each posterior draw of the networks
-  for (i in 1:num_samples) {
-    if (verbose) setTxtProgressBar(pb, i)
-    # Fit a model for each number of components
-    fit_mixtures <- list()
+  for (i in seq_len(num_samples)) {
+    if (verbose) utils::setTxtProgressBar(pb, i)
+    edge_weights <- as.numeric(edgemodel$edge_samples[draw_ids[i], ])
+    ics <- rep(-Inf, num_components)
     for (k in component_range) {
-      fit_mixtures[[k]] <- mclust::Mclust(edgemodel$edge_samples[i, ], G=k, verbose=FALSE)
-      if (i == 1) {
-        component_mean_samples[[k]] <- matrix(0, num_samples, k)
+      fit <- mclust::Mclust(edge_weights, G = k, verbose = FALSE)
+      if (is.null(fit)) {
+        next
       }
-      component_mean_samples[[k]][i, ] <- fit_mixtures[[k]]$parameters$mean
+      # Relabel components in order of their means so labels agree across draws.
+      means <- as.numeric(fit$parameters$mean)
+      ord <- order(means)
+      component_mean_samples[[k]][i, ] <- means[ord]
+      edge_component_samples[i, k, ] <- match(fit$classification, ord)
+      ics[k] <- fit[[tolower(criterion)]]
     }
 
-    # Calculate model weights from IC differences
-    ics <- sapply(fit_mixtures, function(x) x[[tolower(criterion)]])
-    ics_diff <- max(ics) - ics
-    half_exp_diffs <- exp(-0.5 * ics_diff)
-    component_probability_samples[i, ] <- half_exp_diffs/sum(half_exp_diffs)
-
-    # Draw samples of component memberships per posterior draw
-    edge_component_samples[i, , ] <- t(sapply(fit_mixtures, function(x) x$classification))
+    # Model weights from information criterion differences (mclust ICs are "larger is better").
+    weights <- exp(0.5 * (ics - max(ics)))
+    component_probability_samples[i, ] <- weights / sum(weights)
   }
   if (verbose) {
     close(pb)
   }
 
-  # Calculate network-level component probabilities from samples
-  component_probabilities <- apply(component_probability_samples, 2, mean)
+  component_probabilities <- colMeans(component_probability_samples)
 
-  # Calculate edge-level component probabilities for each model from samples
   edge_component_probabilities <- lapply(component_range, function(k) {
-    cbind(sapply(1:k, function(i) {apply(edge_component_samples[, k, ], 2, function(x) mean(x == i))}))
+    sapply(seq_len(k), function(component) {
+      apply(edge_component_samples[, k, , drop = FALSE], 3, function(x) mean(x == component, na.rm = TRUE))
+    })
   })
+  edge_component_probabilities <- lapply(edge_component_probabilities, function(x) matrix(x, nrow = num_edges))
 
-  obj <- list()
-  obj$component_probabilities <- component_probabilities
-  obj$edge_component_probabilities <- edge_component_probabilities
-  obj$component_probability_samples <- component_probability_samples
-  obj$edge_component_samples <- edge_component_samples
-  obj$edgemodel <- edgemodel
-  obj$component_range <- component_range
-  obj$num_components <- length(component_range)
-  obj$fit_mixtures <- fit_mixtures
-  obj$component_mean_samples <- component_mean_samples
+  obj <- list(
+    component_probabilities = component_probabilities,
+    edge_component_probabilities = edge_component_probabilities,
+    component_probability_samples = component_probability_samples,
+    edge_component_samples = edge_component_samples,
+    edgemodel = edgemodel,
+    component_range = component_range,
+    num_components = num_components,
+    component_mean_samples = component_mean_samples,
+    criterion = criterion
+  )
   class(obj) <- "bison_mixture"
   obj
 }
@@ -93,6 +122,7 @@ summary.bison_mixture <- function(object, ...) {
   names(summary_obj$component_probabilities) <- sapply(object$component_range, function(x) paste0("K = ", x))
   summary_obj$edge_component_probabilities <- object$edge_component_probabilities
   summary_obj$bison_mixture_obj <- object
+  summary_obj$num_components <- object$num_components
   class(summary_obj) <- "summary.bison_mixture"
   summary_obj
 }
@@ -120,28 +150,34 @@ print.summary.bison_mixture <- function(x, digits=3, ...) {
   cp[1, ] <- round(x$component_probabilities, digits)
   print(cp)
 
-  component_means <- apply(x$bison_mixture_obj$component_mean_samples[[best_model]], 2, mean)
+  component_means <- apply(
+    mixture_transform(x$bison_mixture_obj, x$bison_mixture_obj$component_mean_samples[[best_model]]),
+    2, stats::median, na.rm = TRUE
+  )
   cat(paste0("=== Component means for best model (K = ", best_model, ") ===\n"))
   cm <- matrix(0, ncol=length(component_means), nrow=1)
-  rownames(cm) <- "mean"
+  rownames(cm) <- "median"
   colnames(cm) <- 1:best_model
-  component_means <- round(component_means, digits)
-  if (x$bison_mixture_obj$edgemodel$model_type == "binary") {
-    component_means <- plogis(component_means)
-  } else if (x$bison_mixture_obj$edgemodel$model_type == "count") {
-    component_means <- exp(component_means)
-  }
-  cm[1, ] <- component_means
+  cm[1, ] <- round(component_means, digits)
   print(cm)
 
   cat(paste0("=== Edge component probabilities for best model (K = ", best_model, ") ===\n"))
   ecp <- x$edge_component_probabilities[[best_model]]
 
-  rownames(ecp) <- do.call(paste, c(get_edgelist(x$bison_mixture_obj$edgemodel)[, 1:2], sep=" <-> "))
+  rownames(ecp) <- x$bison_mixture_obj$edgemodel$dyad_names
   colnames(ecp) <- 1:best_model
 
-  print(head(ecp))
-  cat("...")
+  print(head(round(ecp, digits)))
+  if (nrow(ecp) > 6) cat("... (", nrow(ecp) - 6, " more rows; see get_edge_component_probabilities())\n", sep = "")
+  invisible(x)
+}
+
+# Transform mixture component means from the link scale to the natural scale.
+mixture_transform <- function(object, samples) {
+  if (object$edgemodel$model_type == "binary") {
+    return(stats::plogis(samples))
+  }
+  exp(samples)
 }
 
 #' Get probabilities of component membership for each edge
@@ -152,13 +188,13 @@ print.summary.bison_mixture <- function(x, digits=3, ...) {
 #' @return Dataframe summarising edge component probabilities for each edge
 #' @export
 get_edge_component_probabilities <- function(object, num_components) {
-  node_names <- sapply(
-    1:nrow(object$edgemodel$dyad_to_idx),
-    function(x) names(object$edgemodel$node_to_idx)[object$edgemodel$dyad_to_idx[x, ]]
-  )
+  node_names <- names(object$edgemodel$node_to_idx)
 
   if (num_components <= length(object$edge_component_probabilities)) {
-    df_names <- data.frame(t(node_names))
+    df_names <- data.frame(
+      node_1 = node_names[object$edgemodel$dyad_to_idx[, 1]],
+      node_2 = node_names[object$edgemodel$dyad_to_idx[, 2]]
+    )
     df_components <- data.frame(object$edge_component_probabilities[[num_components]])
     df <- cbind(df_names, df_components)
     colnames(df)[1:2] <- c("node_1", "node_2")
@@ -191,16 +227,10 @@ get_network_component_probabilities <- function(object) {
 get_component_means <- function(object, num_components, ci=0.90) {
   lb_prob <- 0.5 * (1 - ci)
   ub_prob <- 1 - 0.5 * (1 - ci)
-  component_mean_samples <- object$component_mean_samples[[num_components]]
-  if (object$edgemodel$model_type == "binary") {
-    component_mean_samples <- plogis(component_mean_samples)
-  }
-  if (object$edgemodel$model_type == "count") {
-    component_mean_samples <- exp(component_mean_samples)
-  }
-  mu <- apply(component_mean_samples, 2, median)
-  lb <- apply(component_mean_samples, 2, function(x) quantile(x, probs=c(lb_prob)))
-  ub <- apply(component_mean_samples, 2, function(x) quantile(x, probs=c(ub_prob)))
+  component_mean_samples <- mixture_transform(object, object$component_mean_samples[[num_components]])
+  mu <- apply(component_mean_samples, 2, stats::median, na.rm = TRUE)
+  lb <- apply(component_mean_samples, 2, stats::quantile, probs = lb_prob, na.rm = TRUE)
+  ub <- apply(component_mean_samples, 2, stats::quantile, probs = ub_prob, na.rm = TRUE)
   summary_table <- matrix(0, num_components, 3)
   rownames(summary_table) <- sapply(1:num_components, function(i) paste0("K = ", i))
   colnames(summary_table) <- c("50%", paste0(lb_prob * 100, "%"), paste0(ub_prob * 100, "%"))

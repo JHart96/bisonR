@@ -20,46 +20,49 @@ bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metr
   if (inherits(edgemodel_list, "bison_model")) edgemodel_list <- list(edgemodel_list)
   if (is.data.frame(data_list)) data_list <- list(data_list)
 
-  new_bison_term <- paste0("bison_", target_name, "_", metric_name)
+  new_bison_term <- bison_term_name(target_name, metric_name)
 
   posterior_samples_list <- list()
 
-  for (i in 1:length(edgemodel_list)) {
-    # Depending
-    if (target_name == "edge") {
-      node_1_ids <- sapply(
-        dplyr::pull(data_list[[i]], param_names[1]),
-        function(x) which(names(edgemodel_list[[i]]$node_to_idx) == x)
-      )
-      node_2_ids <- sapply(
-        dplyr::pull(data_list[[i]], param_names[2]),
-        function(x) which(names(edgemodel_list[[i]]$node_to_idx) == x)
-      )
-      dyad_ids <- get_dyad_ids(
-        node_1_ids,
-        node_2_ids,
-        edgemodel_list[[i]]$dyad_to_idx,
-        edgemodel_list[[i]]$directed
-      )
+  if (length(edgemodel_list) != length(data_list) && target_name != "global") {
+    stop(
+      "Got ", length(edgemodel_list), " edge model(s) but ", length(data_list),
+      " data frame(s). Provide one data frame per edge model.",
+      call. = FALSE
+    )
+  }
 
-      if (metric_name == "weight") {
-        random_idxs <- sample(1:num_draws)
-        posterior_samples <- extract_metric(edgemodel_list[[i]], paste0(target_name, "_", metric_name), num_draws)[random_idxs, dyad_ids]
+  for (i in seq_along(edgemodel_list)) {
+    model <- edgemodel_list[[i]]
+    metric_string <- paste0(target_name, "_", metric_name)
+    if (target_name == "edge") {
+      node_1_ids <- lookup_node_ids(model, data_list[[i]], param_names[1], i)
+      node_2_ids <- lookup_node_ids(model, data_list[[i]], param_names[2], i)
+      dyad_ids <- get_dyad_ids(node_1_ids, node_2_ids, model$dyad_to_idx, model$directed)
+      if (anyNA(dyad_ids)) {
+        bad <- which(is.na(dyad_ids))[1]
+        stop(
+          "Row ", bad, " of data frame ", i, " refers to a dyad that isn't in edge model ", i, ".",
+          call. = FALSE
+        )
       }
+      if (metric_name != "weight") {
+        stop("Only edge_weight is available as an edge-level metric in bison_brm().", call. = FALSE)
+      }
+      # Edge weights are used on the link scale (logit or log), which is
+      # unbounded and usually better suited to regression.
+      posterior_samples <- extract_metric(model, metric_string, num_draws, transform = FALSE)[, dyad_ids, drop = FALSE]
     } else if (target_name == "node") {
-      node_ids <- sapply(
-        dplyr::pull(data_list[[i]], param_names[1]),
-        function(x) which(names(edgemodel_list[[i]]$node_to_idx) == x)
-      )
-      posterior_samples <- extract_metric(edgemodel_list[[i]], paste0(target_name, "_", metric_name), num_draws)[, node_ids]
+      node_ids <- lookup_node_ids(model, data_list[[i]], param_names[1], i)
+      posterior_samples <- extract_metric(model, metric_string, num_draws)[, node_ids, drop = FALSE]
     } else if (target_name == "global") {
-      posterior_samples <- extract_metric(edgemodel_list[[i]], paste0(target_name, "_", metric_name), num_draws)
+      posterior_samples <- extract_metric(model, metric_string, num_draws)
     } else {
-      stop("Network feature not supported.")
+      stop("Network feature \"", target_name, "\" not supported. Use edge, node or global.", call. = FALSE)
     }
 
     # Make sure posterior samples are in matrix format (for num_draws=1).
-    posterior_samples_list[[i]] <- matrix(posterior_samples, nrow=num_draws)
+    posterior_samples_list[[i]] <- matrix(posterior_samples, nrow = num_draws)
   }
 
   # Generate list of dataframes.
@@ -94,5 +97,33 @@ bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metr
 
   combined_dataframes <- dplyr::bind_rows(list(original_dataframes, imputed_dataframes))
 
-  mice::as.mids(as.data.frame(combined_dataframes))
+  # mice warns about "logged events" when imputed columns are constant within an
+  # imputation, which is expected here, so that warning is muffled.
+  withCallingHandlers(
+    mice::as.mids(as.data.frame(combined_dataframes)),
+    warning = function(w) {
+      if (grepl("logged events", conditionMessage(w))) invokeRestart("muffleWarning")
+    }
+  )
+}
+
+# Find the indices (in the edge model) of the nodes named in a column of a
+# regression data frame, with a clear error if any are missing.
+lookup_node_ids <- function(model, data, column, model_number) {
+  if (!column %in% colnames(data)) {
+    stop("Column `", column, "` not found in data frame ", model_number, ".", call. = FALSE)
+  }
+  node_names <- as.character(data[[column]])
+  ids <- match(node_names, names(model$node_to_idx))
+  if (anyNA(ids)) {
+    missing <- unique(node_names[is.na(ids)])
+    stop(
+      "Node(s) ", paste(utils::head(missing, 5), collapse = ", "),
+      if (length(missing) > 5) ", ..." else "",
+      " in column `", column, "` of data frame ", model_number,
+      " aren't in edge model ", model_number, ".",
+      call. = FALSE
+    )
+  }
+  ids
 }

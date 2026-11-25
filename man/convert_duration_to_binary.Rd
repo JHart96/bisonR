@@ -7,17 +7,28 @@
 convert_duration_to_binary(df, event_name, divisor_name, max_event_length)
 }
 \arguments{
-\item{df}{Original dataframe, ready for use with \code{bison_model}.}
+\item{df}{Original data frame, ready for use with \code{\link[=bison_model]{bison_model()}}.}
 
-\item{event_name}{The variable name in the dataframe corresponding to event durations.}
+\item{event_name}{Name of the column with event durations.}
 
-\item{divisor_name}{The variable name in the dataframe corresponding to divisor durations (e.g. observation time).}
+\item{divisor_name}{Name of the column with observation durations.}
 
-\item{max_event_length}{The maximum length of time a single social event could take place for.}
+\item{max_event_length}{The maximum length of time a single social event could
+last.}
 }
 \value{
-A dataframe the same as the input but with \code{event_name} and \code{divisor_name} columns replaced with values compatible with binary models.
+The input data frame with the \code{event_name} and \code{divisor_name} columns
+replaced by counts suitable for a binary model.
 }
 \description{
-Uses a naive method for converting duration data to binary data. Use with caution. Ensure that all time periods are in the same units.
+Uses a naive method for converting duration data to binary data:
+durations are divided by \code{max_event_length} and rounded. Use with caution, and
+make sure all durations are in the same units.
+}
+\examples{
+df <- data.frame(
+  node_1 = c("A", "A", "B"), node_2 = c("B", "C", "C"),
+  time_together = c(30, 0, 10), time_observed = c(60, 60, 60)
+)
+convert_duration_to_binary(df, "time_together", "time_observed", max_event_length = 10)
 }
