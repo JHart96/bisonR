@@ -12,6 +12,7 @@ prior_predictive_check(
   options = NULL,
   priors = NULL,
   directed = isTRUE(options$directed),
+  num_draws = 50,
   ...
 )
 }
@@ -25,6 +26,8 @@ prior_predictive_check(
 (\code{TRUE}/\code{FALSE}) is used; prefer the \code{directed} argument.}
 
 \item{directed}{Whether the network is directed.}
+
+\item{num_draws}{Number of datasets to simulate from the priors.}
 
 \item{...}{Further arguments passed to \code{\link[=bison_model]{bison_model()}}.}
 }

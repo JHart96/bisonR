@@ -12,6 +12,9 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 * `extract_metric(standardise = TRUE)` now centres within each posterior draw, as documented.
 * Mixture model components are now ordered by their means in each posterior draw, to avoid label switching.
 * `global_diameter` now uses 1/weight as the edge length, consistent with betweenness and closeness.
+* `prior_check()` now shows the correct density for binary edge priors on the probability scale.
+* `node_degree[t]` now counts edges with weight at or above `t`, as documented.
+* `model_comparison()` now works when models have different numbers of posterior draws.
 
 ## Breaking changes
 
@@ -32,6 +35,8 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 * Compiled Stan models are cached between sessions.
 * Conjugate models now return predictions and log-likelihoods, so they work with `plot_predictions()`, `prior_predictive_check()` and `model_comparison()`.
 * New `print()` method for fitted models.
+* `bison_model()` warns if any MCMC chains fail.
+* `prior_predictive_check()` gains a `num_draws` argument.
 
 ## Plots
 
@@ -54,7 +59,7 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 * `draw_edgelist_samples()` gains a `transform` argument (#60).
 * `simulate_bison_model()` gains `num_nodes` and `max_obs` arguments.
 * All exported functions have examples.
-* Updated articles, including a new article on preparing data (#42, #74, #81, #83, #84-#93).
+* Updated articles, and new articles on preparing data, priors, model diagnostics, additional effects in edge models, directed networks, group-based data, count data, nodal regression, comparing networks and working with posterior networks (#42, #74, #81, #83, #84-#93).
 * Expanded unit tests.
 * Updated documentation website.
 * The GitHub repository is JHart96/bisonR and the website is <https://bisonr.org>.

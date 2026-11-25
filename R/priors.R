@@ -48,22 +48,24 @@ get_default_priors <- function(model_type) {
   stop("Model type \"", model_type, "\" not supported. Use \"binary\", \"count\", \"binary_conjugate\" or \"count_conjugate\".", call. = FALSE)
 }
 
-#' Prior checks
+#' Plot prior distributions
 #'
-#' @param priors List of priors for a model, can be retrieved using `get_default_prior()`.
-#' @param model_type Type of model the priors will be used for (same as the argument for `get_default_prior()`).
-#' @param type Type of prior check to run, `"value"` or `"prediction"`. Details below.
+#' Plots the density of each prior in a list. Edge weight priors are shown on the
+#' natural scale (probabilities for binary models, rates for count models); other
+#' priors are shown on the scale on which they are defined. To see the data
+#' implied by the priors together, use [prior_predictive_check()].
 #'
-#' @details The parameter `type` determines what type of prior check to run. `type="value"` will
-#' plot the prior probability over the parameter value on the original scale. `type="predictive"`
-#' will run a prior predictive plot, where predictions from the model are generated using only
-#' prior probabilities (the model when not updated from the data).
+#' @param priors List of priors for a model, as returned by [get_default_priors()].
+#' @param model_type Type of model the priors will be used for, as in
+#'   [get_default_priors()].
+#' @param type Type of plot. Only `"density"` is currently available.
 #'
 #' @examples
 #' priors <- get_default_priors("binary")
 #' prior_check(priors, "binary")
 #' @export
-prior_check <- function(priors, model_type, type="density") {
+prior_check <- function(priors, model_type, type = "density") {
+  type <- match.arg(type, "density")
   if (type == "density") {
     if (length(priors) > 1) {
       num_cols = 2

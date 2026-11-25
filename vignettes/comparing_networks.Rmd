@@ -1,0 +1,171 @@
+---
+title: "Comparing networks"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Comparing networks}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4.5,
+  out.width = "100%"
+)
+set.seed(1)
+```
+
+This article shows how to compare two or more networks, such as networks from two seasons, two study periods or two groups. Each network is estimated with its own edge model, and the comparison is made using samples from the posteriors of those models, so the uncertainty in each network is carried into the comparison.
+
+It assumes familiarity with fitting edge models (`vignette("getting_started")`), network metrics (`vignette("network_metrics")`) and `bison_brm()` (`vignette("bison_brms")`).
+
+```{r setup}
+library(bisonR)
+```
+
+## Simulated data
+
+We simulate observations of the same 12 individuals in two periods. In each period, the edge weight of each dyad is drawn on the logit scale from a normal distribution with mean -1.5. The standard deviation is 0.5 in the first period and 1.5 in the second, so relationships vary more in strength in the second period (higher social differentiation). Each dyad is observed for between 10 and 40 sampling periods, and the data are aggregated to one row per dyad.
+
+```{r}
+simulate_period <- function(edge_sd, num_nodes = 12) {
+  nodes <- LETTERS[1:num_nodes]
+  dyads <- t(combn(num_nodes, 2))
+  logit_weight <- rnorm(nrow(dyads), mean = -1.5, sd = edge_sd)
+  duration <- sample(10:40, nrow(dyads), replace = TRUE)
+  data.frame(
+    node_1_id = factor(nodes[dyads[, 1]], levels = nodes),
+    node_2_id = factor(nodes[dyads[, 2]], levels = nodes),
+    event = rbinom(nrow(dyads), duration, plogis(logit_weight)),
+    duration = duration
+  )
+}
+
+df_1 <- simulate_period(edge_sd = 0.5)
+df_2 <- simulate_period(edge_sd = 1.5)
+head(df_1)
+```
+
+## Fitting the edge models
+
+An edge model is fitted to each dataset separately. There are no observation-level effects, so the conjugate binary model can be used:
+
+```{r}
+priors <- get_default_priors("binary_conjugate")
+
+fit_1 <- bison_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id),
+  data = df_1,
+  model_type = "binary_conjugate",
+  priors = priors
+)
+fit_2 <- bison_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id),
+  data = df_2,
+  model_type = "binary_conjugate",
+  priors = priors
+)
+```
+
+The models should be checked in the usual way before they are compared (see `vignette("getting_started")`).
+
+## Comparing global metrics directly
+
+The simplest comparison is to calculate the posterior distribution of a metric in each network and compare them. Here we use the coefficient of variation of edge weights (`global_cv`), a measure of social differentiation:
+
+```{r}
+cv_1 <- extract_metric(fit_1, "global_cv")
+cv_2 <- extract_metric(fit_2, "global_cv")
+
+rbind(
+  period_1 = quantile(cv_1, probs = c(0.05, 0.5, 0.95)),
+  period_2 = quantile(cv_2, probs = c(0.05, 0.5, 0.95))
+)
+```
+
+```{r}
+dens_1 <- density(cv_1)
+dens_2 <- density(cv_2)
+plot(
+  dens_1, xlim = range(dens_1$x, dens_2$x), ylim = c(0, max(dens_1$y, dens_2$y)),
+  main = "", xlab = "Social differentiation (CV)", lwd = 2
+)
+lines(dens_2, lwd = 2, lty = 2)
+legend("topright", legend = c("Period 1", "Period 2"), lty = c(1, 2), lwd = 2, bty = "n")
+```
+
+The posterior distribution of the difference is obtained by subtracting the samples draw by draw. The two edge models were fitted to independent data, so their posterior draws are independent and can be paired in any order:
+
+```{r}
+cv_diff <- cv_2 - cv_1
+quantile(cv_diff, probs = c(0.05, 0.5, 0.95))
+mean(cv_diff > 0)
+plot_metric(cv_diff, "Difference in social differentiation (period 2 - period 1)")
+```
+
+`mean(cv_diff > 0)` is the posterior probability that social differentiation is higher in the second period. Here all draws of the difference are positive, consistent with the simulation.
+
+Pairing draws in this way is only valid across independent models. For two quantities from the *same* network, such as the strength of two nodes, both should be calculated from the same matrix returned by a single call to `extract_metric()`, because each call samples a new set of posterior draws (see `vignette("posterior_networks")`).
+
+## Global regression
+
+The same comparison can be made with a global regression in `bison_brm()`. This needs a list of edge models and a data frame with one row per network, in the same order as the list. The `bison_network` column identifies each network:
+
+```{r}
+df_global <- data.frame(
+  bison_network = factor(1:2),
+  period = c("first", "second")
+)
+
+fit_global <- bison_brm(
+  bison(global_cv(bison_network)) ~ period,
+  list(fit_1, fit_2),
+  df_global,
+  num_draws = 5, # Small for demonstration; use 100 or more in practice
+  refresh = 0,
+  silent = 2
+)
+summary(fit_global)
+```
+
+With two networks the regression has two observations, and estimating an intercept, a coefficient and a residual standard deviation from two values is not well determined. This shows in the very wide credible interval for `periodsecond`, which is much wider than the interval for the difference calculated directly above, and in the divergent transition warnings. Global regressions become useful when there are many networks, for example one per group or one per time window, and when there are other variables to include. With only two or three networks, the direct comparison of posterior distributions is usually more informative.
+
+## Comparing edges present in both networks
+
+Edge weights can be compared across networks with a dyadic regression. A list of edge models is given with a matching list of data frames, one row per dyad. Each data frame can only contain dyads that are in the corresponding edge model, so to compare the edges present in both networks, each data frame should contain those dyads. Here the same individuals were observed in both periods, so every dyad appears in both:
+
+```{r}
+df_dyadic_1 <- df_1[, c("node_1_id", "node_2_id")]
+df_dyadic_2 <- df_2[, c("node_1_id", "node_2_id")]
+
+fit_edges <- bison_brm(
+  bison(edge_weight(node_1_id, node_2_id)) ~ bison_network + (1 | mm(node_1_id, node_2_id)),
+  list(fit_1, fit_2),
+  list(df_dyadic_1, df_dyadic_2),
+  num_draws = 5, # Small for demonstration; use 100 or more in practice
+  refresh = 0,
+  silent = 2
+)
+summary(fit_edges)
+```
+
+Edge weights in `bison_brm()` are on the logit scale for binary models. The `bison_network2` coefficient is the difference in mean logit edge weight between the second network and the first. Its credible interval includes zero, which is consistent with the simulation: the mean edge weight on the logit scale was the same in both periods, and only the spread differed. A comparison of means does not detect a difference in spread, which is why the choice of metric or model should follow from the question being asked.
+
+If the edge weights of the same dyad are expected to be correlated across networks, a dyad-level random effect can also be added, using a column that identifies each dyad.
+
+## Plotting networks with the same layout
+
+When networks are plotted separately, `plot_network()` chooses a new layout each time, which makes visual comparison difficult. `plot_network()` returns the layout it used, which can be passed to later plots:
+
+```{r, fig.height = 6}
+layout <- plot_network(fit_1, lwd = 5)
+```
+
+```{r, fig.height = 6}
+plot_network(fit_2, lwd = 5, layout = layout)
+```
+
+The layout is a matrix of node coordinates in the order of the nodes in the model, so this only works when the networks contain the same nodes in the same order. Here both datasets use the same factor levels for the node columns. For networks with different individuals, a common set of factor levels can be used for both datasets before the edge models are fitted.

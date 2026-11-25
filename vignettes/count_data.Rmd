@@ -1,0 +1,220 @@
+---
+title: "Count data and continuous observation effort"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Count data and continuous observation effort}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4.5,
+  out.width = "100%"
+)
+set.seed(1)
+```
+
+```{r setup}
+library(bisonR)
+```
+
+This article goes through the analysis of count data, where the number of interactions between each pair is recorded over a known amount of observation time. The example is grooming bouts recorded during focal follows, with observation time in hours as the effort. See `vignette("preparing_data")` for the general data format and the choice between binary and count data.
+
+## Simulating focal follow data
+
+We simulate focal follows of 10 individuals. Each individual is followed several times, and each follow lasts a different length of time. During a follow, every grooming bout between the focal individual and each other individual is counted. Each pair has a true rate of grooming bouts per hour, and the number of bouts seen in a follow is drawn from a Poisson distribution with mean equal to the rate multiplied by the length of the follow.
+
+```{r}
+nodes <- c("Ada", "Bea", "Cat", "Dot", "Eve", "Fay", "Gil", "Hal", "Ian", "Jo")
+n <- length(nodes)
+sociality <- setNames(rnorm(n, 0, 0.5), nodes)
+
+# True rate of grooming bouts per hour for each pair
+dyads <- t(combn(nodes, 2))
+true_rate <- exp(-1.5 + sociality[dyads[, 1]] + sociality[dyads[, 2]] + rnorm(nrow(dyads), 0, 0.8))
+true_rates <- data.frame(node_1 = dyads[, 1], node_2 = dyads[, 2], true_rate = true_rate)
+
+# Each individual is followed 8 times, for between 0.5 and 3 hours
+follows <- data.frame(
+  follow_id = seq_len(n * 8),
+  focal = rep(nodes, each = 8),
+  hours = round(runif(n * 8, 0.5, 3), 2)
+)
+
+# One row per follow and partner
+df <- merge(follows, data.frame(partner = nodes))
+df <- df[df$focal != df$partner, ]
+df <- df[order(df$follow_id, df$partner), ]
+rownames(df) <- NULL
+
+# Look up the true rate of each focal-partner pair (in either order)
+key <- function(a, b) paste(pmin(a, b), pmax(a, b))
+df$true_rate <- true_rates$true_rate[match(key(df$focal, df$partner), key(true_rates$node_1, true_rates$node_2))]
+df$bouts <- rpois(nrow(df), df$true_rate * df$hours)
+head(df[, c("follow_id", "focal", "partner", "hours", "bouts")])
+nrow(df)
+```
+
+Each row records the number of grooming bouts between the focal individual and one partner during one follow. The effort, `hours`, is not a whole number. Rows with no bouts are kept, because they show that the pair were observed and did not groom.
+
+The network is undirected, so a follow of Ada contributes to the Ada-Bea edge in the same way as a follow of Bea.
+
+## Aggregating per dyad
+
+With no follow-level predictors, the rows can be aggregated to one row per dyad by summing the bouts and the hours. The order of the two individuals doesn't matter in an undirected network, but placing them in a consistent order means that rows for Ada-Bea and Bea-Ada are combined by `aggregate()`:
+
+```{r}
+df$node_1 <- pmin(df$focal, df$partner)
+df$node_2 <- pmax(df$focal, df$partner)
+df_agg <- aggregate(cbind(bouts, hours) ~ node_1 + node_2, data = df, FUN = sum)
+nrow(df_agg)
+head(df_agg)
+```
+
+For count models, the edge weight estimates only depend on the total number of events and the total effort of each dyad, so the aggregated data give the same edge weights as the disaggregated data and are faster to fit. Follow-level predictors, such as time of day, need the disaggregated data.
+
+## Edge weights are rates
+
+In a count model, the number of events in each row is modelled with a Poisson distribution:
+
+$$\text{events} \sim \text{Poisson}(\lambda_{ij} \times \text{effort}),$$
+
+where $\lambda_{ij}$ is the edge weight of dyad (i, j): the expected number of events per unit of effort. Here it is the rate of grooming bouts per hour. Edge weights are estimated on the log scale (a log link), so that the rate is always positive.
+
+The rate depends on the units of the effort. If effort were recorded in minutes, the edge weights would be rates per minute, 60 times smaller than rates per hour, and the priors would need to change accordingly.
+
+## Priors
+
+The default priors for the count model are:
+
+```{r}
+priors <- get_default_priors("count")
+priors
+```
+
+The edge prior `normal(0, 1)` is on the log scale. `prior_check()` shows the distribution it implies for the rate:
+
+```{r}
+prior_check(priors["edge"], "count")
+```
+
+With effort in hours, this prior has a median of 1 bout per hour, and 95% of its weight is between about 0.14 and 7.1 bouts per hour:
+
+```{r}
+exp(qnorm(c(0.025, 0.5, 0.975), mean = 0, sd = 1))
+```
+
+This should be checked against what is plausible for the study system and the units of effort. Here the true rates are mostly below 1 bout per hour:
+
+```{r}
+quantile(true_rates$true_rate, probs = c(0, 0.25, 0.5, 0.75, 1))
+```
+
+The default prior is kept in this example. A prior with a lower mean, such as `normal(-1, 1)`, could be used if lower rates were expected.
+
+## Fitting the models
+
+The Stan model uses the log-normal edge prior described above:
+
+```{r}
+fit_count <- bison_model(
+  (bouts | hours) ~ dyad(node_1, node_2),
+  data = df_agg,
+  model_type = "count",
+  priors = priors,
+  seed = 1
+)
+```
+
+The conjugate count model calculates the posterior exactly, with a gamma prior directly on the rate:
+
+```{r}
+get_default_priors("count_conjugate")
+
+fit_count_conj <- bison_model(
+  (bouts | hours) ~ dyad(node_1, node_2),
+  data = df_agg,
+  model_type = "count_conjugate",
+  priors = get_default_priors("count_conjugate")
+)
+```
+
+The two models use different priors, so their estimates differ slightly. The differences are largest for dyads with few events, such as Ada-Cat (1 bout), where the prior has more influence:
+
+```{r}
+head(get_edgelist(fit_count))
+head(get_edgelist(fit_count_conj))
+```
+
+The conjugate model is enough when only the edge weights are needed. The Stan model is needed for other effects in the formula, such as fixed or random effects of follow-level variables.
+
+## Checking the model
+
+`plot_predictions()` compares the observed data with data simulated from the fitted model. For count models, the rates compared are the number of events per unit of effort for each dyad:
+
+```{r}
+plot_predictions(fit_count, num_draws = 20, type = "density")
+```
+
+With `type = "stats"`, summary statistics of the observed rates (red lines) are compared with the same statistics in simulated datasets (histograms):
+
+```{r, fig.height = 5}
+plot_predictions(fit_count, num_draws = 100, type = "stats")
+```
+
+For all four statistics, the observed value is within the range of the simulated values. The observed mean rate is towards the lower end of the simulated values.
+
+## The estimated network
+
+`get_edgelist()` gives the posterior median and 90% credible interval of each rate, in bouts per hour:
+
+```{r}
+edgelist <- get_edgelist(fit_count)
+head(edgelist)
+```
+
+Because the data were simulated, the estimates can be compared with the true rates:
+
+```{r}
+idx <- match(paste(edgelist$node_1, edgelist$node_2), paste(true_rates$node_1, true_rates$node_2))
+plot(true_rates$true_rate[idx], edgelist$median, pch = 19, cex = 0.6,
+     ylim = range(edgelist[, 4:5]),
+     xlab = "True rate (bouts per hour)", ylab = "Estimated rate")
+segments(true_rates$true_rate[idx], edgelist[, 4], true_rates$true_rate[idx], edgelist[, 5], col = "grey50")
+abline(0, 1, lty = 2)
+```
+
+The estimates are close to the true rates. For dyads with the lowest true rates, the estimates are mostly higher than the true values, because they are pulled towards the prior.
+
+Rates are not bounded above by 1, so `plot_network()` rescales the edge widths for count models: the widest upper bound is drawn with width `lwd`, and other edges are drawn in proportion. Widths can be compared within a plot, but not between plots of different models:
+
+```{r, fig.height = 6}
+plot_network(fit_count, lwd = 5)
+```
+
+The fitted model can be used with `extract_metric()` and `bison_brm()` in the same way as a binary model. Metrics such as `node_strength` are then sums of rates, and in `bison_brm()` the edge weights are on the log scale. See `vignette("network_metrics")` and `vignette("bison_brms")`.
+
+## When to use binary data instead
+
+Count models assume that events are counted as separate occurrences and, given the edge weight, occur independently at a constant rate during observation. Binary data may be more appropriate when:
+
+* the data record whether a behaviour occurred in each sampling period (for example, scan samples) rather than how many times;
+* interactions are long and continuous, so that a single bout covers much of the observation time and bouts are difficult to count.
+
+If the data are durations, such as the number of minutes a pair spent grooming, `convert_duration_to_binary()` converts them to binary data. It divides the duration of the behaviour and the observation time by a fixed period length and rounds the results, giving the number of periods with the behaviour and the number of periods observed:
+
+```{r}
+df_duration <- data.frame(
+  node_1 = c("Ada", "Ada", "Bea"),
+  node_2 = c("Bea", "Cat", "Cat"),
+  minutes_grooming = c(42, 0, 15),
+  minutes_observed = c(180, 120, 150)
+)
+convert_duration_to_binary(df_duration, "minutes_grooming", "minutes_observed", max_event_length = 5)
+```
+
+The result can be fitted with a binary model, where the edge weight is the probability that the pair groomed in a 5-minute period. This conversion is an approximation, and the results depend on the period length chosen.

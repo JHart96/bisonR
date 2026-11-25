@@ -186,11 +186,20 @@ plot_predictive_stats <- function(observed, predicted, draw_data) {
     pred <- sapply(predicted, fn)
     obs <- if (draw_data) fn(observed) else NULL
     xlim <- range(c(pred, obs))
-    if (diff(xlim) == 0) xlim <- xlim + c(-0.5, 0.5) * max(abs(xlim[1]), 1e-3)
-    graphics::hist(
-      pred, breaks = 15, xlim = xlim, main = name, xlab = "",
-      col = col2rgba(bison_colors[2], 0.6), border = "white"
-    )
+    if (length(unique(pred)) == 1) {
+      # Every simulated dataset has the same value: draw a single narrow bar.
+      half_width <- max(abs(pred[1]) * 0.05, 1e-3)
+      xlim <- range(c(xlim, pred[1] + c(-1, 1) * half_width * 4))
+      graphics::plot(NULL, xlim = xlim, ylim = c(0, length(pred)), main = name,
+                     xlab = "", ylab = "Frequency")
+      graphics::rect(pred[1] - half_width, 0, pred[1] + half_width, length(pred),
+                     col = col2rgba(bison_colors[2], 0.6), border = "white")
+    } else {
+      graphics::hist(
+        pred, breaks = 15, xlim = xlim, main = name, xlab = "",
+        col = col2rgba(bison_colors[2], 0.6), border = "white"
+      )
+    }
     if (draw_data) {
       graphics::abline(v = obs, col = bison_highlight, lwd = 2.5)
     }

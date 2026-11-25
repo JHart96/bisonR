@@ -10,6 +10,7 @@
 #' @param options A list of extra options. Currently only `directed`
 #'   (`TRUE`/`FALSE`) is used; prefer the `directed` argument.
 #' @param directed Whether the network is directed.
+#' @param num_draws Number of datasets to simulate from the priors.
 #' @param ... Further arguments passed to [bison_model()].
 #'
 #' @return The prior-only model, invisibly.
@@ -25,7 +26,7 @@
 #' @export
 prior_predictive_check <- function(formula, data, model_type, plot_type = "density",
                                    options = NULL, priors = NULL,
-                                   directed = isTRUE(options$directed), ...) {
+                                   directed = isTRUE(options$directed), num_draws = 50, ...) {
   fit <- bison_model(
     formula = formula,
     data = data,
@@ -35,6 +36,6 @@ prior_predictive_check <- function(formula, data, model_type, plot_type = "densi
     priors_only = TRUE,
     ...
   )
-  plot_predictions(fit, num_draws = 20, draw_data = FALSE, type = plot_type)
+  plot_predictions(fit, num_draws = num_draws, draw_data = FALSE, type = plot_type)
   invisible(fit)
 }

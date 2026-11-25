@@ -1,0 +1,184 @@
+---
+title: "Working with posterior networks"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Working with posterior networks}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4.5,
+  out.width = "100%"
+)
+set.seed(1)
+```
+
+A fitted edge model contains samples from the posterior distribution of every edge weight. Each sample (or *draw*) is one possible network that is consistent with the data. Most functions in bisonR summarise these draws, but they can also be used directly, for example to calculate quantities that bisonR does not provide. Calculating a quantity separately for each draw gives a posterior distribution for it, which includes the uncertainty in the edge weights.
+
+This article covers extracting the draws, converting them to `igraph` networks, calculating new metrics and contrasts, and saving fitted models.
+
+```{r setup}
+library(bisonR)
+```
+
+## Simulated data
+
+We simulate 12 individuals in two groups, `north` and `south`. Edge weights on the logit scale are higher within groups (mean -0.5) than between groups (mean -2.5). Each dyad is observed for between 3 and 20 sampling periods, so some edges are estimated more precisely than others.
+
+```{r}
+num_nodes <- 12
+nodes <- LETTERS[1:num_nodes]
+group <- rep(c("north", "south"), each = 6)
+
+dyads <- t(combn(num_nodes, 2))
+same_group <- group[dyads[, 1]] == group[dyads[, 2]]
+logit_weight <- ifelse(same_group, -0.5, -2.5) + rnorm(nrow(dyads), 0, 0.5)
+duration <- sample(3:20, nrow(dyads), replace = TRUE)
+
+df <- data.frame(
+  node_1_id = factor(nodes[dyads[, 1]], levels = nodes),
+  node_2_id = factor(nodes[dyads[, 2]], levels = nodes),
+  event = rbinom(nrow(dyads), duration, plogis(logit_weight)),
+  duration = duration
+)
+
+fit_edge <- bison_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id),
+  data = df,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+```
+
+## Edge list samples
+
+`draw_edgelist_samples()` returns an edge list with one column per posterior draw:
+
+```{r}
+edge_draws <- draw_edgelist_samples(fit_edge, num_draws = 4, transform = TRUE)
+head(edge_draws)
+```
+
+With `transform = TRUE`, the edge weights are on the natural scale (probabilities for binary models, rates for count models). The default, `transform = FALSE`, gives them on the link scale (logit or log). This format can be passed to other software that expects an edge list, with the analysis repeated for each draw.
+
+## Converting to igraph
+
+`bison_to_igraph()` returns a list of `igraph` networks, one per posterior draw. Every network contains all of the nodes in the edge model, in the same order, with edge weights on the natural scale in the `weight` edge attribute:
+
+```{r}
+nets <- bison_to_igraph(fit_edge, num_draws = 500)
+length(nets)
+nets[[1]]
+```
+
+### Assortment by a node attribute
+
+Many functions in igraph ignore edge weights. In a bisonR network, every dyad in the model has an edge in every draw, so an unweighted function returns the same value in every draw. For example, `igraph::assortativity_nominal()` does not use weights:
+
+```{r}
+group_id <- as.integer(factor(group))
+assort_unweighted <- sapply(nets, igraph::assortativity_nominal, types = group_id, directed = FALSE)
+unique(round(assort_unweighted, 6))
+```
+
+Before using an igraph function, check that it uses the `weight` attribute, or pass the weights explicitly. Weighted modularity of the partition into the two groups measures how much edge weight falls within groups compared with what would be expected given each node's strength:
+
+```{r}
+modularity_group <- sapply(nets, function(net) {
+  igraph::modularity(net, membership = group_id, weights = igraph::E(net)$weight)
+})
+quantile(modularity_group, probs = c(0.05, 0.5, 0.95))
+```
+
+The 90% credible interval is above zero, so more edge weight falls within groups than expected, consistent with the simulation. Whether a given value is large depends on the network, and comparisons with null models or with other networks may be needed for interpretation.
+
+### Community detection
+
+Community detection can also be applied to each draw. Here `igraph::cluster_louvain()`, which uses the `weight` attribute, is applied to each network:
+
+```{r}
+memberships <- lapply(nets, function(net) igraph::membership(igraph::cluster_louvain(net)))
+table(sapply(memberships, function(m) length(unique(m))))
+```
+
+The table gives the number of draws in which each number of communities was found. Community labels are arbitrary and change between draws, so they cannot be compared directly. Instead, the uncertainty can be summarised by how often each pair of nodes is assigned to the same community:
+
+```{r}
+co_assignment <- matrix(0, num_nodes, num_nodes, dimnames = list(nodes, nodes))
+for (m in memberships) {
+  co_assignment <- co_assignment + outer(m, m, "==")
+}
+co_assignment <- co_assignment / length(memberships)
+round(co_assignment, 2)
+```
+
+Each value is the proportion of draws in which the two nodes were in the same community. Nodes A to F (the `north` group) and G to L (the `south` group) are usually assigned to the same community as other members of their group. Node B is less consistently assigned than the other nodes: it is in the same community as the other `north` nodes in about 80% of draws, and with each `south` node in between 12% and 16% of draws.
+
+The co-assignment matrix can be plotted as a heatmap:
+
+```{r, fig.height = 6}
+heatmap(co_assignment, symm = TRUE, Rowv = NA, scale = "none",
+        col = grey.colors(20, start = 1, end = 0))
+```
+
+## Standardised metrics
+
+`extract_metric()` with `standardise = TRUE` mean-centres a metric within each posterior draw, so that each value is the difference between a node and the mean of all nodes in that draw:
+
+```{r}
+strength_std <- extract_metric(fit_edge, "node_strength", standardise = TRUE)
+round(t(apply(strength_std, 2, quantile, probs = c(0.05, 0.5, 0.95))), 2)
+```
+
+This is useful when the overall level of the metric is uncertain but the question is about the relative position of nodes. For example, the 90% interval for node E is above zero, so E has a higher strength than the average node in at least 95% of draws.
+
+## Edge-level contrasts
+
+Contrasts between edges can be calculated from the edge weight samples. `extract_metric(fit, "edge_weight")` returns one column per dyad, named after the dyad:
+
+```{r}
+edge_weights <- extract_metric(fit_edge, "edge_weight")
+colnames(edge_weights)[1:6]
+```
+
+The posterior probability that one edge is stronger than another is the proportion of draws in which it is larger. For example, for the edges between A and F and between A and B:
+
+```{r}
+mean(edge_weights[, "A <-> F"] > edge_weights[, "A <-> B"])
+quantile(edge_weights[, "A <-> F"] - edge_weights[, "A <-> B"], probs = c(0.05, 0.5, 0.95))
+```
+
+In this example, the edge between A and F is stronger than the edge between A and B in about 98% of draws.
+
+Both columns must come from the same matrix. `extract_metric()` and `bison_to_igraph()` choose posterior draws at random, so two separate calls return different draws, and pairing columns from different calls would ignore the correlation between quantities within a draw. In the same way, any quantity that combines several edges or nodes, such as the mean edge weight within groups, should be calculated row by row from a single matrix. Here the columns are selected by dyad name:
+
+```{r}
+dyad_names <- paste(df$node_1_id, df$node_2_id, sep = " <-> ")
+within_names <- dyad_names[same_group]
+between_names <- dyad_names[!same_group]
+
+mean_within <- rowMeans(edge_weights[, within_names])
+mean_between <- rowMeans(edge_weights[, between_names])
+quantile(mean_within - mean_between, probs = c(0.05, 0.5, 0.95))
+```
+
+The 90% credible interval of the difference in mean edge weight between within-group and between-group dyads is above zero.
+
+## Saving and loading models
+
+Models fitted with Stan store their draws in temporary files, so `saveRDS()` alone may not produce a file that can be loaded in a new R session. `bison_save()` reads all draws into memory before saving, and `bison_load()` loads the model:
+
+```{r}
+path <- tempfile(fileext = ".rds")
+bison_save(fit_edge, path)
+fit_loaded <- bison_load(path)
+
+all.equal(get_edgelist(fit_edge), get_edgelist(fit_loaded))
+```
+
+The loaded model can be used in the same way as the original, for example with `extract_metric()`, `bison_to_igraph()` or `bison_brm()`. In an analysis, the file would be saved to a permanent location rather than a temporary file.
