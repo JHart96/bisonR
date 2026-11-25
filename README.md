@@ -1,4 +1,4 @@
-# bisonR <img src="man/figures/hex.svg" width="140" align="right" alt="bisonR hex logo" />
+# bisonR
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/JHart96/bisonR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/JHart96/bisonR/actions/workflows/R-CMD-check.yaml)

@@ -61,7 +61,7 @@ blockquote {
 main img {
   border-radius: 0.6rem;
 }
-[data-bs-theme="dark"] main img:not([src$="logo.svg"]):not([src$="hero-network.png"]) {
+[data-bs-theme="dark"] main img:not([src$="hero-network.png"]) {
   filter: none !important;
   background: #fbfaf7;
   padding: 0.5rem;

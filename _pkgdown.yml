@@ -32,10 +32,6 @@ template:
     headings-line-height: 1.25
     navbar-bg: "#ffffff"
     pkgdown-nav-height: "72px"
-  opengraph:
-    image:
-      src: man/figures/logo.svg
-      alt: "bisonR hex logo"
 
 navbar:
   structure:
@@ -49,18 +45,40 @@ navbar:
       text: Articles
       menu:
       - text: "Getting started"
-      - text: "A complete BISoN analysis"
+      - text: "A first analysis"
         href: articles/getting_started.html
       - text: "Preparing your data"
         href: articles/preparing_data.html
       - text: "-------"
+      - text: "Fitting models"
+      - text: "Choosing and checking priors"
+        href: articles/priors.html
+      - text: "Model diagnostics"
+        href: articles/diagnostics.html
+      - text: "Edge models with additional effects"
+        href: articles/edge_model_effects.html
+      - text: "-------"
+      - text: "Types of data"
+      - text: "Directed networks"
+        href: articles/directed_networks.html
+      - text: "Group-based observations"
+        href: articles/group_data.html
+      - text: "Count data and continuous effort"
+        href: articles/count_data.html
+      - text: "-------"
       - text: "Analyses"
-      - text: "Regression with brms"
-        href: articles/bison_brms.html
       - text: "Network metrics"
         href: articles/network_metrics.html
+      - text: "Regression with brms"
+        href: articles/bison_brms.html
+      - text: "Nodal regression"
+        href: articles/nodal_regression.html
+      - text: "Comparing networks"
+        href: articles/comparing_networks.html
       - text: "Edge mixture models"
         href: articles/mixture_models.html
+      - text: "Working with posterior networks"
+        href: articles/posterior_networks.html
       - text: "-------"
       - text: "Help"
       - text: "Installing on Windows"
@@ -74,8 +92,12 @@ articles:
 - title: Getting started
   navbar: ~
   contents: [getting_started, preparing_data]
+- title: Fitting models
+  contents: [priors, diagnostics, edge_model_effects]
+- title: Types of data
+  contents: [directed_networks, group_data, count_data]
 - title: Analyses
-  contents: [bison_brms, network_metrics, mixture_models]
+  contents: [network_metrics, bison_brms, nodal_regression, comparing_networks, mixture_models, posterior_networks]
 - title: Help
   contents: [windows_installation]
 
