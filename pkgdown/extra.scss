@@ -13,8 +13,25 @@ h1, h2, h3, .h1, .h2, .h3 {
 
 .navbar {
   border-bottom: 1px solid var(--bs-border-color);
-  .navbar-brand { font-family: $headings-font-family; font-weight: 600; }
-  .nav-link { font-weight: 500; }
+  .navbar-brand { font-family: $headings-font-family; font-weight: 600; font-size: 1.15rem; }
+  .nav-link { font-size: 0.9rem; font-weight: 400; }
+  .form-control { font-size: 0.875rem; }
+}
+
+// Sidebars (page contents and the home page links): smaller than body text.
+aside {
+  font-size: 0.9rem;
+  h2 {
+    font-family: $font-family-base;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--bs-secondary-color);
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+  #toc .nav-link { font-size: 0.875rem; padding-top: 0.2rem; padding-bottom: 0.2rem; }
 }
 
 .navbar .version, .navbar .nav-text.text-muted {
@@ -203,20 +220,3 @@ main img {
   .bison-article-grid { grid-template-columns: 1fr; }
 }
 
-// ---- Home page guides ---------------------------------------------------------
-
-.bison-guides {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1.25rem;
-  margin: 0.5rem 0 2.5rem;
-  h3 { font-size: 1.05rem; margin-bottom: 0.5rem; }
-  ul { list-style: none; padding: 0; margin: 0; }
-  li { margin: 0 0 0.35rem; font-size: 0.95rem; }
-  a { text-decoration: none; }
-  a:hover { text-decoration: underline; }
-}
-
-@media (max-width: 991.98px) {
-  .bison-guides { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
