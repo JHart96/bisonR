@@ -27,6 +27,7 @@ because a chain failed), the same number of draws is taken at random from
 each model.
 }
 \examples{
+\dontshow{if (!is.null(tryCatch(cmdstanr::cmdstan_path(), error = function(e) NULL))) withAutoprint(\{ # examplesIf}
 # Test for non-random edge weights by comparing a model with edge weights
 # against a null model where every dyad has the same rate of events.
 sim_data <- simulate_bison_model("binary", aggregated = FALSE)
@@ -36,4 +37,5 @@ fit_edge <- bison_model((event | effort) ~ dyad(node_1_id, node_2_id),
 fit_null <- bison_model((event | effort) ~ 1,
                         data = sim_data$df_sim, model_type = "binary", priors = priors)
 model_comparison(list(non_random = fit_edge, random = fit_null))
+\dontshow{\}) # examplesIf}
 }

@@ -21,6 +21,7 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 * cmdstanr is no longer attached by `library(bisonR)`.
 * brms and mice have moved to Suggests and are only needed for `bison_brm()`.
 * For undirected networks, `node_1` in `get_edgelist()` is now the node that comes first in the node levels.
+* When node columns aren't factors with the same levels, nodes are ordered numerically if all names are numbers, and otherwise alphabetically in a locale-independent order (upper case before lower case), so results are the same on every computer. If only one node column is a factor, its unused levels are now kept.
 * `extract_metric(obj, "edge_weight")` returns edge weights on the natural scale by default. Use `transform = FALSE` for the link scale. `bison_brm()` still uses the link scale.
 * Conjugate models now give an error if the formula includes fixed effects, random effects or an intercept.
 * Random effects are now centred on 0, and the `random_mean` prior has been removed (prior lists that include it give a warning). Previously each random effect had an estimated mean, which overlapped with the edge weights so that their overall level depended on the priors. Models with random effects but no `dyad()` term or factor fixed effect need an explicit intercept, e.g. `(event | effort) ~ 1 + (1 | group)`, and give a warning without one.
@@ -33,7 +34,9 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 * Edge weights and random effects use a non-centred parameterisation, which reduces divergent transitions with `partial_pooling = TRUE`.
 * `bison_model()` gains a `chains` argument, and passes `...` to the Stan sampler (e.g. `seed`, `adapt_delta`). The fixed `step_size = 0.1` has been removed.
 * Input data are checked before fitting: missing columns, missing values, non-integer or negative events, more events than sampling periods, and self-loops (#69).
-* Priors are checked against the model type, and missing priors are filled in with the defaults (#70).
+* Priors are checked against the model type, and missing priors are filled in with the defaults (#70). Standard deviations, scales and shapes must be positive.
+* Formulas can use `- 1` to exclude an intercept.
+* `bison_model()` warns when a zero-inflated binary model has one sampling period per row, where zero inflation can't be separated from the edge weights.
 * Compiled Stan models are cached between sessions.
 * Conjugate models now return predictions and log-likelihoods, so they work with `plot_predictions()`, `prior_predictive_check()` and `model_comparison()`.
 * New `print()` method for fitted models.
@@ -55,7 +58,9 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 * Gives clearer errors when the data contain nodes or dyads that aren't in the edge model (#68).
 * Supports thresholded metrics such as `node_degree[0.5]`.
 * New `subset` argument to select rows of the regression data, e.g. `subset = sex == "F"` (#58).
-* New `scale` argument (`"none"`, `"centre"` or `"z"`) to transform the network variable within each posterior draw (#72). `z_score = TRUE` is equivalent to `scale = "z"`.
+* New `scale` argument (`"none"`, `"centre"` or `"z"`) to transform the network variable within each posterior draw (#72). `z_score = TRUE` is equivalent to `scale = "z"`. Global metrics are scaled across networks.
+* Global regressions check that there is one row of data per edge model, and that any `bison_network` column matches the order of the edge models.
+* `bison_brm_get_prior()` gains `scale`, `subset` and `z_score` arguments.
 
 ## Other changes
 

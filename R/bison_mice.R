@@ -13,7 +13,7 @@
 #'   (subtract the mean and divide by the standard deviation).
 #'
 #' @return A mice mids object
-#' @examples
+#' @examplesIf requireNamespace("brms", quietly = TRUE) && requireNamespace("mice", quietly = TRUE) && !identical(Sys.getenv("BISONR_TEST_BRMS"), "false")
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 #' df <- sim_data$df_sim
 #' fit_edge <- bison_model(
@@ -44,12 +44,33 @@ bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metr
 
   posterior_samples_list <- list()
 
-  if (length(edgemodel_list) != length(data_list) && target_name != "global") {
+  if (length(edgemodel_list) != length(data_list)) {
+    if (target_name == "global") {
+      stop(
+        "Got ", length(edgemodel_list), " edge model(s) but ", length(data_list),
+        " row(s) of data. Global metrics need one row of data per edge model, in the same order.",
+        call. = FALSE
+      )
+    }
     stop(
       "Got ", length(edgemodel_list), " edge model(s) but ", length(data_list),
       " data frame(s). Provide one data frame per edge model.",
       call. = FALSE
     )
+  }
+
+  # bison_network is set from the position of each edge model. A column with
+  # this name in the data must agree with that order.
+  for (j in seq_along(data_list)) {
+    if ("bison_network" %in% colnames(data_list[[j]]) &&
+        any(as.character(data_list[[j]]$bison_network) != as.character(j))) {
+      stop(
+        "The `bison_network` column in data frame ", j, " doesn't match the position of its edge ",
+        "model (", j, "). `bison_network` is set from the order of the edge models, so put the ",
+        "data in the same order or remove the column.",
+        call. = FALSE
+      )
+    }
   }
 
   for (i in seq_along(edgemodel_list)) {
@@ -83,6 +104,19 @@ bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metr
 
     # Make sure posterior samples are in matrix format (for num_draws=1).
     posterior_samples_list[[i]] <- matrix(posterior_samples, nrow = num_draws)
+  }
+
+  # Global metrics have one value per network, so scaling is done across the
+  # networks within each draw rather than within each network.
+  if (target_name == "global" && scale != "none") {
+    if (length(posterior_samples_list) < 2) {
+      stop("Scaling a global metric needs at least two networks.", call. = FALSE)
+    }
+    combined <- do.call(cbind, posterior_samples_list)
+    combined <- t(apply(combined, 1, scale_draw, scale = scale))
+    combined <- matrix(combined, nrow = num_draws)
+    posterior_samples_list <- lapply(seq_along(posterior_samples_list), function(j) combined[, j, drop = FALSE])
+    scale <- "none"
   }
 
   # Generate list of dataframes.

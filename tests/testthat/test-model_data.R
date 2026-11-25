@@ -121,3 +121,33 @@ test_that("undirected data with rows in both orders give a message", {
   expect_silent(get_bison_model_data((event | effort) ~ dyad(n1, n2), df, TRUE, "binary"))
   expect_silent(get_bison_model_data((event | effort) ~ dyad(n1, n2), df[c(1, 3), ], FALSE, "binary"))
 })
+
+test_that("numeric node IDs are ordered numerically and character IDs independently of locale", {
+  df <- data.frame(a = c(1, 2, 9), b = c(2, 10, 10), event = 1, effort = 1)
+  info <- get_bison_model_data((event | effort) ~ dyad(a, b), df, FALSE, "binary")
+  expect_equal(names(info$node_to_idx), c("1", "2", "9", "10"))
+
+  df_chr <- data.frame(a = c("b", "B", "a"), b = c("A", "a", "b"), event = 1, effort = 1)
+  info_chr <- get_bison_model_data((event | effort) ~ dyad(a, b), df_chr, FALSE, "binary")
+  expect_equal(names(info_chr$node_to_idx), c("A", "B", "a", "b"))
+})
+
+test_that("factor levels are kept when only one node column is a factor", {
+  df <- data.frame(n1 = factor(c("A", "B"), levels = c("A", "B", "C", "D")), n2 = c("B", "C"), event = 1, effort = 1)
+  info <- get_bison_model_data((event | effort) ~ dyad(n1, n2), df, FALSE, "binary")
+  expect_equal(names(info$node_to_idx), c("A", "B", "C", "D"))
+})
+
+test_that("'- 1' removes the intercept and malformed dyad terms give an error", {
+  spec <- get_bison_model_spec((event | effort) ~ dyad(a, b) - 1)
+  expect_equal(spec$node_1_name, "a")
+  expect_false(spec$intercept)
+  expect_error(get_bison_model_spec((event | effort) ~ dyad(a, b) * x), "Couldn't read the formula term")
+})
+
+test_that("prior parameters that must be positive are checked", {
+  expect_error(validate_priors(list(edge = "normal(0, -1)"), "binary"), "must be positive")
+  expect_error(validate_priors(list(edge = "beta(0, 1)"), "binary_conjugate"), "must be positive")
+  expect_error(validate_priors(list(random_std = "half-normal(0)"), "binary"), "must be positive")
+  expect_silent(validate_priors(list(edge = "normal(-3, 1)"), "binary"))
+})

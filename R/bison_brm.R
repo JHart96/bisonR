@@ -13,8 +13,10 @@ utils::globalVariables(c(".imp"))
 #' @param chains Number of chains to run per model.
 #' @param scale How to transform the network variable within each posterior
 #'   draw: `"none"` (default), `"centre"` (subtract the mean) or `"z"` (subtract
-#'   the mean and divide by the standard deviation). Transformations are applied
-#'   across the rows used in the model, separately for each network.
+#'   the mean and divide by the standard deviation). For edge and node metrics,
+#'   transformations are applied across the rows used in the model, separately
+#'   for each network. Global metrics have one value per network, so they are
+#'   transformed across the networks.
 #' @param subset An optional logical expression, evaluated in each data frame,
 #'   selecting the rows to use, e.g. `subset = sex == "F"`. Network metrics are
 #'   still calculated from the whole network; only the rows of the regression
@@ -22,7 +24,7 @@ utils::globalVariables(c(".imp"))
 #' @param ... Additional arguments to be passed to brm(), such as family or priors
 #'
 #' @return A fitted brms model
-#' @examples
+#' @examplesIf requireNamespace("brms", quietly = TRUE) && requireNamespace("mice", quietly = TRUE) && !identical(Sys.getenv("BISONR_TEST_BRMS"), "false")
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 #' df <- sim_data$df_sim
 #' fit_edge <- bison_model(
@@ -89,13 +91,14 @@ bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score
 #' @param formula A formula compatible with a brms model
 #' @param edgemodel_list A bisonR edge model (or a list of them)
 #' @param data_list A dataframe of regression variables compatible with a brms model (or a list of them)
-#' @param scale,subset As for [bison_brm()]. The scale of the network variable
-#'   affects the default priors, so use the same value as in [bison_brm()].
+#' @param scale,subset,z_score As for [bison_brm()]. The scale of the network
+#'   variable affects the default priors, so use the same values as in
+#'   [bison_brm()].
 #' @param ... Additional parameters to be passed to brms::get_prior()
 #'
 #' @return The output from brms::get_prior()
 #'
-#' @examples
+#' @examplesIf requireNamespace("brms", quietly = TRUE) && requireNamespace("mice", quietly = TRUE) && !identical(Sys.getenv("BISONR_TEST_BRMS"), "false")
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 #' df <- sim_data$df_sim
 #' fit_edge <- bison_model(
@@ -111,8 +114,9 @@ bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score
 #' )
 #' @export
 bison_brm_get_prior <- function(formula, edgemodel_list, data_list, scale = c("none", "centre", "z"),
-                                subset = NULL, ...) {
+                                subset = NULL, z_score = FALSE, ...) {
   scale <- match.arg(scale)
+  if (isTRUE(z_score)) scale <- "z"
   check_suggested("brms", "bison_brm_get_prior")
   check_suggested("mice", "bison_brm_get_prior")
   # Parse formula

@@ -10,6 +10,7 @@ bison_brm_get_prior(
   data_list,
   scale = c("none", "centre", "z"),
   subset = NULL,
+  z_score = FALSE,
   ...
 )
 }
@@ -20,8 +21,9 @@ bison_brm_get_prior(
 
 \item{data_list}{A dataframe of regression variables compatible with a brms model (or a list of them)}
 
-\item{scale, subset}{As for \code{\link[=bison_brm]{bison_brm()}}. The scale of the network variable
-affects the default priors, so use the same value as in \code{\link[=bison_brm]{bison_brm()}}.}
+\item{scale, subset, z_score}{As for \code{\link[=bison_brm]{bison_brm()}}. The scale of the network
+variable affects the default priors, so use the same values as in
+\code{\link[=bison_brm]{bison_brm()}}.}
 
 \item{...}{Additional parameters to be passed to brms::get_prior()}
 }
@@ -32,6 +34,7 @@ The output from brms::get_prior()
 Wrapper for brms::get_prior() for use with bison_brm.
 }
 \examples{
+\dontshow{if (requireNamespace("brms", quietly = TRUE) && requireNamespace("mice", quietly = TRUE) && !identical(Sys.getenv("BISONR_TEST_BRMS"), "false")) withAutoprint(\{ # examplesIf}
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 df <- sim_data$df_sim
 fit_edge <- bison_model(
@@ -45,4 +48,5 @@ bison_brm_get_prior(
   fit_edge,
   df
 )
+\dontshow{\}) # examplesIf}
 }

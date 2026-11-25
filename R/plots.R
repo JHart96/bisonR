@@ -8,7 +8,7 @@
 #' @param par_ids Indices of the edge weights to plot.
 #' @param ... Additional arguments passed to [plot()].
 #'
-#' @examples
+#' @examplesIf !is.null(tryCatch(cmdstanr::cmdstan_path(), error = function(e) NULL))
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 #' fit_edge <- bison_model(
 #'   (event | effort) ~ dyad(node_1_id, node_2_id),

@@ -97,3 +97,37 @@ test_that("bison_brm_get_prior accepts subset and scale", {
     "brmsprior"
   )
 })
+
+test_that("bison_mice matches regression rows to nodes and dyads by name, in any order", {
+  skip_if_not_installed("mice")
+  fit <- fake_bison_model(c("A", "B", "C", "D"), rbind(c("A", "B"), c("B", "C"), c("A", "C"), c("C", "D")),
+                          c(0.5, 0.25, 0.1, 0.8))
+  df_nodal <- data.frame(node = c("D", "A", "C", "B"))
+  imputed <- mice::complete(bison_mice(fit, df_nodal, "node", "node", "strength", num_draws = 2), 1)
+  expect_equal(imputed$bison_node_strength, c(0.8, 0.6, 1.15, 0.75))
+
+  # Undirected dyads can be given in either order
+  df_dyadic <- data.frame(n1 = c("D", "B"), n2 = c("C", "A"))
+  imputed <- mice::complete(bison_mice(fit, df_dyadic, c("n1", "n2"), "edge", "weight", num_draws = 2), 1)
+  expect_equal(imputed$bison_edge_weight, qlogis(c(0.8, 0.5)))
+})
+
+test_that("global metrics are scaled across networks and must match the edge models", {
+  skip_if_not_installed("mice")
+  fit_1 <- fake_bison_model(c("A", "B", "C"), rbind(c("A", "B"), c("B", "C")), c(0.2, 0.4))
+  fit_2 <- fake_bison_model(c("A", "B", "C"), rbind(c("A", "B"), c("B", "C")), c(0.6, 0.8))
+  df_global <- data.frame(bison_network = factor(1:2), condition = c("a", "b"))
+  imputed <- mice::complete(
+    bison_mice(list(fit_1, fit_2), df_global, "bison_network", "global", "density", num_draws = 2, scale = "z"), 1
+  )
+  expect_equal(imputed$bison_global_density, c(-1, 1) / sqrt(2))
+
+  expect_error(
+    bison_mice(list(fit_1, fit_2), df_global[1, ], "bison_network", "global", "density", num_draws = 2),
+    "one row of data per edge model"
+  )
+  expect_error(
+    bison_mice(list(fit_1, fit_2), df_global[2:1, ], "bison_network", "global", "density", num_draws = 2),
+    "doesn't match the position"
+  )
+})

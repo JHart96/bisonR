@@ -27,7 +27,9 @@ draw (so each row has mean 0).}
 \item{transform}{Only used for \code{"edge_weight"}. If \code{TRUE} (default), edge
 weights are on the natural scale (probabilities or rates); if \code{FALSE} they're
 on the link scale (logit or log). All other metrics are always calculated
-from natural-scale edge weights.}
+from natural-scale edge weights. In models with an intercept or other
+effects, natural-scale edge weights are for an observation where those
+effects are 0.}
 }
 \value{
 A matrix with one row per posterior draw and one column per target:

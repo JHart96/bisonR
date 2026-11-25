@@ -14,7 +14,9 @@
 #' @param transform Only used for `"edge_weight"`. If `TRUE` (default), edge
 #'   weights are on the natural scale (probabilities or rates); if `FALSE` they're
 #'   on the link scale (logit or log). All other metrics are always calculated
-#'   from natural-scale edge weights.
+#'   from natural-scale edge weights. In models with an intercept or other
+#'   effects, natural-scale edge weights are for an observation where those
+#'   effects are 0.
 #'
 #' @section Available metrics:
 #' All metrics are calculated on the *weighted* network unless they take a
@@ -83,6 +85,13 @@ extract_metric <- function(obj, metric_string, num_draws = 1000, standardise = F
   }
 
   if (standardise) {
+    if (ncol(metric_samples) < 2) {
+      stop(
+        "`standardise = TRUE` centres a metric across nodes or edges within each draw, ",
+        "so it isn't available for global metrics.",
+        call. = FALSE
+      )
+    }
     metric_samples <- metric_samples - rowMeans(metric_samples)
   }
   metric_samples

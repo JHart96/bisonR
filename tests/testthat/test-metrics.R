@@ -80,3 +80,8 @@ test_that("thresholds include edges equal to the threshold", {
   degree <- extract_metric(fit, "node_degree[0.25]", num_draws = 1)
   expect_equal(unname(degree[1, ]), c(1, 2, 2, 1))
 })
+
+test_that("standardise isn't available for global metrics", {
+  fit <- fake_bison_model(nodes, dyads, weights)
+  expect_error(extract_metric(fit, "global_cv", num_draws = 2, standardise = TRUE), "global metrics")
+})

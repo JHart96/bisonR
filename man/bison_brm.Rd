@@ -35,8 +35,10 @@ posterior draw. Equivalent to \code{scale = "z"}.}
 
 \item{scale}{How to transform the network variable within each posterior
 draw: \code{"none"} (default), \code{"centre"} (subtract the mean) or \code{"z"} (subtract
-the mean and divide by the standard deviation). Transformations are applied
-across the rows used in the model, separately for each network.}
+the mean and divide by the standard deviation). For edge and node metrics,
+transformations are applied across the rows used in the model, separately
+for each network. Global metrics have one value per network, so they are
+transformed across the networks.}
 
 \item{subset}{An optional logical expression, evaluated in each data frame,
 selecting the rows to use, e.g. \code{subset = sex == "F"}. Network metrics are
@@ -52,6 +54,7 @@ A fitted brms model
 Fit a brms model on BISoN network data
 }
 \examples{
+\dontshow{if (requireNamespace("brms", quietly = TRUE) && requireNamespace("mice", quietly = TRUE) && !identical(Sys.getenv("BISONR_TEST_BRMS"), "false")) withAutoprint(\{ # examplesIf}
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 df <- sim_data$df_sim
 fit_edge <- bison_model(
@@ -69,4 +72,5 @@ fit_dyadic <- bison_brm(
   num_draws = 5 # Use more (e.g. 100) in a real analysis
 )
 summary(fit_dyadic)
+\dontshow{\}) # examplesIf}
 }

@@ -14,7 +14,7 @@
 #'   each model.
 #'
 #' @return The model weights returned by [loo::loo_model_weights()].
-#' @examples
+#' @examplesIf !is.null(tryCatch(cmdstanr::cmdstan_path(), error = function(e) NULL))
 #' # Test for non-random edge weights by comparing a model with edge weights
 #' # against a null model where every dyad has the same rate of events.
 #' sim_data <- simulate_bison_model("binary", aggregated = FALSE)

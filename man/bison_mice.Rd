@@ -42,6 +42,7 @@ A mice mids object
 Generate a mice mids object
 }
 \examples{
+\dontshow{if (requireNamespace("brms", quietly = TRUE) && requireNamespace("mice", quietly = TRUE) && !identical(Sys.getenv("BISONR_TEST_BRMS"), "false")) withAutoprint(\{ # examplesIf}
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 df <- sim_data$df_sim
 fit_edge <- bison_model(
@@ -54,4 +55,5 @@ fit_edge <- bison_model(
 df_nodal <- data.frame(node = levels(df$node_1_id))
 imputed <- bison_mice(fit_edge, df_nodal, "node", "node", "strength", num_draws = 5)
 head(mice::complete(imputed, 1))
+\dontshow{\}) # examplesIf}
 }

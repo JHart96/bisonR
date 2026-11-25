@@ -147,3 +147,35 @@ test_that("random effects are centred on zero", {
   intercept <- fit_random$fit$draws("beta_fixed", format = "matrix")
   expect_equal(plogis(median(intercept)), mean(df$event), tolerance = 0.15)
 })
+
+test_that("zero-inflated log-likelihoods match a calculation by hand", {
+  skip_if_no_cmdstan()
+  skip_on_cran()
+  set.seed(9)
+  sim <- simulate_bison_model("binary", aggregated = TRUE)
+  fit <- quiet(bison_model((event | effort) ~ dyad(node_1_id, node_2_id), sim$df_sim, "binary",
+                           zero_inflated = TRUE, priors = get_default_priors("binary"),
+                           iter_sampling = 100, seed = 1))
+  draws <- fit$fit$draws(c("edge_weight", "zero_prob", "log_lik"), format = "matrix")
+  d <- 1
+  p <- plogis(as.numeric(draws[d, grep("^edge_weight", colnames(draws))]))[fit$model_data$dyad_ids]
+  zp <- as.numeric(draws[d, "zero_prob[1]"])
+  ev <- fit$model_data$event
+  n <- fit$model_data$divisor
+  by_hand <- ifelse(ev == 0,
+                    log(zp + (1 - zp) * dbinom(0, n, p)),
+                    log(1 - zp) + dbinom(ev, n, p, log = TRUE))
+  expect_equal(as.numeric(draws[d, grep("^log_lik", colnames(draws))]), by_hand, tolerance = 1e-6)
+})
+
+test_that("zero inflation with one sampling period per row gives a warning", {
+  skip_if_no_cmdstan()
+  skip_on_cran()
+  sim <- simulate_bison_model("binary", aggregated = FALSE)
+  expect_warning(
+    quiet(bison_model((event | effort) ~ dyad(node_1_id, node_2_id), sim$df_sim, "binary",
+                      zero_inflated = TRUE, priors = get_default_priors("binary"),
+                      iter_sampling = 50, iter_warmup = 50, seed = 1)),
+    "one sampling period per row"
+  )
+})

@@ -14,6 +14,11 @@ split_plus <- function(expr) {
   if (is.call(expr) && identical(expr[[1]], as.name("+")) && length(expr) == 3) {
     return(c(split_plus(expr[[2]]), split_plus(expr[[3]])))
   }
+  # "- 1" removes the intercept, as in other R formulas.
+  if (is.call(expr) && identical(expr[[1]], as.name("-")) && length(expr) == 3 &&
+      identical(expr[[3]], 1)) {
+    return(c(split_plus(expr[[2]]), list(0)))
+  }
   list(expr)
 }
 
@@ -87,6 +92,12 @@ get_bison_model_spec <- function(formula) {
     } else if (is.call(inner) && identical(inner[[1]], as.name("|")) && length(inner) == 3 &&
                identical(inner[[2]], 1) && is.name(inner[[3]])) {
       model_spec$random <- c(model_spec$random, as.character(inner[[3]]))
+    } else if (grepl("dyad(", deparse1(term), fixed = TRUE)) {
+      stop(
+        "Couldn't read the formula term \"", deparse1(term), "\". Terms are combined with `+`, ",
+        "e.g. (event | effort) ~ dyad(node_1, node_2) + x.",
+        call. = FALSE
+      )
     } else {
       warning(
         "Formula term \"", deparse1(term), "\" not supported by bisonR and will be ignored. ",
@@ -97,6 +108,17 @@ get_bison_model_spec <- function(formula) {
   }
 
   model_spec
+}
+
+# Sort node names: numerically if every name is a number (so 2 comes before 10),
+# otherwise alphabetically in a locale-independent (C) order, so results don't
+# depend on the computer's language settings.
+sort_node_names <- function(names) {
+  as_numbers <- suppressWarnings(as.numeric(names))
+  if (!anyNA(as_numbers)) {
+    return(names[order(as_numbers)])
+  }
+  sort(names, method = "radix")
 }
 
 # Map pairs of node indices to dyad IDs.
@@ -201,16 +223,21 @@ get_bison_model_data <- function(formula, observations, directed, model_type) {
     node_1_names <- observations[[model_spec$node_1_name]]
     node_2_names <- observations[[model_spec$node_2_name]]
 
-    # Work out the set of nodes. If both columns are factors, their levels are
-    # used (so unobserved nodes are kept); otherwise the observed names are used.
-    if (is.factor(node_1_names) && is.factor(node_2_names)) {
-      if (identical(levels(node_1_names), levels(node_2_names))) {
-        node_levels <- levels(node_1_names)
-      } else {
-        node_levels <- sort(union(levels(node_1_names), levels(node_2_names)))
-      }
+    # Work out the set of nodes. If both columns are factors with the same
+    # levels, the levels (and their order) are used, so unobserved nodes are kept.
+    # Otherwise the nodes are the factor levels of either column plus the
+    # observed names, sorted with sort_node_names().
+    if (is.factor(node_1_names) && is.factor(node_2_names) &&
+        identical(levels(node_1_names), levels(node_2_names))) {
+      node_levels <- levels(node_1_names)
     } else {
-      node_levels <- sort(unique(c(as.character(node_1_names), as.character(node_2_names))))
+      factor_levels <- c(
+        if (is.factor(node_1_names)) levels(node_1_names),
+        if (is.factor(node_2_names)) levels(node_2_names)
+      )
+      node_levels <- sort_node_names(unique(c(
+        factor_levels, as.character(node_1_names), as.character(node_2_names)
+      )))
     }
     node_1_factor <- factor(as.character(node_1_names), levels = node_levels)
     node_2_factor <- factor(as.character(node_2_names), levels = node_levels)

@@ -254,8 +254,18 @@ validate_priors <- function(priors, model_type) {
       )
     }
     expected_params <- if (allowed[[name]] == "half-normal") 1 else 2
-    if (length(dist$parameter_values) != expected_params || anyNA(dist$parameter_values)) {
+    values <- dist$parameter_values
+    if (length(values) != expected_params || anyNA(values)) {
       stop("Couldn't read the parameters of the `", name, "` prior \"", priors[[name]], "\".", call. = FALSE)
+    }
+    # Scale and shape parameters must be positive (the normal mean can be anything).
+    positive <- if (allowed[[name]] == "normal") values[2] else values
+    if (any(positive <= 0)) {
+      stop(
+        "The `", name, "` prior \"", priors[[name]], "\" has a parameter that must be positive ",
+        "(a standard deviation, scale or shape).",
+        call. = FALSE
+      )
     }
   }
   priors[names(defaults)]

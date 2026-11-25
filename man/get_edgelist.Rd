@@ -13,7 +13,9 @@ get_edgelist(obj, ci = 0.9, transform = TRUE)
 
 \item{transform}{If \code{TRUE} (the default), edge weights are on the natural
 scale (probabilities for binary models, rates for count models). If \code{FALSE},
-they're on the internal link scale (logit or log).}
+they're on the internal link scale (logit or log).
+In models with an intercept or other effects, the natural-scale values are
+for an observation where those effects are 0.}
 }
 \value{
 A data frame with one row per dyad and columns \code{node_1}, \code{node_2},

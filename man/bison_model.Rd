@@ -42,7 +42,11 @@ undirected networks, rows for A-B and B-A refer to the same dyad.}
 \item{partial_pooling}{Whether to estimate the spread of edge weights from the
 data, so that information is shared between edges.}
 
-\item{zero_inflated}{Whether to use a zero-inflated model for excess zeroes.}
+\item{zero_inflated}{Whether to use a zero-inflated model for excess zeroes.
+Zero inflation applies to each row of the data: each row has probability
+\code{zero_prob} of being a structural zero. For binary data with one sampling
+period per row this can't be separated from the edge weights, so aggregate
+the data first.}
 
 \item{priors}{A list of priors, in the format returned by \code{\link[=get_default_priors]{get_default_priors()}}.}
 
@@ -88,10 +92,14 @@ needs an intercept (\code{1}) to set the overall rate of events.
 
 Including other terms changes the interpretation of the edge weights, which
 then represent each dyad's tendency to interact after controlling for those
-effects.
+effects. On the natural scale (e.g. in \code{\link[=get_edgelist]{get_edgelist()}} and \code{\link[=extract_metric]{extract_metric()}}),
+they are the probability or rate for an observation in which the other effects
+(and any intercept) are 0, so continuous predictors may be easier to interpret
+if they are centred.
 }
 
 \examples{
+\dontshow{if (!is.null(tryCatch(cmdstanr::cmdstan_path(), error = function(e) NULL))) withAutoprint(\{ # examplesIf}
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 df <- sim_data$df_sim
 
@@ -111,6 +119,7 @@ fit_edge <- bison_model(
   model_type = "binary",
   priors = get_default_priors("binary")
 )
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link[=get_default_priors]{get_default_priors()}}, \code{\link[=prior_check]{prior_check()}}, \code{\link[=summary.bison_model]{summary.bison_model()}}

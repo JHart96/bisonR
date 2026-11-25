@@ -20,6 +20,10 @@
 #' @param partial_pooling Whether to estimate the spread of edge weights from the
 #'   data, so that information is shared between edges.
 #' @param zero_inflated Whether to use a zero-inflated model for excess zeroes.
+#'   Zero inflation applies to each row of the data: each row has probability
+#'   `zero_prob` of being a structural zero. For binary data with one sampling
+#'   period per row this can't be separated from the edge weights, so aggregate
+#'   the data first.
 #' @param priors A list of priors, in the format returned by [get_default_priors()].
 #' @param refresh How often the sampler prints progress (0 for silent).
 #' @param mc_cores Number of chains to run in parallel.
@@ -43,7 +47,10 @@
 #'
 #' Including other terms changes the interpretation of the edge weights, which
 #' then represent each dyad's tendency to interact after controlling for those
-#' effects.
+#' effects. On the natural scale (e.g. in [get_edgelist()] and [extract_metric()]),
+#' they are the probability or rate for an observation in which the other effects
+#' (and any intercept) are 0, so continuous predictors may be easier to interpret
+#' if they are centred.
 #'
 #' @return A `bison_model` object. Use [summary.bison_model()] or [get_edgelist()] to see the
 #'   edge weights, [plot_network()] to visualise them, [plot_trace()] and
@@ -52,7 +59,7 @@
 #'
 #' @seealso [get_default_priors()], [prior_check()], [summary.bison_model()]
 #'
-#' @examples
+#' @examplesIf !is.null(tryCatch(cmdstanr::cmdstan_path(), error = function(e) NULL))
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 #' df <- sim_data$df_sim
 #'
@@ -119,6 +126,16 @@ bison_model <- function(formula, data,
   model_data$priors_only <- as.integer(priors_only)
   model_data$partial_pooling <- as.integer(partial_pooling)
   model_data$zero_inflated <- as.integer(zero_inflated)
+
+  if (zero_inflated && model_type == "binary" && all(model_data$divisor <= 1)) {
+    warning(
+      "Zero inflation is applied to each row of the data. With one sampling period per row, ",
+      "a structural zero can't be distinguished from a lower edge weight, so zero_prob and ",
+      "the edge weights are only separated by their priors. Consider aggregating the data ",
+      "(e.g. to one row per dyad) before using zero_inflated = TRUE.",
+      call. = FALSE
+    )
+  }
 
   if (use_conjugate_model) {
     model <- fit_conjugate_model(
@@ -239,6 +256,8 @@ print.bison_model <- function(x, ...) {
 #' @param transform If `TRUE` (the default), edge weights are reported on the
 #'   natural scale (probabilities for binary models, rates for count models).
 #'   If `FALSE`, they're on the internal link scale (logit or log).
+#'   In models with an intercept or other effects, the natural-scale values are
+#'   for an observation where those effects are 0.
 #' @param ... Not used.
 #'
 #' @return A `summary.bison_model` object. Printing it shows, for each dyad, the
@@ -298,6 +317,8 @@ print.summary.bison_model <- function(x, ...) {
 #' @param transform If `TRUE` (the default), edge weights are on the natural
 #'   scale (probabilities for binary models, rates for count models). If `FALSE`,
 #'   they're on the internal link scale (logit or log).
+#'   In models with an intercept or other effects, the natural-scale values are
+#'   for an observation where those effects are 0.
 #'
 #' @return A data frame with one row per dyad and columns `node_1`, `node_2`,
 #'   `median`, and the lower and upper bounds of the credible interval (named
