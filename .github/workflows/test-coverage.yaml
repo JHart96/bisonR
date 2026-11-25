@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [main, 'release/**']
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -27,11 +27,20 @@ jobs:
           extra-packages: any::covr, any::xml2
           needs: coverage
 
-      - name: Cache CmdStan
-        uses: actions/cache@v4
+      - name: Set R user cache directory
+        shell: bash
+        run: echo "R_USER_CACHE_DIR=$RUNNER_TEMP/r-user-cache" >> "$GITHUB_ENV"
+
+      - name: Restore CmdStan and compiled models
+        id: stan-cache
+        uses: actions/cache/restore@v4
         with:
-          path: ~/.cmdstan
-          key: cmdstan-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-release
+          path: |
+            ~/.cmdstan
+            ${{ runner.temp }}/r-user-cache
+          key: stan-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-release-${{ hashFiles('inst/stan/*.stan') }}
+          restore-keys: |
+            stan-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-release-
 
       - name: Install CmdStan
         shell: Rscript {0}
@@ -47,6 +56,15 @@ jobs:
             install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package"))
           print(cov)
           covr::to_cobertura(cov)
+
+      - name: Save CmdStan and compiled models
+        if: always() && steps.stan-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/.cmdstan
+            ${{ runner.temp }}/r-user-cache
+          key: stan-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-release-${{ hashFiles('inst/stan/*.stan') }}
 
       - uses: codecov/codecov-action@v4
         with:

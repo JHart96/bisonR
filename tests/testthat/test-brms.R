@@ -1,5 +1,6 @@
 test_that("bison_brm fits dyadic, nodal and global regressions", {
   skip_if_not_installed("brms")
+  skip_if_brms_disabled()
   skip_if_not_installed("mice")
   skip_if_no_cmdstan()
   skip_on_cran()
@@ -50,6 +51,7 @@ test_that("bison_brm fits dyadic, nodal and global regressions", {
 
 test_that("bison_brm gives clear errors for mismatched data", {
   skip_if_not_installed("brms")
+  skip_if_brms_disabled()
   skip_if_not_installed("mice")
   sim <- simulate_bison_model("binary", aggregated = TRUE)
   fit_edge <- bison_model((event | duration) ~ dyad(node_1_id, node_2_id), sim$df_sim,
@@ -83,6 +85,7 @@ test_that("network variables can be centred or standardised", {
 
 test_that("bison_brm_get_prior accepts subset and scale", {
   skip_if_not_installed("brms")
+  skip_if_brms_disabled()
   skip_if_not_installed("mice")
   sim <- simulate_bison_model("binary", aggregated = TRUE)
   fit_edge <- bison_model((event | effort) ~ dyad(node_1_id, node_2_id), sim$df_sim,

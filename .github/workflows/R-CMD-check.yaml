@@ -1,8 +1,14 @@
 # R CMD check on all three major platforms.
-# Runs on every push to main or a release/feature branch, and on every pull request.
+#
+# Runs on pull requests, and on pushes to main and feature/fix branches.
+# Release branches are checked through their pull request rather than on every
+# push, so the matrix doesn't run twice per commit.
+#
+# Articles (vignettes) are not rebuilt here: the pkgdown workflow renders every
+# article on each pull request. brms-based tests run on Linux (release) only.
 on:
   push:
-    branches: [main, 'release/**', 'feature/**', 'fix/**']
+    branches: [main, 'feature/**', 'fix/**']
   pull_request:
   workflow_dispatch:
 
@@ -23,10 +29,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest,   r: 'release'}
-          - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest,  r: 'release'}
-          - {os: ubuntu-latest,  r: 'oldrel-1'}
+          - {os: macos-latest,   r: 'release',  brms: 'false'}
+          - {os: windows-latest, r: 'release',  brms: 'false'}
+          - {os: ubuntu-latest,  r: 'release',  brms: 'true'}
+          - {os: ubuntu-latest,  r: 'oldrel-1', brms: 'false'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -35,6 +41,7 @@ jobs:
       # the CRAN submission checks, which would otherwise always warn.
       _R_CHECK_CRAN_INCOMING_: false
       CMDSTAN_VERSION: "2.36.0"
+      BISONR_TEST_BRMS: ${{ matrix.config.brms }}
 
     steps:
       - uses: actions/checkout@v4
@@ -51,21 +58,44 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
-      - name: Cache CmdStan
-        uses: actions/cache@v4
+      # Compiled bisonR Stan models are stored in tools::R_user_dir(), which
+      # follows R_USER_CACHE_DIR, so they can be cached between runs.
+      - name: Set R user cache directory
+        shell: bash
+        run: echo "R_USER_CACHE_DIR=$RUNNER_TEMP/r-user-cache" >> "$GITHUB_ENV"
+
+      - name: Restore CmdStan and compiled models
+        id: stan-cache
+        uses: actions/cache/restore@v4
         with:
-          path: ~/.cmdstan
-          key: cmdstan-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ matrix.config.r }}
+          path: |
+            ~/.cmdstan
+            ${{ runner.temp }}/r-user-cache
+          key: stan-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ matrix.config.r }}-${{ hashFiles('inst/stan/*.stan') }}
+          restore-keys: |
+            stan-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ matrix.config.r }}-
 
       - name: Install CmdStan
         shell: Rscript {0}
         run: |
-          cmdstanr::check_cmdstan_toolchain(fix = TRUE)
           if (is.null(tryCatch(cmdstanr::cmdstan_path(), error = function(e) NULL))) {
+            cmdstanr::check_cmdstan_toolchain(fix = TRUE)
             cmdstanr::install_cmdstan(version = Sys.getenv("CMDSTAN_VERSION"), cores = 2)
           }
 
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
-          build_args: 'c("--no-manual", "--compact-vignettes=gs+qpdf")'
+          build_args: 'c("--no-manual", "--no-build-vignettes")'
+          args: 'c("--no-manual", "--as-cran", "--ignore-vignettes")'
+
+      # Saved even if the check fails or is cancelled, so later runs don't have
+      # to rebuild CmdStan or recompile the models.
+      - name: Save CmdStan and compiled models
+        if: always() && steps.stan-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/.cmdstan
+            ${{ runner.temp }}/r-user-cache
+          key: stan-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ matrix.config.r }}-${{ hashFiles('inst/stan/*.stan') }}

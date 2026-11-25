@@ -34,3 +34,9 @@ fake_bison_model <- function(nodes, dyads, weights, directed = FALSE, num_draws 
   class(obj) <- "bison_model"
   obj
 }
+
+# brms models are slow to compile, so CI runs the brms tests on one platform
+# only (BISONR_TEST_BRMS = "false" elsewhere).
+skip_if_brms_disabled <- function() {
+  testthat::skip_if(identical(Sys.getenv("BISONR_TEST_BRMS"), "false"), "brms tests disabled on this platform")
+}
