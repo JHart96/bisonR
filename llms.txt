@@ -1,0 +1,184 @@
+# bisonR - An R package for Bayesian Inference of Social Networks
+
+![](reference/figures/hex.svg)
+
+**This package is still in continuous development and has not yet been
+fully tested. Please let us know if you encounter any unexpected
+behaviour.**
+
+bisonR is an R package implementing the BISoN framework for conducting
+Bayesian analysis of social networks. BISoN estimates uncertainty over
+edge weights in social networks from empirical data (such as
+observations) and builds networks with uncertainty. The networks can
+then be visualised *with* uncertainty and analysed with a fully Bayesian
+methodology.
+
+## Quick Start
+
+To get started with the package use the code below:
+
+``` r
+
+library(bisonR)
+
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+df <- sim_data$df_sim
+
+priors <- get_default_priors("binary")
+
+fit_edge <- bison_model(
+  (event | duration) ~ dyad(node_1_id, node_2_id), 
+  data=df, 
+  model_type="binary",
+  priors=priors
+)
+
+summary(fit_edge)
+```
+
+This will fit a basic edge model model to simulated data and generate an
+output like this below:
+
+    === Fitted BISoN edge model ===
+    Data type: binary
+    Formula: (event | duration) ~ dyad(node_1_id, node_2_id)
+    Number of nodes: 10
+    Number of dyads: 45
+    Directed: FALSE
+    === Edge list summary ===
+             median    5%   95%
+    1 <-> 2   0.156 0.014 0.530
+    1 <-> 3   0.702 0.219 0.973
+    2 <-> 3   0.793 0.356 0.982
+    ...
+
+For a more detailed example check out the *Getting Started* page here:
+<https://bisonr.org/articles/getting_started.html>.
+
+## Installation
+
+### Installing CmdStanR
+
+The bisonR package is written in R, but uses the Stan programming
+language to fit Bayesian models. Stan is a separate program, and
+interfaces with bisonR using an R package called cmdstanR. Stan and
+cmdstanR are installed in a different way to standard R packages, so
+require a specific series of installation steps.
+
+On Windows, before proceeding you may need to install the version of
+Rtools appropriate for your version of R. Rtools can be found here:
+<https://cran.r-project.org/bin/windows/Rtools/>.
+
+The full instructions to install cmdstanR can be found at
+<https://mc-stan.org/cmdstanr/>. We’ve found that the following steps
+often work, but depending on your operating system and version of R, the
+process may be more involved.
+
+``` r
+
+install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+library(cmdstanr)
+check_cmdstan_toolchain(fix = TRUE, quiet = TRUE)
+install_cmdstan() # On networked PCs, specify a local directory here with the argument dir=path_to_local_directory
+```
+
+### Installing bisonR
+
+bisonR isn’t currently on CRAN, but it can be installed from GitHub. To
+do this, make sure you have the `remotes` package installed. Then run
+the following command:
+
+``` r
+
+remotes::install_github("JHart96/bisonR")
+```
+
+#### Development version
+
+If you want to install the latest development version, bugs and all, you
+can install from the development branch. This option is not recommended
+for standard users.
+
+``` r
+
+remotes::install_github("JHart96/bisonR@dev")
+```
+
+# Package index
+
+## All functions
+
+- [`bisonR-package`](https://bisonr.org/reference/bisonR-package.md)
+  [`bisonR`](https://bisonr.org/reference/bisonR-package.md) : The
+  'bisonR' package.
+- [`bison_brm()`](https://bisonr.org/reference/bison_brm.md) : Fit a
+  brms model on BISoN network data
+- [`bison_brm_get_prior()`](https://bisonr.org/reference/bison_brm_get_prior.md)
+  : Get priors for BISoN brm model
+- [`bison_mice()`](https://bisonr.org/reference/bison_mice.md) :
+  Generate a mice mids object
+- [`bison_mixture()`](https://bisonr.org/reference/bison_mixture.md) :
+  Fit a dyadic mixture model
+- [`bison_model()`](https://bisonr.org/reference/bison_model.md) : Fit
+  an edge model to data
+- [`bison_to_igraph()`](https://bisonr.org/reference/bison_to_igraph.md)
+  : Convert bisonR edgemodel posterior to igraph network objects
+- [`convert_duration_to_binary()`](https://bisonr.org/reference/convert_duration_to_binary.md)
+  : Convert duration data to binary
+- [`convert_gbi_to_bison()`](https://bisonr.org/reference/convert_gbi_to_bison.md)
+  : Convert group-by-individual matrix to bisonR format
+- [`draw_edgelist_samples()`](https://bisonr.org/reference/draw_edgelist_samples.md)
+  : Draw samples from edgelist posterior
+- [`extract_metric()`](https://bisonr.org/reference/extract_metric.md) :
+  Extract samples from posterior metrics for a fitted edge weight model
+- [`get_component_means()`](https://bisonr.org/reference/get_component_means.md)
+  : Get component means from edge mixture model
+- [`get_default_priors()`](https://bisonr.org/reference/get_default_priors.md)
+  : Return default priors for a given model
+- [`get_edge_component_probabilities()`](https://bisonr.org/reference/get_edge_component_probabilities.md)
+  : Get probabilities of component membership for each edge
+- [`get_edgelist()`](https://bisonr.org/reference/get_edgelist.md) :
+  Retrieves an edgelist with uncertainty for a fitted edge weight model
+  object
+- [`get_network_component_probabilities()`](https://bisonr.org/reference/get_network_component_probabilities.md)
+  : Get probabilities of component membership for the entire network
+- [`model_comparison()`](https://bisonr.org/reference/model_comparison.md)
+  : Run leave-one-out model comparison
+- [`plot_metric()`](https://bisonr.org/reference/plot_metric.md) : Plot
+  metric samples
+- [`plot_network()`](https://bisonr.org/reference/plot_network.md) :
+  Sociogram plot with uncertainty of a fitted edge weight model object
+- [`plot_predictions()`](https://bisonr.org/reference/plot_predictions.md)
+  : Posterior predictive checks
+- [`plot_trace()`](https://bisonr.org/reference/plot_trace.md) :
+  Traceplot of MCMC chains
+- [`print(`*`<summary.bison_mixture>`*`)`](https://bisonr.org/reference/print.summary.bison_mixture.md)
+  : Print information about an edge mixture model
+- [`print(`*`<summary.bison_model>`*`)`](https://bisonr.org/reference/print.summary.bison_model.md)
+  : Prints out an edge model summary object.
+- [`prior_check()`](https://bisonr.org/reference/prior_check.md) : Prior
+  checks
+- [`prior_predictive_check()`](https://bisonr.org/reference/prior_predictive_check.md)
+  : Run prior predictive check for a model specification
+- [`simulate_bison_model()`](https://bisonr.org/reference/simulate_bison_model.md)
+  : Simulates data
+- [`simulate_bison_model_mixture()`](https://bisonr.org/reference/simulate_bison_model_mixture.md)
+  : Simulate data for an edge model with mixture components
+- [`summary(`*`<bison_mixture>`*`)`](https://bisonr.org/reference/summary.bison_mixture.md)
+  : Summary of a edge mixture model
+- [`summary(`*`<bison_model>`*`)`](https://bisonr.org/reference/summary.bison_model.md)
+  : Generates a summary object for an edge model object
+
+# Articles
+
+### bisonR
+
+- [Getting started](https://bisonr.org/articles/getting_started.md):
+- [Using brms with BISoN](https://bisonr.org/articles/bison_brms.md):
+- [Edge mixture models](https://bisonr.org/articles/mixture_models.md):
+- [Network metrics](https://bisonr.org/articles/network_metrics.md):
+
+### Help
+
+- [Installing cmdstanR on
+  Windows](https://bisonr.org/articles/windows_installation.md):
