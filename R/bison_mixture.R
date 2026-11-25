@@ -23,7 +23,6 @@
 #'   [get_edge_component_probabilities()], [get_component_means()]
 #'
 #' @examples
-#' \donttest{
 #' sim_data <- simulate_bison_model_mixture(
 #'   "binary", num_components = 2, component_weights = c(0.5, 0.5)
 #' )
@@ -35,7 +34,6 @@
 #' )
 #' fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
 #' summary(fit_mixture)
-#' }
 #' @export
 bison_mixture <- function(edgemodel, num_components = 5, criterion = c("ICL", "BIC"),
                           verbose = TRUE, num_draws = 200) {
@@ -113,7 +111,6 @@ bison_mixture <- function(edgemodel, num_components = 5, criterion = c("ICL", "B
 #'
 #' @return Returns a summary object of an edge mixture model.
 #' @examples
-#' \donttest{
 #' sim_data <- simulate_bison_model_mixture(
 #'   "count", num_components = 2, component_weights = c(0.5, 0.5)
 #' )
@@ -125,7 +122,6 @@ bison_mixture <- function(edgemodel, num_components = 5, criterion = c("ICL", "B
 #' )
 #' fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
 #' summary(fit_mixture)
-#' }
 #' @export
 summary.bison_mixture <- function(object, ...) {
   summary_obj <- list()
@@ -205,7 +201,6 @@ mixture_transform <- function(object, samples) {
 #'
 #' @return Dataframe summarising edge component probabilities for each edge
 #' @examples
-#' \donttest{
 #' sim_data <- simulate_bison_model_mixture(
 #'   "count", num_components = 2, component_weights = c(0.5, 0.5)
 #' )
@@ -217,7 +212,6 @@ mixture_transform <- function(object, samples) {
 #' )
 #' fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
 #' head(get_edge_component_probabilities(fit_mixture, 2))
-#' }
 #' @export
 get_edge_component_probabilities <- function(object, num_components) {
   node_names <- names(object$edgemodel$node_to_idx)
@@ -242,7 +236,6 @@ get_edge_component_probabilities <- function(object, num_components) {
 #'
 #' @return A dataframe of probabilities of numbers of components over the entire network
 #' @examples
-#' \donttest{
 #' sim_data <- simulate_bison_model_mixture(
 #'   "count", num_components = 2, component_weights = c(0.5, 0.5)
 #' )
@@ -254,7 +247,6 @@ get_edge_component_probabilities <- function(object, num_components) {
 #' )
 #' fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
 #' get_network_component_probabilities(fit_mixture)
-#' }
 #' @export
 get_network_component_probabilities <- function(object) {
   num_components <- length(object$component_probabilities)
@@ -270,7 +262,6 @@ get_network_component_probabilities <- function(object) {
 #'
 #' @return A dataframe describing the posteriors of the component means
 #' @examples
-#' \donttest{
 #' sim_data <- simulate_bison_model_mixture(
 #'   "count", num_components = 2, component_weights = c(0.5, 0.5)
 #' )
@@ -282,7 +273,6 @@ get_network_component_probabilities <- function(object) {
 #' )
 #' fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
 #' get_component_means(fit_mixture, 2)
-#' }
 #' @export
 get_component_means <- function(object, num_components, ci=0.90) {
   lb_prob <- 0.5 * (1 - ci)

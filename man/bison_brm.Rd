@@ -39,7 +39,6 @@ A fitted brms model
 Fit a brms model on BISoN network data
 }
 \examples{
-\donttest{
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 df <- sim_data$df_sim
 fit_edge <- bison_model(
@@ -57,5 +56,4 @@ fit_dyadic <- bison_brm(
   num_draws = 5 # Use more (e.g. 100) in a real analysis
 )
 summary(fit_dyadic)
-}
 }

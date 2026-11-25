@@ -1,34 +1,33 @@
 <div class="bison-hero">
 <div class="bison-hero-text">
-<p class="bison-eyebrow">bisonR · Bayesian Inference of Social Networks</p>
-<h2 class="bison-title">Social networks, with honest uncertainty</h2>
-<p class="bison-lead">bisonR estimates animal social networks from observation data, so a pair seen together twice isn't treated as confidently as a pair seen together two hundred times. That uncertainty flows through to everything you do next: plots, network metrics, regressions and comparisons between networks.</p>
+<h2 class="bison-title">bisonR</h2>
+<p class="bison-subtitle">Bayesian inference of animal social networks in R</p>
+<p class="bison-lead">bisonR implements the BISoN framework (Hart et al. 2023). Edge weights are estimated from observation data as posterior distributions, so the precision of each estimate reflects how much the dyad was sampled. These posteriors can then be used in network metrics, regression models and comparisons between networks.</p>
 <div class="bison-actions">
-<a class="btn btn-primary btn-lg" href="articles/getting_started.html">Get started</a>
-<a class="btn btn-outline-primary btn-lg" href="#installation">Install</a>
+<a class="btn btn-primary" href="articles/getting_started.html">Getting started</a>
+<a class="btn btn-outline-primary" href="reference/index.html">Function reference</a>
 </div>
 </div>
 <div class="bison-hero-figure">
-<img src="hero-network.png" alt="A social network drawn by bisonR. Each edge has a dark line showing the lower bound of its weight and a lighter band showing the upper bound." />
-<p class="bison-figure-caption">Dark lines show how weak each edge could be; light bands show how strong.</p>
+<img src="hero-network.png" alt="A network plotted with plot_network(). Each edge has a dark line for the lower bound of its credible interval and a lighter band for the upper bound." />
 </div>
 </div>
 
 <div class="bison-features">
 <div class="bison-feature">
-<h3>Estimate edges from raw data</h3>
-<p>Fit binary or count edge models to observations, with sampling effort, fixed and random effects, partial pooling and zero inflation. Fast conjugate models give exact answers in seconds.</p>
-<a href="articles/preparing_data.html">Preparing your data →</a>
+<h3>Edge weight models</h3>
+<p>Binary and count models of social events with observation effort, optional fixed and random effects, partial pooling and zero inflation. Conjugate models are available for simple cases.</p>
+<a href="articles/preparing_data.html">Preparing data</a>
 </div>
 <div class="bison-feature">
-<h3>Check and visualise</h3>
-<p>Trace plots, posterior predictive checks and network plots that show the uncertainty in every edge, so you can see what the data do and don't tell you.</p>
-<a href="reference/plot_network.html">Plotting networks →</a>
+<h3>Diagnostics and plots</h3>
+<p>MCMC trace plots, prior and posterior predictive checks, and network plots that display the credible interval of each edge.</p>
+<a href="reference/plot_predictions.html">Predictive checks</a>
 </div>
 <div class="bison-feature">
-<h3>Analyse with uncertainty</h3>
-<p>Calculate posterior distributions of network metrics, and fit dyadic, nodal and network-level regressions with brms, without throwing away the uncertainty in the network.</p>
-<a href="articles/bison_brms.html">Regression with brms →</a>
+<h3>Downstream analyses</h3>
+<p>Posterior distributions of node and network metrics, dyadic and nodal regression with brms, edge mixture models and non-random association tests.</p>
+<a href="articles/bison_brms.html">Regression with brms</a>
 </div>
 </div>
 

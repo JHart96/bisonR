@@ -61,7 +61,7 @@ blockquote {
 main img {
   border-radius: 0.6rem;
 }
-[data-bs-theme="dark"] main img:not([src$="logo.svg"]) {
+[data-bs-theme="dark"] main img:not([src$="logo.svg"]):not([src$="hero-network.png"]) {
   filter: none !important;
   background: #fbfaf7;
   padding: 0.5rem;
@@ -89,24 +89,22 @@ main img {
   margin: 1.5rem 0 3rem;
 }
 
-.bison-eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: $bison-teal;
-  margin-bottom: 0.75rem;
+.bison-title {
+  font-size: clamp(2.2rem, 4vw, 2.9rem);
+  line-height: 1.1;
+  margin-bottom: 0.35rem;
 }
 
-.bison-title {
-  font-size: clamp(2.1rem, 4.2vw, 3.2rem);
-  line-height: 1.1;
-  margin-bottom: 1.1rem;
+.bison-subtitle {
+  font-family: $headings-font-family;
+  font-size: 1.25rem;
+  font-style: italic;
+  color: var(--bs-secondary-color);
+  margin-bottom: 1.25rem;
 }
 
 .bison-lead {
-  font-size: 1.15rem;
-  color: var(--bs-secondary-color);
+  font-size: 1.05rem;
   max-width: 38rem;
 }
 
@@ -115,23 +113,11 @@ main img {
   flex-wrap: wrap;
   gap: 0.75rem;
   margin-top: 1.6rem;
-  .btn { border-radius: 999px; padding-left: 1.4rem; padding-right: 1.4rem; font-weight: 600; }
+  .btn { padding-left: 1.1rem; padding-right: 1.1rem; font-weight: 500; }
 }
 
 .bison-hero-figure {
-  background: radial-gradient(circle at 30% 20%, #ffffff 0%, #eef5f4 70%);
-  border: 1px solid #dfe9e7;
-  border-radius: 1.25rem;
-  padding: 1.25rem;
-  box-shadow: 0 18px 40px -24px rgba($bison-ink, 0.35);
   img { width: 100%; height: auto; display: block; background: none; padding: 0; }
-}
-
-.bison-figure-caption {
-  margin: 0.5rem 0 0;
-  font-size: 0.85rem;
-  color: #5b6b73;
-  text-align: center;
 }
 
 .bison-features {
@@ -146,8 +132,6 @@ main img {
   border-radius: 1rem;
   padding: 1.4rem 1.4rem 1.2rem;
   background: var(--bs-body-bg);
-  transition: border-color 0.15s ease, transform 0.15s ease;
-  &:hover { border-color: rgba($bison-teal, 0.6); transform: translateY(-2px); }
   h3 { font-size: 1.2rem; margin-bottom: 0.6rem; }
   p { color: var(--bs-secondary-color); font-size: 0.97rem; }
   a { font-weight: 600; text-decoration: none; }
@@ -175,9 +159,9 @@ main img {
     --bs-navbar-brand-color: #ffffff;
     --bs-navbar-brand-hover-color: #ffffff;
   }
-  .bison-eyebrow { color: #78c7c2; }
   pre { background-color: rgba(120, 199, 194, 0.06); }
   .btn-outline-primary { color: #78c7c2; border-color: #78c7c2; }
-  .bison-hero-figure { border-color: #2b3a3d; }
+  // Invert the home page network so dark edges stay visible on a dark background.
+  .bison-hero-figure img { filter: invert(1) hue-rotate(180deg) !important; background: none !important; padding: 0 !important; }
   .navbar .version, .navbar .nav-text.text-muted { background: rgba(120, 199, 194, 0.12); color: #78c7c2 !important; }
 }

@@ -41,7 +41,6 @@ Components are labelled in increasing order of their mean, so component 1 is
 always the weakest type of edge.
 }
 \examples{
-\donttest{
 sim_data <- simulate_bison_model_mixture(
   "binary", num_components = 2, component_weights = c(0.5, 0.5)
 )
@@ -53,7 +52,6 @@ fit_edge <- bison_model(
 )
 fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
 summary(fit_mixture)
-}
 }
 \seealso{
 \code{\link[=get_network_component_probabilities]{get_network_component_probabilities()}},

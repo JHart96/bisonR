@@ -62,7 +62,6 @@
 #' )
 #' summary(fit_edge)
 #'
-#' \donttest{
 #' # Full model fitted with Stan, which allows extra effects
 #' fit_edge <- bison_model(
 #'   (event | duration) ~ dyad(node_1_id, node_2_id),
@@ -70,7 +69,6 @@
 #'   model_type = "binary",
 #'   priors = get_default_priors("binary")
 #' )
-#' }
 #' @export
 bison_model <- function(formula, data,
                         model_type = c("binary", "count", "binary_conjugate", "count_conjugate"),

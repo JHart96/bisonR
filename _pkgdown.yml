@@ -24,11 +24,12 @@ template:
     border-radius: "0.6rem"
     border-color: "#e3e1da"
     base_font: {google: "Inter"}
-    heading_font: {google: {family: "Fraunces", wght: [500, 600, 700]}}
+    heading_font: {google: {family: "Source Serif 4", wght: [400, 600]}}
     code_font: {google: "JetBrains Mono"}
     font-size-base: "1.0125rem"
     line-height-base: 1.65
     headings-font-weight: 600
+    headings-line-height: 1.25
     navbar-bg: "#ffffff"
     pkgdown-nav-height: "72px"
   opengraph:

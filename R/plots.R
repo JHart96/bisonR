@@ -9,7 +9,6 @@
 #' @param ... Additional arguments passed to [plot()].
 #'
 #' @examples
-#' \donttest{
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 #' fit_edge <- bison_model(
 #'   (event | duration) ~ dyad(node_1_id, node_2_id),
@@ -17,7 +16,6 @@
 #'   priors = get_default_priors("binary")
 #' )
 #' plot_trace(fit_edge, par_ids = 1:4)
-#' }
 #' @export
 plot_trace <- function(obj, par_ids = 1:5, ...) {
   if (!inherits(obj, "bison_model")) {

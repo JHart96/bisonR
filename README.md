@@ -8,7 +8,7 @@
 
 **Bayesian Inference of Social Networks in R.**
 
-bisonR implements the BISoN framework for analysing animal social networks. Instead of treating edge weights as fixed numbers, BISoN estimates each edge weight *with uncertainty* from the observation data (how often a pair was seen interacting, and how much they were observed). That uncertainty is then carried through everything downstream: network plots, network metrics, regressions, and comparisons between networks.
+bisonR implements the BISoN framework for Bayesian analysis of animal social networks (Hart et al. 2023). Edge weights are estimated from observation data as posterior distributions, taking into account how much each dyad was observed. The posteriors can then be used in network metrics, regression models and comparisons between networks.
 
 Documentation, tutorials and the function reference are at **<https://bisonr.org>**.
 

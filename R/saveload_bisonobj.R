@@ -12,7 +12,6 @@
 #' @seealso [bison_load()]
 #'
 #' @examples
-#' \donttest{
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 #' fit_edge <- bison_model(
 #'   (event | duration) ~ dyad(node_1_id, node_2_id),
@@ -23,7 +22,6 @@
 #' path <- tempfile(fileext = ".rds")
 #' bison_save(fit_edge, path)
 #' fit_reloaded <- bison_load(path)
-#' }
 #' @export
 bison_save <- function(bisonobj, file) {
   if (!grepl("\\.rds$", file, ignore.case = TRUE)) {

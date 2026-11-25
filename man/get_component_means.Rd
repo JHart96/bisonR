@@ -20,7 +20,6 @@ A dataframe describing the posteriors of the component means
 Get component means from edge mixture model
 }
 \examples{
-\donttest{
 sim_data <- simulate_bison_model_mixture(
   "count", num_components = 2, component_weights = c(0.5, 0.5)
 )
@@ -32,5 +31,4 @@ fit_edge <- bison_model(
 )
 fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
 get_component_means(fit_mixture, 2)
-}
 }

@@ -101,7 +101,6 @@ fit_edge <- bison_model(
 )
 summary(fit_edge)
 
-\donttest{
 # Full model fitted with Stan, which allows extra effects
 fit_edge <- bison_model(
   (event | duration) ~ dyad(node_1_id, node_2_id),
@@ -109,7 +108,6 @@ fit_edge <- bison_model(
   model_type = "binary",
   priors = get_default_priors("binary")
 )
-}
 }
 \seealso{
 \code{\link[=get_default_priors]{get_default_priors()}}, \code{\link[=prior_check]{prior_check()}}, \code{\link[=summary.bison_model]{summary.bison_model()}}

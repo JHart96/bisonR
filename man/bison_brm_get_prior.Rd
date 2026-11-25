@@ -22,7 +22,6 @@ The output from brms::get_prior()
 Wrapper for brms::get_prior() for use with bison_brm.
 }
 \examples{
-\donttest{
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 df <- sim_data$df_sim
 fit_edge <- bison_model(
@@ -36,5 +35,4 @@ bison_brm_get_prior(
   fit_edge,
   df
 )
-}
 }

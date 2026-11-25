@@ -19,7 +19,6 @@ Plots the MCMC chains for some of the edge weights of a fitted model. Well-mixed
 chains look like overlapping "fuzzy caterpillars" with no trends.
 }
 \examples{
-\donttest{
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 fit_edge <- bison_model(
   (event | duration) ~ dyad(node_1_id, node_2_id),
@@ -27,5 +26,4 @@ fit_edge <- bison_model(
   priors = get_default_priors("binary")
 )
 plot_trace(fit_edge, par_ids = 1:4)
-}
 }

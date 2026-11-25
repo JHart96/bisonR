@@ -21,7 +21,6 @@ in a new R session. \code{bison_save()} reads all draws into memory first and th
 saves the complete object as a single \code{.rds} file.
 }
 \examples{
-\donttest{
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 fit_edge <- bison_model(
   (event | duration) ~ dyad(node_1_id, node_2_id),
@@ -32,7 +31,6 @@ fit_edge <- bison_model(
 path <- tempfile(fileext = ".rds")
 bison_save(fit_edge, path)
 fit_reloaded <- bison_load(path)
-}
 }
 \seealso{
 \code{\link[=bison_load]{bison_load()}}

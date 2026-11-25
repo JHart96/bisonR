@@ -5,7 +5,6 @@
 #'
 #' @return The output of the `loo_compare` function for the fitted models.
 #' @examples
-#' \donttest{
 #' # Test for non-random edge weights by comparing a model with edge weights
 #' # against a null model where every dyad has the same rate of events.
 #' sim_data <- simulate_bison_model("binary", aggregated = FALSE)
@@ -15,7 +14,6 @@
 #' fit_null <- bison_model((event | duration) ~ 1,
 #'                         data = sim_data$df_sim, model_type = "binary", priors = priors)
 #' model_comparison(list(non_random = fit_edge, random = fit_null))
-#' }
 #' @export
 model_comparison <- function(models, ...) {
   loos <- lapply(models, function(model) loo::loo(model$log_lik, r_eff=NA))
