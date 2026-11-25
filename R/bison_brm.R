@@ -59,8 +59,14 @@ bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score
     z_score
   )
 
-  # Run brms imputation.
-  brms::brm_multiple(brms_formula, mice_obj, backend="cmdstanr", cores=cores, chains=chains, ...)
+  # Run brms imputation. brm_multiple() warns that E-BFMI can't be computed for
+  # the combined fit; that warning isn't informative here, so it is muffled.
+  withCallingHandlers(
+    brms::brm_multiple(brms_formula, mice_obj, backend = "cmdstanr", cores = cores, chains = chains, ...),
+    warning = function(w) {
+      if (grepl("E-BFMI not computed", conditionMessage(w), fixed = TRUE)) invokeRestart("muffleWarning")
+    }
+  )
 }
 
 #' Get priors for BISoN brm model

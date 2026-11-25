@@ -74,3 +74,9 @@ test_that("plot_metric handles continuous and discrete metrics", {
   expect_silent(plot_metric(extract_metric(fit, "global_cv", num_draws = 200)))
   expect_silent(plot_metric(extract_metric(fit, "node_degree[0.5]", num_draws = 200)[, 1:2]))
 })
+
+test_that("thresholds include edges equal to the threshold", {
+  fit <- fake_bison_model(nodes, dyads, c(0.5, 0.25, 0.1, 0.8))
+  degree <- extract_metric(fit, "node_degree[0.25]", num_draws = 1)
+  expect_equal(unname(degree[1, ]), c(1, 2, 2, 1))
+})

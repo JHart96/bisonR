@@ -47,9 +47,11 @@ threshold \verb{[t]}, in which case edges with weight at or above \code{t} count
 present and the rest as absent.
 \itemize{
 \item \code{edge_weight}: the edge weights themselves.
-\item \code{node_strength}: sum of the weights of a node's edges.
+\item \code{node_strength}: sum of the weights of a node's edges (in and out edges
+combined in directed networks).
 \item \code{node_degree[t]}: number of edges with weight at or above \code{t}.
-\item \code{node_eigen}: eigenvector centrality.
+\item \code{node_eigen}: eigenvector centrality. Edge direction is ignored in directed
+networks.
 \item \code{node_betweenness}: betweenness, using 1/weight as the distance.
 \item \code{node_closeness}: closeness, using 1/weight as the distance.
 \item \code{node_clustering[t]}: local clustering coefficient of the thresholded network.

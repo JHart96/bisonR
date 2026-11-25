@@ -13,3 +13,12 @@ test_that("priors are converted to Stan data", {
   expect_equal(params$prior_random_std_sigma, 0.5)
   expect_equal(params$prior_zero_prob_beta, 3)
 })
+
+test_that("prior densities for edge weights integrate to one on the natural scale", {
+  binary <- get_density_fn("edge", "binary", "normal")
+  expect_equal(integrate(function(x) binary(x, 0, 2.5), 0, 1)$value, 1, tolerance = 1e-4)
+  # normal(0, 2.5) on the logit scale puts more density near 0 and 1 than at 0.5
+  expect_gt(binary(0.02, 0, 2.5), binary(0.5, 0, 2.5))
+  count <- get_density_fn("edge", "count", "normal")
+  expect_equal(integrate(function(x) count(x, 0, 1), 0, Inf)$value, 1, tolerance = 1e-4)
+})

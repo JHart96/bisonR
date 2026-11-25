@@ -103,7 +103,8 @@ get_density_fn <- function(parameter_name, model_type, distribution_name) {
   if (parameter_name == "edge") {
     if (model_type == "binary") {
       if (distribution_name == "normal") {
-        return(function(x, ...) dnorm(qlogis(x), ...))
+        # Density of a logit-normal distribution on the probability scale.
+        return(function(x, ...) dnorm(qlogis(x), ...) / (x * (1 - x)))
       }
     }
     if (model_type == "count") {

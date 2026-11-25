@@ -22,9 +22,11 @@
 #' present and the rest as absent.
 #'
 #' * `edge_weight`: the edge weights themselves.
-#' * `node_strength`: sum of the weights of a node's edges.
+#' * `node_strength`: sum of the weights of a node's edges (in and out edges
+#'   combined in directed networks).
 #' * `node_degree[t]`: number of edges with weight at or above `t`.
-#' * `node_eigen`: eigenvector centrality.
+#' * `node_eigen`: eigenvector centrality. Edge direction is ignored in directed
+#'   networks.
 #' * `node_betweenness`: betweenness, using 1/weight as the distance.
 #' * `node_closeness`: closeness, using 1/weight as the distance.
 #' * `node_clustering[t]`: local clustering coefficient of the thresholded network.
@@ -156,7 +158,7 @@ get_metric_fn <- function(metric_string) {
     if (!is.na(stringr::str_match(metric_name, "^degree\\[.*\\]$"))) {
       threshold <- as.numeric(str_split(metric_name, "\\[|\\]")[[1]][2])
       return(function(x) {
-        return(igraph::strength(x, weights=1 * (igraph::E(x)$weight > threshold)))
+        return(igraph::strength(x, weights = 1 * (igraph::E(x)$weight >= threshold)))
       })
     }
     if (!is.na(stringr::str_match(metric_name, "^clustering\\[.*\\]$"))) {

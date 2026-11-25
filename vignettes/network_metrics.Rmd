@@ -59,7 +59,7 @@ To use metrics in regression models, use `bison_brm()` (see `vignette("bison_brm
 
 Unless stated otherwise, all metrics are calculated on the **weighted** network, using edge weights on the natural scale (probabilities for binary models, rates for count models). For example, `node_strength` is the weighted version of degree.
 
-Some metrics are only defined for networks where edges are either present or absent. These take a **threshold** in square brackets, such as `node_degree[0.2]`: in each posterior draw, edges with a weight above the threshold count as present and the rest as absent. For an unweighted version of a weighted metric (such as unweighted density), threshold the network in the same way. Results can be sensitive to the choice of threshold, so it is worth checking whether conclusions change with different values.
+Some metrics are only defined for networks where edges are either present or absent. These take a **threshold** in square brackets, such as `node_degree[0.2]`: in each posterior draw, edges with a weight at or above the threshold count as present and the rest as absent. For an unweighted version of a weighted metric (such as unweighted density), threshold the network in the same way. Results can be sensitive to the choice of threshold, so it is worth checking whether conclusions change with different values.
 
 ## Available metrics
 
@@ -74,7 +74,7 @@ Some metrics are only defined for networks where edges are either present or abs
 | Name | Definition |
 |---|---|
 | `node_strength` | Sum of the weights of the node's edges. How much a node associates in total. |
-| `node_degree[t]` | Number of edges with weight above `t`. How many associates a node has. |
+| `node_degree[t]` | Number of edges with weight at or above `t`. |
 | `node_eigen` | Eigenvector centrality: high when a node has strong edges to nodes that are themselves central. Scaled so the most central node has a value of 1. |
 | `node_betweenness` | Betweenness: the number of shortest paths between other pairs of nodes that pass through the node, using 1/weight as the length of each edge (so strong edges are short). |
 | `node_closeness` | Closeness: the inverse of the average shortest-path distance from the node to all others, using 1/weight as edge lengths. |
@@ -114,8 +114,10 @@ Other metrics can be calculated with `bison_to_igraph()`, which returns a list o
 
 ```{r}
 nets <- bison_to_igraph(fit_edge, num_draws = 200)
-assortativity <- sapply(nets, function(net) {
-  igraph::assortativity(net, values = igraph::strength(net))
+weighted_clustering <- sapply(nets, function(net) {
+  mean(igraph::transitivity(net, type = "barrat"), na.rm = TRUE)
 })
-quantile(assortativity, c(0.05, 0.5, 0.95))
+quantile(weighted_clustering, c(0.05, 0.5, 0.95))
 ```
+
+Note that some igraph functions ignore edge weights (for example `igraph::assortativity()`). Because every dyad in the model is an edge in every posterior network, these functions give the same value for every draw, so check that a function uses the `weight` edge attribute before applying it to posterior networks.
