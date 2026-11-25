@@ -59,6 +59,7 @@ bisonR 0.5.0 is a correctness and reliability release. Several bugs could give w
 
 ## Project
 
+* Refreshed documentation site at <https://bisonr.org>: new home page, typography and colour scheme, dark mode, grouped function reference and article menu.
 * Development has moved back to <https://github.com/JHart96/bisonR>, and the documentation is at <https://bisonr.org>.
 * `main` is protected: changes arrive through pull requests that must pass R CMD check on all platforms and bump the version. See the contributing guide.
 * Removed unused dependencies (tidyverse, formula.tools, BH, RcppEigen and others).
