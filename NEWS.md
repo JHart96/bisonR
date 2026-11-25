@@ -13,6 +13,8 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 * Mixture model components are now ordered by their means in each posterior draw, to avoid label switching.
 * `global_diameter` now uses 1/weight as the edge length, consistent with betweenness and closeness.
 * `global_clustering[t]` is 0 when there are no connected triples, consistent with `node_clustering[t]`.
+* `simulate_bison_model()` put the true `age_diff`, `age_1` and `age_2` values in the wrong columns of `df_true`. The simulated data in `df_sim` and the true edge weights were not affected.
+* `simulate_bison_model_mixture()` no longer returns `age_diff`, `age_1`, `age_2` and `location` columns, which were never simulated and contained other values.
 * `prior_check()` now shows the correct density for binary edge priors on the probability scale.
 * `node_degree[t]` now counts edges with weight at or above `t`, as documented.
 * `model_comparison()` now works when models have different numbers of posterior draws, and accounts for autocorrelation in MCMC draws.

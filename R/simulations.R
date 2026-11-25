@@ -49,17 +49,17 @@ simulate_bison_model <- function(model_type, aggregated, location_effect=TRUE, a
           }
           if (model_type == "binary") {
             event <- rbinom(1, 1, plogis(predictor))
-            df_sim[nrow(df_sim) + 1, ] <- list(event=event, node_1_id=i, node_2_id=j, age_diff=age_diff, age_1=ages[i], age_2=ages[j], location=location_id, duration=1)
+            df_sim <- append_sim_row(df_sim, list(event=event, node_1_id=i, node_2_id=j, age_diff=age_diff, age_1=ages[i], age_2=ages[j], location=location_id, duration=1))
           }
           if (model_type == "count") {
             duration <- runif(1, 1, max_obs)
             event <- rpois(1, exp(predictor) * duration)
-            df_sim[nrow(df_sim) + 1, ] <- list(event=event, node_1_id=i, node_2_id=j, age_diff=age_diff, age_1=ages[i], age_2=ages[j], location=location_id, duration=duration)
+            df_sim <- append_sim_row(df_sim, list(event=event, node_1_id=i, node_2_id=j, age_diff=age_diff, age_1=ages[i], age_2=ages[j], location=location_id, duration=duration))
           }
         }
 
         # Set true dataframe
-        df_true[nrow(df_true) + 1, ] <- list(node_1_id=i, node_2_id=j, edge_weight=edge_weights[i, j], age_1=ages[i], age_2=ages[j], age_diff=age_diff)
+        df_true <- append_sim_row(df_true, list(node_1_id=i, node_2_id=j, edge_weight=edge_weights[i, j], age_1=ages[i], age_2=ages[j], age_diff=age_diff))
       }
     }
   }
@@ -102,8 +102,8 @@ simulate_bison_model_mixture <- function(model_type, num_components, component_w
   edge_weights <- matrix(0, num_nodes, num_nodes)
   edge_weights[upper.tri(edge_weights)] <- rnorm(num_edges, mean=component_mu[component_ids], sd=component_sigma[component_ids])
 
-  df_sim <- data.frame(event=numeric(), node_1_id=numeric(), node_2_id=numeric(), age_diff=numeric(), age_1=numeric(), age_2=numeric(), location=numeric(), duration=numeric())
-  df_true <- data.frame(node_1_id=numeric(), node_2_id=numeric(), edge_weight=numeric(), age_diff=numeric())
+  df_sim <- data.frame(event=numeric(), node_1_id=numeric(), node_2_id=numeric(), duration=numeric())
+  df_true <- data.frame(node_1_id=numeric(), node_2_id=numeric(), edge_weight=numeric())
 
   for (i in 1:num_nodes) {
     for (j in 1:num_nodes) {
@@ -112,21 +112,21 @@ simulate_bison_model_mixture <- function(model_type, num_components, component_w
           predictor <- edge_weights[i, j]
           if (model_type == "binary") {
             event <- rbinom(1, 1, plogis(predictor))
-            df_sim[nrow(df_sim) + 1, ] <- list(event=event, node_1_id=i, node_2_id=j, duration=1)
+            df_sim <- append_sim_row(df_sim, list(event=event, node_1_id=i, node_2_id=j, duration=1))
           }
           if (model_type == "count") {
             duration <- runif(1, 1, max_obs)
             event <- rpois(1, exp(predictor) * duration)
-            df_sim[nrow(df_sim) + 1, ] <- list(event=event, node_1_id=i, node_2_id=j, duration=duration)
+            df_sim <- append_sim_row(df_sim, list(event=event, node_1_id=i, node_2_id=j, duration=duration))
           }
         }
 
         # Set true dataframe
-        df_true[nrow(df_true) + 1, ] <- list(node_1_id=i, node_2_id=j, edge_weight=edge_weights[i, j])
+        df_true <- append_sim_row(df_true, list(node_1_id=i, node_2_id=j, edge_weight=edge_weights[i, j]))
       }
     }
   }
-  df_sim <- dplyr::summarise(dplyr::group_by(df_sim, node_1_id, node_2_id), event=sum(event), duration=sum(duration), age_diff=mean(age_diff))
+  df_sim <- dplyr::summarise(dplyr::group_by(df_sim, node_1_id, node_2_id), event=sum(event), duration=sum(duration), .groups = "drop")
   df_sim$node_1_id <- factor(df_sim$node_1_id, levels=1:num_nodes)
   df_sim$node_2_id <- factor(df_sim$node_2_id, levels=1:num_nodes)
   df_true$node_1_id <- factor(df_true$node_1_id, levels=1:num_nodes)
@@ -143,4 +143,12 @@ add_effort_column <- function(df_sim) {
   other <- setdiff(colnames(df_sim), c("event", "effort", "duration"))
   df_sim[, c(other[other %in% c("node_1_id", "node_2_id")], "event", "effort",
              other[!other %in% c("node_1_id", "node_2_id")], "duration")]
+}
+
+# Add one row to a simulated data frame, matching values to columns by name
+# (assigning a list by position would put values in the wrong columns if the
+# order differed).
+append_sim_row <- function(df, row) {
+  df[nrow(df) + 1, names(row)] <- row
+  df
 }
