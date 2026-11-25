@@ -1,7 +1,7 @@
 #' Trace plots of MCMC chains
 #'
-#' Plots the MCMC chains for some of the edge weights of a fitted model. Well-mixed
-#' chains look like overlapping "fuzzy caterpillars" with no trends.
+#' Plots the MCMC chains for some of the edge weights of a fitted model. The
+#' chains should overlap and show no trends.
 #'
 #' @param obj A fitted `bison_model` object (fitted with Stan, not a conjugate
 #'   model).
@@ -59,9 +59,7 @@ plot_trace <- function(obj, par_ids = 1:5, ...) {
 
 #' Posterior predictive checks
 #'
-#' Compares data simulated from a fitted model with the observed data. If the
-#' model describes the data well, the observed data should look like a typical
-#' simulated dataset.
+#' Compares data simulated from a fitted model with the observed data.
 #'
 #' @param obj A fitted model.
 #' @param ... Arguments passed to methods.
@@ -71,20 +69,16 @@ plot_trace <- function(obj, par_ids = 1:5, ...) {
 #'
 #' * `"density"`: the distribution of observed event *rates* per dyad (events
 #'   divided by observation effort), compared with the same distribution in
-#'   `num_draws` simulated datasets. Rates are used rather than raw event counts
-#'   because raw counts mostly reflect how much each dyad was observed, which the
-#'   model takes as given, so almost any model would match them.
+#'   `num_draws` simulated datasets. Rates are used rather than event counts
+#'   because counts largely reflect observation effort.
 #' * `"stats"`: summary statistics of the per-dyad rates in each simulated
 #'   dataset (proportion of dyads with no events, mean, standard deviation and
-#'   maximum), with the observed value shown as a vertical line. These are good at
-#'   revealing too many zeroes or too much or too little variation between dyads.
+#'   maximum), with the observed value shown as a vertical line. These can show
+#'   excess zeroes or over- or under-dispersion between dyads.
 #' * `"point"`: posterior medians and intervals of the edge weights plotted against
-#'   simple point estimates (events / effort). This isn't a predictive check; it
-#'   shows how BISoN estimates are pulled towards the prior when there are few
+#'   simple point estimates (events / effort). This is not a predictive check,
+#'   but shows how estimates are pulled towards the prior when there are few
 #'   data.
-#'
-#' No check can show that a model is correct, but these can reveal common ways
-#' that it is wrong.
 #'
 #' @examples
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
@@ -228,11 +222,9 @@ plot_point_comparison <- function(obj, groups, keep) {
 
 #' Plot the network with uncertainty
 #'
-#' Draws a sociogram where the uncertainty in each edge weight is shown by two
-#' overlapping lines: a solid dark line whose width is the *lower* bound of the
-#' credible interval (how weak the edge could plausibly be), and a wider,
-#' translucent line whose width is the *upper* bound (how strong it could be).
-#' Edges with wide translucent bands are uncertain.
+#' Draws a sociogram in which each edge is shown by two overlapping lines: a
+#' dark line whose width is the lower bound of the credible interval, and a
+#' wider, translucent line whose width is the upper bound.
 #'
 #' @param obj A fitted `bison_model` object.
 #' @param ci Width of the credible interval, e.g. `0.9` for a 90% interval.
@@ -240,8 +232,7 @@ plot_point_comparison <- function(obj, groups, keep) {
 #' @param threshold Hide edges whose weight (see `threshold_on`) is below this
 #'   value. This only affects the plot. `NULL` shows every edge.
 #' @param threshold_on Which estimate to compare with `threshold`: the posterior
-#'   `"median"` (default) or the `"lower"` bound of the credible interval (a
-#'   stricter filter that only keeps edges that are clearly above the threshold).
+#'   `"median"` (default) or the `"lower"` bound of the credible interval.
 #' @param show_all_nodes If `TRUE` (default), nodes with no remaining edges are
 #'   still drawn.
 #' @param layout Optional layout matrix (as returned invisibly by a previous call),

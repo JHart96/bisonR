@@ -15,8 +15,8 @@ model).}
 \item{...}{Additional arguments passed to \code{\link[=plot]{plot()}}.}
 }
 \description{
-Plots the MCMC chains for some of the edge weights of a fitted model. Well-mixed
-chains look like overlapping "fuzzy caterpillars" with no trends.
+Plots the MCMC chains for some of the edge weights of a fitted model. The
+chains should overlap and show no trends.
 }
 \examples{
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)

@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 set.seed(1)
 ```
 
-Network metrics summarise the structure of a network, either for each individual (node metrics) or for the whole network (global metrics). In bisonR, metrics are calculated for many networks drawn from the posterior distribution of the edge model, so each metric comes with a posterior distribution that reflects how certain the network is.
+Network metrics summarise the structure of a network, either for each individual (node metrics) or for the whole network (global metrics). In bisonR, metrics are calculated for networks drawn from the posterior of the edge model, giving a posterior distribution for each metric.
 
 ```{r setup}
 library(bisonR)
@@ -41,7 +41,7 @@ strength <- extract_metric(fit_edge, "node_strength", num_draws = 1000)
 dim(strength)
 ```
 
-The result has one row per posterior draw and one column per target: one column per node for node metrics (named after the nodes, in the order of the node levels), one per dyad for edge metrics, and a single column for global metrics. Summarise it like any set of posterior samples:
+The result has one row per posterior draw and one column per target: one column per node for node metrics (named after the nodes, in the order of the node levels), one per dyad for edge metrics, and a single column for global metrics. These can be summarised in the same way as other posterior samples:
 
 ```{r}
 t(apply(strength, 2, quantile, probs = c(0.05, 0.5, 0.95)))
@@ -53,13 +53,13 @@ t(apply(strength, 2, quantile, probs = c(0.05, 0.5, 0.95)))
 plot_metric(strength[, 1:2], "Strength of node")
 ```
 
-To use metrics as predictors or responses in regressions while keeping their uncertainty, use `bison_brm()` (see `vignette("bison_brms")`) rather than summarising them first.
+To use metrics in regression models, use `bison_brm()` (see `vignette("bison_brms")`) rather than summarising them first.
 
 ## Weighted and thresholded metrics
 
 Unless stated otherwise, all metrics are calculated on the **weighted** network, using edge weights on the natural scale (probabilities for binary models, rates for count models). For example, `node_strength` is the weighted version of degree.
 
-Some metrics are only defined for networks where edges are either present or absent. These take a **threshold** in square brackets, such as `node_degree[0.2]`: in each posterior draw, edges with a weight above the threshold count as present and the rest as absent. For an unweighted version of a weighted metric (such as unweighted density), threshold the network in the same way. The results can depend strongly on the threshold, so choose it for a biological reason and check that conclusions don't change with nearby values.
+Some metrics are only defined for networks where edges are either present or absent. These take a **threshold** in square brackets, such as `node_degree[0.2]`: in each posterior draw, edges with a weight above the threshold count as present and the rest as absent. For an unweighted version of a weighted metric (such as unweighted density), threshold the network in the same way. Results can be sensitive to the choice of threshold, so it is worth checking whether conclusions change with different values.
 
 ## Available metrics
 
@@ -90,7 +90,7 @@ Some metrics are only defined for networks where edges are either present or abs
 | `global_diameter` | Length of the longest shortest path between any two nodes, using 1/weight as edge lengths. |
 | `global_clustering[t]` | Global clustering coefficient (transitivity) of the network thresholded at `t`: the proportion of connected triples that are closed triangles. |
 
-Global metrics are calculated from the dyads in the model. Dyads with no data (not in the data frame) aren't included.
+Global metrics are calculated from the dyads in the model, so dyads that are not in the data are not included.
 
 ## Examples
 
@@ -110,7 +110,7 @@ quantile(clustering, c(0.05, 0.5, 0.95))
 
 ## Using other network tools
 
-For metrics bisonR doesn't provide, `bison_to_igraph()` returns a list of `igraph` networks drawn from the posterior, with edge weights on the natural scale. Calculate the metric on each one to get its posterior distribution:
+Other metrics can be calculated with `bison_to_igraph()`, which returns a list of `igraph` networks drawn from the posterior, with edge weights on the natural scale. Calculating a metric for each network gives its posterior distribution:
 
 ```{r}
 nets <- bison_to_igraph(fit_edge, num_draws = 200)

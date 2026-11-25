@@ -1,16 +1,16 @@
 # Contributing to bisonR
 
-Thanks for helping improve bisonR! This guide explains how changes get from an idea into a release.
+This guide describes how changes to bisonR are made and released.
 
 ## Branches
 
-* **`main`** is the latest release. It's protected: nothing is pushed to it directly, and every change arrives through a pull request (PR) that passes all checks. Anyone installing with `remotes::install_github("JHart96/bisonR")` gets `main`, so it must always work.
+* **`main`** is the latest release, and is what `remotes::install_github("JHart96/bisonR")` installs. It is protected: changes can only be made through pull requests (PRs) that pass the required checks.
 * **`release/<version>`** (e.g. `release/0.5.0`) collects the work for the next release. When the release is ready, a PR from this branch into `main` is reviewed and merged, and a GitHub release is tagged.
 * **Feature and fix branches** (`feature/<short-name>`, `fix/<short-name>`) hold individual changes. Branch from the current release branch and open your PR against it. Small urgent fixes to a release can branch from `main` and target `main` directly, as long as they bump the patch version.
 
 ## Checks on every pull request
 
-GitHub Actions runs these on every PR. A PR into `main` can only be merged when they all pass:
+GitHub Actions runs these checks on every PR. All except `test-coverage` must pass before a PR can be merged into `main`:
 
 | Check | What it does |
 |---|---|
@@ -27,11 +27,11 @@ bisonR uses [semantic versioning](https://semver.org/) (`major.minor.patch`):
 * **minor** (0.5.0 → 0.6.0): new features, or changes that may alter results or require small changes to user code. These must be listed in `NEWS.md`.
 * **major**: reserved for 1.0.0 and later breaking changes.
 
-Bump the version with `usethis::use_version("patch")` (or `"minor"`), which also adds a NEWS heading for you.
+The version can be bumped with `usethis::use_version("patch")` (or `"minor"`), which also adds a heading to `NEWS.md`.
 
 ## Making a change
 
-1. Open an issue (or comment on an existing one) to discuss larger changes first.
+1. For larger changes, open an issue (or comment on an existing one) first.
 2. Create a branch from the current release branch: `git switch -c feature/my-change origin/release/0.5.0`.
 3. Make the change, with tests in `tests/testthat/` for any new behaviour or bug fix.
 4. Run `devtools::document()` if you changed roxygen comments, then `devtools::check()`.

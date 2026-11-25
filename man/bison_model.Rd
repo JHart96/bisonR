@@ -69,9 +69,9 @@ edge weights, \code{\link[=plot_network]{plot_network()}} to visualise them, \co
 for downstream analyses.
 }
 \description{
-Fits a BISoN edge weight model, which estimates the strength of the social
-connection between each pair of nodes (dyad) \emph{with uncertainty}, from
-observations of social events and the effort spent observing each dyad.
+Fits a BISoN edge weight model, which estimates a posterior distribution for
+the edge weight of each dyad from observations of social events and the
+observation effort for each dyad.
 }
 \section{Formula syntax}{
 
@@ -84,8 +84,9 @@ levels, nodes that never appear in the data are kept.
 \item \code{1} or \code{0}: include or exclude a global intercept (excluded by default).
 }
 
-Including extra terms changes what the edge weights mean: they become the
-dyad's tendency to interact \emph{after} accounting for those effects.
+Including other terms changes the interpretation of the edge weights, which
+then represent each dyad's tendency to interact after controlling for those
+effects.
 }
 
 \examples{

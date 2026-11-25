@@ -26,8 +26,7 @@ plot_network(
 value. This only affects the plot. \code{NULL} shows every edge.}
 
 \item{threshold_on}{Which estimate to compare with \code{threshold}: the posterior
-\code{"median"} (default) or the \code{"lower"} bound of the credible interval (a
-stricter filter that only keeps edges that are clearly above the threshold).}
+\code{"median"} (default) or the \code{"lower"} bound of the credible interval.}
 
 \item{show_all_nodes}{If \code{TRUE} (default), nodes with no remaining edges are
 still drawn.}
@@ -42,11 +41,9 @@ so several networks can be drawn with nodes in the same positions.}
 The layout matrix, invisibly.
 }
 \description{
-Draws a sociogram where the uncertainty in each edge weight is shown by two
-overlapping lines: a solid dark line whose width is the \emph{lower} bound of the
-credible interval (how weak the edge could plausibly be), and a wider,
-translucent line whose width is the \emph{upper} bound (how strong it could be).
-Edges with wide translucent bands are uncertain.
+Draws a sociogram in which each edge is shown by two overlapping lines: a
+dark line whose width is the lower bound of the credible interval, and a
+wider, translucent line whose width is the upper bound.
 }
 \examples{
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)

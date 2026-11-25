@@ -1,68 +1,64 @@
 # bisonR 0.5.0
 
-bisonR 0.5.0 is a correctness and reliability release. Several bugs could give wrong results **without any error or warning**, so we recommend re-running analyses fitted with earlier versions if any of the situations below apply to you.
+This release fixes a number of bugs, mostly affecting edge cases and less common uses of the package, and makes some changes to how data and priors are checked. It also updates the documentation, tests and CI.
 
-## Bugs that could silently change results
+## Bug fixes
 
-* Fixed effects whose names end in `1` (e.g. `age1`) were dropped from the model and switched on an intercept (#80). Effort columns with digits in their names (e.g. `obs2`) were read as `NA`, and column names containing `.` were rejected. The formula is now parsed as an R expression, so any column name works.
-* In undirected networks, data containing both `A, B` and `B, A` rows created a second, prior-only edge for the same pair. Both orders now refer to the same dyad.
-* Conjugate models (`binary_conjugate`, `count_conjugate`) only used the *last* observation of each dyad when data were disaggregated (one row per observation). They now use all observations, and give the same answer for aggregated and disaggregated data.
-* Node-level metrics from `extract_metric()` and `bison_to_igraph()` were ordered by the order nodes first appeared in the data, while `bison_brm()` assumed the order of the node factor levels. Unless the data were sorted, regressions on node metrics could attach values to the wrong individuals (#63). Metrics are now always in node-level order, with node names as column names, and nodes without any edges are kept.
-* Zero-inflated models: the zero-inflation probability wasn't bounded above by 1 (#77), and posterior predictions and log-likelihoods (used by `plot_predictions()` and `model_comparison()`) ignored the zero inflation.
-* `extract_metric(standardise = TRUE)` subtracted the overall mean instead of centring within each posterior draw as documented.
-* Mixture models could suffer from label switching between posterior draws, making component means and membership probabilities unreliable. Components are now ordered by their means in every draw.
-* `global_diameter` treated edge weights as distances (so stronger edges counted as *longer*). It now uses 1/weight, like betweenness and closeness.
+* Fixed effects with names ending in `1` (e.g. `age1`) were dropped from the model (#80). Effort columns with digits in their names, and column names containing `.`, are now also handled correctly.
+* In undirected networks, data with rows for both A-B and B-A are now treated as the same dyad.
+* Conjugate models now use all rows for each dyad when data are disaggregated. Previously only the last row was used.
+* Node metrics from `extract_metric()` and `bison_to_igraph()` are now always returned in the order of the node levels, with node names as column names. Previously the order could differ from the one `bison_brm()` assumed when the input data weren't sorted (#63).
+* The zero-inflation probability is now bounded between 0 and 1 (#77), and posterior predictions and log-likelihoods now include the zero inflation.
+* `extract_metric(standardise = TRUE)` now centres within each posterior draw, as documented.
+* Mixture model components are now ordered by their means in each posterior draw, to avoid label switching.
+* `global_diameter` now uses 1/weight as the edge length, consistent with betweenness and closeness.
 
 ## Breaking changes
 
-* `library(bisonR)` no longer attaches cmdstanr. Call cmdstanr functions with `cmdstanr::`.
-* brms and mice are now optional (Suggests). Install them to use `bison_brm()`.
-* Undirected dyads are stored with the node that comes first in the node levels as `node_1`, which can change the order of `node_1` and `node_2` in `get_edgelist()` for some datasets.
-* `extract_metric(obj, "edge_weight")` now returns natural-scale edge weights by default (probabilities or rates), consistent with `get_edgelist()`. Use `transform = FALSE` for the link scale. `bison_brm()` still uses link-scale edge weights.
-* Conjugate models reject formulas with fixed or random effects or intercepts, which were previously ignored silently.
-* `bison_save()` now writes a single `.rds` file (`bison_save(fit, "model.rds")`).
-* Count data from `simulate_bison_model()` now have realistic variation between edges, and the age-difference effect is smaller (0.2 per year on the link scale).
+* cmdstanr is no longer attached by `library(bisonR)`.
+* brms and mice have moved to Suggests and are only needed for `bison_brm()`.
+* For undirected networks, `node_1` in `get_edgelist()` is now the node that comes first in the node levels.
+* `extract_metric(obj, "edge_weight")` returns edge weights on the natural scale by default. Use `transform = FALSE` for the link scale. `bison_brm()` still uses the link scale.
+* Conjugate models now give an error if the formula includes fixed effects, random effects or an intercept.
+* `bison_save()` writes a single `.rds` file.
+* `simulate_bison_model()` count data have more variation between edges, and a smaller age-difference effect.
 
 ## Model fitting
 
-* Edge weights and random effects use a non-centred parameterisation, which removes the divergent transitions that were common with `partial_pooling = TRUE`.
-* `bison_model()` gains `chains` and `...` (passed to Stan, e.g. `seed`, `adapt_delta`). The fixed `step_size = 0.1` was removed.
-* Data are checked before fitting, with clear errors for missing columns, missing values, non-integer or negative events, more events than sampling periods, and self-loops (#69).
-* Priors are checked against the model type, and missing priors are filled in from the defaults (#70).
-* Compiled Stan models are cached between R sessions, so models are only compiled once per bisonR and CmdStan version. bisonR gives a clear message if CmdStan isn't installed.
-* Conjugate models now provide predictions and log-likelihoods, so `plot_predictions()`, `prior_predictive_check()` and `model_comparison()` work with them.
+* Edge weights and random effects use a non-centred parameterisation, which reduces divergent transitions with `partial_pooling = TRUE`.
+* `bison_model()` gains a `chains` argument, and passes `...` to the Stan sampler (e.g. `seed`, `adapt_delta`). The fixed `step_size = 0.1` has been removed.
+* Input data are checked before fitting: missing columns, missing values, non-integer or negative events, more events than sampling periods, and self-loops (#69).
+* Priors are checked against the model type, and missing priors are filled in with the defaults (#70).
+* Compiled Stan models are cached between sessions.
+* Conjugate models now return predictions and log-likelihoods, so they work with `plot_predictions()`, `prior_predictive_check()` and `model_comparison()`.
 * New `print()` method for fitted models.
 
-## Diagnostics and plots
+## Plots
 
-* `plot_predictions()` was redesigned. The `"density"` check previously compared raw event counts per dyad, which mostly reflect sampling effort and matched almost any model. It now compares event *rates*, with a shared smoothing bandwidth, randomly chosen posterior draws, and the observed data drawn on top in a contrasting colour (#92). A new `type = "stats"` check compares the proportion of zero dyads, and the mean, SD and maximum rate, with the observed values.
-* `plot_network()` draws every node, can threshold on the median or lower bound (`threshold_on`), scales count-model edges sensibly, curves directed edges, explains the two line widths in a caption (#93), and returns its layout so several networks can share node positions. Thanks to @cebus-imitator for the threshold fixes (#94, #95).
-* `plot_trace()` shows each edge in its own panel, titled with the dyad name.
-* `plot_metric()` shows discrete metrics (e.g. degree) as bar charts (#57).
+* `plot_predictions()` is now an S3 generic. The `"density"` check compares event rates per dyad rather than event counts, uses random posterior draws, and draws the observed data last in a separate colour (#92). New `type = "stats"` option.
+* `plot_network()` shows all nodes, gains a `threshold_on` argument, rescales edge widths for count models, and adds a caption explaining the line widths (#93). Thanks to @cebus-imitator for the threshold fixes (#94, #95).
+* `plot_trace()` shows each edge in a separate panel.
+* `plot_metric()` uses bar charts for discrete metrics (#57).
 
-## Regression with `bison_brm()`
+## `bison_brm()`
 
-* Warns if a dyadic regression has no multi-membership term (`(1 | mm(node_1, node_2))`) to account for edges sharing nodes.
-* Clear errors when the regression data contain nodes or dyads that aren't in the edge model (#68).
-* Thresholded metrics such as `bison(node_degree[0.5](node))` can now be used.
+* Warns when a dyadic regression doesn't include a multi-membership term.
+* Gives clearer errors when the data contain nodes or dyads that aren't in the edge model (#68).
+* Supports thresholded metrics such as `node_degree[0.5]`.
 
-## Other improvements
+## Other changes
 
-* `bison_save()` and `bison_load()` are exported and work for all model types (#82).
+* `bison_save()` and `bison_load()` are now exported (#82).
 * `bison_to_igraph()` works with `num_draws = 1` (#73).
-* `convert_gbi_to_bison()` is faster and uses column names of the GBI matrix as node names.
+* `convert_gbi_to_bison()` is faster and uses the column names of the GBI matrix as node names.
 * `draw_edgelist_samples()` gains a `transform` argument (#60).
 * `simulate_bison_model()` gains `num_nodes` and `max_obs` arguments.
-* Every exported function has runnable examples.
-* Documentation: rewritten *Getting started* article (addressing the feedback in #84 to #93), a new *Preparing your data* article covering effort, aggregation, directed networks and group-by-individual data (#42, #74, #81), definitions of every network metric (#83), and corrected brms examples that include multi-membership terms.
-* Tests now check results numerically (e.g. against analytic posteriors and simulated true values) instead of only checking that functions run.
-
-## Project
-
-* Refreshed documentation site at <https://bisonr.org>: new home page, typography and colour scheme, dark mode, grouped function reference and article menu.
-* Development has moved back to <https://github.com/JHart96/bisonR>, and the documentation is at <https://bisonr.org>.
-* `main` is protected: changes arrive through pull requests that must pass R CMD check on all platforms and bump the version. See the contributing guide.
-* Removed unused dependencies (tidyverse, formula.tools, BH, RcppEigen and others).
+* All exported functions have examples.
+* Updated articles, including a new article on preparing data (#42, #74, #81, #83, #84-#93).
+* Expanded unit tests.
+* Updated documentation website.
+* The GitHub repository is JHart96/bisonR and the website is <https://bisonr.org>.
+* Removed unused dependencies.
 
 # bisonR 0.4.6
 * Added node_clustering network metric.

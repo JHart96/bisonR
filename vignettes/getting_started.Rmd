@@ -18,18 +18,18 @@ knitr::opts_chunk$set(
 set.seed(1)
 ```
 
-This article walks through a complete BISoN analysis: preparing observation data, estimating the network with uncertainty, checking the model, and using the network to answer questions with regressions and network metrics.
+This article goes through a basic BISoN analysis: fitting an edge weight model, checking it, and using the fitted network in regressions and network metrics.
 
 ## What BISoN does
 
-Most social network analyses start by calculating an edge weight for each pair of individuals (a *dyad*), such as the proportion of sampling periods in which they were seen together, and then treat those numbers as if they were known exactly. But an edge weight calculated from 2 observations is far less certain than one calculated from 200, and ignoring that difference can lead to overconfident or wrong conclusions.
+Social network analyses often start by calculating an edge weight for each pair of individuals (a *dyad*), such as the proportion of sampling periods in which they were seen together, and then treat these values as known. An edge weight calculated from 2 observations is much less certain than one calculated from 200, and not accounting for this can lead to overconfident conclusions.
 
 BISoN works in two stages:
 
-1. **An edge weight model** *estimates* the edge weight of every dyad from the raw observations, giving a full posterior distribution for each edge. Dyads that were rarely observed get wide distributions; well-sampled dyads get narrow ones.
-2. **Downstream analyses** (regressions, network metrics, comparisons between networks) *use* those edge weights, carrying their uncertainty through to the final results.
+1. An **edge weight model** estimates the edge weight of each dyad from the observation data, giving a posterior distribution for each edge. Dyads that were observed less have wider posteriors.
+2. **Downstream analyses** (regressions, network metrics, comparisons between networks) use samples from these posteriors, so the uncertainty in the edge weights is included in the results.
 
-The edge weight model is not an inferential model for testing hypotheses about the network. Its job is to describe the network as honestly as the data allow.
+The edge weight model is used to estimate the network, not to test hypotheses about it. Hypotheses are tested in the second stage.
 
 ## Setting up
 
@@ -87,14 +87,14 @@ Edge weights in binary models are estimated on the logit scale, so `normal(0, 2.
 prior_check(priors, "binary")
 ```
 
-The default edge prior puts a lot of weight on edges near 0 and 1. If we expect most dyads to associate rarely, a prior concentrated on lower probabilities may be more appropriate:
+The default edge prior puts a lot of weight near 0 and 1. If most dyads are expected to associate rarely, a prior with more weight on lower probabilities may be more appropriate:
 
 ```{r, fig.height = 5}
 priors$edge <- "normal(-1, 1.5)"
 prior_check(priors, "binary")
 ```
 
-Choosing priors depends on your study system. The defaults should almost always be checked and adjusted.
+Priors should be chosen for the study system, and the defaults checked before use.
 
 ### The formula
 
@@ -104,10 +104,10 @@ Edge models are specified with a formula, like those used by `lm()` and `brms`:
 (event | duration) ~ dyad(node_1_id, node_2_id)
 ```
 
-* The left-hand side, `(event | duration)`, names the event and effort columns. It describes *how much was observed*.
-* The right-hand side describes *what explains the events*. `dyad(node_1_id, node_2_id)` estimates an edge weight for every dyad, and is all that's needed to build a network.
+* The left-hand side, `(event | duration)`, gives the event and effort columns.
+* The right-hand side gives the terms in the model. `dyad(node_1_id, node_2_id)` estimates an edge weight for each dyad.
 
-Other effects can be added to the right-hand side, such as `+ location` (a fixed effect) or `+ (1 | location)` (a random effect). These account for factors that change how often dyads are observed interacting. Including them changes what the edge weights mean: they become each dyad's tendency to associate *after* accounting for those effects.
+Other effects can be added to the right-hand side, such as `+ location` (a fixed effect) or `+ (1 | location)` (a random effect), to account for factors that affect how often social events are observed. Including them changes the interpretation of the edge weights, which then represent each dyad's tendency to associate after controlling for those effects.
 
 Now we can fit the model:
 
@@ -120,13 +120,13 @@ fit_edge <- bison_model(
 )
 ```
 
-This can take anywhere from seconds to hours depending on the size of the dataset. Models are compiled the first time they're used, and compiled models are cached for later sessions. If there are no observation-level effects, aggregating the data to one row per dyad (or using a conjugate model) is much faster and gives the same edge weights.
+Fitting time depends on the size of the dataset. The Stan models are compiled the first time they are used and then cached. If there are no observation-level effects, aggregating the data to one row per dyad, or using a conjugate model, is faster and gives the same edge weights.
 
 ## Checking the model
 
 ### MCMC diagnostics
 
-`bison_model()` fits models with Stan's MCMC sampler, which prints warnings if something goes wrong (for example, divergent transitions). Even if it's quiet, check the trace plots. Each line is one MCMC chain, and well-behaved chains overlap and look like fuzzy caterpillars, with no trends:
+`bison_model()` fits models with Stan's MCMC sampler, which gives warnings for problems such as divergent transitions. It is still worth checking the trace plots. Each line is one chain; the chains should overlap and show no trends:
 
 ```{r, fig.height = 5}
 plot_trace(fit_edge, par_ids = 1:4)
@@ -134,19 +134,19 @@ plot_trace(fit_edge, par_ids = 1:4)
 
 ### Posterior predictive checks
 
-Next, check that the model can reproduce the main features of the data. `plot_predictions()` simulates new datasets from the fitted model and compares them with the real data. With `type = "density"`, it compares the distribution of observed event rates across dyads (red) with the same distribution in 20 simulated datasets (teal):
+Posterior predictive checks compare data simulated from the fitted model with the observed data. With `type = "density"`, `plot_predictions()` shows the distribution of observed event rates across dyads (red) and the same distribution in 20 simulated datasets (teal):
 
 ```{r}
 plot_predictions(fit_edge, num_draws = 20, type = "density")
 ```
 
-The red line should look like a typical teal line. `type = "stats"` compares specific summaries, which are better at revealing particular problems. For example, if the observed proportion of dyads with no events is far to the right of the simulated values, a zero-inflated model (`zero_inflated = TRUE`) may be needed:
+The observed distribution should fall within the range of the simulated ones. `type = "stats"` compares summary statistics of the observed and simulated data. For example, if the observed proportion of dyads with no events is much higher than in the simulated data, a zero-inflated model (`zero_inflated = TRUE`) may be more appropriate:
 
 ```{r, fig.height = 5}
 plot_predictions(fit_edge, num_draws = 100, type = "stats")
 ```
 
-These checks can reveal that a model doesn't describe the data well, but they can't prove that it does.
+Passing these checks does not guarantee that the model is appropriate, but failing them indicates a problem.
 
 ### Comparing with simple estimates
 
@@ -156,7 +156,7 @@ These checks can reveal that a model doesn't describe the data well, but they ca
 plot_predictions(fit_edge, type = "point")
 ```
 
-Each vertical line is a dyad's 90% credible interval, with the thicker part showing the 50% interval. The estimates should roughly follow the dashed line. Where there are few data, BISoN estimates are pulled towards the prior and are less extreme than the point estimates. This is intentional: a dyad seen together in 1 out of 1 sampling periods isn't good evidence that they're always together.
+Each vertical line is the 90% credible interval for a dyad, and the thicker section is the 50% interval. The estimates should roughly follow the dashed line. For dyads with few observations, the estimates are pulled towards the prior and are less extreme than the point estimates. For example, a dyad seen together in 1 out of 1 sampling periods has a point estimate of 1, but there is little evidence that they are always together.
 
 ## Looking at the network
 
@@ -166,7 +166,7 @@ Each vertical line is a dyad's 90% credible interval, with the thicker part show
 summary(fit_edge)
 ```
 
-For each dyad, `median` is the posterior median edge weight (here the probability that the pair are seen together in a sampling period), and `5%` and `95%` are the bounds of the 90% credible interval. There's a 90% probability that the true edge weight lies between them. `get_edgelist()` returns the same table as a data frame, and `ci = 0.95` gives 95% intervals instead.
+For each dyad, `median` is the posterior median of the edge weight (here, the probability that the pair are seen together in a sampling period), and `5%` and `95%` are the bounds of the 90% credible interval. `get_edgelist()` returns the same information as a data frame. The width of the interval can be changed with `ci`, for example `ci = 0.95`.
 
 `plot_network()` draws the network with its uncertainty:
 
@@ -174,11 +174,11 @@ For each dyad, `median` is the posterior median edge weight (here the probabilit
 plot_network(fit_edge, lwd = 5)
 ```
 
-Each edge is drawn twice. The dark inner line has the width of the **lower bound** (5%) of the edge weight: how weak the edge could plausibly be. The light outer band has the width of the **upper bound** (95%): how strong it could plausibly be. A thin dark line inside a wide light band is an uncertain edge; a dark line almost as wide as its band is a well-estimated one. Edges can be hidden from the plot with `threshold`, for example `threshold = 0.2` to only show edges with a median weight of at least 0.2.
+Each edge is drawn twice. The width of the dark line is the lower bound (5%) of the edge weight, and the width of the light band is the upper bound (95%). Edges with a large difference between the two are more uncertain. Edges can be hidden with `threshold`, for example `threshold = 0.2` only shows edges with a median weight of at least 0.2.
 
 ## Is the network non-random?
 
-A common first question is whether individuals have social preferences at all, or whether every dyad associates at the same rate. This is a Bayesian version of the classic test for non-random association. We compare the edge model with a null model that has a single rate for every dyad (`~ 1`):
+A test for non-random association can be carried out by comparing the edge model with a null model in which every dyad has the same rate (`~ 1`):
 
 ```{r}
 fit_null <- bison_model(
@@ -191,11 +191,11 @@ fit_null <- bison_model(
 model_comparison(list(non_random_model = fit_edge, random_model = fit_null))
 ```
 
-The weights are the relative support for each model when predicting new data (using leave-one-out cross-validation), and sum to 1. A weight close to 1 for the non-random model is evidence that dyads differ in how much they associate. With sparse data (only a few observations per dyad) the test can be inconclusive or even favour the simpler random model, because there isn't enough information to tell dyads apart. Almost all real networks are non-random, so this test is mostly a sanity check that the data contain enough information about social preferences.
+The weights are based on leave-one-out cross-validation and sum to 1. A weight close to 1 for the non-random model suggests that dyads differ in how often they associate. With few observations per dyad the comparison may be inconclusive, or may favour the null model, because there is not enough information to distinguish between dyads.
 
 ## Regressions
 
-Regressions that use the network are fitted with `bison_brm()`, a wrapper around the `brms` package that keeps the uncertainty in the network. The network quantity is written inside `bison()` in the formula.
+Regressions are fitted with `bison_brm()`, which uses the `brms` package. Network variables are specified with `bison()` in the model formula.
 
 ### Dyadic regression
 
@@ -207,7 +207,7 @@ df_dyadic <- df %>%
 head(df_dyadic)
 ```
 
-Edges that share a node aren't independent (an individual that is very social has strong edges with many others). The multi-membership term `(1 | mm(node_1_id, node_2_id))` accounts for this, and should be included in almost every dyadic regression:
+Edges that share a node are not independent. A multi-membership random effect, `(1 | mm(node_1_id, node_2_id))`, accounts for this and should usually be included in dyadic regressions:
 
 ```{r}
 fit_dyadic <- bison_brm(
@@ -221,11 +221,11 @@ fit_dyadic <- bison_brm(
 summary(fit_dyadic)
 ```
 
-In `bison_brm()`, edge weights are on the logit scale for binary models (log scale for count models), which is usually better suited to regression. `bison_brm()` fits a model to each of `num_draws` networks drawn from the posterior and combines them, so warnings about R-hat values are expected and can usually be ignored. See `vignette("bison_brms")` for more types of regression.
+In `bison_brm()`, edge weights are on the logit scale for binary models and the log scale for count models. A model is fitted to each of `num_draws` networks drawn from the posterior and the results are combined, so warnings about R-hat values are expected. See `vignette("bison_brms")` for other types of regression.
 
 ## Network metrics
 
-Posterior distributions of network metrics can be calculated with `extract_metric()`. For example, the coefficient of variation of edge weights (also called social differentiation) measures how varied social relationships are:
+Posterior distributions of network metrics can be calculated with `extract_metric()`. For example, the coefficient of variation of edge weights (social differentiation):
 
 ```{r}
 cv_samples <- extract_metric(fit_edge, "global_cv")
@@ -249,4 +249,4 @@ See `vignette("network_metrics")` for the full list of metrics and how they're d
 * `vignette("network_metrics")`: definitions of the available metrics.
 * `vignette("mixture_models")`: looking for different types of social relationship.
 
-If something doesn't work as expected, please [open an issue](https://github.com/JHart96/bisonR/issues) or ask in [Discussions](https://github.com/JHart96/bisonR/discussions).
+Questions can be asked in [Discussions](https://github.com/JHart96/bisonR/discussions), and bugs reported in [Issues](https://github.com/JHart96/bisonR/issues).

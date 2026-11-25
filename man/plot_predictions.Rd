@@ -28,30 +28,24 @@ plot_predictions(obj, ...)
 predictive checks).}
 }
 \description{
-Compares data simulated from a fitted model with the observed data. If the
-model describes the data well, the observed data should look like a typical
-simulated dataset.
+Compares data simulated from a fitted model with the observed data.
 }
 \details{
 Three types of check are available, chosen with \code{type}:
 \itemize{
 \item \code{"density"}: the distribution of observed event \emph{rates} per dyad (events
 divided by observation effort), compared with the same distribution in
-\code{num_draws} simulated datasets. Rates are used rather than raw event counts
-because raw counts mostly reflect how much each dyad was observed, which the
-model takes as given, so almost any model would match them.
+\code{num_draws} simulated datasets. Rates are used rather than event counts
+because counts largely reflect observation effort.
 \item \code{"stats"}: summary statistics of the per-dyad rates in each simulated
 dataset (proportion of dyads with no events, mean, standard deviation and
-maximum), with the observed value shown as a vertical line. These are good at
-revealing too many zeroes or too much or too little variation between dyads.
+maximum), with the observed value shown as a vertical line. These can show
+excess zeroes or over- or under-dispersion between dyads.
 \item \code{"point"}: posterior medians and intervals of the edge weights plotted against
-simple point estimates (events / effort). This isn't a predictive check; it
-shows how BISoN estimates are pulled towards the prior when there are few
+simple point estimates (events / effort). This is not a predictive check,
+but shows how estimates are pulled towards the prior when there are few
 data.
 }
-
-No check can show that a model is correct, but these can reveal common ways
-that it is wrong.
 }
 \examples{
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)

@@ -1,8 +1,8 @@
 #' Fit an edge weight model
 #'
-#' Fits a BISoN edge weight model, which estimates the strength of the social
-#' connection between each pair of nodes (dyad) *with uncertainty*, from
-#' observations of social events and the effort spent observing each dyad.
+#' Fits a BISoN edge weight model, which estimates a posterior distribution for
+#' the edge weight of each dyad from observations of social events and the
+#' observation effort for each dyad.
 #'
 #' @param formula A formula of the form `(event | effort) ~ dyad(node_1, node_2)`.
 #'   The left-hand side gives the column of social events (0/1 or counts) and the
@@ -39,8 +39,9 @@
 #' * `(1 | g)`: a random intercept for each level of column `g`.
 #' * `1` or `0`: include or exclude a global intercept (excluded by default).
 #'
-#' Including extra terms changes what the edge weights mean: they become the
-#' dyad's tendency to interact *after* accounting for those effects.
+#' Including other terms changes the interpretation of the edge weights, which
+#' then represent each dyad's tendency to interact after controlling for those
+#' effects.
 #'
 #' @return A `bison_model` object. Use [summary.bison_model()] or [get_edgelist()] to see the
 #'   edge weights, [plot_network()] to visualise them, [plot_trace()] and
