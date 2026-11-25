@@ -69,7 +69,7 @@ Then install bisonR from GitHub:
 remotes::install_github("JHart96/bisonR")
 ```
 
-On Windows you may need [Rtools](https://cran.r-project.org/bin/windows/Rtools/) first; the [Windows installation](articles/windows_installation.html) article covers common problems. Upcoming releases are developed on `release/<version>` branches and can be installed with, for example, `remotes::install_github("JHart96/bisonR@release/0.5.0")`.
+On Windows you may need [Rtools](https://cran.r-project.org/bin/windows/Rtools/) first; the [Windows installation](articles/windows_installation.html) article covers common problems. Upcoming releases are developed on `release/<version>` branches and can be installed with, for example, `remotes::install_github("JHart96/bisonR@release/1.1.0")`.
 
 ## Citing bisonR
 

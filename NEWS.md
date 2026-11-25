@@ -1,6 +1,6 @@
-# bisonR 0.5.0
+# bisonR 1.0.0
 
-This release fixes a number of bugs, mostly affecting edge cases and less common uses of the package, and makes some changes to how data and priors are checked. It also updates the documentation, tests and CI.
+bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affecting edge cases and less common uses of the package, adds checks on input data and priors, and updates the documentation, tests and CI. From this release, bisonR follows semantic versioning: breaking changes will only be made in major releases.
 
 ## Bug fixes
 

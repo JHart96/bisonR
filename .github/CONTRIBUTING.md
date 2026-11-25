@@ -5,7 +5,7 @@ This guide describes how changes to bisonR are made and released.
 ## Branches
 
 * **`main`** is the latest release, and is what `remotes::install_github("JHart96/bisonR")` installs. It is protected: changes can only be made through pull requests (PRs) that pass the required checks.
-* **`release/<version>`** (e.g. `release/0.5.0`) collects the work for the next release. When the release is ready, a PR from this branch into `main` is reviewed and merged, and a GitHub release is tagged.
+* **`release/<version>`** (e.g. `release/1.1.0`) collects the work for the next release. When the release is ready, a PR from this branch into `main` is reviewed and merged, and a GitHub release is tagged.
 * **Feature and fix branches** (`feature/<short-name>`, `fix/<short-name>`) hold individual changes. Branch from the current release branch and open your PR against it. Small urgent fixes to a release can branch from `main` and target `main` directly, as long as they bump the patch version.
 
 ## Checks on every pull request
@@ -23,16 +23,18 @@ GitHub Actions runs these checks on every PR. All except `test-coverage` must pa
 
 bisonR uses [semantic versioning](https://semver.org/) (`major.minor.patch`):
 
-* **patch** (0.5.0 → 0.5.1): bug fixes that don't change how existing code is used.
-* **minor** (0.5.0 → 0.6.0): new features, or changes that may alter results or require small changes to user code. These must be listed in `NEWS.md`.
-* **major**: reserved for 1.0.0 and later breaking changes.
+* **patch** (1.0.0 → 1.0.1): bug fixes that don't change how existing code is used.
+* **minor** (1.0.0 → 1.1.0): new features that don't break existing code.
+* **major** (1.0.0 → 2.0.0): breaking changes, such as removing or renaming arguments or functions, or changing results for the same input.
 
-The version can be bumped with `usethis::use_version("patch")` (or `"minor"`), which also adds a heading to `NEWS.md`.
+All changes should be listed in `NEWS.md`.
+
+The version can be bumped with `usethis::use_version("patch")` (or `"minor"` or `"major"`), which also adds a heading to `NEWS.md`.
 
 ## Making a change
 
 1. For larger changes, open an issue (or comment on an existing one) first.
-2. Create a branch from the current release branch: `git switch -c feature/my-change origin/release/0.5.0`.
+2. Create a branch from the current release branch: `git switch -c feature/my-change origin/release/<version>`.
 3. Make the change, with tests in `tests/testthat/` for any new behaviour or bug fix.
 4. Run `devtools::document()` if you changed roxygen comments, then `devtools::check()`.
 5. Add a bullet to `NEWS.md` under the version being worked on.

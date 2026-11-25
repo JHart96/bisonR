@@ -78,10 +78,10 @@ The first time you fit a model, bisonR compiles its Stan models, which takes a m
 
 ### Development versions
 
-The `main` branch always holds the latest release. Work on the next release happens on a `release/<version>` branch (for example `release/0.5.0`) and is merged into `main` when it's ready. To try an upcoming release before it's finished, bugs and all, install from its branch:
+The `main` branch always holds the latest release. Work on the next release is done on a `release/<version>` branch (for example `release/1.1.0`) and merged into `main` when it is ready. An upcoming release can be installed from its branch:
 
 ```r
-remotes::install_github("JHart96/bisonR@release/0.5.0")
+remotes::install_github("JHart96/bisonR@release/1.1.0")
 ```
 
 You can see which release branches exist on the [branches page](https://github.com/JHart96/bisonR/branches). Development versions aren't recommended for published analyses.
