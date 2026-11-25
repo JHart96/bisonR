@@ -51,7 +51,7 @@ Directed: FALSE
 ...
 ```
 
-For a more detailed example check out the *Getting Started* page here: https://jhart96.github.io/bisonR/articles/getting_started.html.
+For a more detailed example check out the *Getting Started* page here: https://bisonr.org/articles/getting_started.html.
 
 ## Installation
 
