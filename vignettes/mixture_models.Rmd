@@ -122,7 +122,7 @@ imputed_data[[2]]
 Now we have a set of imputed dataframes containing the posteriors of mixture-based node strength, we can fit the model using brm_multiple. 
 
 ```{r}
-fit_brm <- brm_multiple(trait ~ mix_strength, imputed_data, silent=2, refresh=0)
+fit_brm <- brm_multiple(trait ~ mix_strength, imputed_data, backend = "cmdstanr", silent = 2, refresh = 0)
 summary(fit_brm)
 ```
 
