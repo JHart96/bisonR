@@ -6,14 +6,18 @@
 #' @param param_names List of column names for network features (e.g. node_1_id, node_2_id or just node_id)
 #' @param target_name Name of network feature (edge, node, global)
 #' @param metric_name Name of network metric to calculate
-#' @param z_score Whether to Z-score bison variable or not.
+#' @param z_score Whether to standardise the network variable within each
+#'   posterior draw. Equivalent to `scale = "z"`.
+#' @param scale How to transform the network variable within each posterior
+#'   draw: `"none"` (default), `"centre"` (subtract the mean) or `"z"`
+#'   (subtract the mean and divide by the standard deviation).
 #'
 #' @return A mice mids object
 #' @examples
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 #' df <- sim_data$df_sim
 #' fit_edge <- bison_model(
-#'   (event | duration) ~ dyad(node_1_id, node_2_id),
+#'   (event | effort) ~ dyad(node_1_id, node_2_id),
 #'   data = df,
 #'   model_type = "binary_conjugate",
 #'   priors = get_default_priors("binary_conjugate")
@@ -23,7 +27,10 @@
 #' imputed <- bison_mice(fit_edge, df_nodal, "node", "node", "strength", num_draws = 5)
 #' head(mice::complete(imputed, 1))
 #' @export
-bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metric_name, num_draws=100, z_score=FALSE) {
+bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metric_name, num_draws=100, z_score=FALSE,
+                       scale = c("none", "centre", "z")) {
+  scale <- match.arg(scale)
+  if (isTRUE(z_score)) scale <- "z"
   check_suggested("mice", "bison_mice")
   if (target_name == "global" && is.data.frame(data_list)) {
     data_list <- lapply(seq_len(nrow(data_list)), function(i) data_list[i, , drop = FALSE])
@@ -83,11 +90,7 @@ bison_mice <- function(edgemodel_list, data_list, param_names, target_name, metr
     # For each posterior draw, combine dataframes from different edge models and data
     new_data_list <- lapply(1:length(edgemodel_list), function(j) {
       new_data <- data_list[[j]]
-      if (z_score) {
-        new_data[new_bison_term] <- (posterior_samples_list[[j]][i, ] - mean(posterior_samples_list[[j]][i, ]))/sd(posterior_samples_list[[j]][i, ])
-      } else {
-        new_data[new_bison_term] <- posterior_samples_list[[j]][i, ]
-      }
+      new_data[new_bison_term] <- scale_draw(posterior_samples_list[[j]][i, ], scale)
       new_data["bison_network"] <- j
       new_data
     })
@@ -139,4 +142,18 @@ lookup_node_ids <- function(model, data, column, model_number) {
     )
   }
   ids
+}
+
+# Transform one posterior draw of a network variable.
+scale_draw <- function(x, scale) {
+  if (scale == "centre") {
+    return(x - mean(x))
+  }
+  if (scale == "z") {
+    if (length(x) < 2 || stats::sd(x) == 0) {
+      stop("Can't standardise a network variable with fewer than two distinct values.", call. = FALSE)
+    }
+    return((x - mean(x)) / stats::sd(x))
+  }
+  x
 }

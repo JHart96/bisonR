@@ -7,9 +7,18 @@ utils::globalVariables(c(".imp"))
 #' @param edgemodel_list A bisonR edge model (or a list of them)
 #' @param data_list A dataframe of regression variables compatible with a brms model (or a list of them)
 #' @param num_draws Number of draws from the network posterior to use when fitting model
-#' @param z_score Whether to Z-score bison variable or not.
+#' @param z_score Whether to standardise the network variable within each
+#'   posterior draw. Equivalent to `scale = "z"`.
 #' @param cores Number of computational cores to use.
 #' @param chains Number of chains to run per model.
+#' @param scale How to transform the network variable within each posterior
+#'   draw: `"none"` (default), `"centre"` (subtract the mean) or `"z"` (subtract
+#'   the mean and divide by the standard deviation). Transformations are applied
+#'   across the rows used in the model, separately for each network.
+#' @param subset An optional logical expression, evaluated in each data frame,
+#'   selecting the rows to use, e.g. `subset = sex == "F"`. Network metrics are
+#'   still calculated from the whole network; only the rows of the regression
+#'   are selected. Not available for global metrics.
 #' @param ... Additional arguments to be passed to brm(), such as family or priors
 #'
 #' @return A fitted brms model
@@ -17,7 +26,7 @@ utils::globalVariables(c(".imp"))
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 #' df <- sim_data$df_sim
 #' fit_edge <- bison_model(
-#'   (event | duration) ~ dyad(node_1_id, node_2_id),
+#'   (event | effort) ~ dyad(node_1_id, node_2_id),
 #'   data = df,
 #'   model_type = "binary_conjugate",
 #'   priors = get_default_priors("binary_conjugate")
@@ -32,12 +41,15 @@ utils::globalVariables(c(".imp"))
 #' )
 #' summary(fit_dyadic)
 #' @export
-bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score=FALSE, cores=4, chains=2, ...) {
+bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score=FALSE, cores=4, chains=2,
+                      scale = c("none", "centre", "z"), subset = NULL, ...) {
   check_suggested("brms", "bison_brm")
   check_suggested("mice", "bison_brm")
+  scale <- match.arg(scale)
   # Parse formula
   parsed_formula <- parse_bison_brms_formula(formula)
   brms_formula <- parsed_formula$brms_formula
+  data_list <- subset_bison_data(data_list, substitute(subset), parent.frame(), parsed_formula$target_name)
 
   if (parsed_formula$target_name == "edge" && !grepl("mm\\(", brms_formula)) {
     warning(
@@ -56,7 +68,8 @@ bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score
     parsed_formula$target_name,
     parsed_formula$metric_name,
     num_draws,
-    z_score
+    z_score,
+    scale = scale
   )
 
   # Run brms imputation. brm_multiple() warns that E-BFMI can't be computed for
@@ -76,6 +89,8 @@ bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score
 #' @param formula A formula compatible with a brms model
 #' @param edgemodel_list A bisonR edge model (or a list of them)
 #' @param data_list A dataframe of regression variables compatible with a brms model (or a list of them)
+#' @param scale,subset As for [bison_brm()]. The scale of the network variable
+#'   affects the default priors, so use the same value as in [bison_brm()].
 #' @param ... Additional parameters to be passed to brms::get_prior()
 #'
 #' @return The output from brms::get_prior()
@@ -84,7 +99,7 @@ bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 #' df <- sim_data$df_sim
 #' fit_edge <- bison_model(
-#'   (event | duration) ~ dyad(node_1_id, node_2_id),
+#'   (event | effort) ~ dyad(node_1_id, node_2_id),
 #'   data = df,
 #'   model_type = "binary_conjugate",
 #'   priors = get_default_priors("binary_conjugate")
@@ -95,12 +110,15 @@ bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score
 #'   df
 #' )
 #' @export
-bison_brm_get_prior <- function(formula, edgemodel_list, data_list, ...) {
+bison_brm_get_prior <- function(formula, edgemodel_list, data_list, scale = c("none", "centre", "z"),
+                                subset = NULL, ...) {
+  scale <- match.arg(scale)
   check_suggested("brms", "bison_brm_get_prior")
   check_suggested("mice", "bison_brm_get_prior")
   # Parse formula
   parsed_formula <- parse_bison_brms_formula(formula)
   brms_formula <- parsed_formula$brms_formula
+  data_list <- subset_bison_data(data_list, substitute(subset), parent.frame(), parsed_formula$target_name)
 
   # Generate mice object
   mice_obj <- bison_mice(
@@ -109,7 +127,8 @@ bison_brm_get_prior <- function(formula, edgemodel_list, data_list, ...) {
     parsed_formula$param_names,
     parsed_formula$target_name,
     parsed_formula$metric_name,
-    num_draws=2
+    num_draws=2,
+    scale = scale
   )
 
   data <- mice::complete(mice_obj)
@@ -171,4 +190,30 @@ bison_term_name <- function(target_name, metric_name) {
   name <- paste0("bison_", target_name, "_", metric_name)
   name <- gsub("[^A-Za-z0-9_]+", "_", name)
   sub("_+$", "", name)
+}
+
+# Select rows of the regression data with a logical expression evaluated in
+# each data frame.
+subset_bison_data <- function(data_list, subset_expr, env, target_name) {
+  if (is.null(subset_expr)) {
+    return(data_list)
+  }
+  if (target_name == "global") {
+    stop("`subset` can't be used with global metrics; select the edge models and rows directly.", call. = FALSE)
+  }
+  select_rows <- function(df) {
+    keep <- eval(subset_expr, df, env)
+    if (!is.logical(keep) || length(keep) != nrow(df)) {
+      stop("`subset` must be a logical expression with one value per row of the data.", call. = FALSE)
+    }
+    keep[is.na(keep)] <- FALSE
+    if (!any(keep)) {
+      stop("`subset` doesn't select any rows.", call. = FALSE)
+    }
+    df[keep, , drop = FALSE]
+  }
+  if (is.data.frame(data_list)) {
+    return(select_rows(data_list))
+  }
+  lapply(data_list, select_rows)
 }

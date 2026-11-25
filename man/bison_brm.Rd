@@ -12,6 +12,8 @@ bison_brm(
   z_score = FALSE,
   cores = 4,
   chains = 2,
+  scale = c("none", "centre", "z"),
+  subset = NULL,
   ...
 )
 }
@@ -24,11 +26,22 @@ bison_brm(
 
 \item{num_draws}{Number of draws from the network posterior to use when fitting model}
 
-\item{z_score}{Whether to Z-score bison variable or not.}
+\item{z_score}{Whether to standardise the network variable within each
+posterior draw. Equivalent to \code{scale = "z"}.}
 
 \item{cores}{Number of computational cores to use.}
 
 \item{chains}{Number of chains to run per model.}
+
+\item{scale}{How to transform the network variable within each posterior
+draw: \code{"none"} (default), \code{"centre"} (subtract the mean) or \code{"z"} (subtract
+the mean and divide by the standard deviation). Transformations are applied
+across the rows used in the model, separately for each network.}
+
+\item{subset}{An optional logical expression, evaluated in each data frame,
+selecting the rows to use, e.g. \code{subset = sex == "F"}. Network metrics are
+still calculated from the whole network; only the rows of the regression
+are selected. Not available for global metrics.}
 
 \item{...}{Additional arguments to be passed to brm(), such as family or priors}
 }
@@ -42,7 +55,7 @@ Fit a brms model on BISoN network data
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 df <- sim_data$df_sim
 fit_edge <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df,
   model_type = "binary_conjugate",
   priors = get_default_priors("binary_conjugate")

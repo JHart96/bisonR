@@ -4,7 +4,14 @@
 \alias{bison_brm_get_prior}
 \title{Get priors for BISoN brm model}
 \usage{
-bison_brm_get_prior(formula, edgemodel_list, data_list, ...)
+bison_brm_get_prior(
+  formula,
+  edgemodel_list,
+  data_list,
+  scale = c("none", "centre", "z"),
+  subset = NULL,
+  ...
+)
 }
 \arguments{
 \item{formula}{A formula compatible with a brms model}
@@ -12,6 +19,9 @@ bison_brm_get_prior(formula, edgemodel_list, data_list, ...)
 \item{edgemodel_list}{A bisonR edge model (or a list of them)}
 
 \item{data_list}{A dataframe of regression variables compatible with a brms model (or a list of them)}
+
+\item{scale, subset}{As for \code{\link[=bison_brm]{bison_brm()}}. The scale of the network variable
+affects the default priors, so use the same value as in \code{\link[=bison_brm]{bison_brm()}}.}
 
 \item{...}{Additional parameters to be passed to brms::get_prior()}
 }
@@ -25,7 +35,7 @@ Wrapper for brms::get_prior() for use with bison_brm.
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 df <- sim_data$df_sim
 fit_edge <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df,
   model_type = "binary_conjugate",
   priors = get_default_priors("binary_conjugate")

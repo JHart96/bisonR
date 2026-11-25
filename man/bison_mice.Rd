@@ -11,7 +11,8 @@ bison_mice(
   target_name,
   metric_name,
   num_draws = 100,
-  z_score = FALSE
+  z_score = FALSE,
+  scale = c("none", "centre", "z")
 )
 }
 \arguments{
@@ -27,7 +28,12 @@ bison_mice(
 
 \item{num_draws}{Number of draws from the network posterior}
 
-\item{z_score}{Whether to Z-score bison variable or not.}
+\item{z_score}{Whether to standardise the network variable within each
+posterior draw. Equivalent to \code{scale = "z"}.}
+
+\item{scale}{How to transform the network variable within each posterior
+draw: \code{"none"} (default), \code{"centre"} (subtract the mean) or \code{"z"}
+(subtract the mean and divide by the standard deviation).}
 }
 \value{
 A mice mids object
@@ -39,7 +45,7 @@ Generate a mice mids object
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 df <- sim_data$df_sim
 fit_edge <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
+  (event | effort) ~ dyad(node_1_id, node_2_id),
   data = df,
   model_type = "binary_conjugate",
   priors = get_default_priors("binary_conjugate")
