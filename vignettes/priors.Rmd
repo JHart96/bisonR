@@ -35,17 +35,16 @@ get_default_priors("binary")
 get_default_priors("count")
 ```
 
-Binary and count models have the same five priors:
+Binary and count models have the same four priors:
 
 | Prior | Parameter | Distribution |
 |---|---|---|
 | `edge` | Edge weight of each dyad, on the link scale | Normal |
 | `fixed` | Each fixed effect parameter (`+ x` in the formula), on the link scale | Normal |
-| `random_mean` | Mean of the first random effect, in models with no `dyad()` term, intercept or factor fixed effect | Normal |
 | `random_std` | Standard deviation of each group of random effects | Half-normal |
 | `zero_prob` | Probability that an observation is a structural zero, in zero-inflated models | Beta |
 
-Priors for parameters that are not in the model are ignored. For example, `random_std` only matters if the formula contains a random effect, `random_mean` only matters for a random effect in a model with no `dyad()` term, intercept or factor fixed effect (otherwise random effects are centred on 0), and `zero_prob` only matters if `zero_inflated = TRUE`.
+Priors for parameters that are not in the model are ignored. For example, `random_std` only matters if the formula contains a random effect, and `zero_prob` only matters if `zero_inflated = TRUE`. Random effects are centred on 0, so they have no prior for their mean.
 
 The default `edge` prior differs between the two model types: `normal(0, 2.5)` for binary models and `normal(0, 1)` for count models. The other defaults are the same.
 
@@ -76,7 +75,7 @@ In binary and count models, the edge weights and other effects are combined on a
 * In binary models the link is the logit. The probability of an event in a sampling period is `plogis(edge + effects)`. An edge weight of 0 corresponds to a probability of 0.5, -2 to about 0.12, and 2 to about 0.88.
 * In count models the link is the log. The expected number of events is `exp(edge + effects) * effort`, so an edge weight of 0 corresponds to a rate of one event per unit of effort.
 
-The `edge`, `fixed` and `random_mean` priors are therefore distributions over log-odds (binary) or log-rates (count). A fixed effect with a `normal(0, 2.5)` prior is a change in log-odds or log-rate per unit of the predictor, so the scale of the predictor affects what the prior means. A predictor measured in days and the same predictor measured in years imply very different effect sizes under the same prior.
+The `edge` and `fixed` priors are therefore distributions over log-odds (binary) or log-rates (count). A fixed effect with a `normal(0, 2.5)` prior is a change in log-odds or log-rate per unit of the predictor, so the scale of the predictor affects what the prior means. A predictor measured in days and the same predictor measured in years imply very different effect sizes under the same prior.
 
 A normal prior on the logit scale does not have the same shape on the probability scale. A wide normal prior on the logit scale puts much of its weight close to 0 and 1. This can be seen by drawing values from the prior and transforming them:
 

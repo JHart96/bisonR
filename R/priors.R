@@ -14,7 +14,6 @@ get_default_priors <- function(model_type) {
     priors <- list(
       edge="normal(0, 2.5)",
       fixed="normal(0, 2.5)",
-      random_mean="normal(0, 1)",
       random_std="half-normal(1)",
       zero_prob="beta(1, 1)"
     )
@@ -25,7 +24,6 @@ get_default_priors <- function(model_type) {
     priors <- list(
       edge="normal(0, 1)",
       fixed="normal(0, 2.5)",
-      random_mean="normal(0, 1)",
       random_std="half-normal(1)",
       zero_prob="beta(1, 1)"
     )
@@ -219,6 +217,14 @@ validate_priors <- function(priors, model_type) {
     stop("`priors` must be a named list, like the output of get_default_priors().", call. = FALSE)
   }
   defaults <- get_default_priors(model_type)
+  if ("random_mean" %in% names(priors)) {
+    warning(
+      "The `random_mean` prior is no longer used: random effects are centred on 0. ",
+      "Add an intercept (`1`) to the formula if the model needs an overall level.",
+      call. = FALSE
+    )
+    priors$random_mean <- NULL
+  }
   unknown <- setdiff(names(priors), names(defaults))
   if (length(unknown) > 0) {
     stop(
@@ -235,7 +241,6 @@ validate_priors <- function(priors, model_type) {
   allowed <- list(
     edge = switch(model_type, binary_conjugate = "beta", count_conjugate = "gamma", "normal"),
     fixed = "normal",
-    random_mean = "normal",
     random_std = "half-normal",
     zero_prob = "beta"
   )

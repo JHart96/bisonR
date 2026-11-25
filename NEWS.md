@@ -23,7 +23,7 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 * For undirected networks, `node_1` in `get_edgelist()` is now the node that comes first in the node levels.
 * `extract_metric(obj, "edge_weight")` returns edge weights on the natural scale by default. Use `transform = FALSE` for the link scale. `bison_brm()` still uses the link scale.
 * Conjugate models now give an error if the formula includes fixed effects, random effects or an intercept.
-* Random effects in edge models with a `dyad()` term, an intercept or a factor fixed effect are now centred on 0. Previously each random effect had an estimated mean, which overlapped with the edge weights so that their overall level depended on the priors. The mean is still estimated, with the `random_mean` prior, for the first random effect in models without any of these terms.
+* Random effects are now centred on 0, and the `random_mean` prior has been removed (prior lists that include it give a warning). Previously each random effect had an estimated mean, which overlapped with the edge weights so that their overall level depended on the priors. Models with random effects but no `dyad()` term or factor fixed effect need an explicit intercept, e.g. `(event | effort) ~ 1 + (1 | group)`, and give a warning without one.
 * `bison_save()` writes a single `.rds` file.
 * `simulate_bison_model()` count data have more variation between edges, and a smaller age-difference effect.
 

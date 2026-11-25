@@ -108,7 +108,7 @@ fit_random <- bison_model(
 
 As with fixed effects, there is one parameter for each level, stored in `beta_random`. The difference is that the levels are drawn from a common normal distribution with mean 0 and standard deviation `random_group_sigma`, which is estimated from the data with the `random_std` prior. Because the levels are centred on 0, the overall rate of events is described by the edge weights, and the random effects describe how each location differs from it.
 
-In a model without a `dyad()` term, intercept or factor fixed effect, such as `(event | duration) ~ (1 | location)`, nothing else sets the overall rate. The first random effect then has an estimated mean, `random_group_mu`, with the `random_mean` prior.
+In a model without a `dyad()` term or factor fixed effect, an intercept is needed to set the overall rate, for example `(event | duration) ~ 1 + (1 | location)`. `bison_model()` gives a warning if it is missing.
 
 ```{r}
 colnames(fit_random$model_data$design_random)
@@ -228,7 +228,7 @@ Partial pooling assumes that the edge weights in the network come from a single 
 
 * Fixed effects (`+ x`) and random effects (`+ (1 | g)`) account for factors that vary between observations of the same dyad. They need disaggregated data and binary or count models.
 * Factor fixed effects get one parameter per level. Integer columns are treated as numeric unless they are converted to factors.
-* The fitted effects are in `fit$fit`, under `beta_fixed`, `beta_random` and `random_group_sigma` (and `random_group_mu` in models where the first random effect has an estimated mean). The level names are the column names of `fit$model_data$design_fixed` and `fit$model_data$design_random`.
+* The fitted effects are in `fit$fit`, under `beta_fixed`, `beta_random` and `random_group_sigma`. The level names are the column names of `fit$model_data$design_fixed` and `fit$model_data$design_random`.
 * With additional effects, edge weights describe each dyad's tendency to interact after accounting for those effects. Their overall level is shared with the effects and depends partly on the priors.
 * Dyad-level predictors belong in downstream regressions with `bison_brm()`, not in the edge model.
 * `partial_pooling = TRUE` estimates the spread of edge weights from the data, around a mean fixed by the `edge` prior.

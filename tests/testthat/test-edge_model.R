@@ -130,7 +130,7 @@ test_that("models can be saved and loaded", {
   expect_equal(dim(reloaded$fit$draws("edge_weight")), dim(fit$fit$draws("edge_weight")))
 })
 
-test_that("random effects are centred on zero when the model has edge weights", {
+test_that("random effects are centred on zero", {
   skip_if_no_cmdstan()
   skip_on_cran()
   set.seed(8)
@@ -139,13 +139,11 @@ test_that("random effects are centred on zero when the model has edge weights", 
   df$location <- factor(df$location)
   fit_dyad <- quiet(bison_model((event | duration) ~ dyad(node_1_id, node_2_id) + (1 | location), df, "binary",
                                 priors = get_default_priors("binary"), iter_sampling = 300, seed = 1))
-  expect_equal(fit_dyad$model_data$num_random_mean, 0)
   expect_false(any(grepl("^random_group_mu", colnames(fit_dyad$fit$draws(format = "matrix")))))
 
-  # A model with only a random effect still estimates the overall level
-  fit_random <- quiet(bison_model((event | duration) ~ (1 | location), df, "binary",
+  # With an explicit intercept, the overall level is estimated by the intercept
+  fit_random <- quiet(bison_model((event | duration) ~ 1 + (1 | location), df, "binary",
                                   priors = get_default_priors("binary"), iter_sampling = 300, seed = 1))
-  mu <- fit_random$fit$draws("random_group_mu", format = "matrix")
-  expect_equal(ncol(mu), 1)
-  expect_equal(plogis(median(mu)), mean(df$event), tolerance = 0.15)
+  intercept <- fit_random$fit$draws("beta_fixed", format = "matrix")
+  expect_equal(plogis(median(intercept)), mean(df$event), tolerance = 0.15)
 })

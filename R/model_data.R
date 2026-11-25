@@ -321,17 +321,22 @@ get_bison_model_data <- function(formula, observations, directed, model_type) {
     num_fixed = ncol(design_fixed),
     num_random = ncol(design_random),
     num_random_groups = length(unique(random_group_index)),
-    random_group_index = as.integer(factor(random_group_index, levels = unique(random_group_index))),
-    # Random effects are centred on 0, except that the first random effect has an
-    # estimated mean when no other term sets the overall level of the predictor
-    # (no dyad() term, no intercept and no factor fixed effects).
-    num_random_mean = as.integer(
-      length(model_spec$random) > 0 && is.null(model_spec$node_1_name) &&
-        !model_spec$intercept && !has_factor_fixed
-    )
+    random_group_index = as.integer(factor(random_group_index, levels = unique(random_group_index)))
   )
   if (model_type == "binary") {
     model_data$divisor <- as.integer(round(divisor))
+  }
+
+  # Random effects are centred on 0, so without a dyad() term, an intercept or a
+  # factor fixed effect nothing sets the overall rate of events.
+  if (length(model_spec$random) > 0 && is.null(model_spec$node_1_name) &&
+      !model_spec$intercept && !has_factor_fixed) {
+    warning(
+      "Random effects are centred on 0, and the model has no dyad() term, intercept or factor ",
+      "fixed effect to set the overall rate of events. Add an intercept with `1`, e.g. ",
+      "(event | effort) ~ 1 + (1 | group).",
+      call. = FALSE
+    )
   }
 
   list(

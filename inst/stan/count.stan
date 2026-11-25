@@ -13,14 +13,11 @@ data {
   matrix[num_rows, num_fixed] design_fixed; // Design matrix for fixed effects
   matrix[num_rows, num_random] design_random; // Design matrix for random effects.
   array[num_random] int<lower=0, upper=num_random_groups> random_group_index; // Index for groupings for random effects
-  int<lower=0, upper=1> num_random_mean; // 1 if the first random effect has an estimated mean (only when no other term sets the overall level)
 
   real prior_edge_mu; // Prior mean for edge weights
   real<lower=0> prior_edge_sigma; // Prior standard deviation for edge weights (or for their spread, with partial pooling)
   real prior_fixed_mu; // Prior mean for fixed effects
   real<lower=0> prior_fixed_sigma; // Prior standard deviation for fixed effects
-  real prior_random_mean_mu; // Prior mean on centralisation of random effects
-  real<lower=0> prior_random_mean_sigma; // Prior standard deviation on centralisation of random effects
   real<lower=0> prior_random_std_sigma; // Prior standard deviation on dispersion of random effects
   real<lower=0> prior_zero_prob_alpha; // Prior alpha on zero inflation
   real<lower=0> prior_zero_prob_beta; // Prior beta on zero inflation
@@ -34,8 +31,7 @@ parameters {
   vector[num_edges] edge_raw; // Standardised edge weights (non-centred parameterisation)
   vector[num_fixed] beta_fixed; // Parameters for fixed effects.
   vector[num_random] random_raw; // Standardised random effects (non-centred parameterisation)
-  vector[num_random_mean] random_group_mu; // Mean of the first random effect, if estimated (otherwise random effects are centred on 0).
-  vector<lower=0>[num_random_groups] random_group_sigma; // Hyperpriors for random effects (std. dev.).
+  vector<lower=0>[num_random_groups] random_group_sigma; // Standard deviation of each group of random effects (centred on 0).
   vector<lower=0>[partial_pooling] edge_sigma; // Spread of edge weights when pooling.
   vector<lower=0, upper=1>[zero_inflated] zero_prob; // Probability of a structural zero.
 }
@@ -51,11 +47,7 @@ transformed parameters {
     edge_weight = prior_edge_mu + prior_edge_sigma * edge_raw;
   }
   if (num_random > 0) {
-    vector[num_random_groups] group_mean = rep_vector(0, num_random_groups);
-    if (num_random_mean == 1) {
-      group_mean[1] = random_group_mu[1];
-    }
-    beta_random = group_mean[random_group_index] + random_group_sigma[random_group_index] .* random_raw;
+    beta_random = random_group_sigma[random_group_index] .* random_raw;
   }
 
   predictor = rep_vector(0, num_rows);
@@ -98,7 +90,6 @@ model {
   }
   if (num_random > 0) {
     random_raw ~ std_normal();
-    random_group_mu ~ normal(prior_random_mean_mu, prior_random_mean_sigma);
     random_group_sigma ~ normal(0, prior_random_std_sigma);
   }
 }
