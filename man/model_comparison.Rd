@@ -2,20 +2,29 @@
 % Please edit documentation in R/model_comparison.R
 \name{model_comparison}
 \alias{model_comparison}
-\title{Run leave-one-out model comparison}
+\title{Compare models with leave-one-out cross-validation}
 \usage{
 model_comparison(models, ...)
 }
 \arguments{
-\item{models}{List of fitted models to compare}
+\item{models}{A list of fitted models, ideally named. All models must be fitted
+to the same data (the same rows, in the same order).}
 
-\item{...}{Additional arguments to be passed to \code{loo::loo_model_weights}}
+\item{...}{Additional arguments passed to \code{\link[loo:loo_model_weights]{loo::loo_model_weights()}}, such as
+\code{method = "pseudobma"}.}
 }
 \value{
-The output of the \code{loo_compare} function for the fitted models.
+The model weights returned by \code{\link[loo:loo_model_weights]{loo::loo_model_weights()}}.
 }
 \description{
-Run leave-one-out model comparison
+Compares fitted models by their expected predictive accuracy, estimated with
+Pareto-smoothed importance sampling leave-one-out cross-validation (PSIS-LOO)
+from the loo package, and returns model weights.
+}
+\details{
+If the models have different numbers of posterior draws (for example
+because a chain failed), the same number of draws is taken at random from
+each model.
 }
 \examples{
 # Test for non-random edge weights by comparing a model with edge weights

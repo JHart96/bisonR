@@ -79,3 +79,20 @@ test_that("conjugate models work with summaries, plots and model comparison", {
   comparison <- suppressWarnings(model_comparison(list(a = fit, b = fit)))
   expect_equal(names(comparison), c("a", "b"))
 })
+
+test_that("model_comparison works when models have different numbers of draws", {
+  sim <- simulate_bison_model("binary", aggregated = TRUE)
+  f <- (event | duration) ~ dyad(node_1_id, node_2_id)
+  fit_a <- bison_model(f, sim$df_sim, "binary_conjugate", priors = conjugate_priors("binary"), iter_sampling = 100)
+  fit_b <- bison_model(f, sim$df_sim, "binary_conjugate", priors = conjugate_priors("binary"), iter_sampling = 75)
+  expect_message(
+    comparison <- suppressWarnings(model_comparison(list(a = fit_a, b = fit_b))),
+    "different numbers of posterior draws"
+  )
+  expect_equal(names(comparison), c("a", "b"))
+
+  sim_other <- simulate_bison_model("binary", aggregated = TRUE, num_nodes = 6)
+  fit_c <- bison_model(f, sim_other$df_sim, "binary_conjugate", priors = conjugate_priors("binary"))
+  expect_error(model_comparison(list(a = fit_a, c = fit_c)), "same data")
+  expect_error(model_comparison(list(a = fit_a)), "at least two")
+})

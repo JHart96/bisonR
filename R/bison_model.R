@@ -141,6 +141,7 @@ bison_model <- function(formula, data,
       iter_warmup = iter_warmup,
       ...
     )
+    check_chains(fit)
 
     if (model_info$num_dyads > 0) {
       chain <- as_plain_matrix(fit$draws("edge_weight", format = "matrix"))
@@ -176,6 +177,36 @@ bison_model <- function(formula, data,
   )
   class(obj) <- "bison_model"
   obj
+}
+
+# Check that every MCMC chain finished. Chains that fail (for example because the
+# sampler process crashed) are dropped by cmdstanr, so warn about them, and stop
+# if none finished.
+check_chains <- function(fit) {
+  return_codes <- tryCatch(fit$return_codes(), error = function(e) NULL)
+  if (is.null(return_codes)) {
+    return(invisible(TRUE))
+  }
+  failed <- which(return_codes != 0)
+  if (length(failed) == 0) {
+    return(invisible(TRUE))
+  }
+  chain_output <- tryCatch(
+    paste(utils::tail(fit$output(failed[1]), 15), collapse = "\n"),
+    error = function(e) ""
+  )
+  if (length(failed) == length(return_codes)) {
+    stop(
+      "All MCMC chains failed. Output from chain ", failed[1], ":\n", chain_output,
+      call. = FALSE
+    )
+  }
+  warning(
+    length(failed), " of ", length(return_codes), " MCMC chains failed and were dropped; ",
+    "results use the remaining chains. Output from chain ", failed[1], ":\n", chain_output,
+    call. = FALSE
+  )
+  invisible(FALSE)
 }
 
 # Convert a posterior draws_matrix into a plain numeric matrix, so that
