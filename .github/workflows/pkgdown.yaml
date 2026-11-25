@@ -1,28 +1,32 @@
-# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
-# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+# Builds the pkgdown site on every PR (so broken docs are caught before merge)
+# and deploys it to the gh-pages branch (served at https://bisonr.org) only on
+# pushes to main and on releases.
 on:
   push:
-    branches: [main, master]
-    tags: ['*']
+    branches: [main]
   pull_request:
-    branches: [master, main]
+  release:
+    types: [published]
+  workflow_dispatch:
 
 name: pkgdown
 
+permissions: read-all
+
+concurrency:
+  group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
+
 jobs:
   pkgdown:
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.fork == false
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-      isPush: ${{ github.event_name == 'push' }}
+      CMDSTAN_VERSION: "2.36.0"
+    permissions:
+      contents: write
 
     steps:
-      - uses: actions/checkout@v2
-
-      - uses: r-lib/actions/setup-tinytex@v2
+      - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -35,18 +39,27 @@ jobs:
           extra-packages: any::pkgdown, local::.
           needs: website
 
-      - name: Install cmdstan
-        run: |
-          cmdstanr::check_cmdstan_toolchain(fix = TRUE)
-          cmdstanr::install_cmdstan()
+      - name: Cache CmdStan
+        uses: actions/cache@v4
+        with:
+          path: ~/.cmdstan
+          key: cmdstan-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-release
+
+      - name: Install CmdStan
         shell: Rscript {0}
-
-      - name: Install package
-        run: R CMD INSTALL .
-
-      - name: Build and deploy pkgdown site
-        if: contains(env.isPush, 'true')
         run: |
-          git config --local user.name "$GITHUB_ACTOR"
-          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          Rscript -e 'pkgdown::deploy_to_branch(new_process = FALSE)'
+          if (is.null(tryCatch(cmdstanr::cmdstan_path(), error = function(e) NULL))) {
+            cmdstanr::install_cmdstan(version = Sys.getenv("CMDSTAN_VERSION"), cores = 2)
+          }
+
+      - name: Build site
+        shell: Rscript {0}
+        run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
+
+      - name: Deploy to GitHub Pages
+        if: github.event_name != 'pull_request'
+        uses: JamesIves/github-pages-deploy-action@v4.6.4
+        with:
+          clean: false
+          branch: gh-pages
+          folder: docs
