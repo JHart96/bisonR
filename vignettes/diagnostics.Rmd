@@ -218,7 +218,7 @@ The two models can also be compared with `model_comparison()`, which uses leave-
 model_comparison(list(standard = fit_standard, zero_inflated = fit_zero))
 ```
 
-The stacking weights favour the standard model (0.82) over the zero-inflated model (0.18). However, the comparison gives warnings that some Pareto k values are too high. This means that the approximation used to calculate LOO is unreliable for some rows of the data, and so are the weights. The Pareto k values for a model can be seen with the `loo` package (they don't depend on the relative efficiency, `r_eff`, which `model_comparison()` calculates from the MCMC chains):
+The stacking weights favour the standard model (0.82) over the zero-inflated model (0.18). However, the comparison gives warnings that some Pareto k values are too high. This means that the approximation used to calculate LOO is unreliable for some rows of the data, and so are the weights. The Pareto k values for a model can be seen with the `loo` package. They may differ slightly from those used by `model_comparison()`, which also accounts for autocorrelation in the MCMC chains:
 
 ```{r}
 loo::loo(fit_standard$log_lik)
