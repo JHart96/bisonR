@@ -10,13 +10,20 @@ plot_trace(obj, par_ids = 1:5, ...)
 \item{obj}{A fitted \code{bison_model} object (fitted with Stan, not a conjugate
 model).}
 
-\item{par_ids}{Indices of the edge weights to plot.}
+\item{par_ids}{Indices of the edge weights to plot, in the order of
+\code{\link[=get_edgelist]{get_edgelist()}}. Indices beyond the number of edges are ignored.}
 
 \item{...}{Additional arguments passed to \code{\link[=plot]{plot()}}.}
 }
+\value{
+\code{NULL}, invisibly. The function is called for its plots.
+}
 \description{
-Plots the MCMC chains for some of the edge weights of a fitted model. The
-chains should overlap and show no trends.
+Plots the MCMC chains for some of the edge weights of a fitted model, to
+check that the sampler worked. MCMC (Markov chain Monte Carlo) draws samples
+from the posterior in several independent runs called chains. The chains
+should overlap and show no trends; if they don't, the posterior may not be
+reliable, and running more warmup iterations may help.
 }
 \examples{
 \dontshow{if (!is.null(tryCatch(cmdstanr::cmdstan_path(), error = function(e) NULL))) withAutoprint(\{ # examplesIf}
@@ -28,4 +35,7 @@ fit_edge <- bison_model(
 )
 plot_trace(fit_edge, par_ids = 1:4)
 \dontshow{\}) # examplesIf}
+}
+\seealso{
+\code{\link[=plot_predictions]{plot_predictions()}} for checking model fit.
 }

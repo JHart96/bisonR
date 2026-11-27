@@ -16,7 +16,7 @@ plot_predictions(obj, ...)
 )
 }
 \arguments{
-\item{obj}{A fitted model.}
+\item{obj}{A fitted \code{bison_model} object.}
 
 \item{...}{Arguments passed to methods.}
 
@@ -27,8 +27,14 @@ plot_predictions(obj, ...)
 \item{draw_data}{Whether to show the observed data (set to \code{FALSE} for prior
 predictive checks).}
 }
+\value{
+\code{NULL}, invisibly. The function is called for its plots.
+}
 \description{
-Compares data simulated from a fitted model with the observed data.
+Compares data simulated from a fitted model with the observed data, to
+check whether the model describes the data well. If the model fits, the
+observed data should look like a typical simulated dataset. Use it after
+\code{\link[=bison_model]{bison_model()}}, before interpreting the results.
 }
 \details{
 Three types of check are available, chosen with \code{type}:
@@ -46,6 +52,8 @@ simple point estimates (events / effort). This is not a predictive check,
 but shows how estimates are pulled towards the prior when there are few
 data.
 }
+
+The default shows the \code{"density"} and \code{"point"} plots.
 }
 \examples{
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
@@ -57,4 +65,8 @@ fit_edge <- bison_model(
 )
 plot_predictions(fit_edge, type = "density")
 plot_predictions(fit_edge, type = "stats")
+}
+\seealso{
+\code{\link[=prior_predictive_check]{prior_predictive_check()}} for the same plots using only the
+priors, and \code{\link[=plot_trace]{plot_trace()}}.
 }

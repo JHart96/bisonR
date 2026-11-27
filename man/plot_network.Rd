@@ -20,7 +20,9 @@ plot_network(
 
 \item{ci}{Width of the credible interval, e.g. \code{0.9} for a 90\% interval.}
 
-\item{lwd}{Scaling factor for edge widths.}
+\item{lwd}{Scaling factor for edge widths. For binary models the width is
+the edge weight (a probability) multiplied by \code{lwd}; for count models,
+rates are rescaled so the widest edge has width \code{lwd}.}
 
 \item{threshold}{Hide edges whose weight (see \code{threshold_on}) is below this
 value. This only affects the plot. \code{NULL} shows every edge.}
@@ -34,16 +36,20 @@ still drawn.}
 \item{layout}{Optional layout matrix (as returned invisibly by a previous call),
 so several networks can be drawn with nodes in the same positions.}
 
-\item{...}{Further arguments passed to \code{\link[igraph:plot.igraph]{igraph::plot.igraph()}}, such as
-\code{vertex.size}.}
+\item{...}{Further arguments passed to \code{\link[igraph:plot.igraph]{igraph::plot.igraph()}} to change how
+nodes are drawn, such as \code{vertex.size}, \code{vertex.color}, \code{vertex.label.color}
+or \code{vertex.label.cex}. These replace the default node style.}
 }
 \value{
 The layout matrix, invisibly.
 }
 \description{
-Draws a sociogram in which each edge is shown by two overlapping lines: a
-dark line whose width is the lower bound of the credible interval, and a
-wider, translucent line whose width is the upper bound.
+Draws a sociogram (a diagram of the network) in which each edge is shown by
+two overlapping lines: a dark line whose width is the lower bound of the
+credible interval, and a wider, translucent line whose width is the upper
+bound. A credible interval contains the true edge weight with the given
+probability, according to the model. Edges with a large difference between
+the two lines are uncertain, usually because the dyad was rarely observed.
 }
 \examples{
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
@@ -55,4 +61,7 @@ fit_edge <- bison_model(
 )
 plot_network(fit_edge, lwd = 5)
 plot_network(fit_edge, lwd = 5, threshold = 0.3)
+}
+\seealso{
+\code{\link[=get_edgelist]{get_edgelist()}}, \code{\link[=bison_to_igraph]{bison_to_igraph()}}
 }

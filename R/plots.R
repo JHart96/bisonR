@@ -1,12 +1,20 @@
 #' Trace plots of MCMC chains
 #'
-#' Plots the MCMC chains for some of the edge weights of a fitted model. The
-#' chains should overlap and show no trends.
+#' Plots the MCMC chains for some of the edge weights of a fitted model, to
+#' check that the sampler worked. MCMC (Markov chain Monte Carlo) draws samples
+#' from the posterior in several independent runs called chains. The chains
+#' should overlap and show no trends; if they don't, the posterior may not be
+#' reliable, and running more warmup iterations may help.
 #'
 #' @param obj A fitted `bison_model` object (fitted with Stan, not a conjugate
 #'   model).
-#' @param par_ids Indices of the edge weights to plot.
+#' @param par_ids Indices of the edge weights to plot, in the order of
+#'   [get_edgelist()]. Indices beyond the number of edges are ignored.
 #' @param ... Additional arguments passed to [plot()].
+#'
+#' @return `NULL`, invisibly. The function is called for its plots.
+#'
+#' @seealso [plot_predictions()] for checking model fit.
 #'
 #' @examplesIf !is.null(tryCatch(cmdstanr::cmdstan_path(), error = function(e) NULL))
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
@@ -59,9 +67,12 @@ plot_trace <- function(obj, par_ids = 1:5, ...) {
 
 #' Posterior predictive checks
 #'
-#' Compares data simulated from a fitted model with the observed data.
+#' Compares data simulated from a fitted model with the observed data, to
+#' check whether the model describes the data well. If the model fits, the
+#' observed data should look like a typical simulated dataset. Use it after
+#' [bison_model()], before interpreting the results.
 #'
-#' @param obj A fitted model.
+#' @param obj A fitted `bison_model` object.
 #' @param ... Arguments passed to methods.
 #'
 #' @details
@@ -79,6 +90,13 @@ plot_trace <- function(obj, par_ids = 1:5, ...) {
 #'   simple point estimates (events / effort). This is not a predictive check,
 #'   but shows how estimates are pulled towards the prior when there are few
 #'   data.
+#'
+#' The default shows the `"density"` and `"point"` plots.
+#'
+#' @return `NULL`, invisibly. The function is called for its plots.
+#'
+#' @seealso [prior_predictive_check()] for the same plots using only the
+#'   priors, and [plot_trace()].
 #'
 #' @examples
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
@@ -231,13 +249,18 @@ plot_point_comparison <- function(obj, groups, keep) {
 
 #' Plot the network with uncertainty
 #'
-#' Draws a sociogram in which each edge is shown by two overlapping lines: a
-#' dark line whose width is the lower bound of the credible interval, and a
-#' wider, translucent line whose width is the upper bound.
+#' Draws a sociogram (a diagram of the network) in which each edge is shown by
+#' two overlapping lines: a dark line whose width is the lower bound of the
+#' credible interval, and a wider, translucent line whose width is the upper
+#' bound. A credible interval contains the true edge weight with the given
+#' probability, according to the model. Edges with a large difference between
+#' the two lines are uncertain, usually because the dyad was rarely observed.
 #'
 #' @param obj A fitted `bison_model` object.
 #' @param ci Width of the credible interval, e.g. `0.9` for a 90% interval.
-#' @param lwd Scaling factor for edge widths.
+#' @param lwd Scaling factor for edge widths. For binary models the width is
+#'   the edge weight (a probability) multiplied by `lwd`; for count models,
+#'   rates are rescaled so the widest edge has width `lwd`.
 #' @param threshold Hide edges whose weight (see `threshold_on`) is below this
 #'   value. This only affects the plot. `NULL` shows every edge.
 #' @param threshold_on Which estimate to compare with `threshold`: the posterior
@@ -246,10 +269,13 @@ plot_point_comparison <- function(obj, groups, keep) {
 #'   still drawn.
 #' @param layout Optional layout matrix (as returned invisibly by a previous call),
 #'   so several networks can be drawn with nodes in the same positions.
-#' @param ... Further arguments passed to [igraph::plot.igraph()], such as
-#'   `vertex.size`.
+#' @param ... Further arguments passed to [igraph::plot.igraph()] to change how
+#'   nodes are drawn, such as `vertex.size`, `vertex.color`, `vertex.label.color`
+#'   or `vertex.label.cex`. These replace the default node style.
 #'
 #' @return The layout matrix, invisibly.
+#'
+#' @seealso [get_edgelist()], [bison_to_igraph()]
 #'
 #' @examples
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
@@ -297,17 +323,21 @@ plot_network <- function(obj, ci = 0.9, lwd = 2, threshold = NULL,
     )
   }
   curved <- if (obj$directed) 0.15 else 0
-  common <- list(
-    net, layout = layout, vertex.label.color = "white", vertex.color = bison_colors[1],
-    vertex.frame.color = "white", vertex.label.family = "sans", edge.curved = curved
+  # Light nodes with dark labels, sized to fit the longest label, so labels are
+  # readable even when they extend past the node. Arguments in ... override these.
+  longest_label <- max(nchar(igraph::V(net)$name), 1)
+  node_style <- list(
+    vertex.color = bison_colors[3], vertex.frame.color = bison_colors[1],
+    vertex.label.color = "#1f2a2e", vertex.label.family = "sans",
+    vertex.label.cex = 0.8, vertex.size = min(10 + 3 * longest_label, 30)
   )
-  do.call(igraph::plot.igraph, c(common, list(
-    edge.width = ub * scale * lwd, edge.color = col2rgba(bison_colors[1], 0.3), edge.arrow.size = 0
-  ), list(...)))
-  do.call(igraph::plot.igraph, c(common, list(
-    edge.width = lb * scale * lwd, edge.color = "grey20",
-    edge.arrow.size = if (obj$directed) 0.4 else 0, add = TRUE
-  ), list(...)))
+  node_style <- utils::modifyList(node_style, list(...))
+  draw <- function(edge_args) {
+    do.call(igraph::plot.igraph, c(list(net, layout = layout, edge.curved = curved), node_style, edge_args))
+  }
+  draw(list(edge.width = ub * scale * lwd, edge.color = col2rgba(bison_colors[1], 0.3), edge.arrow.size = 0))
+  draw(list(edge.width = lb * scale * lwd, edge.color = "grey20",
+            edge.arrow.size = if (obj$directed) 0.4 else 0, add = TRUE))
 
   lb_pct <- format_percent(0.5 * (1 - ci))
   ub_pct <- format_percent(1 - 0.5 * (1 - ci))

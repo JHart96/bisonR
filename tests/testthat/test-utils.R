@@ -114,3 +114,12 @@ test_that("plot_network draws edges for very small rates", {
   expect_silent(layout <- plot_network(fit, threshold = 1e-5))
   expect_equal(nrow(layout), 3)
 })
+
+test_that("plot_network accepts node style overrides", {
+  sim <- simulate_bison_model("binary", aggregated = TRUE)
+  fit <- bison_model((event | effort) ~ dyad(node_1_id, node_2_id), sim$df_sim, "binary_conjugate",
+                     priors = conjugate_priors("binary"))
+  pdf(NULL)
+  on.exit(dev.off())
+  expect_silent(plot_network(fit, vertex.color = "orange", vertex.label.color = "black", vertex.size = 20))
+})
