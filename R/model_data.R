@@ -335,11 +335,16 @@ get_bison_model_data <- function(formula, observations, directed, model_type) {
   fixed_names <- character(0)
   random_names <- character(0)
   random_group_index <- character(0)
+  # Readable labels for get_effects(), e.g. "age", "sex = F", "location = 2".
+  fixed_labels <- character(0)
+  random_labels <- character(0)
+  random_group_labels <- character(0)
   has_factor_fixed <- FALSE
 
   if (model_spec$intercept) {
     design_fixed <- cbind(design_fixed, 1)
     fixed_names <- c(fixed_names, "intercept")
+    fixed_labels <- c(fixed_labels, "intercept")
   }
 
   for (term_name in model_spec$fixed) {
@@ -353,16 +358,20 @@ get_bison_model_data <- function(formula, observations, directed, model_type) {
       for (term_level in levels(values)) {
         design_fixed <- cbind(design_fixed, 1 * (values == term_level))
         fixed_names <- c(fixed_names, paste0("fixed_", term_name, term_level))
+        fixed_labels <- c(fixed_labels, paste0(term_name, " = ", term_level))
       }
     } else {
       design_fixed <- cbind(design_fixed, as.numeric(values))
       fixed_names <- c(fixed_names, paste0("fixed_", term_name))
+      fixed_labels <- c(fixed_labels, term_name)
     }
   }
 
   for (term_name in model_spec$random) {
     values <- as.factor(observations[[term_name]])
+    random_group_labels <- c(random_group_labels, term_name)
     for (term_level in levels(values)) {
+      random_labels <- c(random_labels, paste0(term_name, " = ", term_level))
       design_random <- cbind(design_random, 1 * (values == term_level))
       random_names <- c(random_names, paste0("random_", term_name, term_level))
       random_group_index <- c(random_group_index, paste0("random_", term_name))
@@ -414,6 +423,9 @@ get_bison_model_data <- function(formula, observations, directed, model_type) {
     dyad_names = dyad_names,
     num_nodes = num_nodes,
     num_dyads = num_dyads,
-    row_dyad_ids = as.integer(dyad_ids)
+    row_dyad_ids = as.integer(dyad_ids),
+    fixed_labels = fixed_labels,
+    random_labels = random_labels,
+    random_group_labels = random_group_labels
   )
 }

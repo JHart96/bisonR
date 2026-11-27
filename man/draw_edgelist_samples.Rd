@@ -9,17 +9,22 @@ draw_edgelist_samples(obj, num_draws, transform = FALSE)
 \arguments{
 \item{obj}{A fitted \code{bison_model} object.}
 
-\item{num_draws}{Number of posterior draws to return.}
+\item{num_draws}{Number of posterior draws to return. Draws are chosen
+without replacement, unless more are requested than the model has.}
 
-\item{transform}{If \code{TRUE}, edge weights are on the natural scale; if \code{FALSE}
-(the default, for backwards compatibility) they're on the link scale.}
+\item{transform}{If \code{TRUE}, edge weights are on the natural scale
+(probabilities or rates); if \code{FALSE} (the default, for backwards
+compatibility) they're on the link scale (log-odds or log rates).}
 }
 \value{
-A data frame with columns \code{node_1} and \code{node_2} followed by one
-column per posterior draw (\code{draw.1}, \code{draw.2}, ...).
+A data frame with one row per dyad, columns \code{node_1} and \code{node_2},
+and one column per posterior draw (\code{draw.1}, \code{draw.2}, ...).
 }
 \description{
-Draw samples of the edge list from the posterior
+Returns randomly chosen posterior draws of all the edge weights. Each draw
+is one plausible version of the network, consistent with the data. Use it
+to repeat an analysis in other software on many versions of the network, so
+the results include the uncertainty in the edge weights.
 }
 \examples{
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
@@ -30,4 +35,9 @@ fit_edge <- bison_model(
   priors = get_default_priors("binary_conjugate")
 )
 head(draw_edgelist_samples(fit_edge, num_draws = 3, transform = TRUE))
+}
+\seealso{
+\code{\link[=get_edgelist]{get_edgelist()}} for a summary of each edge weight,
+\code{\link[=bison_to_igraph]{bison_to_igraph()}} for draws as igraph networks, and \code{\link[=extract_metric]{extract_metric()}}
+for draws of network metrics.
 }

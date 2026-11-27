@@ -84,6 +84,7 @@ reference:
   contents:
   - summary.bison_model
   - get_edgelist
+  - get_effects
   - draw_edgelist_samples
   - plot_network
   - bison_to_igraph

@@ -96,3 +96,11 @@ test_that("model_comparison works when models have different numbers of draws", 
   expect_error(model_comparison(list(a = fit_a, c = fit_c)), "same data")
   expect_error(model_comparison(list(a = fit_a)), "at least two")
 })
+
+test_that("get_effects explains that conjugate models only have edge weights", {
+  sim <- simulate_bison_model("binary", aggregated = TRUE)
+  fit <- bison_model((event | effort) ~ dyad(node_1_id, node_2_id), sim$df_sim, "binary_conjugate",
+                     priors = conjugate_priors("binary"))
+  expect_error(get_effects(fit), "only estimate edge weights")
+  expect_false(grepl("Other effects", paste(capture.output(print(summary(fit))), collapse = "\n")))
+})

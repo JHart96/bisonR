@@ -13,7 +13,8 @@
 
 \item{transform}{If \code{TRUE} (the default), edge weights are reported on the
 natural scale (probabilities for binary models, rates for count models).
-If \code{FALSE}, they're on the internal link scale (logit or log).
+If \code{FALSE}, they're on the link scale used inside the model (log-odds for
+binary models, log rates for count models).
 In models with an intercept or other effects, the natural-scale values are
 for an observation where those effects are 0.}
 
@@ -22,10 +23,15 @@ for an observation where those effects are 0.}
 \value{
 A \code{summary.bison_model} object. Printing it shows, for each dyad, the
 posterior median edge weight and the lower and upper bounds of the
-credible interval.
+credible interval, followed by any other effects in the model (see
+\code{\link[=get_effects]{get_effects()}}).
 }
 \description{
-Summarise an edge weight model
+Summarises a fitted edge model: the posterior median and credible interval
+of each edge weight, and of any other effects in the model. A credible
+interval contains the true value with the given probability, according to
+the model. Use \code{summary()} to check the estimates after fitting with
+\code{\link[=bison_model]{bison_model()}}.
 }
 \examples{
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
@@ -36,4 +42,7 @@ fit_edge <- bison_model(
   priors = get_default_priors("binary_conjugate")
 )
 summary(fit_edge, ci = 0.95)
+}
+\seealso{
+\code{\link[=get_edgelist]{get_edgelist()}} to get the edge weights as a data frame.
 }

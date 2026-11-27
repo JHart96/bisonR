@@ -2,12 +2,25 @@
 #'
 #' Fits a BISoN edge weight model, which estimates a posterior distribution for
 #' the edge weight of each dyad from observations of social events and the
-#' observation effort for each dyad.
+#' observation effort for each dyad. An edge weight is a dyad's underlying
+#' tendency to interact or associate, as a probability or a rate. The posterior
+#' distribution describes the values consistent with the data and priors, so
+#' edges observed rarely get wide uncertainty. This is usually the first step
+#' of an analysis: the fitted model is then used to plot the network, calculate
+#' network metrics and fit regressions.
+#'
+#' @details Models other than the conjugate ones are fitted by MCMC (Markov
+#' chain Monte Carlo) in Stan, which draws samples from the posterior in
+#' several independent runs called chains. Conjugate models have a posterior
+#' that can be calculated exactly, so they are fitted in seconds without Stan,
+#' but they can't include other effects.
 #'
 #' @param formula A formula of the form `(event | effort) ~ dyad(node_1, node_2)`.
 #'   The left-hand side gives the column of social events (0/1 or counts) and the
-#'   observation effort (a column, or a single number), and the right-hand side
-#'   gives the terms that explain the events. See *Formula syntax* below.
+#'   observation effort (a column, or a single number). Effort is how much each
+#'   row was observed, such as the number of sampling periods or the hours of
+#'   observation. The right-hand side gives the terms that explain the events.
+#'   See *Formula syntax* below.
 #' @param data A data frame with one row per observation (disaggregated) or one
 #'   row per dyad (aggregated).
 #' @param model_type The type of edge model: `"binary"` (events are present/absent
@@ -18,17 +31,26 @@
 #' @param directed `TRUE` or `FALSE`: whether the network is directed. For
 #'   undirected networks, rows for A-B and B-A refer to the same dyad.
 #' @param partial_pooling Whether to estimate the spread of edge weights from the
-#'   data, so that information is shared between edges.
-#' @param zero_inflated Whether to use a zero-inflated model for excess zeros.
-#'   Zero inflation applies to each row of the data: each row has probability
-#'   `zero_prob` of being a structural zero. For binary data with one sampling
+#'   data, so that information is shared between edges. How far estimates for
+#'   dyads with few observations are pulled towards the mean of the edge prior
+#'   then depends on how much edge weights vary across the network.
+#' @param zero_inflated Whether to use a zero-inflated model, for data with
+#'   more zeros than the edge weights alone would predict (see the `"stats"`
+#'   check in [plot_predictions()]). Zero inflation applies to each row of the data: each row has probability
+#'   `zero_prob` of being a structural zero (a zero regardless of the edge
+#'   weight). For binary data with one sampling
 #'   period per row this can't be separated from the edge weights, so aggregate
 #'   the data first.
-#' @param priors A list of priors, in the format returned by [get_default_priors()].
+#' @param priors A list of priors, in the format returned by
+#'   [get_default_priors()]. A prior describes which values of a parameter are
+#'   plausible before seeing the data. If `NULL`, the defaults are used with a
+#'   message; check them with [prior_check()] and [prior_predictive_check()].
 #' @param refresh How often the sampler prints progress (0 for silent).
 #' @param mc_cores Number of chains to run in parallel.
-#' @param iter_sampling Number of post-warmup draws per chain.
-#' @param iter_warmup Number of warmup iterations per chain.
+#' @param iter_sampling Number of posterior draws to keep per chain, after
+#'   warmup. For conjugate models, `iter_sampling * chains` draws are taken.
+#' @param iter_warmup Number of warmup iterations per chain, during which the
+#'   sampler tunes itself. These draws are discarded.
 #' @param priors_only If `TRUE`, ignore the data and sample from the priors (used
 #'   for prior predictive checks).
 #' @param chains Number of MCMC chains.
@@ -57,7 +79,8 @@
 #'   [plot_predictions()] for diagnostics, and [extract_metric()] or [bison_brm()]
 #'   for downstream analyses.
 #'
-#' @seealso [get_default_priors()], [prior_check()], [summary.bison_model()]
+#' @seealso [get_default_priors()], [prior_check()], [summary.bison_model()],
+#'   [get_effects()], [model_comparison()], [bison_save()]
 #'
 #' @examplesIf !is.null(tryCatch(cmdstanr::cmdstan_path(), error = function(e) NULL))
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
@@ -267,18 +290,28 @@ print.bison_model <- function(x, ...) {
 
 #' Summarise an edge weight model
 #'
+#' Summarises a fitted edge model: the posterior median and credible interval
+#' of each edge weight, and of any other effects in the model. A credible
+#' interval contains the true value with the given probability, according to
+#' the model. Use `summary()` to check the estimates after fitting with
+#' [bison_model()].
+#'
 #' @param object A fitted `bison_model` object.
 #' @param ci Width of the credible interval, e.g. `0.9` for a 90% interval.
 #' @param transform If `TRUE` (the default), edge weights are reported on the
 #'   natural scale (probabilities for binary models, rates for count models).
-#'   If `FALSE`, they're on the internal link scale (logit or log).
+#'   If `FALSE`, they're on the link scale used inside the model (log-odds for
+#'   binary models, log rates for count models).
 #'   In models with an intercept or other effects, the natural-scale values are
 #'   for an observation where those effects are 0.
 #' @param ... Not used.
 #'
 #' @return A `summary.bison_model` object. Printing it shows, for each dyad, the
 #'   posterior median edge weight and the lower and upper bounds of the
-#'   credible interval.
+#'   credible interval, followed by any other effects in the model (see
+#'   [get_effects()]).
+#'
+#' @seealso [get_edgelist()] to get the edge weights as a data frame.
 #'
 #' @examples
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
@@ -299,12 +332,16 @@ summary.bison_model <- function(object, ci = 0.90, transform = TRUE, ...) {
     "\nFormula: ", deparse1(object$formula),
     "\nNumber of nodes: ", object$num_nodes,
     "\nNumber of dyads: ", object$num_dyads,
-    "\nDirected: ", object$directed,
-    "\n=== Edge list summary ===\n"
+    "\nDirected: ", object$directed, "\n"
   )
 
-  summary_obj$edgelist <- get_edgelist(object, ci = ci, transform = transform)
-  summary_obj$dyad_names <- object$dyad_names
+  if (!is.null(object$dyad_to_idx)) {
+    summary_obj$edgelist <- get_edgelist(object, ci = ci, transform = transform)
+    summary_obj$dyad_names <- object$dyad_names
+  }
+  if (!isTRUE(object$conjugate) && !is.null(object$fit)) {
+    summary_obj$effects <- get_effects(object, ci = ci)
+  }
 
   class(summary_obj) <- "summary.bison_model"
   summary_obj
@@ -320,25 +357,44 @@ summary.bison_model <- function(object, ci = 0.90, transform = TRUE, ...) {
 #' @export
 print.summary.bison_model <- function(x, ...) {
   cat(x$description)
-  summary_matrix <- as.matrix(x$edgelist[, 3:5])
-  rownames(summary_matrix) <- x$dyad_names
-  print(summary_matrix, ...)
+  if (!is.null(x$edgelist)) {
+    cat("=== Edge list summary ===\n")
+    summary_matrix <- as.matrix(x$edgelist[, 3:5])
+    rownames(summary_matrix) <- x$dyad_names
+    print(summary_matrix, ...)
+  }
+  if (!is.null(x$effects) && nrow(x$effects) > 0) {
+    cat("=== Other effects (see ?get_effects) ===\n")
+    effects_matrix <- as.matrix(x$effects[, 3:5])
+    rownames(effects_matrix) <- x$effects$effect
+    print(effects_matrix, ...)
+  }
   invisible(x)
 }
 
 #' Get the edge list with uncertainty
 #'
+#' Returns the estimated edge weight of every dyad as a data frame: the
+#' posterior median and a credible interval, which contains the true value
+#' with the given probability according to the model. Use it to report or
+#' export edge weights, or to work with them in other software.
+#'
 #' @param obj A fitted `bison_model` object.
 #' @param ci Width of the credible interval, e.g. `0.9` for a 90% interval.
 #' @param transform If `TRUE` (the default), edge weights are on the natural
 #'   scale (probabilities for binary models, rates for count models). If `FALSE`,
-#'   they're on the internal link scale (logit or log).
+#'   they're on the link scale used inside the model (log-odds for binary
+#'   models, log rates for count models).
 #'   In models with an intercept or other effects, the natural-scale values are
 #'   for an observation where those effects are 0.
 #'
 #' @return A data frame with one row per dyad and columns `node_1`, `node_2`,
 #'   `median`, and the lower and upper bounds of the credible interval (named
-#'   after their quantiles, e.g. `5%` and `95%`).
+#'   after their quantiles, e.g. `5%` and `95%`). Values are rounded to three
+#'   decimal places.
+#'
+#' @seealso [draw_edgelist_samples()] for individual posterior draws of the
+#'   edge list, [summary.bison_model()], [plot_network()].
 #'
 #' @examples
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
@@ -398,13 +454,24 @@ format_percent <- function(p) {
 
 #' Draw samples of the edge list from the posterior
 #'
-#' @param obj A fitted `bison_model` object.
-#' @param num_draws Number of posterior draws to return.
-#' @param transform If `TRUE`, edge weights are on the natural scale; if `FALSE`
-#'   (the default, for backwards compatibility) they're on the link scale.
+#' Returns randomly chosen posterior draws of all the edge weights. Each draw
+#' is one plausible version of the network, consistent with the data. Use it
+#' to repeat an analysis in other software on many versions of the network, so
+#' the results include the uncertainty in the edge weights.
 #'
-#' @return A data frame with columns `node_1` and `node_2` followed by one
-#'   column per posterior draw (`draw.1`, `draw.2`, ...).
+#' @param obj A fitted `bison_model` object.
+#' @param num_draws Number of posterior draws to return. Draws are chosen
+#'   without replacement, unless more are requested than the model has.
+#' @param transform If `TRUE`, edge weights are on the natural scale
+#'   (probabilities or rates); if `FALSE` (the default, for backwards
+#'   compatibility) they're on the link scale (log-odds or log rates).
+#'
+#' @return A data frame with one row per dyad, columns `node_1` and `node_2`,
+#'   and one column per posterior draw (`draw.1`, `draw.2`, ...).
+#'
+#' @seealso [get_edgelist()] for a summary of each edge weight,
+#'   [bison_to_igraph()] for draws as igraph networks, and [extract_metric()]
+#'   for draws of network metrics.
 #'
 #' @examples
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)

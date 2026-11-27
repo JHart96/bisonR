@@ -24,8 +24,10 @@ bison_model(
 \arguments{
 \item{formula}{A formula of the form \code{(event | effort) ~ dyad(node_1, node_2)}.
 The left-hand side gives the column of social events (0/1 or counts) and the
-observation effort (a column, or a single number), and the right-hand side
-gives the terms that explain the events. See \emph{Formula syntax} below.}
+observation effort (a column, or a single number). Effort is how much each
+row was observed, such as the number of sampling periods or the hours of
+observation. The right-hand side gives the terms that explain the events.
+See \emph{Formula syntax} below.}
 
 \item{data}{A data frame with one row per observation (disaggregated) or one
 row per dyad (aggregated).}
@@ -40,23 +42,32 @@ versions \code{"binary_conjugate"} and \code{"count_conjugate"}, which only supp
 undirected networks, rows for A-B and B-A refer to the same dyad.}
 
 \item{partial_pooling}{Whether to estimate the spread of edge weights from the
-data, so that information is shared between edges.}
+data, so that information is shared between edges. How far estimates for
+dyads with few observations are pulled towards the mean of the edge prior
+then depends on how much edge weights vary across the network.}
 
-\item{zero_inflated}{Whether to use a zero-inflated model for excess zeros.
-Zero inflation applies to each row of the data: each row has probability
-\code{zero_prob} of being a structural zero. For binary data with one sampling
+\item{zero_inflated}{Whether to use a zero-inflated model, for data with
+more zeros than the edge weights alone would predict (see the \code{"stats"}
+check in \code{\link[=plot_predictions]{plot_predictions()}}). Zero inflation applies to each row of the data: each row has probability
+\code{zero_prob} of being a structural zero (a zero regardless of the edge
+weight). For binary data with one sampling
 period per row this can't be separated from the edge weights, so aggregate
 the data first.}
 
-\item{priors}{A list of priors, in the format returned by \code{\link[=get_default_priors]{get_default_priors()}}.}
+\item{priors}{A list of priors, in the format returned by
+\code{\link[=get_default_priors]{get_default_priors()}}. A prior describes which values of a parameter are
+plausible before seeing the data. If \code{NULL}, the defaults are used with a
+message; check them with \code{\link[=prior_check]{prior_check()}} and \code{\link[=prior_predictive_check]{prior_predictive_check()}}.}
 
 \item{refresh}{How often the sampler prints progress (0 for silent).}
 
 \item{mc_cores}{Number of chains to run in parallel.}
 
-\item{iter_sampling}{Number of post-warmup draws per chain.}
+\item{iter_sampling}{Number of posterior draws to keep per chain, after
+warmup. For conjugate models, \code{iter_sampling * chains} draws are taken.}
 
-\item{iter_warmup}{Number of warmup iterations per chain.}
+\item{iter_warmup}{Number of warmup iterations per chain, during which the
+sampler tunes itself. These draws are discarded.}
 
 \item{priors_only}{If \code{TRUE}, ignore the data and sample from the priors (used
 for prior predictive checks).}
@@ -75,7 +86,19 @@ for downstream analyses.
 \description{
 Fits a BISoN edge weight model, which estimates a posterior distribution for
 the edge weight of each dyad from observations of social events and the
-observation effort for each dyad.
+observation effort for each dyad. An edge weight is a dyad's underlying
+tendency to interact or associate, as a probability or a rate. The posterior
+distribution describes the values consistent with the data and priors, so
+edges observed rarely get wide uncertainty. This is usually the first step
+of an analysis: the fitted model is then used to plot the network, calculate
+network metrics and fit regressions.
+}
+\details{
+Models other than the conjugate ones are fitted by MCMC (Markov
+chain Monte Carlo) in Stan, which draws samples from the posterior in
+several independent runs called chains. Conjugate models have a posterior
+that can be calculated exactly, so they are fitted in seconds without Stan,
+but they can't include other effects.
 }
 \section{Formula syntax}{
 
@@ -122,5 +145,6 @@ fit_edge <- bison_model(
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-\code{\link[=get_default_priors]{get_default_priors()}}, \code{\link[=prior_check]{prior_check()}}, \code{\link[=summary.bison_model]{summary.bison_model()}}
+\code{\link[=get_default_priors]{get_default_priors()}}, \code{\link[=prior_check]{prior_check()}}, \code{\link[=summary.bison_model]{summary.bison_model()}},
+\code{\link[=get_effects]{get_effects()}}, \code{\link[=model_comparison]{model_comparison()}}, \code{\link[=bison_save]{bison_save()}}
 }

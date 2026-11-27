@@ -13,17 +13,22 @@ get_edgelist(obj, ci = 0.9, transform = TRUE)
 
 \item{transform}{If \code{TRUE} (the default), edge weights are on the natural
 scale (probabilities for binary models, rates for count models). If \code{FALSE},
-they're on the internal link scale (logit or log).
+they're on the link scale used inside the model (log-odds for binary
+models, log rates for count models).
 In models with an intercept or other effects, the natural-scale values are
 for an observation where those effects are 0.}
 }
 \value{
 A data frame with one row per dyad and columns \code{node_1}, \code{node_2},
 \code{median}, and the lower and upper bounds of the credible interval (named
-after their quantiles, e.g. \verb{5\%} and \verb{95\%}).
+after their quantiles, e.g. \verb{5\%} and \verb{95\%}). Values are rounded to three
+decimal places.
 }
 \description{
-Get the edge list with uncertainty
+Returns the estimated edge weight of every dyad as a data frame: the
+posterior median and a credible interval, which contains the true value
+with the given probability according to the model. Use it to report or
+export edge weights, or to work with them in other software.
 }
 \examples{
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
@@ -34,4 +39,8 @@ fit_edge <- bison_model(
   priors = get_default_priors("binary_conjugate")
 )
 head(get_edgelist(fit_edge))
+}
+\seealso{
+\code{\link[=draw_edgelist_samples]{draw_edgelist_samples()}} for individual posterior draws of the
+edge list, \code{\link[=summary.bison_model]{summary.bison_model()}}, \code{\link[=plot_network]{plot_network()}}.
 }

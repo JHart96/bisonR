@@ -60,6 +60,12 @@ test_that("fixed effects ending in 1 are included in the model (issue #80)", {
   expect_equal(fit$model_data$num_fixed, 1)
   expect_equal(ncol(fit$fit$draws("beta_fixed", format = "matrix")), 1)
   expect_equal(ncol(fit$fit$draws("beta_random", format = "matrix")), 5)
+
+  effects <- get_effects(fit)
+  expect_equal(effects$effect, c("age1", paste0("location = ", 1:5), "sd(location)"))
+  expect_equal(effects$type, c("fixed", rep("random", 5), "random sd"))
+  expect_equal(colnames(effects), c("effect", "type", "median", "5%", "95%"))
+  expect_output(print(summary(fit)), "Other effects")
 })
 
 test_that("zero-inflated and partially pooled models sample sensibly", {
@@ -89,6 +95,7 @@ test_that("models without dyads (null models) can be compared with edge models",
   fit_null <- quiet(bison_model((event | duration) ~ 1, sim$df_sim, "binary",
                                 priors = get_default_priors("binary"), seed = 1))
   expect_error(get_edgelist(fit_null), "no edge weights")
+  expect_output(print(summary(fit_null)), "intercept")
   comparison <- suppressWarnings(model_comparison(list(edge = fit_edge, null = fit_null)))
   expect_equal(names(comparison), c("edge", "null"))
   expect_gt(comparison[["edge"]], 0.5)
