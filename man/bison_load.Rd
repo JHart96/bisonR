@@ -7,13 +7,16 @@
 bison_load(file)
 }
 \arguments{
-\item{file}{Path of an \code{.rds} file written by \code{\link[=bison_save]{bison_save()}}.}
+\item{file}{Path of an \code{.rds} file written by \code{\link[=bison_save]{bison_save()}}. \code{.rds} is
+appended if the file isn't found without it.}
 }
 \value{
 The fitted model object.
 }
 \description{
-Load a bisonR model saved with \code{bison_save()}
+Reads a fitted model saved with \code{\link[=bison_save]{bison_save()}}, so it can be used in a new R
+session in the same way as a newly fitted model. Models saved with earlier versions of
+bisonR (0.4.x), which kept the Stan fit in a separate file, are also read.
 }
 \examples{
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)

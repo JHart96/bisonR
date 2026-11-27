@@ -24,7 +24,7 @@ set.seed(1)
 library(bisonR)
 ```
 
-Every BISoN edge model is Bayesian and needs priors. This article describes what each prior controls, the scales on which the priors are defined, and two ways of checking them: plotting the prior distributions with `prior_check()`, and simulating data from the priors with `prior_predictive_check()`. A basic analysis is described in `vignette("getting_started")`.
+Every BISoN edge model is Bayesian, so it needs priors: probability distributions that describe which parameter values are plausible before the data are seen. This article describes what each prior controls, the scales on which the priors are defined, and two ways of checking them: plotting the prior distributions with `prior_check()`, and simulating data from the priors with `prior_predictive_check()`. A basic analysis is described in `vignette("getting_started")`.
 
 There is no prior that is correct for every study. A prior describes what is plausible for a particular system and sampling design, so it should be chosen with knowledge of that system and then checked.
 
@@ -44,15 +44,15 @@ Binary and count models have the same four priors:
 | `edge` | Edge weight of each dyad, on the link scale | Normal |
 | `fixed` | Each fixed effect parameter (`+ x` in the formula), on the link scale | Normal |
 | `random_std` | Standard deviation of each group of random effects | Half-normal |
-| `zero_prob` | Probability that an observation is a structural zero, in zero-inflated models | Beta |
+| `zero_prob` | Probability that an observation is a structural zero (a zero that occurs regardless of the edge weight), in zero-inflated models | Beta |
 
 Priors for parameters that are not in the model are ignored. For example, `random_std` only matters if the formula contains a random effect, and `zero_prob` only matters if `zero_inflated = TRUE`. Random effects are centred on 0, so they have no prior for their mean.
 
 The default `edge` prior differs between the two model types: `normal(0, 2.5)` for binary models and `normal(0, 1)` for count models. The other defaults are the same.
 
-With `partial_pooling = TRUE`, the `edge` prior is used differently. The edge weights are given a normal distribution with mean equal to the mean of the `edge` prior and a standard deviation, `edge_sigma`, that is estimated from the data. The second value of the `edge` prior is then the scale of a half-normal prior on `edge_sigma`.
+With `partial_pooling = TRUE`, the `edge` prior is used differently. The edge weights are given a shared normal distribution. Its mean is the mean of the `edge` prior, and its standard deviation, `edge_sigma`, is estimated from the data. The second value of the `edge` prior is then the scale of a half-normal prior on `edge_sigma`.
 
-Conjugate models only estimate edge weights, so they only have an `edge` prior. It is defined on the natural scale rather than the link scale: a beta distribution over the probability for `"binary_conjugate"`, and a gamma distribution (shape and rate) over the rate for `"count_conjugate"`.
+Conjugate models calculate the posterior exactly, without sampling. They only estimate edge weights, so they only have an `edge` prior. It is defined on the natural scale rather than the link scale: a beta distribution over the probability for `"binary_conjugate"`, and a gamma distribution (shape and rate) over the rate for `"count_conjugate"`.
 
 ```{r}
 get_default_priors("binary_conjugate")
@@ -119,7 +119,7 @@ prior_check(list(edge = "beta(1, 4)"), "binary_conjugate")
 
 ## Prior predictive checks
 
-A prior predictive check simulates data from the model using only the priors, ignoring the observed events. The simulated data can then be compared with what is plausible for the study system. `prior_predictive_check()` takes the same formula, data, model type and priors as `bison_model()`. The data are used only for the dyads, the observation effort and any predictors. Other arguments are passed on to `bison_model()` and from there to Stan: here `seed` makes the results reproducible and `show_messages = FALSE` hides the sampler's progress messages.
+A prior predictive check simulates data from the model using only the priors, ignoring the observed events. The simulated data can then be compared with what is plausible for the study system. `prior_predictive_check()` takes the same formula, data, model type and priors as `bison_model()`. Only the dyads, the observation effort and any predictors are taken from the data. Other arguments are passed on to `bison_model()` and from there to Stan: here `seed` makes the results reproducible and `show_messages = FALSE` hides the sampler's progress messages.
 
 The examples below use simulated aggregated data, with one row per dyad:
 
@@ -214,7 +214,7 @@ prior_predictive_check(
 
 ## Priors and sparsely observed dyads
 
-The effect of the prior on an edge weight depends on how much the dyad was observed. A dyad observed in many sampling periods has a posterior that is mostly determined by the data. A dyad observed only once or twice has a posterior that is mostly determined by the prior.
+The effect of the prior on an edge weight depends on how much the dyad was observed. A dyad observed in many sampling periods has a posterior (the distribution of its edge weight after the data are taken into account) that is mostly determined by the data. A dyad observed only once or twice has a posterior that is mostly determined by the prior.
 
 To show this, the same data are fitted with conjugate models using two different priors: `beta(1, 1)`, which is uniform over probabilities, and `beta(1, 9)`, which has a mean of 0.1.
 
@@ -268,10 +268,10 @@ abline(h = 0, lty = 2)
 
 The differences are largest for the dyads with the least observation effort, and decrease as effort increases. The difference also depends on the data: the dyad `3-8`, observed in 2 periods with no events, has a smaller difference than other dyads with similar effort, because its data agree more closely with the `beta(1, 9)` prior. In this dataset the differences do not disappear even for the most observed dyads. The `beta(1, 9)` prior is fairly strong (it carries about as much information as 10 sampling periods), and most of the dyads in the tables above were seen together in far more than 10% of their sampling periods.
 
-In most datasets some dyads are observed much less than others, so the choice of prior matters most for these dyads, and for any analysis that depends on them. Two practical consequences follow:
+In most datasets some dyads are observed much less than others. The choice of prior matters most for these dyads, and for any analysis that depends on them. This has two practical consequences:
 
 * Results that depend on sparsely observed dyads should be checked for sensitivity to the prior, by refitting the model with other plausible priors and comparing the results.
-* Network metrics and regressions that combine many edge weights can be affected by the prior if many dyads are sparsely observed, even when each individual difference is small.
+* Network metrics and regressions that combine many edge weights can be affected by the prior if many dyads are sparsely observed, even when the difference for each dyad is small.
 
 ## Summary
 

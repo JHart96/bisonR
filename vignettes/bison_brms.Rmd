@@ -16,9 +16,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-`bison_brm()` fits regression models with the [brms](https://paulbuerkner.com/brms/) package using network variables such as edge weights, node metrics or global metrics, taking into account the uncertainty in the network.
+`bison_brm()` fits regression models with the [brms](https://paulbuerkner.com/brms/) package in which a network variable, such as an edge weight, a node metric or a global metric, is the response or a predictor. The uncertainty in the network is included in the results.
 
-It draws networks from the posterior of the edge model, calculates the network variable for each, fits the brms model to each resulting dataset and combines the results, similar to multiple imputation. It takes the same arguments as `brms::brm()`, as well as the edge model(s) and data, and returns a `brmsfit` object.
+`bison_brm()` takes a number of posterior draws from the edge model (each draw is one possible network that is consistent with the data). It calculates the network variable for each draw, fits the brms model to each resulting dataset and combines the results. This is similar to multiple imputation, a method for missing data in which a model is fitted to several plausible versions of a dataset and the results are pooled. It takes the same arguments as `brms::brm()`, as well as the edge model(s) and data, and returns a `brmsfit` object.
 
 ## Formula syntax
 
@@ -33,15 +33,15 @@ Network variables are specified with `bison()` in the formula. Inside `bison()`,
 | `degree ~ x` | `bison(node_degree[0.2](node_id)) ~ x` | node |
 | `cv ~ x` | `bison(global_cv(bison_network)) ~ x` | network |
 
-When a list of edge models is given, a factor `bison_network` is added to the data, giving the position of each edge model in the list. It can be used like any other variable, for example to compare networks or as a random effect.
+When a list of edge models is given, `bison_brm()` adds a factor `bison_network` to the data, giving the position of each edge model in the list. It can be used like any other variable, for example to compare networks or as a random effect.
 
 Some notes:
 
 * **Scale of edge weights.** In `bison_brm()`, edge weights are on the link scale: log-odds (logit) for binary models and log rates for count models. Node and global metrics are calculated from edge weights on the natural scale.
-* **Scaling.** `scale = "z"` standardises the network variable within each posterior draw (subtracting the mean and dividing by the standard deviation), and `scale = "centre"` only subtracts the mean. Standardising can make priors easier to set. For edge and node metrics, scaling is done separately within each network, which removes differences in the average level between networks, so use `scale = "none"` when comparing levels between networks. For global metrics, scaling is done across networks.
+* **Scaling.** `scale = "z"` converts the network variable to z-scores within each posterior draw (subtracting the mean and dividing by the standard deviation), and `scale = "centre"` only subtracts the mean. Standardising can make priors easier to set. For edge and node metrics, scaling is done separately within each network. This removes differences in the average level between networks, so use `scale = "none"` to compare levels between networks. For global metrics, scaling is done across networks.
 * **Selecting rows.** `subset` selects rows of the data with a logical expression, e.g. `subset = sex == "F"`. Network metrics are still calculated from the whole network.
-* **Number of draws.** `num_draws` sets the number of networks drawn. A model is fitted to each, so more draws take longer. We suggest at least 100 for final analyses.
-* **R-hat warnings.** Because the results of separate models are combined, brms may warn about high R-hat values. This is expected, and convergence of the individual models can be checked with `fit$rhats`.
+* **Number of draws.** `num_draws` sets the number of posterior draws used. A model is fitted to each, so more draws take longer. We suggest at least 100 for final analyses.
+* **R-hat warnings.** R-hat is a convergence diagnostic that compares the MCMC chains (independent runs of the sampler). Because the results of separate models are combined, brms may warn about high R-hat values. This is expected, and convergence of the individual models can be checked with `fit$rhats`.
 
 ## Dyadic regression
 
@@ -60,7 +60,7 @@ fit_edge <- bison_model(
 
 ### Edge weight as the response
 
-Edges that share a node are not independent. A multi-membership random effect, `(1 | mm(node_1_id, node_2_id))`, accounts for this and should usually be included in dyadic regressions. `bison_brm()` gives a warning if it is missing.
+Edges that share a node are not independent. A multi-membership random effect, `(1 | mm(node_1_id, node_2_id))`, accounts for this by estimating an effect for each node that applies to every dyad the node is part of. It should usually be included in dyadic regressions. `bison_brm()` gives a warning if it is missing.
 
 ```{r, eval = FALSE}
 fit_dyadic <- bison_brm(
@@ -83,7 +83,7 @@ bison_brm(
 
 ### Comparing edge weights across networks
 
-Give a list of edge models and a corresponding list of data frames. `bison_network` identifies the network for each row:
+Give a list of edge models and a matching list of data frames. `bison_network` identifies the network of each row:
 
 ```{r, eval = FALSE}
 bison_brm(
@@ -150,11 +150,11 @@ bison_brm(
 )
 ```
 
-With only a few networks there is little information for a global regression, so results should be interpreted with care.
+Each network contributes one observation to a global regression, so with only a few networks the results should be interpreted with care.
 
 ## Priors
 
-`bison_brm_get_prior()` returns the default brms priors for a model as a `brmsprior` object, which can be modified as usual:
+Priors describe which parameter values are plausible before the data are seen. `bison_brm_get_prior()` returns the default brms priors for a model as a `brmsprior` object, which can be modified in the usual way:
 
 ```{r, eval = FALSE}
 prior <- bison_brm_get_prior(

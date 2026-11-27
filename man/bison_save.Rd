@@ -18,7 +18,8 @@ The path to the saved file, invisibly.
 Fitted models contain a CmdStan fit object whose draws live in temporary CSV
 files, so \code{saveRDS()} on its own does not produce a file that can be reloaded
 in a new R session. \code{bison_save()} reads all draws into memory first and then
-saves the complete object as a single \code{.rds} file.
+saves the complete object as a single \code{.rds} file. Use it to keep a fitted
+model so it doesn't need to be refitted later.
 }
 \examples{
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)

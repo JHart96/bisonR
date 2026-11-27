@@ -24,11 +24,11 @@ set.seed(1)
 library(bisonR)
 ```
 
-This article goes through the analysis of a directed network, using simulated grooming data. In a directed network, the edge from A to B (A grooms B) is separate from the edge from B to A (B grooms A), and the two can have different weights. `vignette("preparing_data")` introduces the data format for directed networks; this article covers fitting, plotting, network metrics and regression.
+This article analyses a directed network, using simulated grooming data. In a directed network, the edge from A to B (A grooms B) is separate from the edge from B to A (B grooms A), and the two can have different weights. `vignette("preparing_data")` introduces the data format for directed networks; this article covers fitting, plotting, network metrics and regression.
 
 ## Simulating directed data
 
-We simulate grooming among 8 individuals. Each individual has a tendency to give grooming and a tendency to receive grooming, and each ordered pair (i, j) has its own deviation from what these tendencies predict. On the logit scale, the true edge weight of i → j is
+We simulate grooming among 8 individuals. Each individual has a tendency to give grooming and a tendency to receive grooming, and each ordered pair (i, j) has its own deviation from what these tendencies predict. On the logit (log-odds) scale, the true edge weight of i → j is
 
 $$\text{logit}(p_{ij}) = \beta_0 + g_i + r_j + \beta_\text{kin} \, \text{kin}_{ij} + \epsilon_{ij},$$
 
@@ -71,7 +71,7 @@ sum(df$groom == 0)
 
 ## Fitting the edge model
 
-Setting `directed = TRUE` makes `node_1` the actor and `node_2` the receiver. The conjugate model is enough to estimate the edge weights:
+Setting `directed = TRUE` makes `node_1` the actor and `node_2` the receiver. The conjugate model is enough to estimate the edge weights. It calculates the posterior distribution of each edge weight (its plausible values given the data and the prior) exactly, without sampling:
 
 ```{r}
 fit_conj <- bison_model(
@@ -83,7 +83,7 @@ fit_conj <- bison_model(
 )
 ```
 
-The same edges can be estimated with the Stan model, which allows other effects to be added to the formula and uses the logit-scale priors from `get_default_priors("binary")`:
+The same edges can be estimated with the Stan model, which samples from the posterior by Markov chain Monte Carlo (MCMC). It allows other effects to be added to the formula and uses the logit-scale priors from `get_default_priors("binary")`:
 
 ```{r}
 fit_edge <- bison_model(
@@ -124,7 +124,7 @@ df[df$actor %in% c("Ada", "Bea") & df$receiver %in% c("Ada", "Bea"),
 
 Each estimate is based only on the observations in its own direction.
 
-Because the data were simulated, the estimates can be compared with the true edge weights. Each line is a 90% credible interval:
+Because the data were simulated, the estimates can be compared with the true edge weights. Each vertical line is a 90% credible interval, the range that contains the edge weight with 90% probability:
 
 ```{r}
 idx <- match(paste(edgelist$node_1, edgelist$node_2), paste(df$actor, df$receiver))
@@ -139,13 +139,13 @@ The estimates lie close to the dashed line, where estimated and true weights are
 
 ## Plotting the network
 
-For directed models, `plot_network()` draws curved edges with arrows, so that A → B and B → A can be told apart. As for undirected networks, the dark line width is the lower bound of the credible interval and the light band is the upper bound. The arrowheads are drawn on the dark lines:
+For directed models, `plot_network()` draws curved edges with arrows, so that A → B and B → A can be told apart. As for undirected networks, the width of the dark line shows the lower bound of the credible interval, and the width of the light band shows the upper bound. The arrowheads are drawn on the dark lines:
 
 ```{r, fig.height = 6}
 plot_network(fit_edge, lwd = 5)
 ```
 
-With many edges, `threshold` can be used to show only the stronger ones. Here only edges with a median weight of at least 0.2 are drawn:
+With many edges, `threshold` shows only the stronger ones. Here only edges with a median weight of at least 0.2 are drawn:
 
 ```{r, fig.height = 6}
 plot_network(fit_edge, lwd = 5, threshold = 0.2)
@@ -153,7 +153,7 @@ plot_network(fit_edge, lwd = 5, threshold = 0.2)
 
 ## Node metrics
 
-`extract_metric()` calculates node metrics on each posterior network using igraph. For directed networks it uses igraph's default settings, which affect how the metrics are defined:
+`extract_metric()` uses igraph to calculate node metrics on each posterior network (a network whose edge weights are one draw from the posterior). For directed networks it uses igraph's default settings, which affect how the metrics are defined:
 
 * `node_strength` is calculated with `igraph::strength()`, whose default is `mode = "all"`. It is the sum of the weights of all edges into and out of a node, that is, in-strength plus out-strength.
 * `node_degree[t]` is calculated in the same way, with edge weights replaced by 0 or 1, so it counts both incoming and outgoing edges with weight at or above `t`.
@@ -168,7 +168,7 @@ strength <- extract_metric(fit_edge, "node_strength")
 apply(strength, 2, quantile, probs = c(0.05, 0.5, 0.95))
 ```
 
-For the amount of grooming given (out-strength) and received (in-strength) separately, `bison_to_igraph()` returns a list of posterior networks, and `igraph::strength()` can be called on each with `mode = "out"` or `mode = "in"`. The networks contain all nodes in the order of the model's nodes, so the columns can be named with the node names:
+To calculate the grooming given (out-strength) and received (in-strength) separately, `bison_to_igraph()` returns a list of posterior networks, and `igraph::strength()` is called on each with `mode = "out"` or `mode = "in"`. Each network contains all nodes, in the same order as in the model, so the columns can be named with the node names:
 
 ```{r}
 nets <- bison_to_igraph(fit_edge, num_draws = 1000)
@@ -207,7 +207,7 @@ plot(receive, apply(in_strength, 2, median), pch = 19,
 
 Individuals with higher simulated giving tendencies tend to have higher out-strength, and individuals with higher receiving tendencies tend to have higher in-strength. The relationships are not exact, because edge weights also depend on kinship and on the pair-specific deviations.
 
-The posterior samples of in- and out-strength can be used in further analyses in the same way as other metrics. For example, the difference between out-strength and in-strength of each individual in each draw gives the posterior distribution of how much more grooming it gives than it receives:
+The posterior draws of in- and out-strength can be used in further analyses in the same way as other metrics. For example, the difference between out-strength and in-strength of each individual in each draw gives the posterior distribution of how much more grooming it gives than it receives:
 
 ```{r}
 balance <- out_strength - in_strength
@@ -223,7 +223,7 @@ df_dyadic <- df[, c("actor", "receiver", "kin")]
 head(df_dyadic)
 ```
 
-Edges that share an individual are not independent. As for undirected networks, a multi-membership random effect `(1 | mm(actor, receiver))` accounts for this. `bison_brm()` matches each row to the edge in the direction given, so the row for Ada → Bea uses the edge weight of Ada → Bea:
+Edges that share an individual are not independent. As for undirected networks, a multi-membership random effect `(1 | mm(actor, receiver))` accounts for this. It gives each individual one effect that applies to all its edges, as actor or as receiver. `bison_brm()` matches each row to the edge in the direction given, so the row for Ada → Bea uses the edge weight of Ada → Bea:
 
 ```{r}
 fit_kin <- bison_brm(
@@ -241,4 +241,4 @@ Edge weights in `bison_brm()` are on the logit scale, so the coefficient of `kin
 
 The multi-membership term treats the actor and receiver in the same way, so it does not separate giving and receiving tendencies. Separate random effects for actors and receivers, `(1 | actor) + (1 | receiver)`, can be added if the variation between actors and between receivers is of interest.
 
-A model is fitted to each of the `num_draws` networks and the results are combined, so brms may give convergence warnings for the combined fit. See `vignette("bison_brms")` for more on regressions.
+`bison_brm()` fits a model to each of the `num_draws` posterior networks and combines the results, as in multiple imputation. brms may therefore give convergence warnings for the combined fit. See `vignette("bison_brms")` for more on regressions.

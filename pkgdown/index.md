@@ -2,7 +2,7 @@
 <div class="bison-hero-text">
 <h2 class="bison-title">bisonR</h2>
 <p class="bison-subtitle">Bayesian inference of animal social networks in R</p>
-<p class="bison-lead">bisonR implements the BISoN framework (Hart et al. 2023). Edge weights are estimated from observation data as posterior distributions, so the precision of each estimate reflects how much the dyad was sampled. These posteriors can then be used in network metrics, regression models and comparisons between networks.</p>
+<p class="bison-lead">bisonR implements the BISoN framework (Hart et al. 2023). It estimates each edge weight from observation data as a posterior distribution (the range of plausible values given the data and prior), so the precision of each estimate reflects how much that dyad was sampled. These posteriors can then be used to calculate network metrics, fit regression models and compare networks.</p>
 <div class="bison-actions">
 <a class="btn btn-primary" href="articles/getting_started.html">Getting started</a>
 <a class="btn btn-outline-primary" href="reference/index.html">Function reference</a>
@@ -16,12 +16,12 @@
 <div class="bison-features">
 <div class="bison-feature">
 <h3>Edge weight models</h3>
-<p>Binary and count models of social events with observation effort, optional fixed and random effects, partial pooling and zero inflation. Conjugate models are available for simple cases.</p>
+<p>Binary and count models of social events that account for observation effort, with optional fixed and random effects, partial pooling and zero inflation. Faster conjugate models, fitted without MCMC (the sampling method that Stan uses), are available for simple cases.</p>
 <a href="articles/preparing_data.html">Preparing data</a>
 </div>
 <div class="bison-feature">
 <h3>Diagnostics and plots</h3>
-<p>MCMC trace plots, prior and posterior predictive checks, and network plots that display the credible interval of each edge.</p>
+<p>Trace plots of the MCMC sampler, prior and posterior predictive checks, and network plots that show the credible interval of each edge.</p>
 <a href="reference/plot_predictions.html">Predictive checks</a>
 </div>
 <div class="bison-feature">
@@ -50,11 +50,11 @@ plot_network(fit_edge, lwd = 5)                  # Sociogram showing uncertainty
 extract_metric(fit_edge, "node_strength")        # Posterior of each node's strength
 ```
 
-The left-hand side of the formula, `(event | effort)`, says how many social events were seen and how much each dyad was observed. The right-hand side, `dyad(node_1_id, node_2_id)`, asks for an edge weight for every pair. The [Getting started](articles/getting_started.html) article explains each step.
+The left-hand side of the formula, `(event | effort)`, gives the number of social events seen and how much each dyad was observed. The right-hand side, `dyad(node_1_id, node_2_id)`, estimates an edge weight for each dyad (pair of individuals). The [Getting started](articles/getting_started.html) article explains each step.
 
 ## Installation
 
-bisonR fits models with [Stan](https://mc-stan.org/) via the [cmdstanr](https://mc-stan.org/cmdstanr/) package, so install cmdstanr and CmdStan first:
+bisonR fits models with [Stan](https://mc-stan.org/) through the [cmdstanr](https://mc-stan.org/cmdstanr/) package, so install cmdstanr and CmdStan first:
 
 ```r
 install.packages("cmdstanr", repos = c("https://stan-dev.r-universe.dev", getOption("repos")))
@@ -69,7 +69,7 @@ Then install bisonR from GitHub:
 remotes::install_github("JHart96/bisonR")
 ```
 
-On Windows you may need [Rtools](https://cran.r-project.org/bin/windows/Rtools/) first; the [Windows installation](articles/windows_installation.html) article covers common problems. Upcoming releases are developed on `release/<version>` branches and can be installed with, for example, `remotes::install_github("JHart96/bisonR@release/1.1.0")`.
+On Windows you may need to install [Rtools](https://cran.r-project.org/bin/windows/Rtools/) first. The [Windows installation](articles/windows_installation.html) article covers common problems. Upcoming releases are developed on `release/<version>` branches. To install one, use, for example, `remotes::install_github("JHart96/bisonR@release/1.1.0")`.
 
 ## Citing bisonR
 

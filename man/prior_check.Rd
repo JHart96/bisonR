@@ -14,8 +14,12 @@ prior_check(priors, model_type, type = "density")
 
 \item{type}{Type of plot. Only \code{"density"} is currently available.}
 }
+\value{
+\code{NULL}. The function is called for its plots.
+}
 \description{
-Plots the density of each prior in a list. Edge weight priors are shown on the
+Plots the density of each prior in a list, to check that the priors give
+reasonable weight to plausible values. Edge weight priors are shown on the
 natural scale (probabilities for binary models, rates for count models); other
 priors are shown on the scale on which they are defined. To see the data
 implied by the priors together, use \code{\link[=prior_predictive_check]{prior_predictive_check()}}.
@@ -28,4 +32,7 @@ weights, so the edge prior shown here is not the implied prior on each edge.
 \examples{
 priors <- get_default_priors("binary")
 prior_check(priors, "binary")
+}
+\seealso{
+\code{\link[=get_default_priors]{get_default_priors()}}, \code{\link[=prior_predictive_check]{prior_predictive_check()}}
 }

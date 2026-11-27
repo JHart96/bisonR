@@ -63,13 +63,13 @@ Ada and Dot were observed in only 4 periods, so their edge weight is less certai
 
 ### What "effort" means
 
-Effort is the amount of opportunity there was to observe the dyad interacting, for example the number of scans that included both individuals, or the number of hours they were both under observation. It is not the duration of the interactions. Effort determines how much information the data provide about each edge weight.
+Effort is how much each dyad was observed, for example the number of scans that included both individuals, or the number of hours they were both under observation. It tells the model how much information there is about each edge weight: the more a dyad was observed, the more certain its edge weight.
 
 If every row has the same effort, it can be written as a number instead of a column: `(event | 1) ~ dyad(node_1, node_2)`.
 
 ### Node names
 
-Node names can be characters, numbers or factors. If both node columns are factors with the same levels, every level is treated as a node, including any that do not appear in the data. Otherwise, the nodes are the names that appear in the data.
+Node names can be characters, numbers or factors. If both node columns are factors with the same levels, every level is treated as a node, including any that do not appear in the data. Otherwise, the nodes are the names that appear in the data, plus the levels of a node column that is a factor.
 
 ## Binary or count data?
 
@@ -92,16 +92,16 @@ fit_counts <- bison_model(
 get_edgelist(fit_counts)
 ```
 
-For data on the total duration of interactions (e.g. minutes spent grooming), `convert_duration_to_binary()` converts durations to binary data by splitting time into fixed-length periods. This is an approximation and should be used with caution.
+bisonR doesn't yet have a model for the length of interactions (for example, minutes spent grooming). For now, `convert_duration_to_binary()` can turn this kind of data into binary data by splitting time into fixed-length periods. This is an approximation and should be used with caution.
 
 ## Aggregated or disaggregated?
 
 Data can have one row per observation (disaggregated) or one row per dyad, with events and effort summed (aggregated). Both give the same edge weights, but differ in what else can be included in the model:
 
 * Observation-level predictors, such as the location or time of day of each sampling period, need disaggregated data, since they vary between rows of the same dyad.
-* Aggregated data are much faster to fit, and work with the conjugate models.
+* Aggregated data are much faster to fit with Stan. (Conjugate models give the same results for aggregated and disaggregated data.)
 
-Data can be aggregated to the coarsest level that keeps the predictors needed. For example, if location is the only observation-level predictor, the data can be aggregated to one row per dyad per location:
+Data can be aggregated as far as possible while keeping the predictors that are needed. For example, if location is the only observation-level predictor, the data can be aggregated to one row per dyad per location:
 
 ```{r}
 sim <- simulate_bison_model("binary", aggregated = FALSE)
@@ -138,7 +138,7 @@ fit_directed <- bison_model(
 get_edgelist(fit_directed)
 ```
 
-The effort for each direction should be the amount of time in which that behaviour could have been observed. Edges are only estimated for the directions that appear in the data, so rows with 0 events should be included for directions in which the behaviour was never seen.
+The effort for each direction should be how much that behaviour could have been observed in that direction, for example in hours or sampling periods. Edges are only estimated for the directions that appear in the data, so rows with 0 events should be included for directions in which the behaviour was never seen.
 
 ## Dyads that were never observed
 
@@ -146,7 +146,7 @@ Dyads with no rows in the data are not included in the model. If both individual
 
 ## Group-by-individual data
 
-Gambit-of-the-group data are often stored as a group-by-individual (GBI) matrix, where each row is a group or sampling event and each column an individual, with 1 if the individual was present:
+Gambit-of-the-group data (where individuals seen in the same group are assumed to be associating) are often stored as a group-by-individual (GBI) matrix, where each row is a group or sampling event and each column an individual, with 1 if the individual was present:
 
 ```{r}
 gbi <- matrix(rbinom(30 * 6, 1, 0.4), nrow = 30, ncol = 6,
@@ -168,7 +168,7 @@ fit_gbi <- bison_model(
 )
 ```
 
-Group-level information (such as location) can be added with `group_properties`, and individual traits with `individual_properties`. If some pairs could not have been seen together, for example because they were in the study area at different times, `individual_constraints` can be used to give each individual a value; only pairs with the same value are included.
+Group-level information (such as location) can be added with `group_properties`, and individual traits with `individual_properties`. If some pairs could not have been seen together, for example because they were in the study area at different times, use `individual_constraints` to give each individual a value. Only pairs with the same value are then included.
 
 Rows from the same group are not independent, so a random effect of group can be added to a (non-conjugate) model with `+ (1 | group_id)`.
 
@@ -177,6 +177,6 @@ Rows from the same group are not independent, so a random effect of group can be
 `bison_model()` checks the data before fitting. The most common errors are:
 
 * **Columns not found**: the names in the formula must exactly match columns in the data.
-* **Missing values**: remove or impute rows with `NA` in any column used by the model.
+* **Missing values**: remove rows with `NA` in any column used by the model, or impute (fill in) the missing values.
 * **More events than sampling periods**: in binary models, the number of events cannot exceed the effort. Use a count model for counts of interactions.
 * **Self-loops**: rows where both nodes are the same individual aren't allowed.

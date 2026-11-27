@@ -3,7 +3,8 @@
 #' Fitted models contain a CmdStan fit object whose draws live in temporary CSV
 #' files, so `saveRDS()` on its own does not produce a file that can be reloaded
 #' in a new R session. `bison_save()` reads all draws into memory first and then
-#' saves the complete object as a single `.rds` file.
+#' saves the complete object as a single `.rds` file. Use it to keep a fitted
+#' model so it doesn't need to be refitted later.
 #'
 #' @param bisonobj A fitted model, such as the output of [bison_model()].
 #' @param file Path of the `.rds` file to write. `.rds` is appended if missing.
@@ -44,7 +45,12 @@ bison_save <- function(bisonobj, file) {
 
 #' Load a bisonR model saved with `bison_save()`
 #'
-#' @param file Path of an `.rds` file written by [bison_save()].
+#' Reads a fitted model saved with [bison_save()], so it can be used in a new R
+#' session in the same way as a newly fitted model. Models saved with earlier versions of
+#' bisonR (0.4.x), which kept the Stan fit in a separate file, are also read.
+#'
+#' @param file Path of an `.rds` file written by [bison_save()]. `.rds` is
+#'   appended if the file isn't found without it.
 #'
 #' @return The fitted model object.
 #' @seealso [bison_save()]

@@ -19,10 +19,13 @@ extract_metric(
 separated by an underscore, e.g. \code{"node_strength"} or \code{"global_cv"}. See
 \emph{Available metrics}.}
 
-\item{num_draws}{Number of posterior draws to use.}
+\item{num_draws}{Number of posterior draws to use. Each draw is one plausible
+version of the network. Draws are chosen at random, without replacement
+unless more are requested than the model has.}
 
 \item{standardise}{If \code{TRUE}, metrics are mean-centred within each posterior
-draw (so each row has mean 0).}
+draw (so each row has mean 0). They are not divided by the standard
+deviation. Not available for global metrics.}
 
 \item{transform}{Only used for \code{"edge_weight"}. If \code{TRUE} (default), edge
 weights are on the natural scale (probabilities or rates); if \code{FALSE} they're
@@ -35,12 +38,17 @@ effects are 0.}
 A matrix with one row per posterior draw and one column per target:
 per dyad (in the order of \code{\link[=get_edgelist]{get_edgelist()}}) for edge metrics, per node (in
 the order of the node factor levels, with nodes as column names) for node
-metrics, and a single column for global metrics.
+metrics, and a single column for global metrics. Summarise it with, for
+example, \code{apply(x, 2, quantile, probs = c(0.05, 0.5, 0.95))}, or plot it
+with \code{\link[=plot_metric]{plot_metric()}}.
 }
 \description{
 Draws networks from the posterior of a fitted edge model and calculates a
 network metric for each one, giving a posterior distribution of the metric
-that carries the uncertainty in the edge weights.
+that carries the uncertainty in the edge weights. Use it to describe a
+network, for example with the median and credible interval of each node's
+strength, or to compare metrics between nodes or networks. To use a metric
+in a regression, use \code{\link[=bison_brm]{bison_brm()}}.
 }
 \section{Available metrics}{
 
@@ -62,7 +70,8 @@ the node in directed networks).
 \item \code{global_density}: mean edge weight of the dyads in the model.
 \item \code{global_cv}: coefficient of variation of edge weights (social differentiation).
 \item \code{global_std}: standard deviation of edge weights.
-\item \code{global_diameter}: diameter of the network.
+\item \code{global_diameter}: diameter of the network (the longest shortest path
+between two nodes), using 1/weight as the distance.
 \item \code{global_clustering[t]}: global clustering coefficient of the thresholded
 network (0 if there are no connected triples).
 }
@@ -90,4 +99,8 @@ apply(strength, 2, quantile, probs = c(0.05, 0.5, 0.95))
 
 cv <- extract_metric(fit_edge, "global_cv", num_draws = 100)
 plot_metric(cv, "Social differentiation")
+}
+\seealso{
+\code{\link[=plot_metric]{plot_metric()}}, \code{\link[=bison_brm]{bison_brm()}}, and \code{\link[=bison_to_igraph]{bison_to_igraph()}} for
+metrics not listed here.
 }

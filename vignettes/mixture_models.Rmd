@@ -20,9 +20,9 @@ knitr::opts_chunk$set(
 set.seed(1)
 ```
 
-Edge mixture models look for clusters in edge weights, which can be interpreted as different types of social relationship (for example, weak and strong associations). `bison_mixture()` fits Gaussian mixture models to the edge weights in many posterior draws of the network. It gives two main results:
+Edge mixture models look for clusters in edge weights, which can be interpreted as different types of social relationship (for example, weak and strong associations). A Gaussian mixture model describes the edge weights as a combination of several normal distributions, called components. `bison_mixture()` fits these models to the edge weights in many posterior draws of the network (each draw is one possible network that is consistent with the data). It gives two main results:
 
-* the posterior probability of each number of components (clusters), from 1 to a maximum $K$, for the whole network;
+* the probability of each number of components (clusters), from 1 to a maximum $K$, for the whole network;
 * for each dyad, the probability that its edge belongs to each component.
 
 ```{r setup}
@@ -40,7 +40,7 @@ df <- sim_data$df_sim
 head(df)
 ```
 
-There are no observation-level effects, so the conjugate count model can be used:
+There are no observation-level effects, so the conjugate count model can be used. Conjugate models calculate the posterior directly, which is fast, but they cannot include extra effects:
 
 ```{r}
 fit_edge <- bison_model(
@@ -62,7 +62,7 @@ fit_mixture <- bison_mixture(fit_edge, num_components = 5, verbose = FALSE)
 summary(fit_mixture)
 ```
 
-The summary shows the most probable number of components and the posterior probability of each number of components. For the most probable number, it also shows the posterior median of each component's mean edge weight, and the probability that each edge belongs to each component. Components are numbered in order of their means, so component 1 is always the weakest type of relationship.
+The summary shows the most probable number of components and the probability of each number. For the most probable number, it also shows the posterior median of each component's mean edge weight and the probability that each edge belongs to each component. Components are numbered in order of their means, so component 1 is always the weakest type of relationship.
 
 The same results can be extracted for further analysis. `get_network_component_probabilities()` gives the probability of each number of components:
 
@@ -90,7 +90,7 @@ plot_mixture(fit_mixture, num_components = 2)
 
 ## Choosing the information criterion
 
-The posterior probability of each number of components is based on an information criterion, set with `criterion`. The default, `"ICL"`, adds a penalty for components that overlap, so it favours fewer, well-separated components. `"BIC"` does not include this penalty and can support more components when they overlap. Because edge weights are estimated with uncertainty, components often overlap, so the two criteria can give different results:
+The probability of each number of components is calculated from an information criterion, set with `criterion`, in each posterior draw of the network, and then averaged across draws. It is an approximation rather than a full posterior probability. An information criterion scores how well a model fits the data, with a penalty for each extra component. The default, `"ICL"` (integrated completed likelihood), adds a further penalty for components that overlap, so it favours fewer, well-separated components. `"BIC"` (Bayesian information criterion) does not include this extra penalty and can support more components when they overlap. Because edge weights are estimated with uncertainty, components often overlap, so the two criteria can give different results:
 
 ```{r}
 fit_mixture_bic <- bison_mixture(fit_edge, num_components = 5, criterion = "BIC", verbose = FALSE)
@@ -102,7 +102,7 @@ In this example both criteria give the highest probability to two components, th
 
 ## Using components in further analyses
 
-Component membership can be used in other analyses. As an example, suppose the question is whether the total strength of an individual's *strong* relationships is related to a trait. For each posterior draw, edges assigned to the weaker component are set to zero, and node strength is calculated from the remaining edges. Because both the edge weights and the component assignments are uncertain, both are taken from the same posterior draw.
+Component membership can be used in other analyses. For example, the question might be whether the total strength of an individual's *strong* relationships is related to a trait. For each posterior draw, edges assigned to the weaker component are set to zero, and node strength is calculated from the remaining edges. Both the edge weights and the component assignments are uncertain, so both are taken from the same posterior draw.
 
 A data frame of node traits, simulated for this example:
 
@@ -128,7 +128,7 @@ imputed_data <- lapply(seq_len(num_draws), function(i) {
 head(imputed_data[[1]])
 ```
 
-Each data frame is one possible version of the data, so a regression can be fitted to all of them and the results combined, here with `brms::brm_multiple()`:
+Each data frame is one possible version of the data. As in multiple imputation (a method for missing data), a regression can be fitted to each version and the results pooled, here with `brms::brm_multiple()`:
 
 ```{r}
 fit_brm <- brms::brm_multiple(

@@ -2,20 +2,28 @@
 % Please edit documentation in R/bison_mixture.R
 \name{get_edge_component_probabilities}
 \alias{get_edge_component_probabilities}
-\title{Get probabilities of component membership for each edge}
+\title{Get the probability of each edge belonging to each component}
 \usage{
 get_edge_component_probabilities(object, num_components)
 }
 \arguments{
-\item{object}{An S3 edge mixture model object}
+\item{object}{A \code{bison_mixture} object from \code{\link[=bison_mixture]{bison_mixture()}}.}
 
-\item{num_components}{The number of components in the mixture model}
+\item{num_components}{The number of components in the mixture to use,
+between 1 and the \code{num_components} used in \code{\link[=bison_mixture]{bison_mixture()}}. This is
+often the most probable number, from
+\code{\link[=get_network_component_probabilities]{get_network_component_probabilities()}}.}
 }
 \value{
-Dataframe summarising edge component probabilities for each edge
+A data frame with one row per dyad, columns \code{node_1} and \code{node_2},
+and one column per component (\verb{P(component 1)}, ...). Each row sums to 1.
+Components are in increasing order of their mean.
 }
 \description{
-Get probabilities of component membership for each edge
+For a mixture with a given number of components, returns the posterior
+probability that each edge belongs to each component (type of relationship).
+The probabilities include the uncertainty in both the edge weights and the
+mixture. Use it to classify edges, for example as weak or strong bonds.
 }
 \examples{
 sim_data <- simulate_bison_model_mixture(
@@ -29,4 +37,7 @@ fit_edge <- bison_model(
 )
 fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
 head(get_edge_component_probabilities(fit_mixture, 2))
+}
+\seealso{
+\code{\link[=bison_mixture]{bison_mixture()}}, \code{\link[=get_component_means]{get_component_means()}}
 }

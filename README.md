@@ -8,7 +8,7 @@
 
 **Bayesian Inference of Social Networks in R.**
 
-bisonR implements the BISoN framework for Bayesian analysis of animal social networks (Hart et al. 2023). Edge weights are estimated from observation data as posterior distributions, taking into account how much each dyad was observed. The posteriors can then be used in network metrics, regression models and comparisons between networks.
+bisonR implements the BISoN framework for Bayesian analysis of animal social networks (Hart et al. 2023). It estimates each edge weight from observation data as a posterior distribution (the range of plausible values and how probable each one is), taking into account how much each dyad was observed. These posteriors can then be used to calculate network metrics, fit regression models and compare networks.
 
 Documentation, tutorials and the function reference are at **<https://bisonr.org>**.
 
@@ -51,7 +51,7 @@ The [Getting started](https://bisonr.org/articles/getting_started.html) article 
 
 ## Installation
 
-bisonR uses [Stan](https://mc-stan.org/) through the [cmdstanr](https://mc-stan.org/cmdstanr/) package to fit models, so you need cmdstanr and CmdStan before installing bisonR.
+bisonR fits models with [Stan](https://mc-stan.org/) through the [cmdstanr](https://mc-stan.org/cmdstanr/) package, so install cmdstanr and CmdStan before installing bisonR.
 
 ### 1. Install cmdstanr and CmdStan
 
@@ -74,7 +74,7 @@ bisonR isn't on CRAN. Install the latest release from GitHub with:
 remotes::install_github("JHart96/bisonR")
 ```
 
-The first time you fit a model, bisonR compiles its Stan models, which takes a minute or two. Compiled models are cached, so this only happens again when bisonR or CmdStan is updated.
+The first time you fit a model, bisonR compiles its Stan models, which takes a minute or two. Compiled models are cached, so they are only compiled again after bisonR or CmdStan is updated.
 
 ### Development versions
 

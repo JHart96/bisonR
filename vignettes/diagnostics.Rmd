@@ -24,7 +24,7 @@ set.seed(1)
 library(bisonR)
 ```
 
-This article describes how to check a fitted edge weight model. There are two kinds of check. MCMC diagnostics check whether the sampler has given a reliable sample from the posterior. Posterior predictive checks compare data simulated from the fitted model with the observed data, to find ways in which the model does not describe the data. The last section works through an example in which a posterior predictive check shows a problem with the model. A basic analysis is described in `vignette("getting_started")`.
+This article describes how to check a fitted edge weight model. There are two kinds of check. MCMC diagnostics check whether the sampler (Stan's Markov chain Monte Carlo algorithm) has given a reliable sample from the posterior, the distribution of plausible parameter values given the data and priors. Posterior predictive checks compare data simulated from the fitted model with the observed data, to find ways in which the model does not describe the data. The last section works through an example in which a posterior predictive check shows a problem with the model. A basic analysis is described in `vignette("getting_started")`.
 
 ## An example model
 
@@ -49,19 +49,19 @@ fit_edge <- bison_model(
 
 ## MCMC diagnostics
 
-Binary and count models are fitted with Stan's MCMC sampler. Conjugate models are sampled exactly, so they do not need these checks.
+Binary and count models are fitted with Stan's MCMC sampler. Conjugate models calculate the posterior exactly, without MCMC, so they do not need these checks.
 
 ### Stan warnings
 
-After sampling, cmdstanr gives warnings about problems it has detected, such as divergent transitions or iterations that reached the maximum tree depth. Divergent transitions mean that the sampler could not explore part of the posterior, and the results may be biased. These warnings should not be ignored. Possible responses include increasing `adapt_delta` (for example `adapt_delta = 0.95`, passed to `bison_model()`), changing the priors, or simplifying the model.
+After sampling, cmdstanr warns about any problems it has detected, such as divergent transitions or iterations that reached the maximum tree depth (a limit on how far the sampler moves in each step). Divergent transitions mean that the sampler could not explore part of the posterior, and the results may be biased. These warnings should not be ignored. Possible responses include increasing `adapt_delta` (for example `adapt_delta = 0.95`, passed to `bison_model()`), changing the priors, or simplifying the model.
 
-The fitted cmdstanr object is stored in `fit_edge$fit` (it is `NULL` for conjugate models). Its `diagnostic_summary()` method gives the number of divergent transitions and of iterations at the maximum tree depth in each chain, and the E-BFMI of each chain:
+The fitted cmdstanr object is stored in `fit_edge$fit` (it is `NULL` for conjugate models). Its `diagnostic_summary()` method gives, for each chain (an independent run of the sampler), the number of divergent transitions, the number of iterations at the maximum tree depth, and the E-BFMI, a measure of how efficiently the sampler moved through the posterior:
 
 ```{r}
 fit_edge$fit$diagnostic_summary()
 ```
 
-Here there are no divergent transitions and no iterations at the maximum tree depth. Low values of E-BFMI (below about 0.3) indicate that the sampler explored the posterior inefficiently. All four values are well above this.
+Here there are no divergent transitions and no iterations at the maximum tree depth. E-BFMI values below about 0.3 indicate that the sampler explored the posterior inefficiently. All four values are well above this.
 
 ### Trace plots
 
@@ -71,7 +71,7 @@ Here there are no divergent transitions and no iterations at the maximum tree de
 plot_trace(fit_edge, par_ids = 1:4)
 ```
 
-Trace plots can only be inspected for a few parameters, and some problems, such as a chain that is stuck in one region throughout, are easier to detect with numerical summaries.
+Only a few parameters can be inspected with trace plots. Some problems, such as a chain that stays stuck in one region, are easier to detect with numerical summaries.
 
 ### R-hat and effective sample size
 
@@ -124,19 +124,19 @@ An observed value in the tail of a histogram, or outside it, shows a feature of 
 
 ### Comparison with point estimates
 
-With `type = "point"`, the plot shows the posterior median and credible intervals of each edge weight against the simple point estimate (events divided by effort):
+With `type = "point"`, the plot shows the posterior median and credible intervals (ranges that contain the edge weight with a given probability) of each edge weight against the simple point estimate (events divided by effort):
 
 ```{r}
 plot_predictions(fit_edge, type = "point")
 ```
 
-This is not a predictive check. It shows how far the estimates have been pulled away from the point estimates by the prior. Here most estimates are close to the dashed line. Dyads with point estimates of 0 or 1 have estimates pulled towards the centre and wide intervals. Estimates for dyads with few observations are pulled towards the centre of the prior, and have wide intervals. If many estimates are far from the dashed line, the prior may be stronger than intended (see `vignette("priors")`). The plot cannot show whether the point estimates or the model estimates are closer to the truth.
+This is not a predictive check. It shows how far the estimates have been pulled away from the point estimates by the prior. Here most estimates are close to the dashed line. Dyads with point estimates of 0 or 1 have estimates pulled towards the centre, with wide intervals. So do dyads with few observations, whose estimates are pulled towards the centre of the prior. If many estimates are far from the dashed line, the prior may be stronger than intended (see `vignette("priors")`). The plot cannot show whether the point estimates or the model estimates are closer to the truth.
 
 ## Worked example: excess zeros
 
-In some studies, some pairs of individuals are never seen together because they cannot be, for example because they belong to groups that do not meet. These dyads have zero events regardless of how much they were observed. A standard edge model assumes that every dyad has some chance of being seen together, so it may predict fewer dyads with no events than are observed.
+In some studies, some pairs of individuals can never be seen together, for example because they belong to groups that do not meet. These dyads have zero events regardless of how much they were observed. A standard edge model assumes that every dyad has some chance of being seen together, so it may predict fewer dyads with no events than are observed.
 
-The following code simulates data of this kind. There are 15 individuals and 105 dyads. Each dyad is observed in between 10 and 30 sampling periods. Each dyad has a 40% chance of being one that is never seen together. The other dyads are seen together with a probability drawn from a logit-normal distribution.
+The following code simulates data of this kind. There are 15 individuals and 105 dyads. Each dyad is observed in between 10 and 30 sampling periods. Each dyad has a 40% chance of being one that is never seen together. The other dyads are seen together with a probability drawn from a logit-normal distribution (a normal distribution on the logit scale).
 
 ```{r}
 num_nodes <- 15
@@ -212,13 +212,13 @@ plot_predictions(fit_zero, num_draws = 100, type = "stats")
 
 The observed proportion of dyads with no events is now near the centre of the simulated values. However, the observed standard deviation of rates is now in the lower tail of the simulated values: the zero-inflated model predicts more variation between dyads than is observed. A likely reason is that, under this model, a dyad with no events gives little information about its own edge weight, so these edge weights are drawn mostly from the wide default prior. Changing one part of a model can change how well it fits other features of the data, so all of the checks should be repeated after a change.
 
-The two models can also be compared with `model_comparison()`, which uses leave-one-out cross-validation (LOO):
+The two models can also be compared with `model_comparison()`, which uses leave-one-out cross-validation (LOO). LOO estimates how well each model predicts data that were left out of the fit:
 
 ```{r}
 model_comparison(list(standard = fit_standard, zero_inflated = fit_zero))
 ```
 
-The stacking weights favour the standard model (0.82) over the zero-inflated model (0.18). However, the comparison gives warnings that some Pareto k values are too high. This means that the approximation used to calculate LOO is unreliable for some rows of the data, and so are the weights. The Pareto k values for a model can be seen with the `loo` package. They may differ slightly from those used by `model_comparison()`, which also accounts for autocorrelation in the MCMC chains:
+The stacking weights (weights chosen so that the combined models give the best predictions) favour the standard model (0.82) over the zero-inflated model (0.18). However, the comparison warns that some Pareto k values are too high. Pareto k is a diagnostic for the approximation used to calculate LOO. High values mean that the approximation is unreliable for some rows of the data, so the weights are unreliable too. The Pareto k values for a model can be seen with the `loo` package. They may differ slightly from those used by `model_comparison()`, which also accounts for autocorrelation in the MCMC chains:
 
 ```{r}
 loo::loo(fit_standard$log_lik)

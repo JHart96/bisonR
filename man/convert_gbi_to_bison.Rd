@@ -34,7 +34,9 @@ an effort of 1, e.g. \code{(event | 1) ~ dyad(node_1, node_2)}.
 }
 \description{
 Group-by-individual (GBI) data record which individuals were seen together in
-each group or sampling event. This function produces one row for each group
+each group or sampling event, as a matrix with one row per group and one
+column per individual. Use this function to prepare such data for
+\code{\link[=bison_model]{bison_model()}}. It produces one row for each group
 and each pair of individuals where \emph{at least one} of the pair was present.
 The \code{event} column is 1 if both were present and 0 if only one was. Groups
 where neither individual was seen carry no information about the pair and are
@@ -44,4 +46,7 @@ left out.
 gbi <- matrix(rbinom(20 * 5, 1, 0.4), 20, 5, dimnames = list(NULL, LETTERS[1:5]))
 df <- convert_gbi_to_bison(gbi)
 head(df)
+}
+\seealso{
+\code{\link[=bison_model]{bison_model()}}
 }

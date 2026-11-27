@@ -33,10 +33,20 @@ bison_base_igraph <- function(obj, dyad_rows = seq_len(obj$num_dyads)) {
 #' always all the nodes in the model, in the same order as the model's node
 #' levels, so results can be matched back to node names.
 #'
-#' @param obj A fitted `bison_model` object.
-#' @param num_draws Number of networks to draw from the posterior.
+#' Use it to calculate network measures that [extract_metric()] doesn't
+#' provide, with functions from the igraph package or other software that reads
+#' igraph objects. Calculating a measure for every network gives its posterior
+#' distribution, which includes the uncertainty in the edge weights.
 #'
-#' @return A list of `igraph` objects.
+#' @param obj A fitted `bison_model` object.
+#' @param num_draws Number of networks to draw from the posterior. Draws are
+#'   chosen at random, without replacement unless more are requested than the
+#'   model has.
+#'
+#' @return A list of `igraph` objects, with edge weights in the `weight` edge
+#'   attribute. Edges are only included for dyads in the model.
+#'
+#' @seealso [extract_metric()], [draw_edgelist_samples()]
 #'
 #' @examples
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
@@ -66,18 +76,26 @@ bison_to_igraph <- function(obj, num_draws = 1000) {
 
 #' Convert duration data to binary
 #'
-#' @description Uses a naive method for converting duration data to binary data:
-#' durations are divided by `max_event_length` and rounded. Use with caution, and
-#' make sure all durations are in the same units.
+#' @description Converts data on the time dyads spent interacting into
+#' approximate binary data, for use with a binary edge model. Both the time
+#' spent interacting and the time observed are divided by `max_event_length`
+#' and rounded, so each row records the number of periods of that length with
+#' an event, out of the number of periods observed. This is a rough
+#' approximation: use it with caution, and make sure all durations are in the
+#' same units.
 #'
 #' @param df Original data frame, ready for use with [bison_model()].
-#' @param event_name Name of the column with event durations.
-#' @param divisor_name Name of the column with observation durations.
+#' @param event_name Name of the column with the time spent interacting.
+#' @param divisor_name Name of the column with the time observed.
 #' @param max_event_length The maximum length of time a single social event could
-#'   last.
+#'   last, in the same units as the durations.
 #'
 #' @return The input data frame with the `event_name` and `divisor_name` columns
-#'   replaced by counts suitable for a binary model.
+#'   replaced by counts suitable for a binary model, with the converted
+#'   `divisor_name` column as the effort, e.g.
+#'   `(time_together | time_observed) ~ dyad(node_1, node_2)`.
+#'
+#' @seealso [bison_model()]
 #'
 #' @examples
 #' df <- data.frame(
@@ -96,7 +114,9 @@ convert_duration_to_binary <- function(df, event_name, divisor_name, max_event_l
 #' Convert a group-by-individual matrix to bisonR format
 #'
 #' Group-by-individual (GBI) data record which individuals were seen together in
-#' each group or sampling event. This function produces one row for each group
+#' each group or sampling event, as a matrix with one row per group and one
+#' column per individual. Use this function to prepare such data for
+#' [bison_model()]. It produces one row for each group
 #' and each pair of individuals where *at least one* of the pair was present.
 #' The `event` column is 1 if both were present and 0 if only one was. Groups
 #' where neither individual was seen carry no information about the pair and are
@@ -117,6 +137,8 @@ convert_duration_to_binary <- function(df, event_name, divisor_name, max_event_l
 #' @return A data frame with columns `node_1`, `node_2`, `event` and `group_id`,
 #'   plus any property columns, ready for use with a binary [bison_model()] with
 #'   an effort of 1, e.g. `(event | 1) ~ dyad(node_1, node_2)`.
+#'
+#' @seealso [bison_model()]
 #'
 #' @examples
 #' gbi <- matrix(rbinom(20 * 5, 1, 0.4), 20, 5, dimnames = list(NULL, LETTERS[1:5]))

@@ -24,7 +24,8 @@ its posterior median edge weight and its most probable component.
 Shows the distribution of posterior median edge weights (on the natural
 scale) as a histogram, with each edge coloured by the component it most
 probably belongs to. The posterior median and credible interval of each
-component's mean are shown as a vertical line and shaded band.
+component's mean are shown as a vertical line and shaded band. Use it to
+see how well the components separate the edge weights.
 }
 \examples{
 sim_data <- simulate_bison_model_mixture(
@@ -38,4 +39,7 @@ fit_edge <- bison_model(
 )
 fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
 plot_mixture(fit_mixture)
+}
+\seealso{
+\code{\link[=bison_mixture]{bison_mixture()}}, \code{\link[=get_component_means]{get_component_means()}}
 }

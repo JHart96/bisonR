@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulations.R
 \name{simulate_bison_model}
 \alias{simulate_bison_model}
-\title{Simulates data}
+\title{Simulate observation data for an edge model}
 \usage{
 simulate_bison_model(
   model_type,
@@ -14,13 +14,19 @@ simulate_bison_model(
 )
 }
 \arguments{
-\item{model_type}{Type of data to simulate, \code{"binary"} or \code{"count"}.}
+\item{model_type}{Type of data to simulate, \code{"binary"} (whether an event
+occurred in each sampling period) or \code{"count"} (the number of events).}
 
-\item{aggregated}{TRUE/FALSE indicating whether to aggregate over dyads or not.}
+\item{aggregated}{If \code{TRUE}, observations are summed to one row per dyad,
+with the location column removed. If \code{FALSE}, there is one row per
+observation.}
 
-\item{location_effect}{TRUE/FALSE indicating whether there is an effect of location on observations.}
+\item{location_effect}{Whether location affects the probability or rate of
+events.}
 
-\item{age_diff_effect}{TRUE/FALSE indicating whether there is an effect of age difference on observations.}
+\item{age_diff_effect}{Whether the age difference between the two nodes
+affects the probability or rate of events (by 0.2 per unit of age
+difference on the link scale).}
 
 \item{num_nodes}{Number of nodes in the simulated network.}
 
@@ -31,13 +37,28 @@ A list with \code{df_sim}, the simulated observations, and \code{df_true}, the
 true edge weights on the link scale. \code{df_sim} has columns \code{node_1_id},
 \code{node_2_id}, \code{event} and \code{effort} (observation effort), and predictors. It
 also has a \code{duration} column, identical to \code{effort}, for code written for
-earlier versions; new code should use \code{effort}.
+earlier versions; new code should use \code{effort}. The true edge weights in
+\code{df_true} don't include the effects of age difference or location.
 }
 \description{
-Simulates data
+Simulates observations of social events in an undirected network with known
+edge weights. Use it to try out bisonR functions, to learn the format of the
+data, or to check that a model recovers the true values before using it on
+real data.
+}
+\details{
+Each dyad's true edge weight is drawn from a standard normal
+distribution on the link scale (log-odds for binary data, log rates for
+count data). Each node gets an age, and each observation takes place at one
+of five locations, each with its own effect. Binary data have one sampling
+period (effort 1) per observation; count data have an observation effort
+drawn uniformly between 1 and \code{max_obs}.
 }
 \examples{
 sim_data <- simulate_bison_model("binary", aggregated = FALSE)
 head(sim_data$df_sim)  # Observations
 head(sim_data$df_true) # True edge weights (on the logit scale)
+}
+\seealso{
+\code{\link[=simulate_bison_model_mixture]{simulate_bison_model_mixture()}}, \code{\link[=bison_model]{bison_model()}}
 }

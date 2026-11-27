@@ -1,18 +1,68 @@
-#' Generate a mice mids object
+#' Prepare network data for multiple imputation with the mice package
 #'
-#' @param edgemodel_list A bisonR edge model (or a list of them)
-#' @param data_list A dataframe of regression variables compatible with a brms model (or a list of them).
-#' @param num_draws Number of draws from the network posterior
-#' @param param_names List of column names for network features (e.g. node_1_id, node_2_id or just node_id)
-#' @param target_name Name of network feature (edge, node, global)
-#' @param metric_name Name of network metric to calculate
-#' @param z_score Whether to standardise the network variable within each
+#' Combines a regression data frame with posterior draws of a network metric,
+#' producing one completed copy of the data for each draw. This is the step
+#' [bison_brm()] uses to carry the uncertainty in the network into a
+#' regression. Use `bison_mice()` directly to fit the regression with software
+#' other than brms, or to inspect the data that [bison_brm()] would use.
+#'
+#' @details
+#' **Multiple imputation** is a method for missing data: the analysis is
+#' repeated on several plausible versions of the data and the results are
+#' combined, so the final estimates include the uncertainty about the missing
+#' values. bisonR treats a network metric as a variable whose true values are
+#' unknown but described by the posterior distribution of the edge model (the
+#' distribution of values consistent with the data and priors). Each posterior
+#' draw, a single sample from that distribution, gives one version of the data.
+#'
+#' The [mice](https://cran.r-project.org/package=mice) package is an R package
+#' for multiple imputation. It stores the versions of a dataset in a
+#' `mids` object ("multiply imputed data set"). Regression packages that
+#' support mice, such as brms ([brms::brm_multiple()]), and functions in mice
+#' itself ([with()][mice::with.mids()] and [mice::pool()]) can fit a model to each
+#' version and combine the results. Use [mice::complete()] to get the data
+#' frames back.
+#'
+#' The network metric is added as a column named after the metric, such as
+#' `bison_node_strength` or `bison_edge_weight`. A factor `bison_network` gives
+#' the position of the edge model in `edgemodel_list` for each row. Edge weights
+#' are on the link scale (log-odds for binary models, log rates for count
+#' models), which is unbounded and usually better suited to regression. Node
+#' and global metrics are calculated from edge weights on the natural scale, as
+#' in [extract_metric()].
+#'
+#' @param edgemodel_list A fitted `bison_model` object, or a list of them for
+#'   an analysis of several networks.
+#' @param data_list A data frame of regression variables, or a list of data
+#'   frames with one per edge model, in the same order. For edge and node
+#'   metrics, each row refers to a dyad or node in the corresponding edge model.
+#'   For global metrics, give one data frame with one row per edge model.
+#' @param num_draws Number of posterior draws to use, which is the number of
+#'   imputed datasets. 100 is a reasonable value for a final analysis; small
+#'   values (such as 5) are useful for testing code.
+#' @param param_names Names of the columns in the data that identify the
+#'   targets of the metric: two columns (e.g. `c("node_1_id", "node_2_id")`) for
+#'   edge weights and one (e.g. `"node_id"`) for node metrics. The values must
+#'   match the node names in the edge model. Not used for global metrics.
+#' @param target_name The level of the metric: `"edge"`, `"node"` or
+#'   `"global"`.
+#' @param metric_name Name of the metric, without the target prefix, e.g.
+#'   `"weight"` (the only edge metric), `"strength"`, `"degree[0.2]"` or `"cv"`.
+#'   See [extract_metric()] for the metrics available.
+#' @param z_score If `TRUE`, standardise the network variable within each
 #'   posterior draw. Equivalent to `scale = "z"`.
 #' @param scale How to transform the network variable within each posterior
 #'   draw: `"none"` (default), `"centre"` (subtract the mean) or `"z"`
-#'   (subtract the mean and divide by the standard deviation).
+#'   (subtract the mean and divide by the standard deviation). For edge and node
+#'   metrics this is done across the rows of each data frame separately; global
+#'   metrics are transformed across networks.
 #'
-#' @return A mice mids object
+#' @return A `mids` object from the mice package, holding the original data
+#'   (with the network variable missing) and one completed dataset per
+#'   posterior draw.
+#'
+#' @seealso [bison_brm()], which calls this function and fits the regression;
+#'   [extract_metric()] for posterior draws of a metric on its own.
 #' @examplesIf requireNamespace("brms", quietly = TRUE) && requireNamespace("mice", quietly = TRUE) && !identical(Sys.getenv("BISONR_TEST_BRMS"), "false")
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 #' df <- sim_data$df_sim

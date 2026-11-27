@@ -2,15 +2,21 @@
 #'
 #' Draws networks from the posterior of a fitted edge model and calculates a
 #' network metric for each one, giving a posterior distribution of the metric
-#' that carries the uncertainty in the edge weights.
+#' that carries the uncertainty in the edge weights. Use it to describe a
+#' network, for example with the median and credible interval of each node's
+#' strength, or to compare metrics between nodes or networks. To use a metric
+#' in a regression, use [bison_brm()].
 #'
 #' @param obj A fitted `bison_model` object.
 #' @param metric_string Name of the metric, made of a target and a metric
 #'   separated by an underscore, e.g. `"node_strength"` or `"global_cv"`. See
 #'   *Available metrics*.
-#' @param num_draws Number of posterior draws to use.
+#' @param num_draws Number of posterior draws to use. Each draw is one plausible
+#'   version of the network. Draws are chosen at random, without replacement
+#'   unless more are requested than the model has.
 #' @param standardise If `TRUE`, metrics are mean-centred within each posterior
-#'   draw (so each row has mean 0).
+#'   draw (so each row has mean 0). They are not divided by the standard
+#'   deviation. Not available for global metrics.
 #' @param transform Only used for `"edge_weight"`. If `TRUE` (default), edge
 #'   weights are on the natural scale (probabilities or rates); if `FALSE` they're
 #'   on the link scale (logit or log). All other metrics are always calculated
@@ -37,7 +43,8 @@
 #' * `global_density`: mean edge weight of the dyads in the model.
 #' * `global_cv`: coefficient of variation of edge weights (social differentiation).
 #' * `global_std`: standard deviation of edge weights.
-#' * `global_diameter`: diameter of the network.
+#' * `global_diameter`: diameter of the network (the longest shortest path
+#'   between two nodes), using 1/weight as the distance.
 #' * `global_clustering[t]`: global clustering coefficient of the thresholded
 #'   network (0 if there are no connected triples).
 #'
@@ -51,7 +58,12 @@
 #' @return A matrix with one row per posterior draw and one column per target:
 #'   per dyad (in the order of [get_edgelist()]) for edge metrics, per node (in
 #'   the order of the node factor levels, with nodes as column names) for node
-#'   metrics, and a single column for global metrics.
+#'   metrics, and a single column for global metrics. Summarise it with, for
+#'   example, `apply(x, 2, quantile, probs = c(0.05, 0.5, 0.95))`, or plot it
+#'   with [plot_metric()].
+#'
+#' @seealso [plot_metric()], [bison_brm()], and [bison_to_igraph()] for
+#'   metrics not listed here.
 #'
 #' @examples
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
@@ -110,12 +122,22 @@ extract_metric <- function(obj, metric_string, num_draws = 1000, standardise = F
 
 #' Plot the posterior distribution of a network metric
 #'
-#' Continuous metrics are shown as smoothed densities; metrics that only take
-#' whole-number values (such as degree) are shown as bar charts.
+#' Plots the posterior distribution of a network metric from
+#' [extract_metric()], which shows the most plausible values of the metric and
+#' how uncertain it is. Continuous metrics are shown as smoothed densities;
+#' metrics that only take whole-number values (such as degree) are shown as bar
+#' charts. A matrix with several columns (for example, one per node) gives one
+#' plot per column.
 #'
 #' @param x A matrix of metric samples from [extract_metric()].
-#' @param metric_name Label for the x axis.
-#' @param ... Additional arguments passed to the plotting function.
+#' @param metric_name Label for the x axis. With several columns, the column
+#'   name or number is added to it.
+#' @param ... Additional arguments passed to the plotting function
+#'   ([graphics::barplot()] or [graphics::curve()]), such as `xlim`.
+#'
+#' @return `NULL`, invisibly. The function is called for its plots.
+#'
+#' @seealso [extract_metric()]
 #'
 #' @examples
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)

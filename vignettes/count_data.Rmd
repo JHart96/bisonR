@@ -24,7 +24,7 @@ set.seed(1)
 library(bisonR)
 ```
 
-This article goes through the analysis of count data, where the number of interactions between each pair is recorded over a known amount of observation time. The example is grooming bouts recorded during focal follows, with observation time in hours as the effort. See `vignette("preparing_data")` for the general data format and the choice between binary and count data.
+This article analyses count data, in which the number of interactions between each pair is recorded over a known amount of observation time. The example is grooming bouts recorded during focal follows, with observation time in hours as the effort. See `vignette("preparing_data")` for the general data format and the choice between binary and count data.
 
 ## Simulating focal follow data
 
@@ -67,7 +67,7 @@ The network is undirected, so a follow of Ada contributes to the Ada-Bea edge in
 
 ## Aggregating per dyad
 
-With no follow-level predictors, the rows can be aggregated to one row per dyad by summing the bouts and the hours. The order of the two individuals doesn't matter in an undirected network, but placing them in a consistent order means that rows for Ada-Bea and Bea-Ada are combined by `aggregate()`:
+With no follow-level predictors, the rows can be aggregated to one row per dyad by summing the bouts and the hours. The order of the two individuals doesn't matter in an undirected network, but putting them in a consistent order means that `aggregate()` combines the rows for Ada-Bea and Bea-Ada:
 
 ```{r}
 df$node_1 <- pmin(df$focal, df$partner)
@@ -104,13 +104,13 @@ The edge prior `normal(0, 1)` is on the log scale. `prior_check()` shows the dis
 prior_check(priors["edge"], "count")
 ```
 
-With effort in hours, this prior has a median of 1 bout per hour, and 95% of its weight is between about 0.14 and 7.1 bouts per hour:
+With effort in hours, this prior has a median of 1 bout per hour, and 95% of its probability lies between about 0.14 and 7.1 bouts per hour:
 
 ```{r}
 exp(qnorm(c(0.025, 0.5, 0.975), mean = 0, sd = 1))
 ```
 
-This should be checked against what is plausible for the study system and the units of effort. Here the true rates are mostly below 1 bout per hour:
+Check this against rates that are plausible for the study system and the units of effort. Here the true rates are mostly below 1 bout per hour:
 
 ```{r}
 quantile(true_rates$true_rate, probs = c(0, 0.25, 0.5, 0.75, 1))
@@ -120,7 +120,7 @@ The default prior is kept in this example. A prior with a lower mean, such as `n
 
 ## Fitting the models
 
-The Stan model uses the log-normal edge prior described above:
+The Stan model, which samples from the posterior distribution (the plausible values of each edge weight given the data and the prior) by Markov chain Monte Carlo (MCMC), uses the edge prior described above (normal on the log scale, so log-normal on the rate):
 
 ```{r}
 fit_count <- bison_model(
@@ -132,7 +132,7 @@ fit_count <- bison_model(
 )
 ```
 
-The conjugate count model calculates the posterior exactly, with a gamma prior directly on the rate:
+The conjugate count model calculates the posterior distribution exactly, with a gamma prior directly on the rate:
 
 ```{r}
 get_default_priors("count_conjugate")
@@ -172,7 +172,7 @@ For all four statistics, the observed value is within the range of the simulated
 
 ## The estimated network
 
-`get_edgelist()` gives the posterior median and 90% credible interval of each rate, in bouts per hour:
+`get_edgelist()` gives the posterior median and 90% credible interval of each rate, in bouts per hour. A 90% credible interval is the range that contains the rate with 90% probability:
 
 ```{r}
 edgelist <- get_edgelist(fit_count)

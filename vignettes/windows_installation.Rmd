@@ -52,7 +52,7 @@ If the error continues, update R to the latest release.
 
 ## "CmdStan path has not been set yet"
 
-This can happen in the R session after CmdStan was installed, typically on managed computers where the `CMDSTAN` environment variable set during installation is not kept. Set the path with `cmdstanr::set_cmdstan_path()` as shown above, or set the `CMDSTAN` environment variable to the folder for the installed version (for example `C:/Users/you/.cmdstan/cmdstan-2.36.0`), rather than to the `.cmdstan` folder that contains it.
+This can happen in a new R session after CmdStan has been installed, usually on managed computers that do not keep the `CMDSTAN` environment variable set during installation. Set the path with `cmdstanr::set_cmdstan_path()` as shown above, or set the `CMDSTAN` environment variable to the folder for the installed version (for example `C:/Users/you/.cmdstan/cmdstan-2.36.0`), rather than to the `.cmdstan` folder that contains it.
 
 ## Other problems
 

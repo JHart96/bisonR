@@ -17,7 +17,9 @@ prior_predictive_check(
 )
 }
 \arguments{
-\item{formula, data, model_type, priors}{As for \code{\link[=bison_model]{bison_model()}}.}
+\item{formula, data, model_type, priors}{As for \code{\link[=bison_model]{bison_model()}}. The data are
+used for the structure of the model (dyads and observation effort), not
+for the events.}
 
 \item{plot_type}{Type of predictive plot, passed to \code{\link[=plot_predictions]{plot_predictions()}} as
 \code{type}: \code{"density"} or \code{"stats"}.}
@@ -37,7 +39,10 @@ The prior-only model, invisibly.
 \description{
 Fits the model using only the priors (ignoring the observed events) and plots
 the data the model would predict. This shows whether the priors imply
-plausible data before any data are seen.
+plausible data before any data are seen. A prior describes which values of
+a parameter are plausible before seeing the data. Use it before fitting
+with \code{\link[=bison_model]{bison_model()}}: if the predicted rates are implausible for the
+species and sampling method, change the priors.
 }
 \examples{
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
@@ -47,4 +52,8 @@ prior_predictive_check(
   model_type = "binary_conjugate",
   priors = get_default_priors("binary_conjugate")
 )
+}
+\seealso{
+\code{\link[=prior_check]{prior_check()}} to plot the priors themselves,
+\code{\link[=get_default_priors]{get_default_priors()}}, \code{\link[=plot_predictions]{plot_predictions()}}
 }

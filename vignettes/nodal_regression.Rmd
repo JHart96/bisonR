@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 set.seed(1)
 ```
 
-A nodal regression asks whether a trait of individuals, such as age, sex or rank, is related to their position in the network, such as their centrality. This article shows how to fit nodal regressions with `bison_brm()`, with the node metric as the response or as a predictor. The metric is calculated for networks drawn from the posterior of the edge model, so the uncertainty in each node's metric is included in the regression.
+A nodal regression asks whether a trait of individuals, such as age, sex or rank, is related to their position in the network, such as their centrality. This article shows how to fit nodal regressions with `bison_brm()`, with the node metric as the response or as a predictor. The metric is calculated for many posterior draws of the edge model (each draw is one possible network that is consistent with the data), so the uncertainty in each node's metric is included in the regression.
 
 See `vignette("bison_brms")` for an overview of `bison_brm()` and `vignette("network_metrics")` for the definitions of the metrics.
 
@@ -30,7 +30,7 @@ library(bisonR)
 
 ## Simulated data
 
-We simulate 20 individuals whose ages range from 2 to 15 years. Each individual has a *sociality*, which increases with age and also varies between individuals of the same age. On the logit scale, the edge weight of each dyad is the sum of the two individuals' sociality, plus an intercept and dyad-level variation. Older individuals therefore tend to have stronger edges.
+We simulate 20 individuals whose ages range from 2 to 15 years. Each individual has a *sociality*, which increases with age and also varies between individuals of the same age. On the logit (log-odds) scale, the edge weight of each dyad is the sum of the two individuals' sociality, plus an intercept and dyad-level variation. Older individuals therefore tend to have stronger edges.
 
 ```{r}
 num_nodes <- 20
@@ -57,11 +57,11 @@ df_obs <- data.frame(
 head(df_obs)
 ```
 
-`df_obs` contains the observations, one row per dyad with the number of sampling periods in which the pair was seen together (`event`) and the number of sampling periods in which they were observed (`effort`). `df_nodal` has one row per individual.
+`df_obs` contains the observations, with one row per dyad. `event` is the number of sampling periods in which the pair was seen together, and `effort` is the number of sampling periods in which they were observed. `df_nodal` has one row per individual.
 
 ## Fitting the edge model
 
-The edge model is fitted in the same way as for any other analysis. There are no observation-level effects, so the conjugate binary model is used:
+The edge model is fitted in the same way as for any other analysis. There are no observation-level effects, so the conjugate binary model can be used. Conjugate models calculate the posterior directly, which is fast, but they cannot include extra effects:
 
 ```{r}
 fit_edge <- bison_model(
@@ -74,7 +74,7 @@ fit_edge <- bison_model(
 
 ## The node data frame
 
-Nodal regressions need a data frame with one row per node and a column containing the node names. The names must match those used in the edge model, which are the levels of the node columns in the observation data (here `ID01` to `ID20`). `bison_brm()` gives an error if the data frame contains a node that is not in the edge model. The data frame can contain a subset of the nodes, for example if a trait is missing for some individuals.
+A nodal regression needs a data frame with one row per node and a column containing the node names. The names must match those used in the edge model, which are the levels of the node columns in the observation data (here `ID01` to `ID20`). `bison_brm()` gives an error if the data frame contains a node that is not in the edge model. The data frame can contain only some of the nodes, for example if a trait is missing for some individuals.
 
 ```{r}
 head(df_nodal)
@@ -83,7 +83,7 @@ all(df_nodal$node %in% levels(df_obs$node_1_id))
 
 ## Node metric as the response
 
-To ask whether age predicts node strength, the metric is written with `bison()` on the left-hand side of the formula. The column inside `node_strength()` is the column of the data frame containing the node names:
+To test whether age predicts node strength, write the metric inside `bison()` on the left-hand side of the formula. The column inside `node_strength()` is the column of the data frame that contains the node names:
 
 ```{r}
 fit_strength <- bison_brm(
@@ -97,11 +97,11 @@ fit_strength <- bison_brm(
 summary(fit_strength)
 ```
 
-Node strength is the sum of a node's edge weights on the natural scale, so here it is the expected number of associates in a sampling period. The `age` coefficient is the expected change in strength per year of age. Its 95% credible interval is above zero, which is consistent with the simulation. Convergence of the individual models can be checked as described in `vignette("bison_brms")`.
+Node strength is the sum of a node's edge weights on the natural scale (here, probabilities), so it is the expected number of associates in a sampling period. The `age` coefficient is the expected change in strength per year of age. Its 95% credible interval (the range that contains the coefficient with 95% posterior probability) is above zero, which is consistent with the simulation. Convergence of the individual models can be checked as described in `vignette("bison_brms")`.
 
 ### Standardising the metric
 
-With `scale = "z"`, the metric is standardised within each posterior draw, by subtracting the mean across nodes and dividing by the standard deviation across nodes:
+With `scale = "z"`, the metric is converted to z-scores within each posterior draw: the mean across nodes is subtracted and the result is divided by the standard deviation across nodes:
 
 ```{r}
 fit_strength_z <- bison_brm(
@@ -116,11 +116,11 @@ fit_strength_z <- bison_brm(
 summary(fit_strength_z)
 ```
 
-The `age` coefficient is now the change in strength, in standard deviations, per year of age. Standardising makes the coefficient easier to compare between metrics and makes priors easier to set, because the scale of the response is known in advance. It also removes differences in the overall level of the metric between posterior draws, so the model describes the relative position of nodes within each network rather than their absolute values. Which of these is appropriate depends on the question.
+The `age` coefficient is now the change in strength, in standard deviations, per year of age. Standardising makes coefficients easier to compare between metrics. It also makes priors easier to set, because the scale of the response is known in advance. Standardising also removes differences in the overall level of the metric between posterior draws, so the model describes the relative position of nodes within each network rather than their absolute values. Which of these is appropriate depends on the question.
 
 ## Node metric as a predictor
 
-A node metric can also be used as a predictor, for example to ask whether more social individuals have a higher value of some outcome. As an illustration, age is used as the response here:
+A node metric can also be used as a predictor, for example to test whether more social individuals have higher values of some outcome. As an illustration, age is used as the response here:
 
 ```{r}
 fit_predictor <- bison_brm(
@@ -134,7 +134,7 @@ fit_predictor <- bison_brm(
 summary(fit_predictor)
 ```
 
-The `bison_node_strength` coefficient is the expected change in the response per unit of strength. Using a metric as a predictor treats each posterior draw of the metric as a possible value of the predictor, and the results of the separate models are combined, so uncertainty in the metric widens the credible intervals.
+The `bison_node_strength` coefficient is the expected change in the response per unit of strength. Each posterior draw of the metric is treated as a possible value of the predictor, a separate model is fitted to each, and the results are combined. Uncertainty in the metric therefore widens the credible intervals.
 
 ## Choosing a metric
 
@@ -142,7 +142,7 @@ The metric should follow from the biological question. Some common choices are:
 
 * `node_strength`: how much an individual associates in total. Strength depends on the number of other individuals in the network, so it is not directly comparable between networks of different sizes.
 * `node_eigen`: eigenvector centrality, which is high when an individual has strong connections to individuals that are themselves well connected.
-* `node_betweenness` and `node_closeness`: positions on paths through the network, which may be relevant to questions about transmission.
+* `node_betweenness` and `node_closeness`: an individual's position on paths through the network, which may be relevant to questions about transmission.
 * Thresholded metrics such as `node_degree[0.3]`: the number of edges with a weight at or above the threshold (here 0.3), calculated in each posterior draw.
 
 Thresholded metrics are written in the same way, with the threshold in square brackets:
@@ -160,11 +160,11 @@ fit_degree <- bison_brm(
 summary(fit_degree)
 ```
 
-Degree is a count, so a Poisson family is used here, and the `age` coefficient is on the log scale. The choice of threshold is arbitrary, and results can change with different thresholds, so they should be checked for sensitivity to this choice (see `vignette("network_metrics")`).
+Degree is a count, so a Poisson family is used here, and the `age` coefficient is on the log scale. The choice of threshold is arbitrary and results can change with it, so check whether they are sensitive to the threshold (see `vignette("network_metrics")`).
 
 ## Priors
 
-By default, brms uses flat priors on regression coefficients. `bison_brm_get_prior()` takes the same formula, edge model and data as `bison_brm()` and returns the default priors:
+Priors describe which parameter values are plausible before the data are seen. By default, brms uses flat priors on regression coefficients, which treat all values as equally plausible. `bison_brm_get_prior()` takes the same formula, edge model and data as `bison_brm()` and returns the default priors:
 
 ```{r}
 prior <- bison_brm_get_prior(
@@ -175,7 +175,7 @@ prior <- bison_brm_get_prior(
 prior
 ```
 
-The result is a `brmsprior` object, and shows the classes and coefficient names that priors can be set for. Priors are then set with `brms::set_prior()` (or by modifying this object) and passed to `bison_brm()` with the `prior` argument. Here a normal prior with standard deviation 1 is placed on the `age` coefficient:
+The result is a `brmsprior` object that lists the classes and coefficient names that priors can be set for. Priors are then set with `brms::set_prior()` (or by modifying this object) and passed to `bison_brm()` with the `prior` argument. Here a normal prior with standard deviation 1 is placed on the `age` coefficient:
 
 ```{r}
 prior <- brms::set_prior("normal(0, 1)", class = "b", coef = "age")
@@ -192,4 +192,4 @@ fit_strength_prior <- bison_brm(
 brms::prior_summary(fit_strength_prior)
 ```
 
-Priors should be chosen on the scale of the response. For example, a prior on the effect of age on strength depends on the units of age and on the range of strength values, which is one reason that `scale = "z"` can make priors easier to set.
+Priors should be chosen on the scale of the response. For example, a sensible prior on the effect of age on strength depends on the units of age and on the range of strength values. This is one reason that `scale = "z"` can make priors easier to set.

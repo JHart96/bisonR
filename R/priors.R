@@ -1,8 +1,36 @@
-#' Return default priors for a given model
+#' Get the default priors for an edge model
+#'
+#' Returns the default priors for a type of edge model, as a starting point for
+#' choosing priors. A prior describes which values of a parameter are plausible
+#' before seeing the data. The defaults may not suit every study, so check
+#' them with [prior_check()] and [prior_predictive_check()] and change them
+#' where needed before passing them to [bison_model()].
 #'
 #' @param model_type The type of model: `"binary"`, `"count"`, `"binary_conjugate"` or `"count_conjugate"`.
 #'
-#' @return A list of default priors that can be used in the `bison_model()` function.
+#' @details Each prior is a string naming a distribution and its parameters,
+#' such as `"normal(0, 2.5)"`. The entries are:
+#' * `edge`: the edge weights. For `"binary"` and `"count"` models this is a
+#'   normal distribution on the link scale (log-odds for binary models, log
+#'   rates for count models). With `partial_pooling = TRUE`, the second value is
+#'   instead the scale of a half-normal prior on the spread of the edge weights.
+#'   For `"binary_conjugate"` it is a beta distribution on the probability, and
+#'   for `"count_conjugate"` a gamma distribution (shape, rate) on the rate.
+#' * `fixed`: fixed effects, as a normal distribution on the link scale.
+#' * `random_std`: the standard deviation of random effects, as a half-normal
+#'   distribution with the given scale.
+#' * `zero_prob`: in zero-inflated models, the probability that a row of data
+#'   is a structural zero (a zero regardless of the edge weight), as a beta
+#'   distribution.
+#'
+#' Conjugate models only have an `edge` prior. Priors for terms that a model
+#' doesn't include, such as `fixed` in a model without fixed effects, have no
+#' effect.
+#'
+#' @return A named list of priors, in the format used by the `priors` argument
+#'   of [bison_model()].
+#'
+#' @seealso [prior_check()], [prior_predictive_check()], [bison_model()]
 #' @examples
 #' priors <- get_default_priors("binary")
 #' priors
@@ -48,7 +76,8 @@ get_default_priors <- function(model_type) {
 
 #' Plot prior distributions
 #'
-#' Plots the density of each prior in a list. Edge weight priors are shown on the
+#' Plots the density of each prior in a list, to check that the priors give
+#' reasonable weight to plausible values. Edge weight priors are shown on the
 #' natural scale (probabilities for binary models, rates for count models); other
 #' priors are shown on the scale on which they are defined. To see the data
 #' implied by the priors together, use [prior_predictive_check()].
@@ -61,6 +90,10 @@ get_default_priors <- function(model_type) {
 #' @details With `partial_pooling = TRUE` in [bison_model()], the second value of
 #'   the edge prior is the scale of a half-normal prior on the spread of the edge
 #'   weights, so the edge prior shown here is not the implied prior on each edge.
+#'
+#' @return `NULL`. The function is called for its plots.
+#'
+#' @seealso [get_default_priors()], [prior_predictive_check()]
 #'
 #' @examples
 #' priors <- get_default_priors("binary")

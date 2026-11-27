@@ -18,6 +18,7 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 * `prior_check()` now shows the correct density for binary edge priors on the probability scale.
 * `node_degree[t]` now counts edges with weight at or above `t`, as documented.
 * `model_comparison()` now works when models have different numbers of posterior draws, and accounts for autocorrelation in MCMC draws.
+* `get_edge_component_probabilities()` and `get_component_means()` check `num_components`, `simulate_bison_model()` checks `model_type`, and `bison_brm()` accepts a `backend` argument.
 
 ## Breaking changes
 
@@ -46,6 +47,7 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 * Compiled Stan models are cached between sessions.
 * Conjugate models now return predictions and log-likelihoods, so they work with `plot_predictions()`, `prior_predictive_check()` and `model_comparison()`.
 * New `print()` method for fitted models.
+* New `get_effects()` returns the estimates of fixed effects, random effects, partial pooling and zero inflation, with readable labels such as `sex = F`. `summary()` now shows these after the edge weights, and works for models without a `dyad()` term.
 * `bison_model()` warns if any MCMC chains fail, and if `partial_pooling = TRUE` is used without a `dyad()` term.
 * `extract_metric()` warns when nodes have no dyads in the data (their values are fixed rather than estimated), and when eigenvector centrality or closeness is calculated on a network with more than one component. Malformed thresholds give an error.
 * For undirected models, `bison_model()` gives a message when the data have rows for the same pair in both orders, which are combined into one edge (#71).
@@ -54,7 +56,7 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 ## Plots
 
 * `plot_predictions()` is now an S3 generic. The `"density"` check compares event rates per dyad rather than event counts, uses random posterior draws, and draws the observed data last in a separate colour (#92). New `type = "stats"` option.
-* `plot_network()` shows all nodes, gains a `threshold_on` argument, rescales edge widths for count models, and adds a caption explaining the line widths (#93). Thanks to @cebus-imitator for the threshold fixes (#94, #95).
+* `plot_network()` draws light nodes with dark labels sized to fit the node names, and node settings passed through `...` (such as `vertex.color` or `vertex.label.cex`) now replace the defaults. It also shows all nodes, gains a `threshold_on` argument, rescales edge widths for count models, and adds a caption explaining the line widths (#93). Thanks to @cebus-imitator for the threshold fixes (#94, #95).
 * `plot_trace()` shows each edge in a separate panel.
 * `plot_metric()` uses bar charts for discrete metrics (#57).
 * New `plot_mixture()` to plot the components of an edge mixture model (#55). The mixture models article now compares the ICL and BIC criteria (#54).
@@ -82,6 +84,8 @@ bisonR 1.0.0 is the first stable release. It fixes a number of bugs, mostly affe
 * Updated articles, and new articles on preparing data, priors, model diagnostics, additional effects in edge models, directed networks, group-based data, count data, nodal regression, comparing networks and working with posterior networks (#42, #74, #81, #83, #84-#93).
 * Expanded unit tests.
 * Updated documentation website.
+* Rewritten help pages for all functions, with more context on what each function is for and when to use it.
+* Michael Weiss, Daniel Franks, Lauren Brent and Samuel Ellis are listed as authors, and Joe Wilde as a contributor.
 * The GitHub repository is JHart96/bisonR and the website is <https://bisonr.org>.
 * Removed unused dependencies.
 

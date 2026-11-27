@@ -9,16 +9,25 @@ bison_to_igraph(obj, num_draws = 1000)
 \arguments{
 \item{obj}{A fitted \code{bison_model} object.}
 
-\item{num_draws}{Number of networks to draw from the posterior.}
+\item{num_draws}{Number of networks to draw from the posterior. Draws are
+chosen at random, without replacement unless more are requested than the
+model has.}
 }
 \value{
-A list of \code{igraph} objects.
+A list of \code{igraph} objects, with edge weights in the \code{weight} edge
+attribute. Edges are only included for dyads in the model.
 }
 \description{
 Each network is one draw from the posterior distribution of networks, with
 edge weights on the natural scale (probabilities or rates). The vertices are
 always all the nodes in the model, in the same order as the model's node
 levels, so results can be matched back to node names.
+}
+\details{
+Use it to calculate network measures that \code{\link[=extract_metric]{extract_metric()}} doesn't
+provide, with functions from the igraph package or other software that reads
+igraph objects. Calculating a measure for every network gives its posterior
+distribution, which includes the uncertainty in the edge weights.
 }
 \examples{
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
@@ -31,4 +40,7 @@ fit_edge <- bison_model(
 nets <- bison_to_igraph(fit_edge, num_draws = 10)
 # Posterior distribution of the strength of each node
 strengths <- sapply(nets, igraph::strength)
+}
+\seealso{
+\code{\link[=extract_metric]{extract_metric()}}, \code{\link[=draw_edgelist_samples]{draw_edgelist_samples()}}
 }

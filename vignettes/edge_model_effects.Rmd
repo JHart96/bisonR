@@ -26,11 +26,11 @@ library(bisonR)
 
 The probability of seeing a social event often depends on the conditions of observation as well as on the relationship between the individuals. For example, pairs may be seen together more often at a feeding site than elsewhere, or one observer may record more interactions than another. Binary and count edge models can include such factors as fixed or random effects, so that the edge weights are estimated after accounting for them. This article describes the terms that can be added to the edge model formula, how to inspect the fitted effects, and how the effects change the interpretation of the edge weights. A basic analysis is described in `vignette("getting_started")`.
 
-Conjugate models only support `dyad()` terms, so the models in this article are fitted with `model_type = "binary"`.
+Conjugate models (`model_type = "binary_conjugate"` or `"count_conjugate"`), which calculate the results exactly without sampling, only support `dyad()` terms. The models in this article are therefore fitted with `model_type = "binary"`.
 
 ## The data
 
-Additional effects are estimated from variation between observations, so they need disaggregated data, with one row per sampling period or observation session. `simulate_bison_model()` simulates binary data in which the probability that a pair is seen together depends on the dyad, on the age difference between the two individuals, and on which of five locations the observation was made at:
+Additional effects are estimated from variation between observations, so they need disaggregated data, with one row per sampling period or observation session. `simulate_bison_model()` simulates binary data in which the probability that a pair is seen together depends on the dyad, on the age difference between the two individuals, and on the location (one of five) where the observation was made:
 
 ```{r}
 sim_data <- simulate_bison_model("binary", aggregated = FALSE, max_obs = 15)
@@ -81,14 +81,13 @@ fit_fixed <- bison_model(
 )
 ```
 
-A factor fixed effect gets one parameter per level. There is no reference level, unlike in `lm()`. A numeric column gets a single parameter. The fixed effect parameters are stored in the Stan parameter `beta_fixed`, in the order of the columns of the design matrix:
+A factor fixed effect gets one parameter per level. There is no reference level, unlike in `lm()`. A numeric column gets a single parameter. `get_effects()` gives the estimates, labelled by level (they are also shown by `summary()`):
 
 ```{r}
-colnames(fit_fixed$model_data$design_fixed)
-fit_fixed$fit$summary("beta_fixed")
+get_effects(fit_fixed)
 ```
 
-The parameters are on the link scale (log-odds for binary models), and each has the `fixed` prior, `normal(0, 2.5)` by default. Here location 3 has a positive effect (posterior median 1.39), and the other four locations have negative medians, between -1.57 and -0.65. These values are not relative to a reference location. Their overall level is shared with the edge weights, as described below.
+The parameters are on the link scale, the scale on which effects are added together (log-odds for binary models). Each has the `fixed` prior (the distribution assumed for it before seeing the data), `normal(0, 2.5)` by default. The table gives the median of each parameter's posterior distribution, which describes its plausible values given the data and the priors, and a 90% credible interval, the range that contains the parameter with 90% probability. Here location 3 has a positive effect (posterior median 1.39), and the other four locations have negative medians, between -1.57 and -0.65. These values are not relative to a reference location. Their overall level is shared with the edge weights, as described below.
 
 ## Intercepts
 
@@ -111,20 +110,19 @@ fit_random <- bison_model(
 )
 ```
 
-As with fixed effects, there is one parameter for each level, stored in `beta_random`. The difference is that the levels are drawn from a common normal distribution with mean 0 and standard deviation `random_group_sigma`, which is estimated from the data with the `random_std` prior. Because the levels are centred on 0, the overall rate of events is described by the edge weights, and the random effects describe how each location differs from it.
+As with fixed effects, there is one parameter for each level. The difference is that the levels are drawn from a common normal distribution with mean 0 and a standard deviation that is estimated from the data, with the `random_std` prior. Because the levels are centred on 0, the overall rate of events is described by the edge weights, and the random effects describe how each location differs from it.
 
 In a model without a `dyad()` term or factor fixed effect, an intercept is needed to set the overall rate, for example `(event | effort) ~ 1 + (1 | location)`. `bison_model()` gives a warning if it is missing.
 
 ```{r}
-colnames(fit_random$model_data$design_random)
-fit_random$fit$summary(c("beta_random", "random_group_sigma"))
+get_effects(fit_random)
 ```
 
-The location effects are similar to those of the fixed effect model: their medians range from -1.24 to 1.42, compared with -1.57 to 1.39. The median of the standard deviation between locations, `random_group_sigma`, is 1.12. The random effects are centred on 0 a priori, but with only five levels their estimated values need not average 0; here the medians average about -0.4.
+The location effects are similar to those of the fixed effect model: their medians range from -1.24 to 1.42, compared with -1.57 to 1.39. The median of the standard deviation between locations, `sd(location)`, is 1.12. The prior centres the random effects on 0, but with only five levels their estimates need not average 0. Here the medians average about -0.4.
 
-Because the levels share a common distribution, levels with few observations are pulled towards the mean of the other levels. Random effects are therefore suited to factors with many levels, or with some levels that are rarely observed, such as observers or observation days. With few levels, as here, `random_group_sigma` is estimated from only a few values and depends more on its prior. The choice between a fixed and a random effect should be based on the study design rather than on which gives the preferred result.
+Because the levels share a common distribution, levels with few observations are pulled towards the mean of the other levels. Random effects are therefore suited to factors with many levels, or with some levels that are rarely observed, such as observers or observation days. With few levels, as here, the standard deviation between levels (`random_group_sigma`) is estimated from only a few values and depends more on its prior. Choose between a fixed and a random effect based on the study design, not on which gives the preferred result.
 
-A model can contain several fixed and random effects, for example `+ location + (1 | observer)`. Each random effect term has its own `random_group_sigma`.
+A model can contain several fixed and random effects, for example `+ location + (1 | observer)`. Each random effect term has its own standard deviation (`random_group_sigma`).
 
 ## How effects change the edge weights
 
@@ -158,10 +156,11 @@ Almost all edge weights are higher in the models with a location effect. The ran
 
 Two separate things change when the location effect is added.
 
-The first is the relative position of dyads. A dyad that was mostly observed at locations with a high rate of events would otherwise appear to have a strong edge, partly because of where it was observed. The change in each edge weight on the link scale can be compared with the average fitted location effect over the observations of that dyad:
+The first is the relative position of dyads. A dyad that was mostly observed at locations with a high rate of events would otherwise appear to have a strong edge, partly because of where it was observed. The plot below compares the change in each edge weight (on the link scale) with the mean fitted location effect across that dyad's observations:
 
 ```{r}
-beta_location <- fit_fixed$fit$summary("beta_fixed")$median
+fixed_effects <- get_effects(fit_fixed)
+beta_location <- fixed_effects$median[fixed_effects$type == "fixed"]
 dyad_ids <- fit_fixed$model_info$row_dyad_ids
 mean_location_effect <- tapply(beta_location[as.integer(df$location)], dyad_ids, mean)
 
@@ -185,13 +184,13 @@ mean_location <- rowMeans(draws[, grep("^beta_fixed", colnames(draws))])
 cor(mean_edge, mean_location)
 ```
 
-The correlation is strongly negative: in posterior draws in which the location effects are higher, the edge weights are lower. The general increase in the edge weights in the first plot is partly a shift of this kind. The location effects are mostly negative, and the edge weights are higher to compensate.
+The correlation is strongly negative: in posterior draws (samples from the posterior distribution) in which the location effects are higher, the edge weights are lower. The general increase in the edge weights in the first plot is partly a shift of this kind. The location effects are mostly negative, and the edge weights are higher to compensate.
 
-The same applies to an intercept added with `1`. Random effects are less affected because they are centred on 0, but with few levels their estimated values need not average 0 (as in the example above), so some trade-off remains. As a result, the absolute values of the edge weights in models with factor fixed effects or an intercept should be interpreted with care. The reported probability `plogis(edge_ij)` corresponds to an observation with all effects equal to 0, which may not correspond to any real observation. Differences between dyads, and analyses that depend on them, are better determined by the data.
+The same applies to an intercept added with `1`. Random effects are less affected because they are centred on 0, but with few levels their estimated values need not average 0 (as in the example above), so some trade-off remains. As a result, interpret the absolute values of the edge weights in models with factor fixed effects or an intercept with care. The reported probability `plogis(edge_ij)` corresponds to an observation with all effects equal to 0, which may not correspond to any real observation. Differences between dyads, and analyses that depend on them, are better determined by the data.
 
 ### Dyad-level predictors
 
-A predictor that has the same value in every observation of a dyad, such as the age difference between the two individuals, cannot be separated from the edge weight of that dyad, because each dyad already has its own parameter. If it were included in the edge model, its parameter could trade off against the edge weights, and would be identified only weakly, through the `edge` prior. The effect of dyad-level predictors on edge weights should instead be estimated in a downstream regression with `bison_brm()`, as described in `vignette("getting_started")` and `vignette("bison_brms")`. Fixed and random effects in the edge model are for factors that vary between observations of the same dyad.
+A predictor that has the same value in every observation of a dyad, such as the age difference between the two individuals, cannot be separated from the edge weight of that dyad, because each dyad already has its own parameter. If it were included in the edge model, its parameter could trade off against the edge weights, and only the `edge` prior would separate the two. Instead, estimate the effect of dyad-level predictors on edge weights in a downstream regression (a second model fitted to the estimated edge weights) with `bison_brm()`, as described in `vignette("getting_started")` and `vignette("bison_brms")`. Fixed and random effects in the edge model are for factors that vary between observations of the same dyad.
 
 ## Partial pooling
 
@@ -209,10 +208,10 @@ fit_pooled <- bison_model(
   show_messages = FALSE,
   show_exceptions = FALSE
 )
-fit_pooled$fit$summary(c("edge_sigma", "beta_fixed"))
+get_effects(fit_pooled)
 ```
 
-The median of `edge_sigma` is 1.17, with a 90% credible interval from 0.82 to 1.64, so the edge weights are estimated to vary less than the default `edge` prior (standard deviation 2.5) allows. The location effects are similar to those of the model without pooling, with narrower intervals.
+The median of the standard deviation of the edge weights, `sd(edge weights)`, is 1.17, with a 90% credible interval from 0.82 to 1.64, so the edge weights are estimated to vary less than the default `edge` prior (standard deviation 2.5) allows. The location effects are similar to those of the model without pooling, with narrower intervals.
 
 The effect of partial pooling on individual edges can be seen by comparing the credible intervals of the two models:
 
@@ -232,7 +231,7 @@ Partial pooling assumes that the edge weights in the network come from a single 
 
 * Fixed effects (`+ x`) and random effects (`+ (1 | g)`) account for factors that vary between observations of the same dyad. They need disaggregated data and binary or count models.
 * Factor fixed effects get one parameter per level. Integer columns are treated as numeric unless they are converted to factors.
-* The fitted effects are in `fit$fit`, under `beta_fixed`, `beta_random` and `random_group_sigma`. The level names are the column names of `fit$model_data$design_fixed` and `fit$model_data$design_random`.
+* `get_effects()` gives the estimates of the fixed effects, random effects and their standard deviations, and `summary()` shows them after the edge weights.
 * With additional effects, edge weights describe each dyad's tendency to interact after accounting for those effects. Their overall level is shared with the effects and depends partly on the priors.
 * Dyad-level predictors belong in downstream regressions with `bison_brm()`, not in the edge model.
 * `partial_pooling = TRUE` estimates the spread of edge weights from the data, around a mean fixed by the `edge` prior.

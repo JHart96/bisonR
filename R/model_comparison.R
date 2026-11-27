@@ -1,19 +1,34 @@
 #' Compare models with leave-one-out cross-validation
 #'
-#' Compares fitted models by their expected predictive accuracy, estimated with
-#' Pareto-smoothed importance sampling leave-one-out cross-validation (PSIS-LOO)
-#' from the loo package, and returns model weights.
+#' Compares fitted edge models by their expected predictive accuracy, estimated
+#' with Pareto-smoothed importance sampling leave-one-out cross-validation
+#' (PSIS-LOO) from the loo package, and returns model weights. Leave-one-out
+#' cross-validation measures how well a model predicts each observation when
+#' that observation is left out of the fit; PSIS-LOO approximates this without
+#' refitting the model. Use it to compare models with different terms, for
+#' example to test whether edge weights differ between dyads by comparing a
+#' model with a `dyad()` term against a null model with only an intercept.
 #'
-#' @param models A list of fitted models, ideally named. All models must be fitted
-#'   to the same data (the same rows, in the same order).
+#' @param models A list of two or more models fitted with [bison_model()],
+#'   ideally named. All models must be fitted to the same data (the same rows,
+#'   in the same order).
 #' @param ... Additional arguments passed to [loo::loo_model_weights()], such as
 #'   `method = "pseudobma"`.
 #'
-#' @details If the models have different numbers of posterior draws (for example
+#' @details The model weights describe how much each model contributes to the
+#'   best predictions: a model with a weight close to 1 predicts the data better
+#'   than the others. loo may warn about high Pareto k values, which mean the
+#'   approximation is unreliable for some observations; see [loo::loo()].
+#'
+#'   If the models have different numbers of posterior draws (for example
 #'   because a chain failed), the same number of draws is taken at random from
 #'   each model.
 #'
-#' @return The model weights returned by [loo::loo_model_weights()].
+#' @return The model weights returned by [loo::loo_model_weights()], one per
+#'   model, named after the elements of `models`. By default these are stacking
+#'   weights.
+#'
+#' @seealso [bison_model()]
 #' @examplesIf !is.null(tryCatch(cmdstanr::cmdstan_path(), error = function(e) NULL))
 #' # Test for non-random edge weights by comparing a model with edge weights
 #' # against a null model where every dyad has the same rate of events.

@@ -2,22 +2,30 @@
 % Please edit documentation in R/bison_mixture.R
 \name{get_component_means}
 \alias{get_component_means}
-\title{Get component means from edge mixture model}
+\title{Get the mean edge weight of each mixture component}
 \usage{
 get_component_means(object, num_components, ci = 0.9)
 }
 \arguments{
-\item{object}{An S3 edge mixture model object}
+\item{object}{A \code{bison_mixture} object from \code{\link[=bison_mixture]{bison_mixture()}}.}
 
-\item{num_components}{The number of components in the mixture model}
+\item{num_components}{The number of components in the mixture to use,
+between 1 and the \code{num_components} used in \code{\link[=bison_mixture]{bison_mixture()}}.}
 
-\item{ci}{Credible interval for component mean estimates}
+\item{ci}{Width of the credible interval, e.g. \code{0.9} for a 90\% interval.}
 }
 \value{
-A dataframe describing the posteriors of the component means
+A data frame with one row per component (\verb{Component 1}, ...), in
+increasing order of their mean, and columns for the posterior median
+(\verb{50\%}) and the lower and upper bounds of the credible interval (named
+after their quantiles, e.g. \verb{5\%} and \verb{95\%}).
 }
 \description{
-Get component means from edge mixture model
+For a mixture with a given number of components, returns the posterior
+median and credible interval of each component's mean edge weight, on the
+natural scale (probabilities for binary models, rates for count models).
+This describes how strong each type of relationship is. A credible interval
+contains the true value with the given probability, according to the model.
 }
 \examples{
 sim_data <- simulate_bison_model_mixture(
@@ -31,4 +39,7 @@ fit_edge <- bison_model(
 )
 fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
 get_component_means(fit_mixture, 2)
+}
+\seealso{
+\code{\link[=bison_mixture]{bison_mixture()}}, \code{\link[=plot_mixture]{plot_mixture()}}
 }

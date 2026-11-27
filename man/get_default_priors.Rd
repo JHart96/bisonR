@@ -2,7 +2,7 @@
 % Please edit documentation in R/priors.R
 \name{get_default_priors}
 \alias{get_default_priors}
-\title{Return default priors for a given model}
+\title{Get the default priors for an edge model}
 \usage{
 get_default_priors(model_type)
 }
@@ -10,14 +10,44 @@ get_default_priors(model_type)
 \item{model_type}{The type of model: \code{"binary"}, \code{"count"}, \code{"binary_conjugate"} or \code{"count_conjugate"}.}
 }
 \value{
-A list of default priors that can be used in the \code{bison_model()} function.
+A named list of priors, in the format used by the \code{priors} argument
+of \code{\link[=bison_model]{bison_model()}}.
 }
 \description{
-Return default priors for a given model
+Returns the default priors for a type of edge model, as a starting point for
+choosing priors. A prior describes which values of a parameter are plausible
+before seeing the data. The defaults may not suit every study, so check
+them with \code{\link[=prior_check]{prior_check()}} and \code{\link[=prior_predictive_check]{prior_predictive_check()}} and change them
+where needed before passing them to \code{\link[=bison_model]{bison_model()}}.
+}
+\details{
+Each prior is a string naming a distribution and its parameters,
+such as \code{"normal(0, 2.5)"}. The entries are:
+\itemize{
+\item \code{edge}: the edge weights. For \code{"binary"} and \code{"count"} models this is a
+normal distribution on the link scale (log-odds for binary models, log
+rates for count models). With \code{partial_pooling = TRUE}, the second value is
+instead the scale of a half-normal prior on the spread of the edge weights.
+For \code{"binary_conjugate"} it is a beta distribution on the probability, and
+for \code{"count_conjugate"} a gamma distribution (shape, rate) on the rate.
+\item \code{fixed}: fixed effects, as a normal distribution on the link scale.
+\item \code{random_std}: the standard deviation of random effects, as a half-normal
+distribution with the given scale.
+\item \code{zero_prob}: in zero-inflated models, the probability that a row of data
+is a structural zero (a zero regardless of the edge weight), as a beta
+distribution.
+}
+
+Conjugate models only have an \code{edge} prior. Priors for terms that a model
+doesn't include, such as \code{fixed} in a model without fixed effects, have no
+effect.
 }
 \examples{
 priors <- get_default_priors("binary")
 priors
 # Priors are strings describing distributions, and can be changed:
 priors$edge <- "normal(-1, 1.5)"
+}
+\seealso{
+\code{\link[=prior_check]{prior_check()}}, \code{\link[=prior_predictive_check]{prior_predictive_check()}}, \code{\link[=bison_model]{bison_model()}}
 }

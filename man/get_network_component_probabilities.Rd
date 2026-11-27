@@ -2,18 +2,22 @@
 % Please edit documentation in R/bison_mixture.R
 \name{get_network_component_probabilities}
 \alias{get_network_component_probabilities}
-\title{Get probabilities of component membership for the entire network}
+\title{Get the probability of each number of components in the network}
 \usage{
 get_network_component_probabilities(object)
 }
 \arguments{
-\item{object}{An S3 edge mixture model object}
+\item{object}{A \code{bison_mixture} object from \code{\link[=bison_mixture]{bison_mixture()}}.}
 }
 \value{
-A dataframe of probabilities of numbers of components over the entire network
+A data frame with columns \code{num_components} and \code{probability}, with
+one row for each number of components.
+The probabilities sum to 1.
 }
 \description{
-Get probabilities of component membership for the entire network
+Returns the posterior probability of each number of components (types of
+relationship) considered by \code{\link[=bison_mixture]{bison_mixture()}}, from 1 up to the maximum.
+Use it to judge how many types of edge the network contains.
 }
 \examples{
 sim_data <- simulate_bison_model_mixture(
@@ -27,4 +31,7 @@ fit_edge <- bison_model(
 )
 fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
 get_network_component_probabilities(fit_mixture)
+}
+\seealso{
+\code{\link[=bison_mixture]{bison_mixture()}}, \code{\link[=get_edge_component_probabilities]{get_edge_component_probabilities()}}
 }
