@@ -23,6 +23,15 @@ Useful links:
 Authors:
 \itemize{
   \item Jordan Hart \email{jordan.da.hart@gmail.com} (\href{https://orcid.org/0000-0002-4636-0760}{ORCID})
+  \item Michael N. Weiss
+  \item Daniel W. Franks
+  \item Lauren J. N. Brent
+  \item Samuel Ellis
+}
+
+Other contributors:
+\itemize{
+  \item Joe Wilde (Windows installation article) [contributor]
 }
 
 }
