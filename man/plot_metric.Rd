@@ -2,17 +2,40 @@
 % Please edit documentation in R/metrics.R
 \name{plot_metric}
 \alias{plot_metric}
-\title{Plot metric samples}
+\title{Plot the posterior distribution of a network metric}
 \usage{
 plot_metric(x, metric_name = "Network Metric", ...)
 }
 \arguments{
-\item{x}{Network metric samples object}
+\item{x}{A matrix of metric samples from \code{\link[=extract_metric]{extract_metric()}}.}
 
-\item{metric_name}{Metric name to use for plot axis label}
+\item{metric_name}{Label for the x axis. With several columns, the column
+name or number is added to it.}
 
-\item{...}{Additional parameters to be passed to plot function}
+\item{...}{Additional arguments passed to the plotting function
+(\code{\link[graphics:barplot]{graphics::barplot()}} or \code{\link[graphics:curve]{graphics::curve()}}), such as \code{xlim}.}
+}
+\value{
+\code{NULL}, invisibly. The function is called for its plots.
 }
 \description{
-Plot metric samples
+Plots the posterior distribution of a network metric from
+\code{\link[=extract_metric]{extract_metric()}}, which shows the most plausible values of the metric and
+how uncertain it is. Continuous metrics are shown as smoothed densities;
+metrics that only take whole-number values (such as degree) are shown as bar
+charts. A matrix with several columns (for example, one per node) gives one
+plot per column.
+}
+\examples{
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+fit_edge <- bison_model(
+  (event | effort) ~ dyad(node_1_id, node_2_id),
+  data = sim_data$df_sim,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+plot_metric(extract_metric(fit_edge, "global_cv", num_draws = 200), "CV of edge weights")
+}
+\seealso{
+\code{\link[=extract_metric]{extract_metric()}}
 }

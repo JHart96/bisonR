@@ -1,87 +1,111 @@
-test_that("network metrics work", {
-  sim_data <- simulate_bison_model("binary", aggregated = TRUE)
-  df <- sim_data$df_sim
+nodes <- c("A", "B", "C", "D")
+dyads <- rbind(c("A", "B"), c("B", "C"), c("A", "C"), c("C", "D"))
+weights <- c(0.5, 0.25, 0.1, 0.8)
 
-  fit_edge <- bison_model(
-    (event | duration) ~ dyad(node_1_id, node_2_id),
-    data=df,
-    model_type="binary_conjugate",
-    priors=get_default_priors("binary_conjugate")
-  )
+test_that("metrics are correct on a network with known edge weights", {
+  fit <- fake_bison_model(nodes, dyads, weights)
+  strength <- extract_metric(fit, "node_strength", num_draws = 3)
+  expect_equal(colnames(strength), nodes)
+  expect_equal(unname(strength[1, ]), c(0.6, 0.75, 1.15, 0.8))
 
-  x <- expect_warning(
-    extract_metric(fit_edge, "edge_weight", num_draws=10),
-    regexp=NA
-  )
-  expect_equal(dim(x)[1], 10)
+  degree <- extract_metric(fit, "node_degree[0.2]", num_draws = 2)
+  expect_equal(unname(degree[1, ]), c(1, 2, 2, 1))
 
-  x <- expect_warning(
-    extract_metric(fit_edge, "node_strength", num_draws=50),
-    regexp=NA
-  )
-  expect_equal(dim(x)[1], 50)
+  expect_equal(extract_metric(fit, "global_density", num_draws = 2)[1, 1], mean(weights))
+  expect_equal(extract_metric(fit, "global_cv", num_draws = 2)[1, 1], sd(weights) / mean(weights))
+  expect_equal(extract_metric(fit, "global_std", num_draws = 2)[1, 1], sd(weights))
 
-  net <- bison_to_igraph(fit_edge, 2)[[1]]
-  expect_true(cor(igraph::strength(net), x[1, ]) > 0)
+  # Triangle A-B-C exists only if the 0.1 edge counts
+  expect_equal(extract_metric(fit, "global_clustering[0.05]", num_draws = 1)[1, 1],
+               igraph::transitivity(igraph::make_graph(~ A - B - C - A, C - D), "global"))
+  expect_equal(extract_metric(fit, "node_clustering[0.2]", num_draws = 1)[1, ], c(A = 0, B = 0, C = 0, D = 0))
 
-  x <- expect_error(
-    extract_metric(fit_edge, "not_a_metric", standardise=TRUE)
-  )
+  edge_weight <- extract_metric(fit, "edge_weight", num_draws = 2)
+  expect_equal(unname(edge_weight[1, ]), weights)
+  expect_equal(unname(extract_metric(fit, "edge_weight", num_draws = 2, transform = FALSE)[1, ]), qlogis(weights))
+})
 
-  x <- expect_warning(
-    extract_metric(fit_edge, "node_strength", standardise=TRUE),
-    regexp=NA
-  )
+test_that("nodes with no edges are kept, in node order", {
+  fit <- fake_bison_model(c(nodes, "E"), dyads, weights)
+  expect_warning(strength <- extract_metric(fit, "node_strength", num_draws = 2), "no dyads")
+  expect_equal(colnames(strength), c(nodes, "E"))
+  expect_equal(unname(strength[1, 5]), 0)
+  net <- bison_to_igraph(fit, num_draws = 1)[[1]]
+  expect_equal(igraph::V(net)$name, c(nodes, "E"))
+})
 
-  x <- expect_warning(
-    extract_metric(fit_edge, "node_betweenness"),
-    regexp=NA
-  )
+test_that("node metrics stay aligned with node names when rows are shuffled (issue #63)", {
+  set.seed(10)
+  sim <- simulate_bison_model("binary", aggregated = TRUE)
+  df <- sim$df_sim[sample(nrow(sim$df_sim)), ]
+  levels(df$node_1_id) <- levels(df$node_2_id) <- LETTERS[1:10]
+  fit <- bison_model((event | duration) ~ dyad(node_1_id, node_2_id), df, "binary_conjugate",
+                     priors = conjugate_priors("binary"))
+  strength <- extract_metric(fit, "node_strength", num_draws = 200)
+  edgelist <- get_edgelist(fit)
+  by_hand <- sapply(LETTERS[1:10], function(n) {
+    sum(edgelist$median[edgelist$node_1 == n | edgelist$node_2 == n])
+  })
+  expect_equal(colnames(strength), LETTERS[1:10])
+  expect_equal(unname(apply(strength, 2, median)), unname(by_hand), tolerance = 0.15)
+})
 
-  x <- expect_warning(
-    extract_metric(fit_edge, "node_eigen"),
-    regexp=NA
-  )
+test_that("standardise centres metrics within each draw", {
+  fit <- fake_bison_model(nodes, dyads, weights)
+  x <- extract_metric(fit, "node_strength", num_draws = 4, standardise = TRUE)
+  expect_equal(unname(rowMeans(x)), rep(0, 4))
+})
 
-  x <- expect_warning(
-    extract_metric(fit_edge, "node_degree[0.2]"),
-    regexp=NA
-  )
+test_that("all metric names work and unknown metrics fail", {
+  fit <- fake_bison_model(nodes, dyads, weights)
+  for (metric in c("node_eigen", "node_betweenness", "node_closeness", "global_diameter")) {
+    expect_true(all(is.finite(extract_metric(fit, metric, num_draws = 2))), info = metric)
+  }
+  expect_error(extract_metric(fit, "not_a_metric"), "does not exist")
+})
 
-  x <- expect_warning(
-    extract_metric(fit_edge, "node_clustering[0.2]"),
-    regexp=NA
-  )
+test_that("plot_metric handles continuous and discrete metrics", {
+  set.seed(11)
+  sim <- simulate_bison_model("binary", aggregated = TRUE)
+  fit <- bison_model((event | duration) ~ dyad(node_1_id, node_2_id), sim$df_sim, "binary_conjugate",
+                     priors = conjugate_priors("binary"))
+  pdf(NULL)
+  on.exit(dev.off())
+  expect_silent(plot_metric(extract_metric(fit, "global_cv", num_draws = 200)))
+  expect_silent(plot_metric(extract_metric(fit, "node_degree[0.5]", num_draws = 200)[, 1:2]))
+})
 
-  x <- expect_warning(
-    extract_metric(fit_edge, "global_cv"),
-    regexp=NA
-  )
+test_that("thresholds include edges equal to the threshold", {
+  fit <- fake_bison_model(nodes, dyads, c(0.5, 0.25, 0.1, 0.8))
+  degree <- extract_metric(fit, "node_degree[0.25]", num_draws = 1)
+  expect_equal(unname(degree[1, ]), c(1, 2, 2, 1))
+})
 
-  x <- expect_warning(
-    extract_metric(fit_edge, "global_density"),
-    regexp=NA
-  )
+test_that("standardise isn't available for global metrics", {
+  fit <- fake_bison_model(nodes, dyads, weights)
+  expect_error(extract_metric(fit, "global_cv", num_draws = 2, standardise = TRUE), "global metrics")
+})
 
-  x <- expect_warning(
-    extract_metric(fit_edge, "global_std"),
-    regexp=NA
-  )
+test_that("malformed thresholds give an error", {
+  fit <- fake_bison_model(nodes, dyads, weights)
+  expect_error(extract_metric(fit, "node_degree[abc]", num_draws = 1), "Couldn't read the threshold")
+})
 
-  x <- expect_warning(
-    extract_metric(fit_edge, "global_diameter"),
-    regexp=NA
-  )
+test_that("global clustering is 0 when there are no connected triples", {
+  fit <- fake_bison_model(c("A", "B", "C"), rbind(c("A", "B")), 0.5)
+  expect_equal(suppressWarnings(extract_metric(fit, "global_clustering[0.1]", num_draws = 1))[1, 1], 0)
+})
 
-  x <- expect_warning(
-    extract_metric(fit_edge, "global_clustering[0.2]"),
-    regexp=NA
-  )
+test_that("nodes without dyads and disconnected networks give warnings", {
+  fit <- fake_bison_model(c(nodes, "E"), dyads, weights)
+  expect_warning(extract_metric(fit, "node_strength", num_draws = 2), "1 node\\(s\\) have no dyads")
+  two_parts <- fake_bison_model(c("A", "B", "C", "D"), rbind(c("A", "B"), c("C", "D")), c(0.5, 0.6))
+  expect_warning(extract_metric(two_parts, "node_eigen", num_draws = 2), "more than one connected component")
+  expect_silent(extract_metric(fit <- fake_bison_model(nodes, dyads, weights), "node_eigen", num_draws = 2))
+})
 
-  expect_warning (
-    plot_metric(x),
-    regexp=NA
-  )
-
-
+test_that("plot_metric bar charts keep non-integer discrete values", {
+  heights <- discrete_distribution(c(rep(0, 3), rep(1 / 3, 7)))
+  expect_equal(as.numeric(heights), c(0.3, 0.7))
+  expect_equal(as.numeric(discrete_distribution(c(1, 1, 3))), c(2, 0, 1) / 3)
 })

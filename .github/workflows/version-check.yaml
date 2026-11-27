@@ -1,0 +1,45 @@
+# Every pull request into main must bump the package version and document the
+# change in NEWS.md. This keeps main releasable at all times.
+on:
+  pull_request:
+    branches: [main]
+
+name: version-check
+
+permissions: read-all
+
+jobs:
+  version-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check DESCRIPTION version is bumped and NEWS.md updated
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          base=$(git show "origin/${BASE_REF}:DESCRIPTION" | sed -n 's/^Version:[[:space:]]*//p')
+          head=$(sed -n 's/^Version:[[:space:]]*//p' DESCRIPTION)
+          echo "Version on ${BASE_REF}: ${base}"
+          echo "Version in this PR:  ${head}"
+
+          if [ "${head}" = "${base}" ]; then
+            echo "::error file=DESCRIPTION::Version must be bumped (still ${base}). Use usethis::use_version()."
+            exit 1
+          fi
+          highest=$(printf '%s\n%s\n' "${base}" "${head}" | sort -V | tail -n 1)
+          if [ "${highest}" != "${head}" ]; then
+            echo "::error file=DESCRIPTION::Version ${head} is lower than ${base} on ${BASE_REF}."
+            exit 1
+          fi
+
+          first_heading=$(grep -m 1 '^# ' NEWS.md)
+          expected="# bisonR ${head}"
+          case "${first_heading}" in
+            "${expected}"|"${expected} "*) echo "NEWS.md heading OK: ${first_heading}" ;;
+            *)
+              echo "::error file=NEWS.md::The first heading in NEWS.md must be '${expected}' (found '${first_heading}')."
+              exit 1 ;;
+          esac

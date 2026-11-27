@@ -2,12 +2,12 @@
 % Please edit documentation in R/bison_model.R
 \name{bison_model}
 \alias{bison_model}
-\title{Fit an edge model to data}
+\title{Fit an edge weight model}
 \usage{
 bison_model(
   formula,
   data,
-  model_type = c("binary", "count"),
+  model_type = c("binary", "count", "binary_conjugate", "count_conjugate"),
   directed = FALSE,
   partial_pooling = FALSE,
   zero_inflated = FALSE,
@@ -16,45 +16,135 @@ bison_model(
   mc_cores = 4,
   iter_sampling = 1000,
   iter_warmup = 1000,
-  priors_only = FALSE
+  priors_only = FALSE,
+  chains = 4,
+  ...
 )
 }
 \arguments{
-\item{formula}{Formula specifying social events and sampling effort on the LHS and edge weights, fixed, and random effects on the RHS.}
+\item{formula}{A formula of the form \code{(event | effort) ~ dyad(node_1, node_2)}.
+The left-hand side gives the column of social events (0/1 or counts) and the
+observation effort (a column, or a single number). Effort is how much each
+row was observed, such as the number of sampling periods or the hours of
+observation. The right-hand side gives the terms that explain the events.
+See \emph{Formula syntax} below.}
 
-\item{data}{Aggregated or disaggregated dataframe of dyadic observations.}
+\item{data}{A data frame with one row per observation (disaggregated) or one
+row per dyad (aggregated).}
 
-\item{model_type}{"binary" or "count", specifying the type of edge weight model to use.}
+\item{model_type}{The type of edge model: \code{"binary"} (events are present/absent
+in each sampling period, edge weights are probabilities), \code{"count"} (events
+are counts, edge weights are rates per unit effort), or the fast conjugate
+versions \code{"binary_conjugate"} and \code{"count_conjugate"}, which only support a
+\code{dyad()} term.}
 
-\item{directed}{\code{TRUE} or \code{FALSE} specifying whether the network is directed or not.}
+\item{directed}{\code{TRUE} or \code{FALSE}: whether the network is directed. For
+undirected networks, rows for A-B and B-A refer to the same dyad.}
 
-\item{partial_pooling}{Whether to pool edge weights so that information is shared between edges.}
+\item{partial_pooling}{Whether to estimate the spread of edge weights from the
+data, so that information is shared between edges. How far estimates for
+dyads with few observations are pulled towards the mean of the edge prior
+then depends on how much edge weights vary across the network.}
 
-\item{zero_inflated}{Whether to use a zero-inflated model to model excess zeroes.}
+\item{zero_inflated}{Whether to use a zero-inflated model, for data with
+more zeros than the edge weights alone would predict (see the \code{"stats"}
+check in \code{\link[=plot_predictions]{plot_predictions()}}). Zero inflation applies to each row of the data: each row has probability
+\code{zero_prob} of being a structural zero (a zero regardless of the edge
+weight). For binary data with one sampling
+period per row this can't be separated from the edge weights, so aggregate
+the data first.}
 
-\item{priors}{List of priors in the format supplied by \code{get_default_priors()}.}
+\item{priors}{A list of priors, in the format returned by
+\code{\link[=get_default_priors]{get_default_priors()}}. A prior describes which values of a parameter are
+plausible before seeing the data. If \code{NULL}, the defaults are used with a
+message; check them with \code{\link[=prior_check]{prior_check()}} and \code{\link[=prior_predictive_check]{prior_predictive_check()}}.}
 
-\item{refresh}{Frequency of messages printed while running the sampler.}
+\item{refresh}{How often the sampler prints progress (0 for silent).}
 
-\item{mc_cores}{Number of cores to use when running the sampler.}
+\item{mc_cores}{Number of chains to run in parallel.}
 
-\item{iter_sampling}{Number of iterations to use for posterior samples.}
+\item{iter_sampling}{Number of posterior draws to keep per chain, after
+warmup. For conjugate models, \code{iter_sampling * chains} draws are taken.}
 
-\item{iter_warmup}{Number of iterations to use for warmup (will not be used for samples).}
+\item{iter_warmup}{Number of warmup iterations per chain, during which the
+sampler tunes itself. These draws are discarded.}
 
-\item{priors_only}{Whether to use priors as posteriors or to allow the posteriors to be updated by data.}
+\item{priors_only}{If \code{TRUE}, ignore the data and sample from the priors (used
+for prior predictive checks).}
+
+\item{chains}{Number of MCMC chains.}
+
+\item{...}{Further arguments passed to the \verb{$sample()} method of
+\link[cmdstanr:CmdStanModel]{cmdstanr::CmdStanModel}, such as \code{seed} or \code{adapt_delta}.}
 }
 \value{
-An S3 edge model object containing edge samples and processed data.
+A \code{bison_model} object. Use \code{\link[=summary.bison_model]{summary.bison_model()}} or \code{\link[=get_edgelist]{get_edgelist()}} to see the
+edge weights, \code{\link[=plot_network]{plot_network()}} to visualise them, \code{\link[=plot_trace]{plot_trace()}} and
+\code{\link[=plot_predictions]{plot_predictions()}} for diagnostics, and \code{\link[=extract_metric]{extract_metric()}} or \code{\link[=bison_brm]{bison_brm()}}
+for downstream analyses.
 }
 \description{
-Fit an edge model to data
+Fits a BISoN edge weight model, which estimates a posterior distribution for
+the edge weight of each dyad from observations of social events and the
+observation effort for each dyad. An edge weight is a dyad's underlying
+tendency to interact or associate, as a probability or a rate. The posterior
+distribution describes the values consistent with the data and priors, so
+edges observed rarely get wide uncertainty. This is usually the first step
+of an analysis: the fitted model is then used to plot the network, calculate
+network metrics and fit regressions.
 }
 \details{
-Fits a BISoN edge weight model to a user-provided dataframe. The function supports either aggregated (at the
-dyad-level) or disaggregated (at the observation-level) dataframes. Node names or IDs need to be formatted
-as factors with the same levels.
+Models other than the conjugate ones are fitted by MCMC (Markov
+chain Monte Carlo) in Stan, which draws samples from the posterior in
+several independent runs called chains. Conjugate models have a posterior
+that can be calculated exactly, so they are fitted in seconds without Stan,
+but they can't include other effects.
+}
+\section{Formula syntax}{
 
-The type of edge model and the interpretation of edge weights used depends on \code{model_type}, and will change
-the interpretation of the edge weights.
+\itemize{
+\item \code{dyad(node_1, node_2)}: estimate an edge weight for each dyad. The two
+columns hold node names or IDs. If they are both factors with the same
+levels, nodes that never appear in the data are kept.
+\item \code{x}: a fixed effect of column \code{x}. Factors get one parameter per level.
+\item \code{(1 | g)}: a random intercept for each level of column \code{g}. Random effects
+are centred on 0, so a model without a \code{dyad()} term or factor fixed effect
+needs an intercept (\code{1}) to set the overall rate of events.
+\item \code{1} or \code{0}: include or exclude a global intercept (excluded by default).
+}
+
+Including other terms changes the interpretation of the edge weights, which
+then represent each dyad's tendency to interact after controlling for those
+effects. On the natural scale (e.g. in \code{\link[=get_edgelist]{get_edgelist()}} and \code{\link[=extract_metric]{extract_metric()}}),
+they are the probability or rate for an observation in which the other effects
+(and any intercept) are 0, so continuous predictors may be easier to interpret
+if they are centred.
+}
+
+\examples{
+\dontshow{if (!is.null(tryCatch(cmdstanr::cmdstan_path(), error = function(e) NULL))) withAutoprint(\{ # examplesIf}
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+df <- sim_data$df_sim
+
+# Fast conjugate model, no MCMC needed
+fit_edge <- bison_model(
+  (event | effort) ~ dyad(node_1_id, node_2_id),
+  data = df,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+summary(fit_edge)
+
+# Full model fitted with Stan, which allows extra effects
+fit_edge <- bison_model(
+  (event | effort) ~ dyad(node_1_id, node_2_id),
+  data = df,
+  model_type = "binary",
+  priors = get_default_priors("binary")
+)
+\dontshow{\}) # examplesIf}
+}
+\seealso{
+\code{\link[=get_default_priors]{get_default_priors()}}, \code{\link[=prior_check]{prior_check()}}, \code{\link[=summary.bison_model]{summary.bison_model()}},
+\code{\link[=get_effects]{get_effects()}}, \code{\link[=model_comparison]{model_comparison()}}, \code{\link[=bison_save]{bison_save()}}
 }

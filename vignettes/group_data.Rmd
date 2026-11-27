@@ -1,0 +1,211 @@
+---
+title: "Group-based observations"
+description: >
+  Gambit-of-the-group data: converting group-by-individual matrices, group-level effects and pairs that could not have been seen together.
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Group-based observations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4.5,
+  out.width = "100%"
+)
+set.seed(1)
+```
+
+```{r setup}
+library(bisonR)
+```
+
+This article analyses group-based observations, in which individuals seen in the same group are assumed to be associating (the gambit of the group). Data of this type are often stored as a group-by-individual (GBI) matrix. `vignette("preparing_data")` shows how to convert GBI matrices; this article covers a full analysis, including group-level effects and constraints on which pairs could have been seen together.
+
+## Simulating a GBI matrix
+
+A GBI matrix has one row per group (or sighting) and one column per individual, with 1 if the individual was in the group and 0 otherwise. We simulate sightings of 12 individuals that belong to two communities. Each group is formed around one community: members of that community are likely to be present, and members of the other community are rarely present. Each group was seen in either the wet or the dry season, and individuals are more likely to be in a group in the wet season.
+
+```{r}
+community <- c(Ada = "A", Bea = "A", Cat = "A", Dot = "A", Eve = "A", Fay = "A",
+               Gil = "B", Hal = "B", Ian = "B", Jo = "B", Kit = "B", Lou = "B")
+num_groups <- 80
+
+group_community <- sample(c("A", "B"), num_groups, replace = TRUE)
+wet <- rbinom(num_groups, 1, 0.5) # 1 = wet season, 0 = dry season
+
+gbi <- matrix(0, num_groups, length(community), dimnames = list(NULL, names(community)))
+for (k in seq_len(num_groups)) {
+  member <- community == group_community[k]
+  logit_p <- ifelse(member, -0.5, -3) + 1 * wet[k]
+  gbi[k, ] <- rbinom(length(community), 1, plogis(logit_p))
+}
+
+# Remove groups in which no individuals were seen
+keep <- rowSums(gbi) > 0
+gbi <- gbi[keep, ]
+wet <- wet[keep]
+dim(gbi)
+head(gbi)
+```
+
+## Converting to bisonR format
+
+`convert_gbi_to_bison()` converts the GBI matrix to one row per pair of individuals per group. For each pair (i, j), it adds a row for every group in which at least one of i and j was present. `event` is 1 if both were present and 0 if only one was. Groups in which neither was present are left out, because they carry no information about whether the two associate. `group_id` is the row of the GBI matrix that each row came from.
+
+Group-level variables are passed with `group_properties`, a vector with one value per row of the GBI matrix, and are added as the column `group_property`:
+
+```{r}
+df <- convert_gbi_to_bison(gbi, group_properties = wet)
+names(df)[names(df) == "group_property"] <- "wet"
+head(df)
+nrow(df)
+```
+
+For example, the rows for Ada and Bea correspond to the groups in which Ada, Bea or both were present:
+
+```{r}
+df_ab <- df[df$node_1 == "Ada" & df$node_2 == "Bea", ]
+nrow(df_ab)
+sum(gbi[, "Ada"] == 1 | gbi[, "Bea"] == 1)
+sum(df_ab$event)
+sum(gbi[, "Ada"] == 1 & gbi[, "Bea"] == 1)
+```
+
+Each row is one sampling period for the pair, so the effort is 1. Individual traits, such as sex or age, can be added with `individual_properties` (one value per column of the GBI matrix), which adds the columns `node_1_property` and `node_2_property`.
+
+## Fitting a conjugate model
+
+With no other effects in the model, the edge weights can be estimated with the conjugate binary model. It calculates the posterior distribution of each edge weight (its plausible values given the data and the prior) exactly, without sampling. The edge weight of a pair is the probability that both are present in a group, given that at least one of them is:
+
+```{r}
+fit_conj <- bison_model(
+  (event | 1) ~ dyad(node_1, node_2),
+  data = df,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+head(get_edgelist(fit_conj))
+```
+
+```{r, fig.height = 6}
+plot_network(fit_conj, lwd = 5)
+```
+
+All pairs were seen in at least one group, so every pair has an edge. The posterior medians, arranged as a matrix, show the community structure:
+
+```{r}
+edgelist <- get_edgelist(fit_conj)
+nodes <- names(community)
+adj <- matrix(NA, length(nodes), length(nodes), dimnames = list(nodes, nodes))
+adj[cbind(edgelist$node_1, edgelist$node_2)] <- edgelist$median
+adj[cbind(edgelist$node_2, edgelist$node_1)] <- edgelist$median
+round(adj, 2)
+```
+
+Pairs in the same community (Ada to Fay, and Gil to Lou) mostly have higher edge weights than pairs from different communities, although the two ranges overlap. Plotting only the edges with a median weight of at least 0.2 shows this more clearly:
+
+```{r, fig.height = 6}
+plot_network(fit_conj, lwd = 5, threshold = 0.2)
+```
+
+## Group-level effects
+
+Rows that come from the same group are not independent. In a group that many individuals joined, all the pairs among them have `event = 1`, and in the wet season all individuals are more likely to be in groups. A Stan model can include a random effect of group, `(1 | group_id)`, which estimates an effect for each group drawn from a shared distribution, and fixed effects of group properties such as `wet`. Conjugate models only allow `dyad()`, so this needs `model_type = "binary"`:
+
+```{r}
+fit_group <- bison_model(
+  (event | 1) ~ dyad(node_1, node_2) + wet + (1 | group_id),
+  data = df,
+  model_type = "binary",
+  priors = get_default_priors("binary"),
+  seed = 1,
+  show_exceptions = FALSE
+)
+```
+
+The edge weights are now estimated after accounting for the season and for differences between groups. The season and group effects are added to the edge weights on the logit (log-odds) scale, so the edge weights describe the probability of association in the dry season (`wet = 0`) in a group with a random effect of 0. They are not on the same scale as those of the conjugate model:
+
+```{r}
+head(get_edgelist(fit_group))
+```
+
+The estimates of the other effects are shown by `summary()`, and returned as a data frame by `get_effects()`. They are on the log-odds scale. The table also has a random effect for each of the `r length(unique(df$group_id))` groups, so here only the effect of the wet season and the standard deviation of the group effects are shown:
+
+```{r}
+effects <- get_effects(fit_group)
+effects[effects$type != "random", ]
+```
+
+The effect of `wet` is positive (median 0.49 on the logit scale), so pairs were more likely to be seen together in wet-season groups, and the standard deviation of the group effects is about 0.32. The edge weights describe a dry-season group (`wet = 0`) with a group effect of 0, so they are lower than those of the conjugate model, which does not separate the seasons. For example, the median edge weight of Ada and Bea is 0.20 in this model and 0.27 in the conjugate model.
+
+`plot_network()` works in the same way as for the conjugate model:
+
+```{r, fig.height = 6}
+plot_network(fit_group, lwd = 5)
+```
+
+## Pairs that could not have been seen together
+
+If some individuals could never have been in the same group, for example because they were in the study area at different times, the rows for these pairs contain only zeros. These zeros are not evidence that the pair avoid each other, and they lead to low estimated edge weights. `individual_constraints` gives each individual a value, and only pairs with the same value are included.
+
+As an example, we simulate a second data set from two study periods with different individuals: Ada to Dot were only present in the first period, and Eve to Hal only in the second.
+
+```{r}
+period_individuals <- list(c("Ada", "Bea", "Cat", "Dot"), c("Eve", "Fay", "Gil", "Hal"))
+gbi_periods <- matrix(0, 40, 8, dimnames = list(NULL, unlist(period_individuals)))
+for (k in 1:40) {
+  period <- if (k <= 20) 1 else 2
+  gbi_periods[k, period_individuals[[period]]] <- rbinom(4, 1, 0.5)
+}
+gbi_periods <- gbi_periods[rowSums(gbi_periods) > 0, ]
+```
+
+Without constraints, all `r choose(8, 2)` pairs are included, including the 16 pairs of individuals from different periods:
+
+```{r}
+df_all <- convert_gbi_to_bison(gbi_periods)
+nrow(unique(df_all[, c("node_1", "node_2")]))
+```
+
+In a model fitted to these data, the pairs from different periods have edge weights close to 0, because the two individuals were never seen in the same group:
+
+```{r}
+fit_all <- bison_model(
+  (event | 1) ~ dyad(node_1, node_2),
+  data = df_all,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+edgelist_all <- get_edgelist(fit_all)
+edgelist_all[edgelist_all$node_1 == "Ada", ]
+```
+
+With the study period as a constraint, only pairs from the same period are included:
+
+```{r}
+period <- c(1, 1, 1, 1, 2, 2, 2, 2)
+df_constrained <- convert_gbi_to_bison(gbi_periods, individual_constraints = period)
+nrow(unique(df_constrained[, c("node_1", "node_2")]))
+
+fit_periods <- bison_model(
+  (event | 1) ~ dyad(node_1, node_2),
+  data = df_constrained,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+```
+
+```{r, fig.height = 6}
+plot_network(fit_periods, lwd = 5)
+```
+
+Pairs from different periods have no edge in the model, so they are not drawn. Network metrics calculated from this model treat these pairs as having no edge, rather than an estimated weight.
+
+## Further analyses
+
+The fitted models can be used in the same way as any other edge model, for example with `extract_metric()` and `bison_brm()`. See `vignette("getting_started")`, `vignette("network_metrics")` and `vignette("bison_brms")`.

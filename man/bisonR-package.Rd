@@ -8,3 +8,31 @@
 \description{
 An R package for Bayesian Inference of Social Networks
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://bisonr.org}
+  \item \url{https://github.com/JHart96/bisonR}
+  \item Report bugs at \url{https://github.com/JHart96/bisonR/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Jordan Hart \email{jordan.da.hart@gmail.com} (\href{https://orcid.org/0000-0002-4636-0760}{ORCID})
+
+Authors:
+\itemize{
+  \item Jordan Hart \email{jordan.da.hart@gmail.com} (\href{https://orcid.org/0000-0002-4636-0760}{ORCID})
+  \item Michael N. Weiss
+  \item Daniel W. Franks
+  \item Lauren J. N. Brent
+  \item Samuel Ellis
+}
+
+Other contributors:
+\itemize{
+  \item Joe Wilde (Windows installation article) [contributor]
+}
+
+}
+\keyword{internal}

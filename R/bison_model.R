@@ -1,110 +1,208 @@
-require(igraph)
-require(dplyr)
-require(stringr)
-
-#' Fit an edge model to data
+#' Fit an edge weight model
 #'
+#' Fits a BISoN edge weight model, which estimates a posterior distribution for
+#' the edge weight of each dyad from observations of social events and the
+#' observation effort for each dyad. An edge weight is a dyad's underlying
+#' tendency to interact or associate, as a probability or a rate. The posterior
+#' distribution describes the values consistent with the data and priors, so
+#' edges observed rarely get wide uncertainty. This is usually the first step
+#' of an analysis: the fitted model is then used to plot the network, calculate
+#' network metrics and fit regressions.
 #'
-#' @param formula Formula specifying social events and sampling effort on the LHS and edge weights, fixed, and random effects on the RHS.
-#' @param data Aggregated or disaggregated dataframe of dyadic observations.
-#' @param model_type "binary" or "count", specifying the type of edge weight model to use.
-#' @param directed `TRUE` or `FALSE` specifying whether the network is directed or not.
-#' @param priors List of priors in the format supplied by `get_default_priors()`.
-#' @param refresh Frequency of messages printed while running the sampler.
-#' @param mc_cores Number of cores to use when running the sampler.
-#' @param iter_sampling Number of iterations to use for posterior samples.
-#' @param iter_warmup Number of iterations to use for warmup (will not be used for samples).
-#' @param priors_only Whether to use priors as posteriors or to allow the posteriors to be updated by data.
-#' @param partial_pooling Whether to pool edge weights so that information is shared between edges.
-#' @param zero_inflated Whether to use a zero-inflated model to model excess zeroes.
+#' @details Models other than the conjugate ones are fitted by MCMC (Markov
+#' chain Monte Carlo) in Stan, which draws samples from the posterior in
+#' several independent runs called chains. Conjugate models have a posterior
+#' that can be calculated exactly, so they are fitted in seconds without Stan,
+#' but they can't include other effects.
 #'
-#' @details
-#' Fits a BISoN edge weight model to a user-provided dataframe. The function supports either aggregated (at the
-#' dyad-level) or disaggregated (at the observation-level) dataframes. Node names or IDs need to be formatted
-#' as factors with the same levels.
+#' @param formula A formula of the form `(event | effort) ~ dyad(node_1, node_2)`.
+#'   The left-hand side gives the column of social events (0/1 or counts) and the
+#'   observation effort (a column, or a single number). Effort is how much each
+#'   row was observed, such as the number of sampling periods or the hours of
+#'   observation. The right-hand side gives the terms that explain the events.
+#'   See *Formula syntax* below.
+#' @param data A data frame with one row per observation (disaggregated) or one
+#'   row per dyad (aggregated).
+#' @param model_type The type of edge model: `"binary"` (events are present/absent
+#'   in each sampling period, edge weights are probabilities), `"count"` (events
+#'   are counts, edge weights are rates per unit effort), or the fast conjugate
+#'   versions `"binary_conjugate"` and `"count_conjugate"`, which only support a
+#'   `dyad()` term.
+#' @param directed `TRUE` or `FALSE`: whether the network is directed. For
+#'   undirected networks, rows for A-B and B-A refer to the same dyad.
+#' @param partial_pooling Whether to estimate the spread of edge weights from the
+#'   data, so that information is shared between edges. How far estimates for
+#'   dyads with few observations are pulled towards the mean of the edge prior
+#'   then depends on how much edge weights vary across the network.
+#' @param zero_inflated Whether to use a zero-inflated model, for data with
+#'   more zeros than the edge weights alone would predict (see the `"stats"`
+#'   check in [plot_predictions()]). Zero inflation applies to each row of the data: each row has probability
+#'   `zero_prob` of being a structural zero (a zero regardless of the edge
+#'   weight). For binary data with one sampling
+#'   period per row this can't be separated from the edge weights, so aggregate
+#'   the data first.
+#' @param priors A list of priors, in the format returned by
+#'   [get_default_priors()]. A prior describes which values of a parameter are
+#'   plausible before seeing the data. If `NULL`, the defaults are used with a
+#'   message; check them with [prior_check()] and [prior_predictive_check()].
+#' @param refresh How often the sampler prints progress (0 for silent).
+#' @param mc_cores Number of chains to run in parallel.
+#' @param iter_sampling Number of posterior draws to keep per chain, after
+#'   warmup. For conjugate models, `iter_sampling * chains` draws are taken.
+#' @param iter_warmup Number of warmup iterations per chain, during which the
+#'   sampler tunes itself. These draws are discarded.
+#' @param priors_only If `TRUE`, ignore the data and sample from the priors (used
+#'   for prior predictive checks).
+#' @param chains Number of MCMC chains.
+#' @param ... Further arguments passed to the `$sample()` method of
+#'   [cmdstanr::CmdStanModel], such as `seed` or `adapt_delta`.
 #'
-#' The type of edge model and the interpretation of edge weights used depends on `model_type`, and will change
-#' the interpretation of the edge weights.
+#' @section Formula syntax:
+#' * `dyad(node_1, node_2)`: estimate an edge weight for each dyad. The two
+#'   columns hold node names or IDs. If they are both factors with the same
+#'   levels, nodes that never appear in the data are kept.
+#' * `x`: a fixed effect of column `x`. Factors get one parameter per level.
+#' * `(1 | g)`: a random intercept for each level of column `g`. Random effects
+#'   are centred on 0, so a model without a `dyad()` term or factor fixed effect
+#'   needs an intercept (`1`) to set the overall rate of events.
+#' * `1` or `0`: include or exclude a global intercept (excluded by default).
 #'
-#' @return An S3 edge model object containing edge samples and processed data.
+#' Including other terms changes the interpretation of the edge weights, which
+#' then represent each dyad's tendency to interact after controlling for those
+#' effects. On the natural scale (e.g. in [get_edgelist()] and [extract_metric()]),
+#' they are the probability or rate for an observation in which the other effects
+#' (and any intercept) are 0, so continuous predictors may be easier to interpret
+#' if they are centred.
 #'
+#' @return A `bison_model` object. Use [summary.bison_model()] or [get_edgelist()] to see the
+#'   edge weights, [plot_network()] to visualise them, [plot_trace()] and
+#'   [plot_predictions()] for diagnostics, and [extract_metric()] or [bison_brm()]
+#'   for downstream analyses.
+#'
+#' @seealso [get_default_priors()], [prior_check()], [summary.bison_model()],
+#'   [get_effects()], [model_comparison()], [bison_save()]
+#'
+#' @examplesIf !is.null(tryCatch(cmdstanr::cmdstan_path(), error = function(e) NULL))
+#' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+#' df <- sim_data$df_sim
+#'
+#' # Fast conjugate model, no MCMC needed
+#' fit_edge <- bison_model(
+#'   (event | effort) ~ dyad(node_1_id, node_2_id),
+#'   data = df,
+#'   model_type = "binary_conjugate",
+#'   priors = get_default_priors("binary_conjugate")
+#' )
+#' summary(fit_edge)
+#'
+#' # Full model fitted with Stan, which allows extra effects
+#' fit_edge <- bison_model(
+#'   (event | effort) ~ dyad(node_1_id, node_2_id),
+#'   data = df,
+#'   model_type = "binary",
+#'   priors = get_default_priors("binary")
+#' )
 #' @export
-bison_model <- function(formula, data, model_type=c("binary", "count"),
-                        directed=FALSE, partial_pooling=FALSE, zero_inflated=FALSE,
-                        priors=NULL, refresh=0, mc_cores=4, iter_sampling=1000,
-                        iter_warmup=1000, priors_only=FALSE) {
+bison_model <- function(formula, data,
+                        model_type = c("binary", "count", "binary_conjugate", "count_conjugate"),
+                        directed = FALSE, partial_pooling = FALSE, zero_inflated = FALSE,
+                        priors = NULL, refresh = 0, mc_cores = 4, iter_sampling = 1000,
+                        iter_warmup = 1000, priors_only = FALSE, chains = 4, ...) {
+  model_type <- match.arg(model_type)
+  full_model_type <- model_type
 
   # If user-specified priors haven't been set, use the defaults
   if (is.null(priors)) {
-    message("No priors set by user, using default priors instead. We recommend setting and checking priors explicitly for reliable inference.")
+    message(
+      "No priors set by user, using default priors instead. ",
+      "We recommend setting and checking priors explicitly for reliable inference."
+    )
     priors <- get_default_priors(model_type)
   }
+  priors <- validate_priors(priors, model_type)
 
-  # If the model is a conjugate model, change the data type
-  use_conjugate_model <- FALSE
-  if (length(str_match_all(model_type, "conjugate")[[1]]) > 0) {
-    use_conjugate_model <- TRUE
-    model_type <- str_split(model_type, "_")[[1]][1]
-    if (!(model_type %in% c("binary", "count"))) {
-      stop("Conjugate models only available for binary and count data")
-    }
-  }
-
-  model_spec <- get_bison_model_spec(formula)
+  use_conjugate_model <- grepl("_conjugate$", model_type)
+  model_type <- sub("_conjugate$", "", model_type)
 
   model_info <- get_bison_model_data(formula, data, directed, model_type)
+  model_spec <- model_info$model_spec
+
+  if (partial_pooling && is.null(model_spec$node_1_name)) {
+    warning("`partial_pooling` only applies to models with a dyad() term, so it is ignored.", call. = FALSE)
+    partial_pooling <- FALSE
+  }
+
+  if (use_conjugate_model) {
+    if (is.null(model_spec$node_1_name)) {
+      stop("Conjugate models need a dyad(node_1, node_2) term.", call. = FALSE)
+    }
+    if (model_spec$intercept || length(model_spec$fixed) > 0 || length(model_spec$random) > 0) {
+      stop(
+        "Conjugate models only support dyad() terms. Use model_type = \"", model_type,
+        "\" to include intercepts, fixed effects or random effects.",
+        call. = FALSE
+      )
+    }
+    if (partial_pooling || zero_inflated) {
+      stop("Partial pooling and zero inflation aren't available for conjugate models.", call. = FALSE)
+    }
+  }
 
   # Set the priors in model data
   prior_parameters <- extract_prior_parameters(priors)
   model_data <- c(model_info$model_data, prior_parameters)
-  # Set whether only the priors should be sampled
-  model_data$priors_only <- priors_only
-  model_data$partial_pooling <- (partial_pooling * 1)
-  model_data$zero_inflated <- zero_inflated
+  model_data$priors_only <- as.integer(priors_only)
+  model_data$partial_pooling <- as.integer(partial_pooling)
+  model_data$zero_inflated <- as.integer(zero_inflated)
 
-  # Select sampling method
+  if (zero_inflated && model_type == "binary" && all(model_data$divisor <= 1)) {
+    warning(
+      "Zero inflation is applied to each row of the data. With one sampling period per row, ",
+      "a structural zero can't be distinguished from a lower edge weight, so zero_prob and ",
+      "the edge weights are only separated by their priors. Consider aggregating the data ",
+      "(e.g. to one row per dyad) before using zero_inflated = TRUE.",
+      call. = FALSE
+    )
+  }
+
   if (use_conjugate_model) {
-    # Fit conjugate model
-    model <- fit_conjugate_model(model_type, model_data, num_samples=iter_sampling*mc_cores, priors_only=priors_only)
+    model <- fit_conjugate_model(
+      model_type, model_data,
+      num_samples = iter_sampling * chains,
+      priors_only = priors_only
+    )
     chain <- model$chain
     event_preds <- model$event_preds
+    log_lik <- model$log_lik
     fit <- NULL
-    log_lik <- NULL
+    stan_model <- NULL
   } else {
-    # Build Stan model
-    model <- build_stan_model(model_type)
+    stan_model <- build_stan_model(model_type)
 
-    # Fit model
-    fit <- model$sample(
-      data=model_data,
-      refresh=refresh,
-      chains=4,
-      parallel_chains=mc_cores,
-      step_size=0.1,
-      iter_sampling=iter_sampling,
-      iter_warmup=iter_warmup
+    fit <- stan_model$sample(
+      data = model_data,
+      refresh = refresh,
+      chains = chains,
+      parallel_chains = mc_cores,
+      iter_sampling = iter_sampling,
+      iter_warmup = iter_warmup,
+      ...
     )
+    check_chains(fit)
 
-    # Extract edge weights from fitted edge model.
     if (model_info$num_dyads > 0) {
-      chain <- fit$draws("edge_weight", format="matrix")
+      chain <- as_plain_matrix(fit$draws("edge_weight", format = "matrix"))
     } else {
       chain <- NULL
     }
-
-    event_preds <- fit$draws("event_pred", format="matrix")
-
-    log_lik <- fit$draws("log_lik", format="matrix")
+    event_preds <- as_plain_matrix(fit$draws("event_pred", format = "matrix"))
+    log_lik <- as_plain_matrix(fit$draws("log_lik", format = "matrix"))
   }
 
-  # Extract edge samples
-  edge_samples <- chain
-
-  # Prepare output object.
   obj <- list(
     chain = chain,
     event_preds = event_preds,
-    edge_samples=edge_samples,
+    edge_samples = chain,
     num_nodes = model_info$num_nodes,
     num_dyads = model_info$num_dyads,
     node_to_idx = model_info$node_to_idx,
@@ -115,74 +213,205 @@ bison_model <- function(formula, data, model_type=c("binary", "count"),
     fit = fit,
     formula = formula,
     model_type = model_type,
+    full_model_type = full_model_type,
+    priors = priors,
     model_data = model_data,
     input_data = data,
-    stan_model = model,
+    stan_model = stan_model,
     conjugate = use_conjugate_model,
-    log_lik = log_lik
+    log_lik = log_lik,
+    bisonR_version = as.character(utils::packageVersion("bisonR"))
   )
   class(obj) <- "bison_model"
-  return(obj)
+  obj
 }
 
-#' Generates a summary object for an edge model object
-#'
-#' @param object An S3 edge model object to be summarised.
-#' @param ci Credible interval to use in summary, based on quantiles.
-#' @param transform `TRUE` or `FALSE` specifying whether to transform the edge weights from the internal link function scale.
-#' @param ... Additional arguments
-#'
+# Check that every MCMC chain finished. Chains that fail (for example because the
+# sampler process crashed) are dropped by cmdstanr, so warn about them, and stop
+# if none finished.
+check_chains <- function(fit) {
+  return_codes <- tryCatch(fit$return_codes(), error = function(e) NULL)
+  if (is.null(return_codes)) {
+    return(invisible(TRUE))
+  }
+  failed <- which(return_codes != 0)
+  # cmdstanr can report a crashed chain as successful, so also compare the
+  # number of chains that returned draws with the number requested.
+  chains_with_draws <- tryCatch(dim(fit$draws("lp__"))[2], error = function(e) length(return_codes))
+  if (length(failed) == 0 && chains_with_draws < length(return_codes)) {
+    warning(
+      length(return_codes) - chains_with_draws, " of ", length(return_codes),
+      " MCMC chains failed and were dropped; results use the remaining chains.",
+      call. = FALSE
+    )
+    return(invisible(FALSE))
+  }
+  if (length(failed) == 0) {
+    return(invisible(TRUE))
+  }
+  chain_output <- tryCatch(
+    paste(utils::tail(fit$output(failed[1]), 15), collapse = "\n"),
+    error = function(e) ""
+  )
+  if (length(failed) == length(return_codes)) {
+    stop(
+      "All MCMC chains failed. Output from chain ", failed[1], ":\n", chain_output,
+      call. = FALSE
+    )
+  }
+  warning(
+    length(failed), " of ", length(return_codes), " MCMC chains failed and were dropped; ",
+    "results use the remaining chains. Output from chain ", failed[1], ":\n", chain_output,
+    call. = FALSE
+  )
+  invisible(FALSE)
+}
+
+# Convert a posterior draws_matrix into a plain numeric matrix, so that
+# subsetting behaves like ordinary R matrices.
+as_plain_matrix <- function(x) {
+  out <- matrix(as.numeric(x), nrow = nrow(x), ncol = ncol(x))
+  colnames(out) <- colnames(x)
+  out
+}
+
 #' @export
-summary.bison_model <- function(object, ci=0.90, transform=TRUE, ...) {
+print.bison_model <- function(x, ...) {
+  cat(
+    "BISoN edge model (", x$full_model_type, ")\n",
+    "Formula: ", deparse1(x$formula), "\n",
+    "Nodes: ", x$num_nodes, ", dyads: ", x$num_dyads,
+    ", directed: ", x$directed, "\n",
+    "Use summary() to see the estimated edge weights.\n",
+    sep = ""
+  )
+  invisible(x)
+}
+
+#' Summarise an edge weight model
+#'
+#' Summarises a fitted edge model: the posterior median and credible interval
+#' of each edge weight, and of any other effects in the model. A credible
+#' interval contains the true value with the given probability, according to
+#' the model. Use `summary()` to check the estimates after fitting with
+#' [bison_model()].
+#'
+#' @param object A fitted `bison_model` object.
+#' @param ci Width of the credible interval, e.g. `0.9` for a 90% interval.
+#' @param transform If `TRUE` (the default), edge weights are reported on the
+#'   natural scale (probabilities for binary models, rates for count models).
+#'   If `FALSE`, they're on the link scale used inside the model (log-odds for
+#'   binary models, log rates for count models).
+#'   In models with an intercept or other effects, the natural-scale values are
+#'   for an observation where those effects are 0.
+#' @param ... Not used.
+#'
+#' @return A `summary.bison_model` object. Printing it shows, for each dyad, the
+#'   posterior median edge weight and the lower and upper bounds of the
+#'   credible interval, followed by any other effects in the model (see
+#'   [get_effects()]).
+#'
+#' @seealso [get_edgelist()] to get the edge weights as a data frame.
+#'
+#' @examples
+#' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+#' fit_edge <- bison_model(
+#'   (event | effort) ~ dyad(node_1_id, node_2_id),
+#'   data = sim_data$df_sim,
+#'   model_type = "binary_conjugate",
+#'   priors = get_default_priors("binary_conjugate")
+#' )
+#' summary(fit_edge, ci = 0.95)
+#' @export
+summary.bison_model <- function(object, ci = 0.90, transform = TRUE, ...) {
   summary_obj <- list()
 
   summary_obj$description <- paste0(
     "=== Fitted BISoN edge model ===",
     "\nData type: ", object$model_type,
-    "\nFormula: ", format(object$formula),
+    "\nFormula: ", deparse1(object$formula),
     "\nNumber of nodes: ", object$num_nodes,
     "\nNumber of dyads: ", object$num_dyads,
-    "\nDirected: ", object$directed,
-    "\n=== Edge list summary ===\n"
+    "\nDirected: ", object$directed, "\n"
   )
 
-  summary_obj$edgelist <- get_edgelist(object, ci=ci, transform=transform)
-  summary_obj$dyad_names <- do.call(paste, c(get_edgelist(object)[, 1:2], sep=" <-> "))
+  if (!is.null(object$dyad_to_idx)) {
+    summary_obj$edgelist <- get_edgelist(object, ci = ci, transform = transform)
+    summary_obj$dyad_names <- object$dyad_names
+  }
+  if (!isTRUE(object$conjugate) && !is.null(object$fit)) {
+    summary_obj$effects <- get_effects(object, ci = ci)
+  }
 
   class(summary_obj) <- "summary.bison_model"
-
   summary_obj
 }
 
-#' Prints out an edge model summary object.
+#' Print an edge model summary
 #'
-#' @param x An S3 edge model object.
-#' @param ... Additional parameters to be passed to print function.
+#' @param x A `summary.bison_model` object.
+#' @param ... Additional arguments passed to [print()].
 #'
+#' @seealso [summary.bison_model()]
+#' @keywords internal
 #' @export
 print.summary.bison_model <- function(x, ...) {
   cat(x$description)
-  summary_matrix <- as.matrix(x$edgelist[, 3:5])
-  rownames(summary_matrix) <- x$dyad_names
-  print(summary_matrix, ...)
+  if (!is.null(x$edgelist)) {
+    cat("=== Edge list summary ===\n")
+    summary_matrix <- as.matrix(x$edgelist[, 3:5])
+    rownames(summary_matrix) <- x$dyad_names
+    print(summary_matrix, ...)
+  }
+  if (!is.null(x$effects) && nrow(x$effects) > 0) {
+    cat("=== Other effects (see ?get_effects) ===\n")
+    effects_matrix <- as.matrix(x$effects[, 3:5])
+    rownames(effects_matrix) <- x$effects$effect
+    print(effects_matrix, ...)
+  }
+  invisible(x)
 }
 
-#' Retrieves an edgelist with uncertainty for a fitted edge weight model object
+#' Get the edge list with uncertainty
 #'
-#' @param obj An S3 edge model object.
-#' @param ci Credible interval to use in summary, based on quantiles.
-#' @param transform `TRUE` or `FALSE` specifying whether to transform the edge weights from the internal link function scale.
+#' Returns the estimated edge weight of every dyad as a data frame: the
+#' posterior median and a credible interval, which contains the true value
+#' with the given probability according to the model. Use it to report or
+#' export edge weights, or to work with them in other software.
 #'
-#' @return A `data.frame` object with columns of node IDs, median, lower, and upper bounds.
+#' @param obj A fitted `bison_model` object.
+#' @param ci Width of the credible interval, e.g. `0.9` for a 90% interval.
+#' @param transform If `TRUE` (the default), edge weights are on the natural
+#'   scale (probabilities for binary models, rates for count models). If `FALSE`,
+#'   they're on the link scale used inside the model (log-odds for binary
+#'   models, log rates for count models).
+#'   In models with an intercept or other effects, the natural-scale values are
+#'   for an observation where those effects are 0.
+#'
+#' @return A data frame with one row per dyad and columns `node_1`, `node_2`,
+#'   `median`, and the lower and upper bounds of the credible interval (named
+#'   after their quantiles, e.g. `5%` and `95%`). Values are rounded to three
+#'   decimal places.
+#'
+#' @seealso [draw_edgelist_samples()] for individual posterior draws of the
+#'   edge list, [summary.bison_model()], [plot_network()].
+#'
+#' @examples
+#' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+#' fit_edge <- bison_model(
+#'   (event | effort) ~ dyad(node_1_id, node_2_id),
+#'   data = sim_data$df_sim,
+#'   model_type = "binary_conjugate",
+#'   priors = get_default_priors("binary_conjugate")
+#' )
+#' head(get_edgelist(fit_edge))
 #' @export
-get_edgelist <- function (obj, ci=0.9, transform=TRUE) {
+get_edgelist <- function(obj, ci = 0.9, transform = TRUE) {
   if (is.null(obj$dyad_to_idx)) {
-    stop("No edge weights in this model.")
+    stop("This model has no edge weights (it has no dyad() term).", call. = FALSE)
   }
-  node_names <- sapply(
-    1:nrow(obj$dyad_to_idx),
-    function(x) names(obj$node_to_idx)[obj$dyad_to_idx[x, ]]
-  )
+  check_ci(ci)
+  node_names <- names(obj$node_to_idx)
   lb <- 0.5 * (1 - ci)
   ub <- 1 - lb
 
@@ -191,371 +420,92 @@ get_edgelist <- function (obj, ci=0.9, transform=TRUE) {
     edge_samples <- edge_transform(obj)
   }
 
-  edge_lower <- apply(edge_samples, 2, function(x) quantile(x, probs=lb))
-  edge_upper <- apply(edge_samples, 2, function(x) quantile(x, probs=ub))
-  edge_median <- apply(edge_samples, 2, function(x) quantile(x, probs=0.5))
+  quantiles <- edge_quantiles(edge_samples, ci)
 
   edgelist <- data.frame(
-    node_1 = node_names[1, ],
-    node_2 = node_names[2, ],
-    median = round(edge_median, 3),
-    lb = round(edge_lower, 3),
-    ub = round(edge_upper, 3),
-    row.names=NULL
+    node_1 = node_names[obj$dyad_to_idx[, 1]],
+    node_2 = node_names[obj$dyad_to_idx[, 2]],
+    median = round(quantiles[1, ], 3),
+    lb = round(quantiles[2, ], 3),
+    ub = round(quantiles[3, ], 3),
+    row.names = NULL
   )
-  colnames(edgelist)[4] <- paste0(as.character(lb * 100), "%")
-  colnames(edgelist)[5] <- paste0(as.character(ub * 100), "%")
+  colnames(edgelist)[4] <- paste0(format_percent(lb), "%")
+  colnames(edgelist)[5] <- paste0(format_percent(ub), "%")
   edgelist
 }
 
-#' Draw samples from edgelist posterior
+# Posterior median and credible interval bounds of each edge (columns of
+# edge_samples), unrounded: a 3 x num_edges matrix.
+edge_quantiles <- function(edge_samples, ci) {
+  lb <- 0.5 * (1 - ci)
+  apply(edge_samples, 2, stats::quantile, probs = c(0.5, lb, 1 - lb), names = FALSE)
+}
+
+check_ci <- function(ci) {
+  if (!is.numeric(ci) || length(ci) != 1 || ci <= 0 || ci >= 1) {
+    stop("`ci` must be a single number between 0 and 1, e.g. 0.9.", call. = FALSE)
+  }
+}
+
+format_percent <- function(p) {
+  format(round(p * 100, 2), scientific = FALSE, trim = TRUE, drop0trailing = TRUE)
+}
+
+#' Draw samples of the edge list from the posterior
 #'
-#' @param obj An S3 edge model object to be summarised.
-#' @param num_draws Number of sample distributions to draw from the posterior.
+#' Returns randomly chosen posterior draws of all the edge weights. Each draw
+#' is one plausible version of the network, consistent with the data. Use it
+#' to repeat an analysis in other software on many versions of the network, so
+#' the results include the uncertainty in the edge weights.
 #'
-#' @return A `data.frame` of sample draws from the posteriors, where each column corresponds to a posterior draw.
+#' @param obj A fitted `bison_model` object.
+#' @param num_draws Number of posterior draws to return. Draws are chosen
+#'   without replacement, unless more are requested than the model has.
+#' @param transform If `TRUE`, edge weights are on the natural scale
+#'   (probabilities or rates); if `FALSE` (the default, for backwards
+#'   compatibility) they're on the link scale (log-odds or log rates).
+#'
+#' @return A data frame with one row per dyad, columns `node_1` and `node_2`,
+#'   and one column per posterior draw (`draw.1`, `draw.2`, ...).
+#'
+#' @seealso [get_edgelist()] for a summary of each edge weight,
+#'   [bison_to_igraph()] for draws as igraph networks, and [extract_metric()]
+#'   for draws of network metrics.
+#'
+#' @examples
+#' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+#' fit_edge <- bison_model(
+#'   (event | effort) ~ dyad(node_1_id, node_2_id),
+#'   data = sim_data$df_sim,
+#'   model_type = "binary_conjugate",
+#'   priors = get_default_priors("binary_conjugate")
+#' )
+#' head(draw_edgelist_samples(fit_edge, num_draws = 3, transform = TRUE))
 #' @export
-draw_edgelist_samples <- function (obj, num_draws) {
-  node_names <- sapply(
-    1:nrow(obj$dyad_to_idx),
-    function(x) names(obj$node_to_idx)[obj$dyad_to_idx[x, ]]
+draw_edgelist_samples <- function(obj, num_draws, transform = FALSE) {
+  if (is.null(obj$dyad_to_idx)) {
+    stop("This model has no edge weights (it has no dyad() term).", call. = FALSE)
+  }
+  node_names <- names(obj$node_to_idx)
+  edge_samples <- if (transform) edge_transform(obj) else obj$chain
+  draw_ids <- sample_draw_ids(nrow(edge_samples), num_draws)
+  draws <- t(edge_samples[draw_ids, , drop = FALSE])
+  colnames(draws) <- paste0("draw.", seq_len(num_draws))
+  data.frame(
+    node_1 = factor(node_names[obj$dyad_to_idx[, 1]], levels = node_names),
+    node_2 = factor(node_names[obj$dyad_to_idx[, 2]], levels = node_names),
+    draws,
+    row.names = NULL,
+    check.names = FALSE
   )
-  edgelist_samples <- data.frame(
-    node_1 = factor(node_names[1, ], levels=names(obj$node_to_idx)),
-    node_2 = factor(node_names[2, ], levels=names(obj$node_to_idx)),
-    draw = t(obj$chain[sample(1:dim(obj$chain)[1], size=num_draws, replace=TRUE), ]),
-    row.names=NULL
-  )
-  edgelist_samples
 }
 
-plot_predictions.bison_model <- function(obj, num_draws=20, type=c("density", "point"), draw_data=TRUE) {
-
-  par(mfrow=c(1, length(type)))
-
-  if ("density" %in% type) {
-    # Density plot
-    event_preds <- obj$event_preds
-    df_draw <- data.frame(event=obj$model_data$event, dyad_id=obj$model_info$row_dyad_ids) # Get dyad IDs from somewhere sensible.
-    df_summed <- aggregate(event ~ as.factor(dyad_id), df_draw, sum)
-    obs_density <- density(df_summed$event)
-
-    pred_density <- list()
-    for (i in 1:num_draws) {
-      df_draw$event <- as.vector(event_preds[i, ])
-      df_summed <- aggregate(event ~ as.factor(dyad_id), df_draw, sum)
-      pred_density[[i]] <- density(df_summed$event)
-    }
-
-    xmin <- min(c(sapply(pred_density, function(x) x$x)))
-    xmax <- max(c(sapply(pred_density, function(x) x$x)))
-    ymax <- max(c(sapply(pred_density, function(x) x$y)))
-
-    # Only include observation extrema in the limit calculation if draw_data is TRUE to prevent information leakage
-    if (draw_data) {
-      xmin <- min(xmin, obs_density$x)
-      xmax <- max(xmax, obs_density$x)
-      ymax <- max(ymax, obs_density$y)
-    }
-
-    plot(NULL, main="Observed vs predicted social events", xlab="Social events", ylab="Probability",
-         xlim=c(xmin, xmax), ylim=c(0, ymax * 1.1))
-
-    for (i in 1:num_draws) {
-      lines(pred_density[[i]], col=col2rgba(bison_colors[1], 0.5))
-    }
-
-    if (draw_data) {
-      lines(obs_density, lwd=2)
-      legend("topright", legend=c("observed", "predicted"), fill=c("black", bison_colors[1]))
-    } else {
-      legend("topright", legend=c("predicted"), fill=c(bison_colors[1]))
-    }
+# Choose posterior draws at random: without replacement where possible,
+# with replacement if more draws are requested than are available.
+sample_draw_ids <- function(num_available, num_draws) {
+  if (num_draws < 1) {
+    stop("`num_draws` must be at least 1.", call. = FALSE)
   }
-
-  if ("point" %in% type) {
-    # Compare edge weights to point estimates
-    df_draw <- data.frame(event=obj$model_data$event, divisor=obj$model_data$divisor, dyad_id=obj$model_info$row_dyad_ids) # Get dyad IDs from somewhere sensible.
-    df_draw$dyad_id <- as.factor(df_draw$dyad_id)
-    df_summed <- aggregate(cbind(event, divisor) ~ dyad_id, df_draw, sum)
-    point_estimate <- df_summed$event/df_summed$divisor
-    dyad_ids <- as.integer(as.character(df_summed$dyad_id))
-    edgelist <- get_edgelist(obj)
-    bison_median <- edgelist[dyad_ids, 3]
-    bison_lower <- edgelist[dyad_ids, 4]
-    bison_upper <- edgelist[dyad_ids, 5]
-    edgelist_inner <- get_edgelist(obj, ci=0.5)
-    bison_inner_lower <- edgelist_inner[dyad_ids, 4]
-    bison_inner_upper <- edgelist_inner[dyad_ids, 5]
-    plot(point_estimate, bison_median, ylim=c(min(bison_lower), max(bison_upper)), main="Point vs BISoN estimates", xlab="Point estimates", ylab="BISoN estimates", col=rgb(0, 0, 0, 0))
-    abline(a=0, b=1)
-    segments(x0=point_estimate, y0=bison_lower, x1=point_estimate, y1=bison_upper)
-    segments(x0=point_estimate, y0=bison_inner_lower, x1=point_estimate, y1=bison_inner_upper, lwd=5, col=bison_colors[1])
-  }
-
-  par(mfrow=c(1, 1))
-}
-
-#' Sociogram plot with uncertainty of a fitted edge weight model object
-#'
-#' @param obj An S3 edge model object to be summarised.
-#' @param ci Credible interval to use in plot, based on quantiles.
-#' @param lwd Line width scaling for edge weights
-#' @param threshold Edge weights below this will be removed from the visualisation (for plotting purposes only). NULL if no threshold should be applied.
-#'
-#' @export
-plot_network <- function(obj, ci=0.9, lwd=2, threshold=NULL) {
-  edgelist <- get_edgelist(obj, ci=ci, transform=TRUE)
-  threshold_ids <- rep(TRUE, nrow(edgelist))
-  if (!is.null(threshold)) {
-    threshold_ids <- edgelist[, 3] >= threshold
-  }
-  net <- igraph::graph_from_edgelist(as.matrix(edgelist[threshold_ids, 1:2]), directed=obj$directed)
-  lb <- edgelist[threshold_ids, 4]
-  ub <- edgelist[threshold_ids, 5]
-  coords <- igraph::layout_nicely(net)
-  igraph::plot.igraph(net, edge.width=lb * lwd, layout=coords, vertex.label.color="white", vertex.color=bison_colors[1], edge.color=rgb(0, 0, 0, 1), edge.arrow.size=0)
-  igraph::plot.igraph(net, edge.width=ub * lwd, layout=coords, vertex.label.color="white", vertex.color=bison_colors[1], edge.color=rgb(0, 0, 0, 0.3), edge.arrow.size=0, add=TRUE)
-  if (obj$directed) {
-    igraph::plot.igraph(net, edge.width=lb * 0, layout=coords, vertex.label.color="white", vertex.color=bison_colors[1], edge.color=rgb(0.5, 0.5, 0.5), add=TRUE)
-  }
-}
-
-get_bison_model_data <- function(formula, observations, directed, model_type) {
-  # Get model specification from formula
-  model_spec <- get_bison_model_spec(formula)
-
-  # Automatically detect and apply factor levels
-  if (!is.null(model_spec$node_1_name)) {
-    node_1_names <- dplyr::pull(observations, model_spec$node_1_name)
-    node_2_names <- dplyr::pull(observations, model_spec$node_2_name)
-    if (!is.factor(node_1_names) || !all(levels(node_1_names) == levels(node_2_names))) {
-      unique_node_names <- sort(unique(c(node_1_names, node_2_names)))
-      observations[, model_spec$node_1_name] <- factor(node_1_names, levels=unique_node_names)
-      observations[, model_spec$node_2_name] <- factor(node_2_names, levels=unique_node_names)
-    }
-  }
-
-  if (!is.null(model_spec$node_1_name)) {
-    # Get node to index mapping
-    node_to_idx <- 1:length(levels(dplyr::pull(observations, model_spec$node_1_name)))
-    names(node_to_idx) <- levels(dplyr::pull(observations, model_spec$node_1_name))
-
-    # Get number of nodes
-    num_nodes <- length(node_to_idx)
-
-    # Get dyad to index mapping
-
-    # Get unique dyads in both directions
-    unique_dyads_1 <- unique(cbind(
-      node_to_idx[dplyr::pull(observations, model_spec$node_1_name)],
-      node_to_idx[dplyr::pull(observations, model_spec$node_2_name)]
-    ))
-    unique_dyads_2 <- unique(cbind(
-      node_to_idx[dplyr::pull(observations, model_spec$node_2_name)],
-      node_to_idx[dplyr::pull(observations, model_spec$node_1_name)]
-    ))
-    if (directed == FALSE) {
-      dyad_to_idx <- unique_dyads_1
-      rownames(dyad_to_idx) <- 1:nrow(dyad_to_idx) # Assign dyad IDs
-
-      # Generate dyad names
-      dyad_names <- sapply(
-        1:nrow(dyad_to_idx),
-        function(x) paste0(names(node_to_idx)[dyad_to_idx[x, ]], collapse=" <-> ")
-      )
-    } else {
-      dyad_to_idx = unique(rbind(unique_dyads_1, unique_dyads_2))
-      rownames(dyad_to_idx) <- 1:nrow(dyad_to_idx) # Assign dyad IDs
-
-      # Generate dyad names
-      dyad_names <- sapply(
-        1:nrow(dyad_to_idx),
-        function(x) paste0(names(node_to_idx)[dyad_to_idx[x, ]], collapse=" -> ")
-      )
-    }
-    num_dyads <- nrow(dyad_to_idx)
-  } else {
-    dyad_ids = rep(1, nrow(observations))
-    node_1_names = NULL
-    node_2_names = NULL
-    node_to_idx = NULL
-    dyad_to_idx = NULL
-    dyad_names = NULL
-    num_nodes = 0
-    num_dyads = 0
-  }
-
-  # Get events
-  event <- dplyr::pull(observations, model_spec$event_var_name)
-
-  # Create empty design matrices for fixed (design_fixed) and random (design_random) effects
-  design_fixed <- data.frame(empty_col = rep(0, nrow(observations)))
-  design_random <- data.frame(empty_col = rep(0, nrow(observations)))
-
-  # Add intercept term if needed
-  if (model_spec$intercept) {
-    design_fixed[, "intercept"] <- 1
-  }
-
-  # If using dyad-level weights, populate design matrix
-  if (!is.null(model_spec$node_1_name)) {
-    # Get dyad IDs in the correct order
-    node_1_names <- dplyr::pull(observations, model_spec$node_1_name)
-    node_2_names <- dplyr::pull(observations, model_spec$node_2_name)
-
-    dyad_ids = as.factor(get_dyad_ids(
-      node_to_idx[node_1_names],
-      node_to_idx[node_2_names],
-      dyad_to_idx,
-      directed=directed
-    ))
-  }
-
-  # Variable grouping for random effects
-  random_group_index <- c()
-
-  # Get additional fixed effects
-  if (!is.null(model_spec$fixed)) {
-    for (term_name in model_spec$fixed) {
-      # If it's a factor, create a column for each level.
-      if (is.factor(dplyr::pull(observations, term_name))) {
-        var_group <- paste0("fixed_", term_name)
-        term_levels <- levels(dplyr::pull(observations, term_name))
-        for (term_level in term_levels) {
-          new_term_name <-  paste0("fixed_", term_name, term_level)
-          design_fixed[, new_term_name] <- 1 * (dplyr::pull(observations, term_name) == term_level)
-        }
-      } else {
-        # Otherwise, create a single column:
-        new_term_name <- paste0(c("fixed_", term_name), collapse="")
-        design_fixed[, new_term_name] <- dplyr::pull(observations, term_name)
-      }
-    }
-  }
-
-  # Get additional random effects
-  if (!is.null(model_spec$random)) {
-    for (term_name in model_spec$random) {
-      var_group <- paste0("random_", term_name)
-      term_levels <- levels(as.factor(dplyr::pull(observations, term_name)))
-      for (term_level in term_levels) {
-        new_term_name <-  paste0("random_", term_name, term_level)
-        design_random[, new_term_name] <- 1 * (as.factor(dplyr::pull(observations, term_name)) == term_level)
-        random_group_index[length(random_group_index) + 1] <- var_group
-      }
-    }
-  }
-
-  # Check if divisor is a real
-  if (!is.na(str_match(model_spec$divisor_var_name, "\\d+"))) {
-    divisor <- rep(as.numeric(model_spec$divisor_var_name), nrow(observations))
-  } else {
-    divisor <- dplyr::pull(observations, model_spec$divisor_var_name)
-  }
-
-  # If divisor is a single value, convert it to a list.
-  if (length(divisor) == 1) {
-    divisor <- rep(divisor, nrow(observations))
-  }
-
-  model_data <- list(
-    num_rows=nrow(design_fixed),
-    event=event,
-    divisor=divisor,
-    dyad_ids=dyad_ids,
-    design_fixed=data.matrix(design_fixed[, -1]),
-    design_random=data.matrix(design_random[, -1]),
-    num_edges = num_dyads,
-    num_fixed=ncol(as.matrix(design_fixed[, -1])),
-    num_random=ncol(as.matrix(design_random[, -1])),
-    num_random_groups=length(unique(random_group_index)),
-    random_group_index=as.integer(as.factor(random_group_index))
-  )
-
-  obj <- list(
-    model_data=model_data,
-    node_to_idx=node_to_idx,
-    dyad_to_idx=dyad_to_idx,
-    dyad_names=dyad_names,
-    num_nodes=num_nodes,
-    num_dyads=num_dyads,
-    row_dyad_ids=dyad_ids
-  )
-
-  return(obj)
-}
-
-get_bison_model_spec <- function(formula) {
-  model_spec <- list()
-
-  x <- str_split(deparse1(formula), "~")[[1]]
-  lhs <- x[1]
-  rhs <- x[2]
-
-  # Process left hand side
-  lhs_split <- str_split(lhs, "\\|")[[1]]
-  event_var_name <- lhs_split[1]
-  event_var_name <- str_replace_all(event_var_name, "\\(", "")
-  event_var_name <- str_replace_all(event_var_name, " ", "")
-  model_spec$event_var_name <- event_var_name
-
-  divisor_var_name <- lhs_split[2]
-  divisor_var_name <- str_replace_all(divisor_var_name, "\\)", "")
-  divisor_var_name <- str_replace_all(divisor_var_name, " ", "")
-  model_spec$divisor_var_name <- divisor_var_name
-
-  # Set intercept to false by default
-  model_spec$intercept <- FALSE
-
-  model_spec$fixed <- c()
-  model_spec$random <- c()
-
-  rhs_split <- str_split(rhs, "\\+")[[1]]
-  for (term in rhs_split) {
-    term <- str_replace_all(term, " ", "")
-    # Is it an intercept, a dyad, a fixed effect, or a random effect?
-    if (!is.na(str_match(term, "^0|1$"))) {
-      # Intercept
-      if (term == "0") {
-        model_spec$intercept <- FALSE
-      } else {
-        model_spec$intercept <- TRUE
-      }
-    } else if (!is.na(str_match(term, "^dyad\\(.*,.*\\)$")[[1]])) {
-      # dyad(,) term
-      node_names <- str_split(term, "\\(|\\)")[[1]][2]
-      node_names <- str_replace_all(node_names, " ", "")
-      node_names_split <- str_split(node_names, ",")[[1]]
-      model_spec$node_1_name <- node_names_split[1]
-      model_spec$node_2_name <- node_names_split[2]
-    } else if (is.na(str_match(term, "[^a-zA-Z0-9_]"))) {
-      # Fixed effect
-      model_spec$fixed[length(model_spec$fixed) + 1] <- term
-    } else if (!is.na(str_match(term, "^\\(1\\|.*\\)$"))) {
-      # Random intercept
-      term_name <- str_split(term, "\\(|\\||\\)")[[1]][3]
-      model_spec$random[length(model_spec$random) + 1] <- term_name
-    } else {
-      warning(paste0("Formula term \"", term, "\" not supported by bisonR. Check the formula is correctly specified."))
-    }
-  }
-
-  model_spec
-}
-
-get_dyad_ids <- function(node_id_1, node_id_2, dyad_to_idx, directed) {
-  dyad_ids <- rep(NA, length(node_id_1))
-  for (i in 1:length(node_id_1)) {
-    if (directed == TRUE) {
-      dyad_ids[i] <- which(dyad_to_idx[, 1] == node_id_1[i] & dyad_to_idx[, 2] == node_id_2[i])[[1]]
-    }
-    if (directed == FALSE) {
-      dyad_ids[i] <- which(
-        (dyad_to_idx[, 1] == node_id_1[i] & dyad_to_idx[, 2] == node_id_2[i]) |
-        (dyad_to_idx[, 1] == node_id_2[i] & dyad_to_idx[, 2] == node_id_1[i])
-      )[[1]]
-    }
-  }
-  dyad_ids
+  sample.int(num_available, size = num_draws, replace = num_draws > num_available)
 }

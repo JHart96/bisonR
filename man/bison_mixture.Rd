@@ -2,22 +2,77 @@
 % Please edit documentation in R/bison_mixture.R
 \name{bison_mixture}
 \alias{bison_mixture}
-\title{Fit a dyadic mixture model}
+\title{Fit an edge mixture model}
 \usage{
-bison_mixture(edgemodel, num_components = 5, criterion = "ICL", verbose = TRUE)
+bison_mixture(
+  edgemodel,
+  num_components = 5,
+  criterion = c("ICL", "BIC"),
+  verbose = TRUE,
+  num_draws = 200
+)
 }
 \arguments{
-\item{edgemodel}{A fitted edge weight model.}
+\item{edgemodel}{A fitted \code{bison_model} object.}
 
-\item{num_components}{Maximum number of components to fit.}
+\item{num_components}{Maximum number of components to consider.}
 
-\item{criterion}{"ICL" or "BIC" describing the criterion to use for model comparison.}
+\item{criterion}{\code{"ICL"} (default) or \code{"BIC"}: the information criterion used
+to weigh the different numbers of components. BIC (Bayesian information
+criterion) measures how well the mixture fits the edge weights. ICL
+(integrated completed likelihood) also penalises components that overlap,
+so it favours clearly separated clusters.}
 
-\item{verbose}{TRUE/FALSE indicating whether to output messages and progress when fitting.}
+\item{verbose}{Whether to show a progress bar.}
+
+\item{num_draws}{Number of posterior draws to fit mixtures to (at most the
+number available). More draws give more precise probabilities but take
+longer.}
 }
 \value{
-A bison_mixture object
+A \code{bison_mixture} object. Use \code{summary()} on it for an overview,
+\code{\link[=get_network_component_probabilities]{get_network_component_probabilities()}} for the probability of each number
+of components, \code{\link[=get_edge_component_probabilities]{get_edge_component_probabilities()}} for the component of
+each edge, \code{\link[=get_component_means]{get_component_means()}} for the component means, and
+\code{\link[=plot_mixture]{plot_mixture()}} to plot them. Its \code{draw_ids} element gives the rows of
+\code{edgemodel$edge_samples} used for each mixture draw, so component
+assignments can be matched to the edge weights of the same draw.
 }
 \description{
-Fit a dyadic mixture model
+Looks for clusters (components) in the edge weights, which can be interpreted
+as different types of social relationship, such as weak and strong bonds.
+Use it after \code{\link[=bison_model]{bison_model()}} to ask whether the network contains distinct
+types of edge, and which edges belong to each type.
+}
+\details{
+A Gaussian mixture model describes the edge weights as coming from
+several normal distributions (the components), each with its own mean and
+spread. It is fitted with the mclust package to the edge weights (on the
+link scale) in each of \code{num_draws} posterior draws, for every number of
+components from 1 to \code{num_components}. In each draw, the numbers of
+components are weighted by an information criterion, a measure of fit that
+penalises complexity. Averaging over draws gives the probability of each
+number of components, and of each edge belonging to each component, taking
+into account the uncertainty in the edge weights.
+
+Components are labelled in increasing order of their mean, so component 1 is
+always the weakest type of edge.
+}
+\examples{
+sim_data <- simulate_bison_model_mixture(
+  "binary", num_components = 2, component_weights = c(0.5, 0.5)
+)
+fit_edge <- bison_model(
+  (event | effort) ~ dyad(node_1_id, node_2_id),
+  data = sim_data$df_sim,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
+summary(fit_mixture)
+}
+\seealso{
+\code{\link[=get_network_component_probabilities]{get_network_component_probabilities()}},
+\code{\link[=get_edge_component_probabilities]{get_edge_component_probabilities()}}, \code{\link[=get_component_means]{get_component_means()}},
+\code{\link[=plot_mixture]{plot_mixture()}}
 }

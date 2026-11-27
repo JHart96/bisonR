@@ -2,20 +2,44 @@
 % Please edit documentation in R/simulations.R
 \name{simulate_bison_model_mixture}
 \alias{simulate_bison_model_mixture}
-\title{Simulate data for an edge model with mixture components}
+\title{Simulate observation data with several types of edge}
 \usage{
 simulate_bison_model_mixture(model_type, num_components, component_weights)
 }
 \arguments{
-\item{model_type}{Type of data to simulate, either "binary" or "count".}
+\item{model_type}{Type of data to simulate, \code{"binary"} or \code{"count"}.}
 
-\item{num_components}{Number of mixture components in the simulation (>=2).}
+\item{num_components}{Number of components in the simulation (at least 2).}
 
-\item{component_weights}{Vector of component weightings for each component. Must sum to 1.}
+\item{component_weights}{Vector giving the proportion of edges in each
+component, e.g. \code{c(0.5, 0.5)}. Must sum to 1.}
 }
 \value{
-A dataframe of the format accepted by edge weight models.
+A list with \code{df_sim}, the simulated observations, and \code{df_true}, the
+true edge weights on the link scale. \code{df_sim} has columns \code{node_1_id},
+\code{node_2_id}, \code{event} and \code{effort} (observation effort). It
+also has a \code{duration} column, identical to \code{effort}, for code written for
+earlier versions; new code should use \code{effort}.
 }
 \description{
-Simulate data for an edge model with mixture components
+Simulates observations of social events in an undirected network of 15
+nodes, where each edge belongs to one of several components (types of
+relationship) with different mean edge weights. Use it to try out
+\code{\link[=bison_mixture]{bison_mixture()}}, or to check that it recovers the true number of
+components.
+}
+\details{
+Component means are evenly spaced between -2.5 and 2.5 on the link
+scale (log-odds for binary data, log rates for count data), and edge weights
+within a component have a standard deviation of 0.5. Each dyad is observed
+between 1 and 20 times, and the data are summed to one row per dyad.
+}
+\examples{
+sim_data <- simulate_bison_model_mixture(
+  "binary", num_components = 2, component_weights = c(0.5, 0.5)
+)
+head(sim_data$df_sim)
+}
+\seealso{
+\code{\link[=bison_mixture]{bison_mixture()}}, \code{\link[=simulate_bison_model]{simulate_bison_model()}}
 }

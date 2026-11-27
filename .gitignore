@@ -8,3 +8,7 @@ docs/*
 .VSCodeCounter*
 /doc/
 /Meta/
+.DS_Store
+docs/
+Rplots.pdf
+.claude/

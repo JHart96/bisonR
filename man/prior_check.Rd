@@ -2,23 +2,37 @@
 % Please edit documentation in R/priors.R
 \name{prior_check}
 \alias{prior_check}
-\title{Prior checks}
+\title{Plot prior distributions}
 \usage{
 prior_check(priors, model_type, type = "density")
 }
 \arguments{
-\item{priors}{List of priors for a model, can be retrieved using \code{get_default_prior()}.}
+\item{priors}{List of priors for a model, as returned by \code{\link[=get_default_priors]{get_default_priors()}}.}
 
-\item{model_type}{Type of model the priors will be used for (same as the argument for \code{get_default_prior()}).}
+\item{model_type}{Type of model the priors will be used for, as in
+\code{\link[=get_default_priors]{get_default_priors()}}.}
 
-\item{type}{Type of prior check to run, \code{"value"} or \code{"prediction"}. Details below.}
+\item{type}{Type of plot. Only \code{"density"} is currently available.}
+}
+\value{
+\code{NULL}. The function is called for its plots.
 }
 \description{
-Prior checks
+Plots the density of each prior in a list, to check that the priors give
+reasonable weight to plausible values. Edge weight priors are shown on the
+natural scale (probabilities for binary models, rates for count models); other
+priors are shown on the scale on which they are defined. To see the data
+implied by the priors together, use \code{\link[=prior_predictive_check]{prior_predictive_check()}}.
 }
 \details{
-The parameter \code{type} determines what type of prior check to run. \code{type="value"} will
-plot the prior probability over the parameter value on the original scale. \code{type="predictive"}
-will run a prior predictive plot, where predictions from the model are generated using only
-prior probabilities (the model when not updated from the data).
+With \code{partial_pooling = TRUE} in \code{\link[=bison_model]{bison_model()}}, the second value of
+the edge prior is the scale of a half-normal prior on the spread of the edge
+weights, so the edge prior shown here is not the implied prior on each edge.
+}
+\examples{
+priors <- get_default_priors("binary")
+prior_check(priors, "binary")
+}
+\seealso{
+\code{\link[=get_default_priors]{get_default_priors()}}, \code{\link[=prior_predictive_check]{prior_predictive_check()}}
 }

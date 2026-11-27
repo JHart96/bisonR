@@ -2,18 +2,41 @@
 % Please edit documentation in R/bison_mixture.R
 \name{summary.bison_mixture}
 \alias{summary.bison_mixture}
-\title{Summary of a edge mixture model}
+\title{Summarise an edge mixture model}
 \usage{
 \method{summary}{bison_mixture}(object, ...)
 }
 \arguments{
-\item{object}{An S3 edge mixture model}
+\item{object}{A \code{bison_mixture} object from \code{\link[=bison_mixture]{bison_mixture()}}.}
 
-\item{...}{Additional arguments to be passed to summary calculations.}
+\item{...}{Not used.}
 }
 \value{
-Returns a summary object of an edge mixture model.
+A \code{summary.bison_mixture} object, which is printed as described
+above.
 }
 \description{
-Summary of a edge mixture model
+Summarises the results of \code{\link[=bison_mixture]{bison_mixture()}}. Printing the summary shows the
+most probable number of components and its probability, the probability of
+each number of components, and, for the most probable number, the posterior
+median of each component mean (on the natural scale) and the probability of
+the first few edges belonging to each component.
+}
+\examples{
+sim_data <- simulate_bison_model_mixture(
+  "count", num_components = 2, component_weights = c(0.5, 0.5)
+)
+fit_edge <- bison_model(
+  (event | effort) ~ dyad(node_1_id, node_2_id),
+  data = sim_data$df_sim,
+  model_type = "count_conjugate",
+  priors = get_default_priors("count_conjugate")
+)
+fit_mixture <- bison_mixture(fit_edge, num_components = 3, verbose = FALSE)
+summary(fit_mixture)
+}
+\seealso{
+\code{\link[=get_network_component_probabilities]{get_network_component_probabilities()}},
+\code{\link[=get_edge_component_probabilities]{get_edge_component_probabilities()}}, \code{\link[=get_component_means]{get_component_means()}} for the same
+results as data frames.
 }

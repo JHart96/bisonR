@@ -2,22 +2,62 @@
 % Please edit documentation in R/bison_brm.R
 \name{bison_brm_get_prior}
 \alias{bison_brm_get_prior}
-\title{Get priors for BISoN brm model}
+\title{List the priors of a bison_brm() regression}
 \usage{
-bison_brm_get_prior(formula, edgemodel_list, data_list, ...)
+bison_brm_get_prior(
+  formula,
+  edgemodel_list,
+  data_list,
+  scale = c("none", "centre", "z"),
+  subset = NULL,
+  z_score = FALSE,
+  ...
+)
 }
 \arguments{
-\item{formula}{A formula compatible with a brms model}
+\item{formula}{A brms formula containing one \code{bison()} term, as for
+\code{\link[=bison_brm]{bison_brm()}}.}
 
-\item{edgemodel_list}{A bisonR edge model (or a list of them)}
+\item{edgemodel_list}{A fitted \code{bison_model} object, or a list of them.}
 
-\item{data_list}{A dataframe of regression variables compatible with a brms model (or a list of them)}
+\item{data_list}{A data frame of regression variables, or a list of them,
+as for \code{\link[=bison_brm]{bison_brm()}}.}
 
-\item{...}{Additional parameters to be passed to brms::get_prior()}
+\item{scale, subset, z_score}{As for \code{\link[=bison_brm]{bison_brm()}}. The scale of the network
+variable affects the default priors, so use the same values as in
+\code{\link[=bison_brm]{bison_brm()}}.}
+
+\item{...}{Additional arguments passed to \code{\link[brms:get_prior]{brms::get_prior()}}, such as
+\code{family}.}
 }
 \value{
-The output from brms::get_prior()
+A data frame of priors (a \code{brmsprior} object) from
+\code{\link[brms:get_prior]{brms::get_prior()}}, with one row per parameter or class of parameters.
 }
 \description{
-Wrapper for brms::get_prior() for use with bison_brm.
+Shows the parameters of a \code{\link[=bison_brm]{bison_brm()}} regression that can be given priors,
+and their default priors, using \code{\link[brms:get_prior]{brms::get_prior()}}. Use it before fitting
+to choose priors, which can then be set with the \code{prior} argument of
+\code{\link[=bison_brm]{bison_brm()}}. A prior is the distribution that describes what is plausible
+for a parameter before seeing the data.
+}
+\examples{
+\dontshow{if (requireNamespace("brms", quietly = TRUE) && requireNamespace("mice", quietly = TRUE) && !identical(Sys.getenv("BISONR_TEST_BRMS"), "false")) withAutoprint(\{ # examplesIf}
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+df <- sim_data$df_sim
+fit_edge <- bison_model(
+  (event | effort) ~ dyad(node_1_id, node_2_id),
+  data = df,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+bison_brm_get_prior(
+  bison(edge_weight(node_1_id, node_2_id)) ~ age_diff + (1 | mm(node_1_id, node_2_id)),
+  fit_edge,
+  df
+)
+\dontshow{\}) # examplesIf}
+}
+\seealso{
+\code{\link[=bison_brm]{bison_brm()}}, \code{\link[brms:set_prior]{brms::set_prior()}}
 }

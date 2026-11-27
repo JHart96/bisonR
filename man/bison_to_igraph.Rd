@@ -2,18 +2,45 @@
 % Please edit documentation in R/utils.R
 \name{bison_to_igraph}
 \alias{bison_to_igraph}
-\title{Convert bisonR edgemodel posterior to igraph network objects}
+\title{Convert a fitted edge model into a list of igraph networks}
 \usage{
 bison_to_igraph(obj, num_draws = 1000)
 }
 \arguments{
-\item{obj}{bisonR edge model}
+\item{obj}{A fitted \code{bison_model} object.}
 
-\item{num_draws}{Number of draws to sample from network posterior}
+\item{num_draws}{Number of networks to draw from the posterior. Draws are
+chosen at random, without replacement unless more are requested than the
+model has.}
 }
 \value{
-List of igraph objects representing posterior distribution of networks
+A list of \code{igraph} objects, with edge weights in the \code{weight} edge
+attribute. Edges are only included for dyads in the model.
 }
 \description{
-Convert bisonR edgemodel posterior to igraph network objects
+Each network is one draw from the posterior distribution of networks, with
+edge weights on the natural scale (probabilities or rates). The vertices are
+always all the nodes in the model, in the same order as the model's node
+levels, so results can be matched back to node names.
+}
+\details{
+Use it to calculate network measures that \code{\link[=extract_metric]{extract_metric()}} doesn't
+provide, with functions from the igraph package or other software that reads
+igraph objects. Calculating a measure for every network gives its posterior
+distribution, which includes the uncertainty in the edge weights.
+}
+\examples{
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+fit_edge <- bison_model(
+  (event | effort) ~ dyad(node_1_id, node_2_id),
+  data = sim_data$df_sim,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+nets <- bison_to_igraph(fit_edge, num_draws = 10)
+# Posterior distribution of the strength of each node
+strengths <- sapply(nets, igraph::strength)
+}
+\seealso{
+\code{\link[=extract_metric]{extract_metric()}}, \code{\link[=draw_edgelist_samples]{draw_edgelist_samples()}}
 }

@@ -1,43 +1,59 @@
 ---
-title: "Installing cmdstanR on Windows"
+title: "Installing cmdstanr on Windows"
+description: >
+  Solutions to common problems when installing cmdstanr and CmdStan on Windows.
 output: rmarkdown::html_vignette
 author: "Jordan Hart, Joe Wilde"
 vignette: >
-  %\VignetteIndexEntry{Installing cmdstanR on Windows}
+  %\VignetteIndexEntry{Installing cmdstanr on Windows}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-# Introduction
+bisonR fits models with Stan, through the cmdstanr package and the CmdStan program. Installing these on Windows can be more involved than on other systems, particularly on managed or networked computers. This article lists problems we have encountered and solutions that have worked. The general installation instructions are in the [cmdstanr documentation](https://mc-stan.org/cmdstanr/articles/cmdstanr.html).
 
-The installation of cmdstanR can be troublesome on Windows computers, even more so for networked computers. Don't let this put you off though, once you get cmdstanR installed you'll be able to run bisonR and many other packages at speed and with less buggy-ness. In this article we've compiled a list of problems and fixes that have worked for us. In some cases we've resorted to editing the registry to fix some of the problems, but be careful when doing this and make sure only to make changes if you're confident, as the registry holds a lot of important information used by the OS. Don't change anything if you don't have a complete backup or don't fully understand what is being changed.
+## Before installing
 
-# Fixes
+CmdStan compiles models with a C++ toolchain, which on Windows is provided by [Rtools](https://cran.r-project.org/bin/windows/Rtools/). Install the version of Rtools that matches your version of R, then install cmdstanr and check the toolchain:
 
-## Installing into a network directory/issues with tar.exe
-
-If you're using a computer on a network (i.e. in most universities and businesses), there's a good chance that your `HOME` environment variable will be a network location. This will cause many problems with installation and even if it did work, would likely be much slower too. The easiest solution to this problem is to create a local directory (i.e. somewhere in your C drive that isn't indexed by network backups etc) called "cmdstan". This will be the install location for cmdstan, and you can specify this directory when using `install_cmdstan()`:
 ```r
-install_cmdstan(dir="C:/path/to/directory/cmdstan")
+install.packages("cmdstanr", repos = c("https://stan-dev.r-universe.dev", getOption("repos")))
+cmdstanr::check_cmdstan_toolchain(fix = TRUE)
+cmdstanr::install_cmdstan()
 ```
 
-## RTools 4.x was not found but is required to run CmdStan with R version 4.x.
+## Installing on a networked computer
 
-This problem occurs because an environment variable was not set properly when Rtools was installed. This appears to be a common problem, but it can be fixed by adding an environment variable `RTOOLS40_HOME` (for Rtools 4.0) or `RTOOLS42_HOME` (for Rtools 4.2). The environment variable should point to the location of your Rtools installation.
+On computers in universities and other organisations, the `HOME` directory is often on a network drive. Installing CmdStan there can fail (for example, with errors from `tar.exe`), or be very slow. Instead, create a folder on a local drive that isn't synchronised with the network, and install CmdStan there:
 
-## Supplied csv file is corrupt
-
-This occurs after running the sampler. We don't know the source of this problem, but installing the github version of `cmdstanR` seems to fix the problem. This can be done by running the following code:
 ```r
-remotes::install_github("stan-dev/cmdstanr")
+cmdstanr::install_cmdstan(dir = "C:/path/to/local/folder")
 ```
 
-If this doesn't work, make sure you're using the latest version of R (R 4.2.1) at the time of writing.
+cmdstanr may not find this installation in later sessions. If so, set its location at the start of each session (or in your `.Rprofile`), pointing to the folder for the installed version:
 
-## Error: CmdStan path has not been set yet.
+```r
+cmdstanr::set_cmdstan_path("C:/path/to/local/folder/cmdstan-2.36.0")
+```
 
-This can happen on the R session following the session in which you first installed cmdstanR. For some reason the environment variable `CMDSTAN`, which was set on installation, has been overwritten. We think this may be due to the configuration of managed computers. The solution to this problem is to set `CMDSTAN` to the path of your cmdstan installation. Specifically, this needs to point to the installation version directory (e.g. `.cmdstan/cmdstan-2.30.0`), rather than just the `.cmdstan/` or `cmdstan/` directory. 
+## "Rtools was not found but is required to run CmdStan"
 
-# Get in touch
+This happens when the environment variable that tells R where Rtools is installed hasn't been set. Check that the installed version of Rtools matches your version of R. If it does, set the variable for your version of Rtools (for example `RTOOLS44_HOME` for Rtools 4.4, or `RTOOLS45_HOME` for Rtools 4.5) to the folder where Rtools is installed, then restart R.
 
-Let us know if any of these fixes work or don't work for you, or if there are any more elegant ways to fix these issues. We've spent several hours trying to fix these issues and we hope the lessons we've learned will be useful!
+## "Supplied CSV file is corrupt"
+
+This error appears after sampling. We have not identified its cause, but updating cmdstanr to the latest version has fixed it for us:
+
+```r
+install.packages("cmdstanr", repos = c("https://stan-dev.r-universe.dev", getOption("repos")))
+```
+
+If the error continues, update R to the latest release.
+
+## "CmdStan path has not been set yet"
+
+This can happen in a new R session after CmdStan has been installed, usually on managed computers that do not keep the `CMDSTAN` environment variable set during installation. Set the path with `cmdstanr::set_cmdstan_path()` as shown above, or set the `CMDSTAN` environment variable to the folder for the installed version (for example `C:/Users/you/.cmdstan/cmdstan-2.36.0`), rather than to the `.cmdstan` folder that contains it.
+
+## Other problems
+
+If none of these solutions work, please ask in [Discussions](https://github.com/JHart96/bisonR/discussions), including the error message and your versions of R, Rtools and cmdstanr. Reports of solutions that work on other systems are also welcome.

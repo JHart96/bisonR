@@ -1,21 +1,22 @@
-# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
-# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master, dev]
+    branches: [main]
   pull_request:
-    branches: [main, master, dev]
+  workflow_dispatch:
 
 name: test-coverage
+
+permissions: read-all
 
 jobs:
   test-coverage:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      CMDSTAN_VERSION: "2.36.0"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -23,13 +24,65 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: covr
+          extra-packages: any::covr, any::xml2
+          needs: coverage
 
-      - name: Install cmdstan
+      # The runner image version is part of the cache keys, so CmdStan and the
+      # compiled models are rebuilt when GitHub updates the compilers.
+      - name: Set cache directory and image version
+        shell: bash
         run: |
-          cmdstanr::install_cmdstan()
+          echo "R_USER_CACHE_DIR=$RUNNER_TEMP/r-user-cache" >> "$GITHUB_ENV"
+          echo "IMAGE_VERSION=${ImageVersion:-unknown}" >> "$GITHUB_ENV"
+
+      # CmdStan and the compiled bisonR models are cached separately. CmdStan is
+      # saved straight after a successful install; models only after a
+      # successful job, so a cancelled job can't save a partial install.
+      - name: Restore CmdStan
+        id: cmdstan-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.cmdstan
+          key: cmdstan-v2-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ env.IMAGE_VERSION }}-release
+
+      - name: Restore compiled models
+        id: model-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/r-user-cache
+          key: models-v2-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ env.IMAGE_VERSION }}-release-${{ hashFiles('inst/stan/*.stan') }}
+
+      - name: Install CmdStan
+        id: install-cmdstan
+        if: steps.cmdstan-cache.outputs.cache-hit != 'true'
         shell: Rscript {0}
+        run: |
+          cmdstanr::install_cmdstan(version = Sys.getenv("CMDSTAN_VERSION"), cores = 2)
+          stopifnot(file.exists(file.path(cmdstanr::cmdstan_path(), "bin")))
+
+      - name: Save CmdStan
+        if: steps.install-cmdstan.outcome == 'success'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cmdstan
+          key: cmdstan-v2-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ env.IMAGE_VERSION }}-release
 
       - name: Test coverage
-        run: covr::codecov()
         shell: Rscript {0}
+        run: |
+          cov <- covr::package_coverage(quiet = FALSE, clean = FALSE,
+            install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package"))
+          print(cov)
+          covr::to_cobertura(cov)
+
+      - name: Save compiled models
+        if: success() && steps.model-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/r-user-cache
+          key: models-v2-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ env.IMAGE_VERSION }}-release-${{ hashFiles('inst/stan/*.stan') }}
+      - uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: false
+          files: ./cobertura.xml
+          token: ${{ secrets.CODECOV_TOKEN }}

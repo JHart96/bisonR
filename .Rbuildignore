@@ -1,10 +1,11 @@
-^bisonR\.Rproj$
-^\.Rproj\.user$
-^_pkgdown\.yml$
-^docs$
-^pkgdown$
 ^LICENSE\.md$
+^Meta$
+^\.Rproj\.user$
+^\.claude$
 ^\.github$
+^_pkgdown\.yml$
+^bisonR\.Rproj$
 ^codecov\.yml$
 ^doc$
-^Meta$
+^docs$
+^pkgdown$

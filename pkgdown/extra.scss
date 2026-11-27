@@ -1,0 +1,226 @@
+// bisonR site theme. Colours and fonts are set in _pkgdown.yml (bslib);
+// this file adds the home page layout and finishing touches.
+
+$bison-teal: #2b7a78;
+$bison-teal-light: #d6e8e6;
+$bison-ink: #1f2a2e;
+
+// ---- General ---------------------------------------------------------------
+
+h1, h2, h3, .h1, .h2, .h3 {
+  letter-spacing: -0.01em;
+}
+
+.navbar {
+  border-bottom: 1px solid var(--bs-border-color);
+  .navbar-brand { font-family: $headings-font-family; font-weight: 600; font-size: 1.15rem; }
+  .nav-link { font-size: 0.9rem; font-weight: 400; border-radius: 0.4rem; }
+  // Space between items, so the hover and active highlights don't touch.
+  .navbar-nav { gap: 0.25rem; }
+  .form-control { font-size: 0.875rem; }
+}
+
+// Sidebars (page contents and the home page links): smaller than body text.
+aside {
+  font-size: 0.9rem;
+  h2 {
+    font-family: $font-family-base;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--bs-secondary-color);
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+  #toc .nav-link { font-size: 0.875rem; padding-top: 0.2rem; padding-bottom: 0.2rem; }
+}
+
+.navbar .version, .navbar .nav-text.text-muted {
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  background: rgba($bison-teal, 0.1);
+  color: $bison-teal !important;
+  font-size: 0.8rem;
+}
+
+a { text-underline-offset: 0.18em; }
+
+// Code blocks
+pre {
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.6rem;
+  background-color: rgba($bison-teal, 0.04);
+  padding: 1rem 1.1rem;
+}
+code { font-size: 0.875em; }
+
+// Show code exactly as typed (no ligatures turning <- or == into symbols).
+pre, code, kbd, samp {
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+}
+
+// Tables in articles and reference pages
+main table {
+  font-size: 0.95rem;
+  th { border-bottom-width: 2px; }
+  td, th { padding: 0.45rem 0.75rem; }
+}
+
+blockquote {
+  border-left: 3px solid $bison-teal;
+  padding: 0.25rem 0 0.25rem 1rem;
+  color: var(--bs-secondary-color);
+}
+
+// Article figures. pkgdown inverts images in dark mode, which would swap the
+// meaning of light and dark lines in network plots, so show plots unchanged on
+// a light card instead.
+main img {
+  border-radius: 0.6rem;
+}
+[data-bs-theme="dark"] main img:not([src$="hero-network.png"]) {
+  filter: none !important;
+  background: #fbfaf7;
+  padding: 0.5rem;
+}
+
+// Reference index
+.template-reference-index main h2 {
+  margin-top: 2.5rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+// ---- Home page --------------------------------------------------------------
+
+.template-home {
+  // pkgdown renders the README/index title as h1; we provide our own hero.
+  .page-header { display: none; }
+}
+
+.bison-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 2.5rem;
+  align-items: center;
+  margin: 1.5rem 0 3rem;
+}
+
+.bison-title {
+  font-size: clamp(2.2rem, 4vw, 2.9rem);
+  line-height: 1.1;
+  margin-bottom: 0.35rem;
+}
+
+.bison-subtitle {
+  font-family: $headings-font-family;
+  font-size: 1.25rem;
+  font-style: italic;
+  color: var(--bs-secondary-color);
+  margin-bottom: 1.25rem;
+}
+
+.bison-lead {
+  font-size: 1.05rem;
+  max-width: 38rem;
+}
+
+.bison-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.6rem;
+  .btn { padding-left: 1.1rem; padding-right: 1.1rem; font-weight: 500; }
+}
+
+.bison-hero-figure {
+  img { width: 100%; height: auto; display: block; background: none; padding: 0; }
+}
+
+.bison-features {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 3rem;
+}
+
+.bison-feature {
+  border: 1px solid var(--bs-border-color);
+  border-radius: 1rem;
+  padding: 1.4rem 1.4rem 1.2rem;
+  background: var(--bs-body-bg);
+  h3 { font-size: 1.2rem; margin-bottom: 0.6rem; }
+  p { color: var(--bs-secondary-color); font-size: 0.97rem; }
+  a { font-weight: 600; text-decoration: none; }
+}
+
+@media (max-width: 991.98px) {
+  .bison-hero { grid-template-columns: 1fr; gap: 1.75rem; }
+  .bison-features { grid-template-columns: 1fr; }
+}
+
+// ---- Dark mode ---------------------------------------------------------------
+
+[data-bs-theme="dark"] {
+  --bs-body-bg: #12191b;
+  --bs-body-color: #dfe7e6;
+  --bs-border-color: #2b3a3d;
+  --bs-link-color-rgb: 120, 199, 194;
+  --bs-link-hover-color-rgb: 160, 220, 215;
+
+  .navbar {
+    background-color: #172124 !important;
+    --bs-navbar-color: rgba(223, 231, 230, 0.8);
+    --bs-navbar-hover-color: #ffffff;
+    --bs-navbar-active-color: #ffffff;
+    --bs-navbar-brand-color: #ffffff;
+    --bs-navbar-brand-hover-color: #ffffff;
+  }
+  pre { background-color: rgba(120, 199, 194, 0.06); }
+  .btn-outline-primary { color: #78c7c2; border-color: #78c7c2; }
+  // Invert the home page network so dark edges stay visible on a dark background.
+  .bison-hero-figure img { filter: invert(1) hue-rotate(180deg) !important; background: none !important; padding: 0 !important; }
+  .navbar .version, .navbar .nav-text.text-muted { background: rgba(120, 199, 194, 0.12); color: #78c7c2 !important; }
+}
+
+// ---- Articles index ---------------------------------------------------------
+
+.bison-articles-index {
+  main h3 {
+    margin-top: 2.25rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--bs-border-color);
+  }
+  .section-desc p { color: var(--bs-secondary-color); margin-bottom: 0.9rem; }
+}
+
+.bison-article-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0;
+}
+
+.bison-article-card {
+  position: relative;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.75rem;
+  padding: 1rem 1.1rem 0.9rem;
+  background: var(--bs-body-bg);
+  dt { margin: 0 0 0.35rem; font-family: $headings-font-family; font-size: 1.1rem; font-weight: 600; }
+  dt a { text-decoration: none; }
+  // Make the whole card clickable.
+  dt a::after { content: ""; position: absolute; inset: 0; }
+  dd { margin: 0 !important; padding: 0 !important; color: var(--bs-secondary-color); font-size: 0.93rem; }
+  dd p { margin: 0; }
+  &:hover { border-color: rgba($bison-teal, 0.6); }
+  &:focus-within { outline: 2px solid $bison-teal; outline-offset: 2px; }
+  dt a:focus { outline: none; }
+}
+
+@media (max-width: 767.98px) {
+  .bison-article-grid { grid-template-columns: 1fr; }
+}
+

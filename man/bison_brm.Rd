@@ -2,7 +2,7 @@
 % Please edit documentation in R/bison_brm.R
 \name{bison_brm}
 \alias{bison_brm}
-\title{Fit a brms model on BISoN network data}
+\title{Fit a regression with a network metric}
 \usage{
 bison_brm(
   formula,
@@ -12,29 +12,121 @@ bison_brm(
   z_score = FALSE,
   cores = 4,
   chains = 2,
+  scale = c("none", "centre", "z"),
+  subset = NULL,
   ...
 )
 }
 \arguments{
-\item{formula}{A formula compatible with a brms model}
+\item{formula}{A brms formula containing one \code{bison()} term (see \emph{Details}).}
 
-\item{edgemodel_list}{A bisonR edge model (or a list of them)}
+\item{edgemodel_list}{A fitted \code{bison_model} object, or a list of them for
+an analysis of several networks.}
 
-\item{data_list}{A dataframe of regression variables compatible with a brms model (or a list of them)}
+\item{data_list}{A data frame of regression variables, or a list of data
+frames with one per edge model, in the same order. For edge and node
+metrics, each row refers to a dyad or node, and the columns named in the
+\code{bison()} term must hold node names that match the edge model. For global
+metrics, give one data frame with one row per edge model.}
 
-\item{num_draws}{Number of draws from the network posterior to use when fitting model}
+\item{num_draws}{Number of posterior draws of the network metric to use,
+which is the number of regressions fitted. 100 is a reasonable value for
+a final analysis; smaller values (such as 5 or 10) are useful while
+developing a model.}
 
-\item{z_score}{Whether to Z-score bison variable or not.}
+\item{z_score}{If \code{TRUE}, standardise the network variable within each
+posterior draw. Equivalent to \code{scale = "z"}.}
 
-\item{cores}{Number of computational cores to use.}
+\item{cores}{Number of processor cores to use.}
 
-\item{chains}{Number of chains to run per model.}
+\item{chains}{Number of MCMC chains to run for each regression. MCMC (Markov
+chain Monte Carlo) draws samples from the posterior; a chain is one
+independent run of the sampler.}
 
-\item{...}{Additional arguments to be passed to brm(), such as family or priors}
+\item{scale}{How to transform the network variable within each posterior
+draw: \code{"none"} (default), \code{"centre"} (subtract the mean) or \code{"z"} (subtract
+the mean and divide by the standard deviation). For edge and node metrics,
+transformations are applied across the rows used in the model, separately
+for each network, which removes differences in the average level between
+networks; use \code{"none"} to compare levels between networks. Global metrics
+have one value per network, so they are transformed across the networks.}
+
+\item{subset}{An optional logical expression, evaluated in each data frame,
+selecting the rows to use, e.g. \code{subset = sex == "F"}. Network metrics are
+still calculated from the whole network; only the rows of the regression
+are selected. Not available for global metrics.}
+
+\item{...}{Additional arguments passed to \code{\link[brms:brm_multiple]{brms::brm_multiple()}}, such as
+\code{family} or \code{prior}.}
 }
 \value{
-A fitted brms model
+A fitted brms model (a \code{brmsfit} object) combining the fits to all
+imputed datasets. Use \code{summary()}, \code{\link[brms:conditional_effects]{brms::conditional_effects()}} or
+\code{\link[brms:hypothesis]{brms::hypothesis()}} on it as for any brms model.
 }
 \description{
-Fit a brms model on BISoN network data
+Fits a Bayesian regression with the brms package in which a network metric,
+such as node strength or edge weight, is a response or predictor. The
+uncertainty in the metric, estimated by the edge model, is carried into the
+regression by multiple imputation. Use it after \code{\link[=bison_model]{bison_model()}} to test
+hypotheses about edges, nodes or whole networks, for example whether age
+predicts node strength.
+}
+\details{
+The network metric is written in the formula as a \code{bison()} term containing
+the metric and the data columns that identify its targets:
+\itemize{
+\item \code{bison(edge_weight(node_1_id, node_2_id))} for dyadic regression;
+\item \code{bison(node_strength(node_id))}, \code{bison(node_degree[0.2](node_id))} and so
+on for nodal regression;
+\item \code{bison(global_cv(bison_network))} and so on for global metrics, with one
+row of data per network.
+}
+
+The \code{bison()} term can be on either side of the formula, and the rest of the
+formula uses ordinary brms syntax, including random effects such as
+\code{(1 | mm(node_1_id, node_2_id))}. In the fitted model, the network variable is
+named after the metric, such as \code{bison_node_strength}. See \code{\link[=extract_metric]{extract_metric()}}
+for the metrics available.
+
+Multiple imputation repeats an analysis on several plausible versions of the
+data and combines the results. Here, each version uses one posterior draw of
+the network metric (see \code{\link[=bison_mice]{bison_mice()}}). \code{\link[brms:brm_multiple]{brms::brm_multiple()}} fits the
+regression to each version and combines the posterior draws of all the fits,
+so \code{num_draws} regressions are fitted and fitting time grows with
+\code{num_draws}. Models are fitted with the cmdstanr backend unless \code{backend} is
+given in \code{...}.
+
+Edge weights are used on the link scale (log-odds for binary models, log
+rates for count models). Node and global metrics are calculated from edge
+weights on the natural scale.
+
+With a list of edge models, a factor \code{bison_network} is added to the data,
+giving the position of each edge model in the list. It can be used as a
+predictor or random effect to compare networks.
+}
+\examples{
+\dontshow{if (requireNamespace("brms", quietly = TRUE) && requireNamespace("mice", quietly = TRUE) && !identical(Sys.getenv("BISONR_TEST_BRMS"), "false")) withAutoprint(\{ # examplesIf}
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+df <- sim_data$df_sim
+fit_edge <- bison_model(
+  (event | effort) ~ dyad(node_1_id, node_2_id),
+  data = df,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+# Does age difference predict edge weight? The multi-membership term accounts
+# for edges that share a node not being independent.
+fit_dyadic <- bison_brm(
+  bison(edge_weight(node_1_id, node_2_id)) ~ age_diff + (1 | mm(node_1_id, node_2_id)),
+  fit_edge,
+  df,
+  num_draws = 5 # Use more (e.g. 100) in a real analysis
+)
+summary(fit_dyadic)
+\dontshow{\}) # examplesIf}
+}
+\seealso{
+\code{\link[=bison_brm_get_prior]{bison_brm_get_prior()}} to see and set the priors of the
+regression, \code{\link[=bison_mice]{bison_mice()}} for the imputed data, and \code{\link[=extract_metric]{extract_metric()}}.
 }

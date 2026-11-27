@@ -2,19 +2,47 @@
 % Please edit documentation in R/bison_model.R
 \name{summary.bison_model}
 \alias{summary.bison_model}
-\title{Generates a summary object for an edge model object}
+\title{Summarise an edge weight model}
 \usage{
 \method{summary}{bison_model}(object, ci = 0.9, transform = TRUE, ...)
 }
 \arguments{
-\item{object}{An S3 edge model object to be summarised.}
+\item{object}{A fitted \code{bison_model} object.}
 
-\item{ci}{Credible interval to use in summary, based on quantiles.}
+\item{ci}{Width of the credible interval, e.g. \code{0.9} for a 90\% interval.}
 
-\item{transform}{\code{TRUE} or \code{FALSE} specifying whether to transform the edge weights from the internal link function scale.}
+\item{transform}{If \code{TRUE} (the default), edge weights are reported on the
+natural scale (probabilities for binary models, rates for count models).
+If \code{FALSE}, they're on the link scale used inside the model (log-odds for
+binary models, log rates for count models).
+In models with an intercept or other effects, the natural-scale values are
+for an observation where those effects are 0.}
 
-\item{...}{Additional arguments}
+\item{...}{Not used.}
+}
+\value{
+A \code{summary.bison_model} object. Printing it shows, for each dyad, the
+posterior median edge weight and the lower and upper bounds of the
+credible interval, followed by any other effects in the model (see
+\code{\link[=get_effects]{get_effects()}}).
 }
 \description{
-Generates a summary object for an edge model object
+Summarises a fitted edge model: the posterior median and credible interval
+of each edge weight, and of any other effects in the model. A credible
+interval contains the true value with the given probability, according to
+the model. Use \code{summary()} to check the estimates after fitting with
+\code{\link[=bison_model]{bison_model()}}.
+}
+\examples{
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+fit_edge <- bison_model(
+  (event | effort) ~ dyad(node_1_id, node_2_id),
+  data = sim_data$df_sim,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+summary(fit_edge, ci = 0.95)
+}
+\seealso{
+\code{\link[=get_edgelist]{get_edgelist()}} to get the edge weights as a data frame.
 }

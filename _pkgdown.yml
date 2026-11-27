@@ -1,19 +1,128 @@
 url: https://bisonr.org
+
 home:
-  title: BISoN R Package
+  title: "bisonR: Bayesian Inference of Social Networks"
+  description: >
+    Estimate animal social networks with uncertainty, and carry that
+    uncertainty through to plots, network metrics and regressions.
+  sidebar:
+    structure: [links, license, citation, authors, dev]
+
 template:
   bootstrap: 5
-  bootswatch: minty
+  light-switch: true
+  math-rendering: mathjax
+  bslib:
+    primary: "#2b7a78"
+    secondary: "#5b6b73"
+    success: "#3a8f5c"
+    info: "#45818e"
+    danger: "#c4453c"
+    body-bg: "#fbfaf7"
+    body-color: "#1f2a2e"
+    link-color: "#21706e"
+    border-radius: "0.6rem"
+    border-color: "#e3e1da"
+    base_font: {google: {family: "Source Sans 3", wght: [400, 600]}}
+    heading_font: {google: {family: "Source Serif 4", wght: [400, 600]}}
+    code_font: {google: "JetBrains Mono"}
+    font-size-base: "1.0625rem"
+    line-height-base: 1.65
+    headings-font-weight: 600
+    headings-line-height: 1.25
+    navbar-bg: "#ffffff"
+    pkgdown-nav-height: "72px"
+
 navbar:
-  bg: light
-  type: light
+  structure:
+    left: [start, articles, reference, news]
+    right: [search, github, lightswitch]
+  components:
+    start:
+      text: Get started
+      href: articles/getting_started.html
+    articles:
+      text: Articles
+      href: articles/index.html
+    github:
+      icon: fa-github
+      href: https://github.com/JHart96/bisonR
+      aria-label: GitHub
+
+articles:
+- title: Getting started
+  desc: Start here for a first analysis and the data format used by bisonR.
+  navbar: ~
+  contents: [getting_started, preparing_data]
+- title: Fitting models
+  desc: Priors, diagnostics and additional effects in edge weight models.
+  contents: [priors, diagnostics, edge_model_effects]
+- title: Types of data
+  desc: Worked analyses for directed networks, group-based observations and count data.
+  contents: [directed_networks, group_data, count_data]
+- title: Analyses
+  desc: Network metrics, regression, comparing networks, mixture models and working with posterior networks.
+  contents: [network_metrics, bison_brms, nodal_regression, comparing_networks, mixture_models, posterior_networks]
+- title: Help
+  contents: [windows_installation]
+
+reference:
+- title: Fitting edge weight models
+  desc: Estimate the network, with uncertainty, from observation data.
+  contents:
+  - bison_model
+  - get_default_priors
+  - prior_check
+  - prior_predictive_check
+- title: Checking models
+  desc: MCMC diagnostics, predictive checks and model comparison.
+  contents:
+  - plot_trace
+  - plot_predictions
+  - model_comparison
+- title: Exploring the network
+  contents:
+  - summary.bison_model
+  - get_edgelist
+  - get_effects
+  - draw_edgelist_samples
+  - plot_network
+  - bison_to_igraph
+- title: Network metrics
+  contents:
+  - extract_metric
+  - plot_metric
+- title: Regression
+  desc: Use network quantities in brms models while keeping their uncertainty.
+  contents:
+  - bison_brm
+  - bison_brm_get_prior
+  - bison_mice
+- title: Edge mixture models
+  desc: Look for different types of social relationship.
+  contents:
+  - bison_mixture
+  - summary.bison_mixture
+  - get_network_component_probabilities
+  - get_edge_component_probabilities
+  - get_component_means
+  - plot_mixture
+- title: Preparing data
+  contents:
+  - convert_gbi_to_bison
+  - convert_duration_to_binary
+  - simulate_bison_model
+  - simulate_bison_model_mixture
+- title: Saving models
+  contents:
+  - bison_save
+  - bison_load
+
 authors:
   Jordan Hart:
     href: https://jordanhart.co.uk/
-articles:
-- title: bisonR
-  navbar: bisonR
-  contents: [getting_started, bison_brms, mixture_models, network_metrics]
-- title: Help
-  navbar: Help
-  contents: [windows_installation]
+
+footer:
+  structure:
+    left: developed_by
+    right: built_with
