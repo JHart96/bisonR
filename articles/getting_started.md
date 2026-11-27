@@ -198,14 +198,14 @@ fit_edge <- bison_model(
 )
 #> Running MCMC with 4 parallel chains...
 #> 
-#> Chain 1 finished in 1.2 seconds.
-#> Chain 2 finished in 1.3 seconds.
-#> Chain 3 finished in 1.3 seconds.
+#> Chain 1 finished in 1.3 seconds.
+#> Chain 2 finished in 1.2 seconds.
 #> Chain 4 finished in 1.2 seconds.
+#> Chain 3 finished in 1.3 seconds.
 #> 
 #> All 4 chains finished successfully.
-#> Mean chain execution time: 1.2 seconds.
-#> Total execution time: 1.4 seconds.
+#> Mean chain execution time: 1.3 seconds.
+#> Total execution time: 1.5 seconds.
 ```
 
 Fitting time depends on the size of the dataset. The Stan models are

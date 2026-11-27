@@ -76,13 +76,13 @@ fit_edge <- bison_model(
 #> Running MCMC with 4 parallel chains...
 #> 
 #> Chain 1 finished in 1.0 seconds.
-#> Chain 2 finished in 1.0 seconds.
-#> Chain 3 finished in 1.0 seconds.
-#> Chain 4 finished in 1.0 seconds.
+#> Chain 2 finished in 1.1 seconds.
+#> Chain 3 finished in 1.1 seconds.
+#> Chain 4 finished in 1.1 seconds.
 #> 
 #> All 4 chains finished successfully.
-#> Mean chain execution time: 1.0 seconds.
-#> Total execution time: 1.3 seconds.
+#> Mean chain execution time: 1.1 seconds.
+#> Total execution time: 1.2 seconds.
 #> 
 get_effects(fit_edge)
 #>         effect      type median     5%    95%

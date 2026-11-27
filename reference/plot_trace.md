@@ -58,7 +58,7 @@ fit_edge <- bison_model(
 #> 
 #> All 4 chains finished successfully.
 #> Mean chain execution time: 0.2 seconds.
-#> Total execution time: 0.5 seconds.
+#> Total execution time: 0.4 seconds.
 #> 
 plot_trace(fit_edge, par_ids = 1:4)
 ```

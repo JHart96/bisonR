@@ -202,14 +202,14 @@ fit_group <- bison_model(
 )
 #> Running MCMC with 4 parallel chains...
 #> 
-#> Chain 2 finished in 17.0 seconds.
 #> Chain 3 finished in 17.2 seconds.
-#> Chain 1 finished in 18.0 seconds.
-#> Chain 4 finished in 18.2 seconds.
+#> Chain 2 finished in 17.4 seconds.
+#> Chain 1 finished in 18.2 seconds.
+#> Chain 4 finished in 18.0 seconds.
 #> 
 #> All 4 chains finished successfully.
-#> Mean chain execution time: 17.6 seconds.
-#> Total execution time: 18.5 seconds.
+#> Mean chain execution time: 17.7 seconds.
+#> Total execution time: 18.4 seconds.
 ```
 
 The edge weights are now estimated after accounting for the season and

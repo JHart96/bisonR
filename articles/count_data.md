@@ -195,7 +195,7 @@ fit_count <- bison_model(
 #> Chain 1 finished in 0.2 seconds.
 #> Chain 2 finished in 0.2 seconds.
 #> Chain 3 finished in 0.2 seconds.
-#> Chain 4 finished in 0.2 seconds.
+#> Chain 4 finished in 0.3 seconds.
 #> 
 #> All 4 chains finished successfully.
 #> Mean chain execution time: 0.2 seconds.

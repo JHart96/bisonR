@@ -19,7 +19,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/JHart96/bisonR/blob/main/inst/CITATION)
+[`inst/CITATION`](https://github.com/JHart96/bisonR/blob/v1.0.0/inst/CITATION)
 
 Hart, J. D. A., Weiss, M. N., Franks, D. W., & Brent, L. J. N. (2023).
 BISoN: A Bayesian framework for inference of social networks. Methods in

@@ -88,9 +88,9 @@ nets <- bison_to_igraph(fit_edge, num_draws = 500)
 length(nets)
 #> [1] 500
 nets[[1]]
-#> IGRAPH d5f0a6a UNW- 12 66 -- 
+#> IGRAPH 0bcd734 UNW- 12 66 -- 
 #> + attr: name (v/c), weight (e/n)
-#> + edges from d5f0a6a (vertex names):
+#> + edges from 0bcd734 (vertex names):
 #>  [1] A--B A--C A--D A--E A--F A--G A--H A--I A--J A--K A--L B--C B--D B--E B--F
 #> [16] B--G B--H B--I B--J B--K B--L C--D C--E C--F C--G C--H C--I C--J C--K C--L
 #> [31] D--E D--F D--G D--H D--I D--J D--K D--L E--F E--G E--H E--I E--J E--K E--L

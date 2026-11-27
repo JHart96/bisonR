@@ -72,14 +72,14 @@ fit_edge <- bison_model((event | effort) ~ dyad(node_1_id, node_2_id),
 #> 
 #> All 4 chains finished successfully.
 #> Mean chain execution time: 0.5 seconds.
-#> Total execution time: 0.8 seconds.
+#> Total execution time: 0.7 seconds.
 #> 
 fit_null <- bison_model((event | effort) ~ 1,
                         data = sim_data$df_sim, model_type = "binary", priors = priors)
 #> Running MCMC with 4 parallel chains...
 #> 
 #> Chain 1 finished in 0.3 seconds.
-#> Chain 2 finished in 0.3 seconds.
+#> Chain 2 finished in 0.4 seconds.
 #> Chain 3 finished in 0.3 seconds.
 #> Chain 4 finished in 0.3 seconds.
 #> 
