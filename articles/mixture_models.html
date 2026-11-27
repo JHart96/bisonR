@@ -5,26 +5,34 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Edge mixture models • bisonR</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
-<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
-<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="icon" sizes="any" href="../favicon.ico">
-<link rel="manifest" href="../site.webmanifest">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_3-0.5.0/font.css" rel="stylesheet">
+<link href="../deps/JetBrains_Mono-0.5.0/font.css" rel="stylesheet">
+<link href="../deps/Source_Serif_4-0.5.0/font.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Edge mixture models">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><script src="../extra.js"></script><meta property="og:title" content="Edge mixture models">
+<meta name="description" content="Looking for different types of social relationship with edge mixture models.
+">
+<meta property="og:description" content="Looking for different types of social relationship with edge mixture models.
+">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">bisonR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,28 +41,24 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="../articles/getting_started.html">Get started</a></li>
+<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>bisonR</h6></li>
-    <li><a class="dropdown-item" href="../articles/getting_started.html">Getting started</a></li>
-    <li><a class="dropdown-item" href="../articles/bison_brms.html">Using brms with BISoN</a></li>
-    <li><a class="dropdown-item" href="../articles/mixture_models.html">Edge mixture models</a></li>
-    <li><a class="dropdown-item" href="../articles/network_metrics.html">Network metrics</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Help</h6></li>
-    <li><a class="dropdown-item" href="../articles/windows_installation.html">Installing cmdstanR on Windows</a></li>
-  </ul>
-</li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JHart96/bisonR/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JHart96/bisonR" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -77,379 +81,251 @@
 
     
     
-<div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
-</h2>
-<p>Edge mixture models can be used to detect different types of social
-connections by looking for clustering in edge weights. bisonR provides
-support for edge mixture models with the <code>bison_mixture</code>
-function. There are two key outputs from a bisonR edge mixture model.
-First it generates a posterior probability distribution over the number
-of components (clusters, interpreted associal connection types), from 1
-to a maximum
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>,
-over the entire network. Secondly, for each edge it calculates the
-probability that each dyad belongs to each possible component. To show
-how this all works, first we’ll load in bisonR and simulate some
-data:</p>
+<p>Edge mixture models look for clusters in edge weights, which can be
+interpreted as different types of social relationship (for example, weak
+and strong associations). A Gaussian mixture model describes the edge
+weights as a combination of several normal distributions, called
+components. <code><a href="../reference/bison_mixture.html">bison_mixture()</a></code> fits these models to the edge
+weights in many posterior draws of the network (each draw is one
+possible network that is consistent with the data). It gives two main
+results:</p>
+<ul>
+<li>the probability of each number of components (clusters), from 1 to a
+maximum <span class="math inline">\(K\)</span>, for the whole
+network;</li>
+<li>for each dyad, the probability that its edge belongs to each
+component.</li>
+</ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bisonr.org">bisonR</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: cmdstanr</span></span>
-<span><span class="co">#&gt; This is cmdstanr version 0.9.0.9002</span></span>
-<span><span class="co">#&gt; - CmdStanR documentation and vignettes: mc-stan.org/cmdstanr</span></span>
-<span><span class="co">#&gt; - CmdStan path: /home/runner/.cmdstan/cmdstan-2.40.0</span></span>
-<span><span class="co">#&gt; - CmdStan version: 2.40.0</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     filter, lag</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r.igraph.org/" class="external-link">igraph</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'igraph'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:dplyr':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     as_data_frame, groups, union</span></span>
 <span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     decompose, spectrum</span></span>
 <span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     union</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/paul-buerkner/brms" class="external-link">brms</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: Rcpp</span></span>
-<span><span class="co">#&gt; Loading 'brms' package (version 2.23.0). Useful instructions</span></span>
-<span><span class="co">#&gt; can be found by typing help('brms'). A more detailed introduction</span></span>
-<span><span class="co">#&gt; to the package is available through vignette('brms_overview').</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'brms'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     ar</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mclust-org.github.io/mclust/" class="external-link">mclust</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Package 'mclust' version 6.1.4</span></span>
-<span><span class="co">#&gt; Type 'citation("mclust")' for citing this R package in publications.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'mclust'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:brms':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     me</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     count</span></span></code></pre></div>
-<p>In this example we simulate data from a binary edge model with 2
-underlying clusters (also called components), with dyads belong to
-either cluster with equal probability:</p>
+<span><span class="co">#&gt;     union</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="simulated-data">Simulated data<a class="anchor" aria-label="anchor" href="#simulated-data"></a>
+</h2>
+<p>The data are simulated from a count edge model in which each dyad
+belongs to one of two components with equal probability. The data are
+aggregated, with one row per dyad:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_bison_model_mixture.html">simulate_bison_model_mixture</a></span><span class="op">(</span><span class="st">"binary"</span>, num_components <span class="op">=</span> <span class="fl">2</span>, component_weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_bison_model_mixture.html">simulate_bison_model_mixture</a></span><span class="op">(</span><span class="st">"count"</span>, num_components <span class="op">=</span> <span class="fl">2</span>, component_weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">sim_data</span><span class="op">$</span><span class="va">df_sim</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 5</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Groups:   node_1_id [1]</span></span></span>
-<span><span class="co">#&gt;   node_1_id node_2_id event duration age_diff</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1         2            10       11        1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1         3             0        1        1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1         4            13       13        1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1         5            10       10        1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1         6             3       12        1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1         7            14       16        1</span></span></code></pre></div>
-<p>Since the data are already aggregated (e.g. a single row for each
-dyad), we can use the binary conjugate model for speed:</p>
+<span><span class="co">#&gt;   node_1_id node_2_id event    effort  duration</span></span>
+<span><span class="co">#&gt; 1         1         2   698  81.01022  81.01022</span></span>
+<span><span class="co">#&gt; 2         1         3  1706 146.60679 146.60679</span></span>
+<span><span class="co">#&gt; 3         1         4    21 170.27994 170.27994</span></span>
+<span><span class="co">#&gt; 4         1         5     6 156.03195 156.03195</span></span>
+<span><span class="co">#&gt; 5         1         6  1075  90.48502  90.48502</span></span>
+<span><span class="co">#&gt; 6         1         7   650  46.09167  46.09167</span></span></code></pre></div>
+<p>There are no observation-level effects, so the conjugate count model
+can be used. Conjugate models calculate the posterior directly, which is
+fast, but they cannot include extra effects:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_edge</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bison_model.html">bison_model</a></span><span class="op">(</span></span>
-<span>  <span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="va">duration</span><span class="op">)</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span><span class="op">)</span>, </span>
-<span>  data<span class="op">=</span><span class="va">df</span>, </span>
-<span>  model_type<span class="op">=</span><span class="st">"binary_conjugate"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; No priors set by user, using default priors instead. We recommend setting and checking priors explicitly for reliable inference.</span></span></code></pre></div>
-<p>We won’t conduct the usual checks for the sake of this tutorial, but
-at this point we’d recommend conducting diagnostic checks to ensure
-model fit. Once the model has fit well, we can use the
-<code><a href="../reference/bison_mixture.html">bison_mixture()</a></code> function to fit the edge mixture model:</p>
+<span>  <span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="va">effort</span><span class="op">)</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">df</span>,</span>
+<span>  model_type <span class="op">=</span> <span class="st">"count_conjugate"</span>,</span>
+<span>  priors <span class="op">=</span> <span class="fu"><a href="../reference/get_default_priors.html">get_default_priors</a></span><span class="op">(</span><span class="st">"count_conjugate"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>In a real analysis the edge model should be checked before fitting a
+mixture model (see <code><a href="../articles/diagnostics.html">vignette("diagnostics")</a></code>).</p>
+</div>
+<div class="section level2">
+<h2 id="fitting-the-mixture-model">Fitting the mixture model<a class="anchor" aria-label="anchor" href="#fitting-the-mixture-model"></a>
+</h2>
+<p><code>num_components</code> sets the largest number of components
+considered:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># verbose=FALSE for tutorial purposes</span></span>
-<span><span class="va">fit_mixture</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bison_mixture.html">bison_mixture</a></span><span class="op">(</span><span class="va">fit_edge</span>, num_components<span class="op">=</span><span class="fl">5</span>, verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">fit_mixture</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bison_mixture.html">bison_mixture</a></span><span class="op">(</span><span class="va">fit_edge</span>, num_components <span class="op">=</span> <span class="fl">5</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_mixture</span><span class="op">)</span></span>
 <span><span class="co">#&gt; === Fitted dyadic mixture model ===</span></span>
-<span><span class="co">#&gt; Maximum number of components: </span></span>
-<span><span class="co">#&gt; Best model: 1 components</span></span>
-<span><span class="co">#&gt; Probability of best model: 73.5%</span></span>
+<span><span class="co">#&gt; Maximum number of components: 5</span></span>
+<span><span class="co">#&gt; Most probable number of components: 2</span></span>
+<span><span class="co">#&gt; Posterior probability: 95.1%</span></span>
 <span><span class="co">#&gt; === Component probabilities ===</span></span>
-<span><span class="co">#&gt;            1     2     3     4 5</span></span>
-<span><span class="co">#&gt; P(K=k) 0.735 0.231 0.019 0.015 0</span></span>
-<span><span class="co">#&gt; === Component means for best model (K = 1) ===</span></span>
-<span><span class="co">#&gt;              1</span></span>
-<span><span class="co">#&gt; mean 0.5471098</span></span>
-<span><span class="co">#&gt; === Edge component probabilities for best model (K = 1) ===</span></span>
-<span><span class="co">#&gt;         1</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 2 1</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 3 1</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 4 1</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 5 1</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 6 1</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 7 1</span></span>
-<span><span class="co">#&gt; ...</span></span></code></pre></div>
-<p>There’s quite a bit going on in the summary, so let’s break it down.
-The top section shows the model that fits best and the probability
-assigned to that model. The second section shows the probabilities of
-the models corresponding to each number of components
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>K</mi><mo>=</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn><mo>,</mo><mi>.</mi><mi>.</mi><mi>.</mi></mrow><annotation encoding="application/x-tex">K = 1, 2, 3, ...</annotation></semantics></math>).
-You’ll notice the model with the highest probability is the same as the
-best fitting model from the section above. The final section shows the
-edge-level probabilities of component membership for the corresponding
-dyad. This can be interpreted as the probability a dyad belongs to a
-given component/cluster/social connection type.</p>
-<p>The information shown in the summary above can also be accessed using
-the functions <code><a href="../reference/get_network_component_probabilities.html">get_network_component_probabilities()</a></code> and
-<code><a href="../reference/get_edge_component_probabilities.html">get_edge_component_probabilities()</a></code>. These two functions
-make it possible to access the mixture model output programmatically for
-downstream analysis or plotting.</p>
-<p>To get network-level probabilities of the number of components, we
-can use <code><a href="../reference/get_network_component_probabilities.html">get_network_component_probabilities()</a></code> function:</p>
+<span><span class="co">#&gt;        1     2     3 4 5</span></span>
+<span><span class="co">#&gt; P(K=k) 0 0.951 0.049 0 0</span></span>
+<span><span class="co">#&gt; === Component means (K = 2) ===</span></span>
+<span><span class="co">#&gt;            1      2</span></span>
+<span><span class="co">#&gt; median 0.073 11.736</span></span>
+<span><span class="co">#&gt; === Edge component probabilities (K = 2) ===</span></span>
+<span><span class="co">#&gt;         1 2</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 2 0 1</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 3 0 1</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 4 1 0</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 5 1 0</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 6 0 1</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 7 0 1</span></span>
+<span><span class="co">#&gt; ... (99 more rows; see get_edge_component_probabilities())</span></span></code></pre></div>
+<p>The summary shows the most probable number of components and the
+probability of each number. For the most probable number, it also shows
+the posterior median of each component’s mean edge weight and the
+probability that each edge belongs to each component. Components are
+numbered in order of their means, so component 1 is always the weakest
+type of relationship.</p>
+<p>The same results can be extracted for further analysis.
+<code><a href="../reference/get_network_component_probabilities.html">get_network_component_probabilities()</a></code> gives the probability
+of each number of components:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_network_component_probabilities.html">get_network_component_probabilities</a></span><span class="op">(</span><span class="va">fit_mixture</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   num_components  probability</span></span>
-<span><span class="co">#&gt; 1              1 0.7345254805</span></span>
-<span><span class="co">#&gt; 2              2 0.2312023503</span></span>
-<span><span class="co">#&gt; 3              3 0.0188747949</span></span>
-<span><span class="co">#&gt; 4              4 0.0152140086</span></span>
-<span><span class="co">#&gt; 5              5 0.0001833657</span></span></code></pre></div>
-<p>To use probabilities over component membership for a given number of
-components, we can use the
-<code><a href="../reference/get_edge_component_probabilities.html">get_edge_component_probabilities()</a></code> function, where
-<code>3</code> is the number of components we assume to exist in the
-network:</p>
+<span><span class="co">#&gt; 1              1 4.538917e-29</span></span>
+<span><span class="co">#&gt; 2              2 9.509335e-01</span></span>
+<span><span class="co">#&gt; 3              3 4.906273e-02</span></span>
+<span><span class="co">#&gt; 4              4 3.778354e-06</span></span>
+<span><span class="co">#&gt; 5              5 2.880072e-08</span></span></code></pre></div>
+<p><code><a href="../reference/get_edge_component_probabilities.html">get_edge_component_probabilities()</a></code> gives, for a chosen
+number of components, the probability that each edge belongs to each
+component. Here two components are used, as in the simulation:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_edge_component_probabilities.html">get_edge_component_probabilities</a></span><span class="op">(</span><span class="va">fit_mixture</span>, <span class="fl">3</span><span class="op">)</span></span>
-<span><span class="co">#&gt;     node_1 node_2 P(K = 1) P(K = 2) P(K = 3)</span></span>
-<span><span class="co">#&gt; 1        1      2    0.015    0.425    0.560</span></span>
-<span><span class="co">#&gt; 2        1      3    0.605    0.260    0.135</span></span>
-<span><span class="co">#&gt; 3        1      4    0.000    0.310    0.690</span></span>
-<span><span class="co">#&gt; 4        1      5    0.000    0.340    0.660</span></span>
-<span><span class="co">#&gt; 5        1      6    0.790    0.155    0.055</span></span>
-<span><span class="co">#&gt; 6        1      7    0.030    0.460    0.510</span></span>
-<span><span class="co">#&gt; 7        1      8    0.935    0.060    0.005</span></span>
-<span><span class="co">#&gt; 8        1      9    0.925    0.075    0.000</span></span>
-<span><span class="co">#&gt; 9        1     10    0.925    0.070    0.005</span></span>
-<span><span class="co">#&gt; 10       1     11    0.850    0.125    0.025</span></span>
-<span><span class="co">#&gt; 11       1     12    0.895    0.095    0.010</span></span>
-<span><span class="co">#&gt; 12       1     13    0.960    0.040    0.000</span></span>
-<span><span class="co">#&gt; 13       1     14    0.650    0.250    0.100</span></span>
-<span><span class="co">#&gt; 14       1     15    0.005    0.270    0.725</span></span>
-<span><span class="co">#&gt; 15       2      3    0.860    0.115    0.025</span></span>
-<span><span class="co">#&gt; 16       2      4    0.015    0.455    0.530</span></span>
-<span><span class="co">#&gt; 17       2      5    0.085    0.430    0.485</span></span>
-<span><span class="co">#&gt; 18       2      6    0.035    0.355    0.610</span></span>
-<span><span class="co">#&gt; 19       2      7    0.000    0.385    0.615</span></span>
-<span><span class="co">#&gt; 20       2      8    0.935    0.055    0.010</span></span>
-<span><span class="co">#&gt; 21       2      9    0.795    0.190    0.015</span></span>
-<span><span class="co">#&gt; 22       2     10    0.930    0.070    0.000</span></span>
-<span><span class="co">#&gt; 23       2     11    0.925    0.075    0.000</span></span>
-<span><span class="co">#&gt; 24       2     12    0.010    0.450    0.540</span></span>
-<span><span class="co">#&gt; 25       2     13    0.920    0.075    0.005</span></span>
-<span><span class="co">#&gt; 26       2     14    0.090    0.410    0.500</span></span>
-<span><span class="co">#&gt; 27       2     15    0.935    0.055    0.010</span></span>
-<span><span class="co">#&gt; 28       3      4    0.170    0.450    0.380</span></span>
-<span><span class="co">#&gt; 29       3      5    0.915    0.080    0.005</span></span>
-<span><span class="co">#&gt; 30       3      6    0.005    0.490    0.505</span></span>
-<span><span class="co">#&gt; 31       3      7    0.000    0.420    0.580</span></span>
-<span><span class="co">#&gt; 32       3      8    0.000    0.375    0.625</span></span>
-<span><span class="co">#&gt; 33       3      9    0.230    0.430    0.340</span></span>
-<span><span class="co">#&gt; 34       3     10    0.000    0.395    0.605</span></span>
-<span><span class="co">#&gt; 35       3     11    0.835    0.135    0.030</span></span>
-<span><span class="co">#&gt; 36       3     12    0.930    0.060    0.010</span></span>
-<span><span class="co">#&gt; 37       3     13    0.940    0.055    0.005</span></span>
-<span><span class="co">#&gt; 38       3     14    0.910    0.085    0.005</span></span>
-<span><span class="co">#&gt; 39       3     15    0.940    0.060    0.000</span></span>
-<span><span class="co">#&gt; 40       4      5    0.625    0.220    0.155</span></span>
-<span><span class="co">#&gt; 41       4      6    0.035    0.405    0.560</span></span>
-<span><span class="co">#&gt; 42       4      7    0.015    0.420    0.565</span></span>
-<span><span class="co">#&gt; 43       4      8    0.935    0.060    0.005</span></span>
-<span><span class="co">#&gt; 44       4      9    0.000    0.310    0.690</span></span>
-<span><span class="co">#&gt; 45       4     10    0.005    0.405    0.590</span></span>
-<span><span class="co">#&gt; 46       4     11    0.935    0.065    0.000</span></span>
-<span><span class="co">#&gt; 47       4     12    0.245    0.455    0.300</span></span>
-<span><span class="co">#&gt; 48       4     13    0.030    0.425    0.545</span></span>
-<span><span class="co">#&gt; 49       4     14    0.940    0.055    0.005</span></span>
-<span><span class="co">#&gt; 50       4     15    0.945    0.050    0.005</span></span>
-<span><span class="co">#&gt; 51       5      6    0.085    0.415    0.500</span></span>
-<span><span class="co">#&gt; 52       5      7    0.910    0.080    0.010</span></span>
-<span><span class="co">#&gt; 53       5      8    0.660    0.255    0.085</span></span>
-<span><span class="co">#&gt; 54       5      9    0.000    0.300    0.700</span></span>
-<span><span class="co">#&gt; 55       5     10    0.925    0.070    0.005</span></span>
-<span><span class="co">#&gt; 56       5     11    0.020    0.450    0.530</span></span>
-<span><span class="co">#&gt; 57       5     12    0.005    0.380    0.615</span></span>
-<span><span class="co">#&gt; 58       5     13    0.000    0.370    0.630</span></span>
-<span><span class="co">#&gt; 59       5     14    0.005    0.405    0.590</span></span>
-<span><span class="co">#&gt; 60       5     15    0.015    0.510    0.475</span></span>
-<span><span class="co">#&gt; 61       6      7    0.000    0.350    0.650</span></span>
-<span><span class="co">#&gt; 62       6      8    0.010    0.370    0.620</span></span>
-<span><span class="co">#&gt; 63       6      9    0.670    0.245    0.085</span></span>
-<span><span class="co">#&gt; 64       6     10    0.065    0.485    0.450</span></span>
-<span><span class="co">#&gt; 65       6     11    0.090    0.440    0.470</span></span>
-<span><span class="co">#&gt; 66       6     12    0.620    0.295    0.085</span></span>
-<span><span class="co">#&gt; 67       6     13    0.000    0.300    0.700</span></span>
-<span><span class="co">#&gt; 68       6     14    0.080    0.410    0.510</span></span>
-<span><span class="co">#&gt; 69       6     15    0.945    0.045    0.010</span></span>
-<span><span class="co">#&gt; 70       7      8    0.940    0.055    0.005</span></span>
-<span><span class="co">#&gt; 71       7      9    0.000    0.435    0.565</span></span>
-<span><span class="co">#&gt; 72       7     10    0.940    0.050    0.010</span></span>
-<span><span class="co">#&gt; 73       7     11    0.025    0.475    0.500</span></span>
-<span><span class="co">#&gt; 74       7     12    0.000    0.380    0.620</span></span>
-<span><span class="co">#&gt; 75       7     13    0.000    0.360    0.640</span></span>
-<span><span class="co">#&gt; 76       7     14    0.005    0.400    0.595</span></span>
-<span><span class="co">#&gt; 77       7     15    0.890    0.090    0.020</span></span>
-<span><span class="co">#&gt; 78       8      9    0.000    0.280    0.720</span></span>
-<span><span class="co">#&gt; 79       8     10    0.945    0.055    0.000</span></span>
-<span><span class="co">#&gt; 80       8     11    0.000    0.310    0.690</span></span>
-<span><span class="co">#&gt; 81       8     12    0.925    0.065    0.010</span></span>
-<span><span class="co">#&gt; 82       8     13    0.015    0.460    0.525</span></span>
-<span><span class="co">#&gt; 83       8     14    0.925    0.075    0.000</span></span>
-<span><span class="co">#&gt; 84       8     15    0.005    0.445    0.550</span></span>
-<span><span class="co">#&gt; 85       9     10    0.000    0.405    0.595</span></span>
-<span><span class="co">#&gt; 86       9     11    0.915    0.065    0.020</span></span>
-<span><span class="co">#&gt; 87       9     12    0.000    0.320    0.680</span></span>
-<span><span class="co">#&gt; 88       9     13    0.810    0.120    0.070</span></span>
-<span><span class="co">#&gt; 89       9     14    0.000    0.435    0.565</span></span>
-<span><span class="co">#&gt; 90       9     15    0.005    0.380    0.615</span></span>
-<span><span class="co">#&gt; 91      10     11    0.005    0.455    0.540</span></span>
-<span><span class="co">#&gt; 92      10     12    0.935    0.065    0.000</span></span>
-<span><span class="co">#&gt; 93      10     13    0.020    0.380    0.600</span></span>
-<span><span class="co">#&gt; 94      10     14    0.000    0.255    0.745</span></span>
-<span><span class="co">#&gt; 95      10     15    0.935    0.065    0.000</span></span>
-<span><span class="co">#&gt; 96      11     12    0.000    0.425    0.575</span></span>
-<span><span class="co">#&gt; 97      11     13    0.000    0.415    0.585</span></span>
-<span><span class="co">#&gt; 98      11     14    0.665    0.220    0.115</span></span>
-<span><span class="co">#&gt; 99      11     15    0.960    0.030    0.010</span></span>
-<span><span class="co">#&gt; 100     12     13    0.960    0.035    0.005</span></span>
-<span><span class="co">#&gt; 101     12     14    0.025    0.475    0.500</span></span>
-<span><span class="co">#&gt; 102     12     15    0.000    0.425    0.575</span></span>
-<span><span class="co">#&gt; 103     13     14    0.910    0.090    0.000</span></span>
-<span><span class="co">#&gt; 104     13     15    0.000    0.285    0.715</span></span>
-<span><span class="co">#&gt; 105     14     15    0.225    0.460    0.315</span></span></code></pre></div>
-<p>It’s often useful to know where the mixture components are location,
-so we can get their posterior means using the
-<code><a href="../reference/get_component_means.html">get_component_means()</a></code> function for a given number of
-components. Here we’ll calculate the posterior means of the components
-for the mixture model with 3 components:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/get_edge_component_probabilities.html">get_edge_component_probabilities</a></span><span class="op">(</span><span class="va">fit_mixture</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   node_1 node_2 P(component 1) P(component 2)</span></span>
+<span><span class="co">#&gt; 1      1      2              0              1</span></span>
+<span><span class="co">#&gt; 2      1      3              0              1</span></span>
+<span><span class="co">#&gt; 3      1      4              1              0</span></span>
+<span><span class="co">#&gt; 4      1      5              1              0</span></span>
+<span><span class="co">#&gt; 5      1      6              0              1</span></span>
+<span><span class="co">#&gt; 6      1      7              0              1</span></span></code></pre></div>
+<p><code><a href="../reference/get_component_means.html">get_component_means()</a></code> gives the posterior median and
+credible interval of each component’s mean edge weight:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_component_means.html">get_component_means</a></span><span class="op">(</span><span class="va">fit_mixture</span>, <span class="fl">3</span><span class="op">)</span></span>
-<span><span class="co">#&gt;              50%         5%       95%</span></span>
-<span><span class="co">#&gt; K = 1 0.09508668 0.03845895 0.1298062</span></span>
-<span><span class="co">#&gt; K = 2 0.84673683 0.22354973 0.9533372</span></span>
-<span><span class="co">#&gt; K = 3 0.90170414 0.78050683 0.9976114</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_component_means.html">get_component_means</a></span><span class="op">(</span><span class="va">fit_mixture</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                     50%          5%         95%</span></span>
+<span><span class="co">#&gt; Component 1  0.07343781  0.06479166  0.08056646</span></span>
+<span><span class="co">#&gt; Component 2 11.73647180 11.60590011 11.84564248</span></span></code></pre></div>
+<p><code><a href="../reference/plot_mixture.html">plot_mixture()</a></code> shows the distribution of posterior
+median edge weights, with each edge coloured by its most probable
+component, and the posterior median and 90% interval of each component
+mean. By default it shows the most probable number of components; here
+the two-component model is shown:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_mixture.html">plot_mixture</a></span><span class="op">(</span><span class="va">fit_mixture</span>, num_components <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<p><img src="mixture_models_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level2">
-<h2 id="using-components-in-downstream-analysis">Using components in downstream analysis<a class="anchor" aria-label="anchor" href="#using-components-in-downstream-analysis"></a>
+<h2 id="choosing-the-information-criterion">Choosing the information criterion<a class="anchor" aria-label="anchor" href="#choosing-the-information-criterion"></a>
 </h2>
-<p>Now say that we’re interested in the number of strong vs weak
-partners. Specifically we want to know if the strength of connections
-only to strong partners predicts a node-level trait. This is a
-non-standard analysis so will require some manual data wrangling to fit
-the right kind of model.</p>
-<p>For demonstration purposes, we’ll create a dataframe that might be
-used for this kind of analysis:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">df_nodal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>node_id<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">node_1_id</span><span class="op">)</span><span class="op">)</span>, trait<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">15</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">df_nodal</span></span>
-<span><span class="co">#&gt;    node_id        trait</span></span>
-<span><span class="co">#&gt; 1        1 -0.163956869</span></span>
-<span><span class="co">#&gt; 2        2  0.417166376</span></span>
-<span><span class="co">#&gt; 3        3 -1.026529143</span></span>
-<span><span class="co">#&gt; 4        4  0.154483632</span></span>
-<span><span class="co">#&gt; 5        5  0.049465437</span></span>
-<span><span class="co">#&gt; 6        6 -0.418917019</span></span>
-<span><span class="co">#&gt; 7        7  1.124576040</span></span>
-<span><span class="co">#&gt; 8        8 -0.724778621</span></span>
-<span><span class="co">#&gt; 9        9  0.106686091</span></span>
-<span><span class="co">#&gt; 10      10  0.783754076</span></span>
-<span><span class="co">#&gt; 11      11 -0.721932177</span></span>
-<span><span class="co">#&gt; 12      12  0.465342170</span></span>
-<span><span class="co">#&gt; 13      13  0.057968075</span></span>
-<span><span class="co">#&gt; 14      14  0.811572887</span></span>
-<span><span class="co">#&gt; 15      15 -0.003290682</span></span></code></pre></div>
-<p>This dataframe will provide the information about traits that we need
-for the analysis. Next, we need to calculate strength using only
-individuals categorised as strong according to the mixture model. Since
-both component membership (strong or weak) <em>and</em> edge weights are
-probabilistic, we have to sample from both posteriors as we build a new
-posterior of mixture-based strength:</p>
+<p>The probability of each number of components is calculated from an
+information criterion, set with <code>criterion</code>, in each
+posterior draw of the network, and then averaged across draws. It is an
+approximation rather than a full posterior probability. An information
+criterion scores how well a model fits the data, with a penalty for each
+extra component. The default, <code>"ICL"</code> (integrated completed
+likelihood), adds a further penalty for components that overlap, so it
+favours fewer, well-separated components. <code>"BIC"</code> (Bayesian
+information criterion) does not include this extra penalty and can
+support more components when they overlap. Because edge weights are
+estimated with uncertainty, components often overlap, so the two
+criteria can give different results:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Set number of nodes and number of posterior samples</span></span>
-<span><span class="va">num_nodes</span> <span class="op">&lt;-</span> <span class="va">fit_edge</span><span class="op">$</span><span class="va">num_nodes</span></span>
-<span><span class="va">num_draws</span> <span class="op">&lt;-</span> <span class="fl">5</span> <span class="co"># Keep short for demo purposes.</span></span>
-<span></span>
-<span><span class="co"># Create a list of igraph networks from edgemodel to represent network posterior</span></span>
-<span><span class="va">nets</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bison_to_igraph.html">bison_to_igraph</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="va">num_draws</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Create an empty matrix to hold strengths of top mixture component</span></span>
-<span><span class="va">mix_strengths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">num_draws</span>, <span class="va">num_nodes</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Create an empty list for imputed versions of the dataframe</span></span>
-<span><span class="va">imputed_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Loop through each posterior sample and calculate strength of top mixture.</span></span>
-<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">num_draws</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="co"># Calculate edge components (1 if strong, 0 if weak)</span></span>
-<span>  <span class="va">edge_components</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">*</span> <span class="op">(</span><span class="va">fit_mixture</span><span class="op">$</span><span class="va">edge_component_samples</span><span class="op">[</span><span class="va">i</span>, <span class="fl">2</span>, <span class="op">]</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># If the edge is strong, don't change edge weight, but if it's weak then set to zero.</span></span>
-<span>  <span class="fu"><a href="https://r.igraph.org/reference/E.html" class="external-link">E</a></span><span class="op">(</span><span class="va">nets</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">weight</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r.igraph.org/reference/E.html" class="external-link">E</a></span><span class="op">(</span><span class="va">nets</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">weight</span> <span class="op">*</span> <span class="va">edge_components</span></span>
-<span>  </span>
-<span>  <span class="co"># Change the metric values of the imputed data to be mixture-based strength</span></span>
-<span>  <span class="va">imputed_data</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">df_nodal</span></span>
-<span>  <span class="va">imputed_data</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">mix_strength</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r.igraph.org/reference/strength.html" class="external-link">strength</a></span><span class="op">(</span><span class="va">nets</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="va">imputed_data</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt;    node_id        trait mix_strength</span></span>
-<span><span class="co">#&gt; 1        1 -0.163956869     5.022821</span></span>
-<span><span class="co">#&gt; 2        2  0.417166376     6.020381</span></span>
-<span><span class="co">#&gt; 3        3 -1.026529143     5.139991</span></span>
-<span><span class="co">#&gt; 4        4  0.154483632     6.716043</span></span>
-<span><span class="co">#&gt; 5        5  0.049465437     7.994020</span></span>
-<span><span class="co">#&gt; 6        6 -0.418917019     8.381191</span></span>
-<span><span class="co">#&gt; 7        7  1.124576040     8.500934</span></span>
-<span><span class="co">#&gt; 8        8 -0.724778621     5.236292</span></span>
-<span><span class="co">#&gt; 9        9  0.106686091     8.102017</span></span>
-<span><span class="co">#&gt; 10      10  0.783754076     6.080982</span></span>
-<span><span class="co">#&gt; 11      11 -0.721932177     5.932365</span></span>
-<span><span class="co">#&gt; 12      12  0.465342170     6.218257</span></span>
-<span><span class="co">#&gt; 13      13  0.057968075     6.985885</span></span>
-<span><span class="co">#&gt; 14      14  0.811572887     5.875518</span></span>
-<span><span class="co">#&gt; 15      15 -0.003290682     5.162626</span></span></code></pre></div>
-<p>Now we have a set of imputed dataframes containing the posteriors of
-mixture-based node strength, we can fit the model using
-brm_multiple.</p>
+<code class="sourceCode R"><span><span class="va">fit_mixture_bic</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bison_mixture.html">bison_mixture</a></span><span class="op">(</span><span class="va">fit_edge</span>, num_components <span class="op">=</span> <span class="fl">5</span>, criterion <span class="op">=</span> <span class="st">"BIC"</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/get_network_component_probabilities.html">get_network_component_probabilities</a></span><span class="op">(</span><span class="va">fit_mixture</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   num_components  probability</span></span>
+<span><span class="co">#&gt; 1              1 4.538917e-29</span></span>
+<span><span class="co">#&gt; 2              2 9.509335e-01</span></span>
+<span><span class="co">#&gt; 3              3 4.906273e-02</span></span>
+<span><span class="co">#&gt; 4              4 3.778354e-06</span></span>
+<span><span class="co">#&gt; 5              5 2.880072e-08</span></span>
+<span><span class="fu"><a href="../reference/get_network_component_probabilities.html">get_network_component_probabilities</a></span><span class="op">(</span><span class="va">fit_mixture_bic</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   num_components  probability</span></span>
+<span><span class="co">#&gt; 1              1 4.293633e-29</span></span>
+<span><span class="co">#&gt; 2              2 9.297643e-01</span></span>
+<span><span class="co">#&gt; 3              3 4.552982e-02</span></span>
+<span><span class="co">#&gt; 4              4 2.430812e-02</span></span>
+<span><span class="co">#&gt; 5              5 3.977640e-04</span></span></code></pre></div>
+<p>In this example both criteria give the highest probability to two
+components, the number used in the simulation. Where the two criteria
+disagree, the number of components should be interpreted with
+caution.</p>
+</div>
+<div class="section level2">
+<h2 id="using-components-in-further-analyses">Using components in further analyses<a class="anchor" aria-label="anchor" href="#using-components-in-further-analyses"></a>
+</h2>
+<p>Component membership can be used in other analyses. For example, the
+question might be whether the total strength of an individual’s
+<em>strong</em> relationships is related to a trait. For each posterior
+draw, edges assigned to the weaker component are set to zero, and node
+strength is calculated from the remaining edges. Both the edge weights
+and the component assignments are uncertain, so both are taken from the
+same posterior draw.</p>
+<p>A data frame of node traits, simulated for this example:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit_brm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://paulbuerkner.com/brms/reference/brm_multiple.html" class="external-link">brm_multiple</a></span><span class="op">(</span><span class="va">trait</span> <span class="op">~</span> <span class="va">mix_strength</span>, <span class="va">imputed_data</span>, silent<span class="op">=</span><span class="fl">2</span>, refresh<span class="op">=</span><span class="fl">0</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">df_nodal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>node_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">node_1_id</span><span class="op">)</span>, trait <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">15</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df_nodal</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   node_id       trait</span></span>
+<span><span class="co">#&gt; 1       1  1.01707313</span></span>
+<span><span class="co">#&gt; 2       2  0.48666567</span></span>
+<span><span class="co">#&gt; 3       3  0.26326237</span></span>
+<span><span class="co">#&gt; 4       4 -1.30498601</span></span>
+<span><span class="co">#&gt; 5       5  0.44131592</span></span>
+<span><span class="co">#&gt; 6       6  0.04251927</span></span></code></pre></div>
+<p><code>fit_mixture$draw_ids</code> records which posterior draws of
+the edge model were used by the mixture model, so the component
+assignments in mixture draw <code>i</code> can be matched to the edge
+weights of the same draw:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">num_draws</span> <span class="op">&lt;-</span> <span class="fl">5</span> <span class="co"># Use more (e.g. 100) in a real analysis</span></span>
+<span><span class="va">net</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bison_to_igraph.html">bison_to_igraph</a></span><span class="op">(</span><span class="va">fit_edge</span>, num_draws <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span></span>
+<span><span class="va">imputed_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">num_draws</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># Edge weights (rates) from the posterior draw used by mixture draw i</span></span>
+<span>  <span class="va">edge_weights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">fit_edge</span><span class="op">$</span><span class="va">edge_samples</span><span class="op">[</span><span class="va">fit_mixture</span><span class="op">$</span><span class="va">draw_ids</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="co"># Component assignments in the two-component model; component 2 is the stronger one</span></span>
+<span>  <span class="va">strong</span> <span class="op">&lt;-</span> <span class="va">fit_mixture</span><span class="op">$</span><span class="va">edge_component_samples</span><span class="op">[</span><span class="va">i</span>, <span class="fl">2</span>, <span class="op">]</span> <span class="op">==</span> <span class="fl">2</span></span>
+<span>  <span class="fu"><a href="https://r.igraph.org/reference/E.html" class="external-link">E</a></span><span class="op">(</span><span class="va">net</span><span class="op">)</span><span class="op">$</span><span class="va">weight</span> <span class="op">&lt;-</span> <span class="va">edge_weights</span> <span class="op">*</span> <span class="va">strong</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">df_nodal</span>, strong_strength <span class="op">=</span> <span class="fu"><a href="https://r.igraph.org/reference/strength.html" class="external-link">strength</a></span><span class="op">(</span><span class="va">net</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">imputed_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   node_id       trait strong_strength</span></span>
+<span><span class="co">#&gt; 1       1  1.01707313        90.69834</span></span>
+<span><span class="co">#&gt; 2       2  0.48666567       113.74316</span></span>
+<span><span class="co">#&gt; 3       3  0.26326237        74.35616</span></span>
+<span><span class="co">#&gt; 4       4 -1.30498601        61.40979</span></span>
+<span><span class="co">#&gt; 5       5  0.44131592        53.84517</span></span>
+<span><span class="co">#&gt; 6       6  0.04251927        76.12181</span></span></code></pre></div>
+<p>Each data frame is one possible version of the data. As in multiple
+imputation (a method for missing data), a regression can be fitted to
+each version and the results pooled, here with
+<code><a href="https://paulbuerkner.com/brms/reference/brm_multiple.html" class="external-link">brms::brm_multiple()</a></code>:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit_brm</span> <span class="op">&lt;-</span> <span class="fu">brms</span><span class="fu">::</span><span class="fu"><a href="https://paulbuerkner.com/brms/reference/brm_multiple.html" class="external-link">brm_multiple</a></span><span class="op">(</span></span>
+<span>  <span class="va">trait</span> <span class="op">~</span> <span class="va">strong_strength</span>, <span class="va">imputed_data</span>,</span>
+<span>  backend <span class="op">=</span> <span class="st">"cmdstanr"</span>, silent <span class="op">=</span> <span class="fl">2</span>, refresh <span class="op">=</span> <span class="fl">0</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: E-BFMI not computed because it is undefined for posterior chains of</span></span>
+<span><span class="co">#&gt; length less than 3.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_brm</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  Family: gaussian </span></span>
 <span><span class="co">#&gt;   Links: mu = identity </span></span>
-<span><span class="co">#&gt; Formula: trait ~ mix_strength </span></span>
+<span><span class="co">#&gt; Formula: trait ~ strong_strength </span></span>
 <span><span class="co">#&gt;    Data: imputed_data (Number of observations: 15) </span></span>
 <span><span class="co">#&gt;   Draws: 20 chains, each with iter = 2000; warmup = 1000; thin = 1;</span></span>
 <span><span class="co">#&gt;          total post-warmup draws = 20000</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Regression Coefficients:</span></span>
-<span><span class="co">#&gt;              Estimate Est.Error l-95% CI u-95% CI</span></span>
-<span><span class="co">#&gt; Intercept       -1.17      0.96    -3.07     0.75</span></span>
-<span><span class="co">#&gt; mix_strength     0.19      0.14    -0.10     0.48</span></span>
+<span><span class="co">#&gt;                 Estimate Est.Error l-95% CI u-95% CI</span></span>
+<span><span class="co">#&gt; Intercept           0.43      0.96    -1.46     2.33</span></span>
+<span><span class="co">#&gt; strong_strength    -0.00      0.01    -0.02     0.01</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Further Distributional Parameters:</span></span>
 <span><span class="co">#&gt;       Estimate Est.Error l-95% CI u-95% CI</span></span>
-<span><span class="co">#&gt; sigma     0.64      0.15     0.42     0.99</span></span>
+<span><span class="co">#&gt; sigma     1.05      0.23     0.71     1.62</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Draws were sampled using sampling(NUTS). Overall Rhat and ESS estimates</span></span>
+<span><span class="co">#&gt; Draws were sampled using sample(hmc). Overall Rhat and ESS estimates</span></span>
 <span><span class="co">#&gt; are not informative for brm_multiple models and are hence not displayed.</span></span>
 <span><span class="co">#&gt; Please see ?brm_multiple for how to assess convergence of such models.</span></span></code></pre></div>
-<p>This was a short tutorial on how to use <code><a href="../reference/bison_mixture.html">bison_mixture()</a></code>
-to fit mixture models in bisonR. If you have any questions please get in
-touch.</p>
+<p>The trait was simulated independently of the network, so the
+coefficient of <code>strong_strength</code> should be consistent with
+zero. <code><a href="../articles/bison_brms.html">vignette("bison_brms")</a></code> describes
+<code><a href="../reference/bison_brm.html">bison_brm()</a></code>, which carries out this kind of analysis for
+the standard network metrics.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -458,7 +334,7 @@ touch.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by <a href="https://jordanhart.co.uk/" class="external-link">Jordan Hart</a>.</p>
+  <p>Developed by <a href="https://jordanhart.co.uk/" class="external-link">Jordan Hart</a>, Michael N. Weiss, Daniel W. Franks, Lauren J. N. Brent, Samuel Ellis.</p>
 </div>
 
 <div class="pkgdown-footer-right">

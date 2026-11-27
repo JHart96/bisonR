@@ -5,26 +5,34 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Network metrics • bisonR</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
-<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
-<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="icon" sizes="any" href="../favicon.ico">
-<link rel="manifest" href="../site.webmanifest">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_3-0.5.0/font.css" rel="stylesheet">
+<link href="../deps/JetBrains_Mono-0.5.0/font.css" rel="stylesheet">
+<link href="../deps/Source_Serif_4-0.5.0/font.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Network metrics">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><script src="../extra.js"></script><meta property="og:title" content="Network metrics">
+<meta name="description" content="Definitions of the node, edge and global metrics available in bisonR, and how to extract their posterior distributions.
+">
+<meta property="og:description" content="Definitions of the node, edge and global metrics available in bisonR, and how to extract their posterior distributions.
+">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">bisonR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,28 +41,24 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="../articles/getting_started.html">Get started</a></li>
+<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>bisonR</h6></li>
-    <li><a class="dropdown-item" href="../articles/getting_started.html">Getting started</a></li>
-    <li><a class="dropdown-item" href="../articles/bison_brms.html">Using brms with BISoN</a></li>
-    <li><a class="dropdown-item" href="../articles/mixture_models.html">Edge mixture models</a></li>
-    <li><a class="dropdown-item" href="../articles/network_metrics.html">Network metrics</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Help</h6></li>
-    <li><a class="dropdown-item" href="../articles/windows_installation.html">Installing cmdstanR on Windows</a></li>
-  </ul>
-</li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JHart96/bisonR/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JHart96/bisonR" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -77,238 +81,244 @@
 
     
     
-<p>Network metrics can be extracted using the function
-<code>extract_metric(bison_model, metric_name)</code>. The
-<code>metric_name</code> variable is made up of two parts: the network
-feature and the network metric. For example, <code>node_eigen</code>
-will calculate the eigenvector centrality of each node.</p>
-<p>The following feature/metric pairs are currently supported in
-bisonR:</p>
-<ul>
-<li>
-<code>edge</code> - Edge-level properties
-<ul>
-<li>
-<code>weight</code> - Edge weight</li>
-</ul>
-</li>
-<li>
-<code>node</code> - Node-level properties
-<ul>
-<li>
-<code>degree[t]</code> - Node degree (where t is the binary
-threshold for an edge)</li>
-<li>
-<code>strength</code> - Node strength</li>
-<li>
-<code>eigen</code> - Node eigenvector centrality</li>
-<li>
-<code>betweenness</code> - Node betweenness</li>
-<li>
-<code>closeness</code> - Node closeness</li>
-<li>
-<code>clustering</code> - Node-level clustering coefficient</li>
-</ul>
-</li>
-<li>
-<code>global</code> - Network-level properties
-<ul>
-<li>
-<code>density</code> - Weighted density</li>
-<li>
-<code>cv</code> - Coefficient of variation of edge weights - also
-known as social differentiation</li>
-<li>
-<code>std</code> - Standard deviation of edge weights</li>
-<li>
-<code>diameter</code> - Diameter of the network</li>
-<li>
-<code>clustering</code> - Clustering coefficient of the network -
-also known as transitivity</li>
-</ul>
-</li>
-</ul>
+<p>Network metrics summarise the structure of a network, either for each
+individual (node metrics) or for the whole network (global metrics). The
+edge model gives a posterior distribution for each edge weight, and each
+sample from it (a <em>posterior draw</em>) is one possible network that
+is consistent with the data. bisonR calculates a metric for each
+posterior draw, which gives a posterior distribution for the metric.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bisonr.org">bisonR</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_bison_model.html">simulate_bison_model</a></span><span class="op">(</span><span class="st">"binary"</span>, aggregated <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">fit_edge</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bison_model.html">bison_model</a></span><span class="op">(</span></span>
+<span>  <span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="va">effort</span><span class="op">)</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">sim_data</span><span class="op">$</span><span class="va">df_sim</span>,</span>
+<span>  model_type <span class="op">=</span> <span class="st">"binary_conjugate"</span>,</span>
+<span>  priors <span class="op">=</span> <span class="fu"><a href="../reference/get_default_priors.html">get_default_priors</a></span><span class="op">(</span><span class="st">"binary_conjugate"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="extracting-metrics">Extracting metrics<a class="anchor" aria-label="anchor" href="#extracting-metrics"></a>
+</h2>
+<p>Metrics are calculated with
+<code>extract_metric(fit, metric_name)</code>. The name has two parts:
+the <em>target</em> (<code>edge</code>, <code>node</code> or
+<code>global</code>) and the <em>metric</em>, joined by an underscore,
+such as <code>node_strength</code> or <code>global_cv</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">strength</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"node_strength"</span>, num_draws <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">strength</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1000   10</span></span></code></pre></div>
+<p>The result has one row per posterior draw and one column per target:
+one column per node for node metrics (named after the nodes, in the
+order of the node levels), one per dyad for edge metrics, and a single
+column for global metrics. The columns can be summarised in the same way
+as any other posterior samples:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">strength</span>, <span class="fl">2</span>, <span class="va">quantile</span>, probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.5</span>, <span class="fl">0.95</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;          5%      50%      95%</span></span>
+<span><span class="co">#&gt; 1  3.251381 4.345390 5.363105</span></span>
+<span><span class="co">#&gt; 2  3.676587 4.565101 5.447701</span></span>
+<span><span class="co">#&gt; 3  3.343305 4.361036 5.367084</span></span>
+<span><span class="co">#&gt; 4  3.584986 4.528936 5.450037</span></span>
+<span><span class="co">#&gt; 5  2.909792 3.933265 4.889573</span></span>
+<span><span class="co">#&gt; 6  2.602736 3.599878 4.664193</span></span>
+<span><span class="co">#&gt; 7  3.773139 4.750287 5.680407</span></span>
+<span><span class="co">#&gt; 8  2.389676 3.293668 4.268710</span></span>
+<span><span class="co">#&gt; 9  3.266363 4.260105 5.171311</span></span>
+<span><span class="co">#&gt; 10 2.928467 3.888107 4.977658</span></span></code></pre></div>
+<p><code><a href="../reference/plot_metric.html">plot_metric()</a></code> plots the posterior distribution of a
+metric. Continuous metrics are shown as densities, and discrete metrics,
+such as degree, as bar charts (see the examples below):</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_metric.html">plot_metric</a></span><span class="op">(</span><span class="va">strength</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>, <span class="st">"Strength of node"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="network_metrics_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="100%"><img src="network_metrics_files/figure-html/unnamed-chunk-4-2.png" class="r-plt" alt="" width="100%"></p>
+<p>To use metrics in a regression, use <code><a href="../reference/bison_brm.html">bison_brm()</a></code> (see
+<code><a href="../articles/bison_brms.html">vignette("bison_brms")</a></code>) rather than summarising them first
+(for example as posterior means), so that the uncertainty in the metric
+is included in the regression.</p>
+</div>
+<div class="section level2">
+<h2 id="weighted-and-thresholded-metrics">Weighted and thresholded metrics<a class="anchor" aria-label="anchor" href="#weighted-and-thresholded-metrics"></a>
+</h2>
+<p>Unless stated otherwise, all metrics are calculated on the
+<strong>weighted</strong> network, using edge weights on the natural
+scale (probabilities for binary models, rates for count models). For
+example, <code>node_strength</code> is the weighted version of
+degree.</p>
+<p>Some metrics are only defined for networks where edges are either
+present or absent. These take a <strong>threshold</strong> in square
+brackets, such as <code>node_degree[0.2]</code>: in each posterior draw,
+edges with a weight at or above the threshold count as present and the
+rest as absent. For an unweighted version of a weighted metric (such as
+unweighted density), threshold the network in the same way. Results can
+depend on the threshold, so check whether conclusions change with
+different values.</p>
+</div>
+<div class="section level2">
+<h2 id="available-metrics">Available metrics<a class="anchor" aria-label="anchor" href="#available-metrics"></a>
+</h2>
+<div class="section level3">
+<h3 id="edge-metrics">Edge metrics<a class="anchor" aria-label="anchor" href="#edge-metrics"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>Name</th>
+<th>Definition</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td><code>edge_weight</code></td>
+<td>The edge weight of each dyad. On the natural scale by default; use
+<code>transform = FALSE</code> for the link scale (logit, or log-odds,
+for binary models and log for count models).</td>
+</tr></tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="node-metrics">Node metrics<a class="anchor" aria-label="anchor" href="#node-metrics"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>Name</th>
+<th>Definition</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>node_strength</code></td>
+<td>Sum of the weights of the node’s edges. How much a node associates
+in total.</td>
+</tr>
+<tr class="even">
+<td><code>node_degree[t]</code></td>
+<td>Number of edges with weight at or above <code>t</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>node_eigen</code></td>
+<td>Eigenvector centrality: high when a node has strong edges to nodes
+that are themselves central. Scaled so the most central node has a value
+of 1.</td>
+</tr>
+<tr class="even">
+<td><code>node_betweenness</code></td>
+<td>Betweenness: the number of shortest paths between other pairs of
+nodes that pass through the node, using 1/weight as the length of each
+edge (so strong edges are short).</td>
+</tr>
+<tr class="odd">
+<td><code>node_closeness</code></td>
+<td>Closeness: the inverse of the sum of shortest-path distances from
+the node to all other reachable nodes, using 1/weight as edge
+lengths.</td>
+</tr>
+<tr class="even">
+<td><code>node_clustering[t]</code></td>
+<td>Local clustering coefficient of the network thresholded at
+<code>t</code>: the proportion of pairs of the node’s associates that
+are also associates of each other. Nodes with fewer than two associates
+get 0.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="global-metrics">Global metrics<a class="anchor" aria-label="anchor" href="#global-metrics"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>Name</th>
+<th>Definition</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>global_density</code></td>
+<td>Mean edge weight across all dyads in the model (weighted
+density).</td>
+</tr>
+<tr class="even">
+<td><code>global_cv</code></td>
+<td>Coefficient of variation (SD / mean) of edge weights, also called
+social differentiation. High values mean relationships vary a lot in
+strength.</td>
+</tr>
+<tr class="odd">
+<td><code>global_std</code></td>
+<td>Standard deviation of edge weights.</td>
+</tr>
+<tr class="even">
+<td><code>global_diameter</code></td>
+<td>Length of the longest shortest path between any two nodes, using
+1/weight as edge lengths.</td>
+</tr>
+<tr class="odd">
+<td><code>global_clustering[t]</code></td>
+<td>Global clustering coefficient (transitivity) of the network
+thresholded at <code>t</code>: the proportion of connected triples that
+are closed triangles.</td>
+</tr>
+</tbody>
+</table>
+<p>Global metrics are calculated only from the dyads in the model, so
+dyads that do not appear in the data are not included.</p>
+</div>
+</div>
 <div class="section level2">
 <h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
 </h2>
-<p>See below for examples of how to generate the network metrics listed
-above.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bisonr.org">bisonR</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: cmdstanr</span></span>
-<span><span class="co">#&gt; This is cmdstanr version 0.9.0.9002</span></span>
-<span><span class="co">#&gt; - CmdStanR documentation and vignettes: mc-stan.org/cmdstanr</span></span>
-<span><span class="co">#&gt; - CmdStan path: /home/runner/.cmdstan/cmdstan-2.40.0</span></span>
-<span><span class="co">#&gt; - CmdStan version: 2.40.0</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     filter, lag</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_bison_model.html">simulate_bison_model</a></span><span class="op">(</span><span class="st">"binary"</span>, aggregated <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">sim_data</span><span class="op">$</span><span class="va">df_sim</span></span>
-<span></span>
-<span><span class="va">fit_edge</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bison_model.html">bison_model</a></span><span class="op">(</span></span>
-<span>  <span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="va">duration</span><span class="op">)</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span><span class="op">)</span>,</span>
-<span>  data<span class="op">=</span><span class="va">df</span>,</span>
-<span>  model_type<span class="op">=</span><span class="st">"binary_conjugate"</span>,</span>
-<span>  priors<span class="op">=</span><span class="fu"><a href="../reference/get_default_priors.html">get_default_priors</a></span><span class="op">(</span><span class="st">"binary_conjugate"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="edge">Edge<a class="anchor" aria-label="anchor" href="#edge"></a>
-</h3>
-<div class="section level4">
-<h4 id="edge-weight">Edge weight<a class="anchor" aria-label="anchor" href="#edge-weight"></a>
-</h4>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">metrics</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"edge_weight"</span>, num_draws<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
-<span><span class="va">metrics</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="co"># Preview first few samples and edges</span></span>
-<span><span class="co">#&gt;            [,1]      [,2]      [,3]      [,4]      [,5]</span></span>
-<span><span class="co">#&gt; [1,] -1.7763303 1.2071965 1.3689566 3.2731301 3.4882468</span></span>
-<span><span class="co">#&gt; [2,]  0.9357479 0.9649296 1.0682155 1.1780742 0.8553972</span></span>
-<span><span class="co">#&gt; [3,] -3.6258711 1.8834824 2.0402320 0.2606149 2.6947782</span></span>
-<span><span class="co">#&gt; [4,] -2.7593545 3.0038231 1.1405372 1.8913551 5.6115489</span></span>
-<span><span class="co">#&gt; [5,] -1.8913159 0.9642772 0.8170626 4.0066255 1.8581266</span></span>
-<span><span class="co">#&gt; [6,]  0.1826523 1.2889817 1.4426996 0.8583163 2.2183483</span></span></code></pre></div>
-</div>
-</div>
-<div class="section level3">
-<h3 id="node">Node<a class="anchor" aria-label="anchor" href="#node"></a>
-</h3>
-<div class="section level4">
-<h4 id="node-degree">Node degree<a class="anchor" aria-label="anchor" href="#node-degree"></a>
-</h4>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">metrics</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"node_degree[0.2]"</span><span class="op">)</span></span>
-<span><span class="va">metrics</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="co"># Preview first few samples and nodes</span></span>
-<span><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5]</span></span>
-<span><span class="co">#&gt; [1,]    8    7    5    6    8</span></span>
-<span><span class="co">#&gt; [2,]    8    7    8    8    4</span></span>
-<span><span class="co">#&gt; [3,]    8    5    7    8    7</span></span>
-<span><span class="co">#&gt; [4,]    9    6    5    8    8</span></span>
-<span><span class="co">#&gt; [5,]    7    6    8    7    6</span></span>
-<span><span class="co">#&gt; [6,]    8    5    8    7    6</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="node-strength">Node strength<a class="anchor" aria-label="anchor" href="#node-strength"></a>
-</h4>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">metrics</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"node_strength"</span>, num_draws<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
-<span><span class="va">metrics</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="co"># Preview first few samples and nodes</span></span>
-<span><span class="co">#&gt;          [,1]     [,2]     [,3]     [,4]     [,5]</span></span>
-<span><span class="co">#&gt; [1,] 5.250600 3.605330 4.044063 4.328342 4.147407</span></span>
-<span><span class="co">#&gt; [2,] 6.390623 3.869768 4.278853 5.145356 4.451589</span></span>
-<span><span class="co">#&gt; [3,] 6.153401 3.094590 4.164048 4.940242 4.975292</span></span>
-<span><span class="co">#&gt; [4,] 6.359865 3.531231 5.004913 5.160148 4.461221</span></span>
-<span><span class="co">#&gt; [5,] 5.756916 3.451609 4.778303 4.609269 4.311387</span></span>
-<span><span class="co">#&gt; [6,] 5.174642 3.617823 5.412316 4.863402 3.786787</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="node-eigenvector-centrality">Node eigenvector centrality<a class="anchor" aria-label="anchor" href="#node-eigenvector-centrality"></a>
-</h4>
+<code class="sourceCode R"><span><span class="va">degree</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"node_degree[0.5]"</span>, num_draws <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot_metric.html">plot_metric</a></span><span class="op">(</span><span class="va">degree</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>, <span class="st">"Degree (threshold 0.5) of node 1"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="network_metrics_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="100%"></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">metrics</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"node_eigen"</span><span class="op">)</span></span>
-<span><span class="va">metrics</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="co"># Preview first few samples and nodes</span></span>
-<span><span class="co">#&gt;      [,1]      [,2]      [,3]      [,4]      [,5]</span></span>
-<span><span class="co">#&gt; [1,]    1 0.6998075 0.8274551 0.7619760 0.7679569</span></span>
-<span><span class="co">#&gt; [2,]    1 0.5417456 0.8373102 0.8503530 0.8265666</span></span>
-<span><span class="co">#&gt; [3,]    1 0.6760519 0.8898821 0.9472859 0.9077447</span></span>
-<span><span class="co">#&gt; [4,]    1 0.4732591 0.7720060 0.8812934 0.7572672</span></span>
-<span><span class="co">#&gt; [5,]    1 0.4138459 0.8436132 0.9317520 0.8012959</span></span>
-<span><span class="co">#&gt; [6,]    1 0.5517734 0.8733358 0.9190946 0.6936717</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="node-betweenness">Node betweenness<a class="anchor" aria-label="anchor" href="#node-betweenness"></a>
-</h4>
+<code class="sourceCode R"><span></span>
+<span><span class="va">eigen</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"node_eigen"</span>, num_draws <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">eigen</span>, <span class="fl">2</span>, <span class="va">median</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    1    2    3    4    5    6    7    8    9   10 </span></span>
+<span><span class="co">#&gt; 0.87 0.92 0.85 0.88 0.78 0.70 0.93 0.66 0.83 0.78</span></span>
+<span></span>
+<span><span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"global_cv"</span>, num_draws <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot_metric.html">plot_metric</a></span><span class="op">(</span><span class="va">cv</span>, <span class="st">"Social differentiation (CV)"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="network_metrics_files/figure-html/unnamed-chunk-5-2.png" class="r-plt" alt="" width="100%"></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">metrics</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"node_betweenness"</span><span class="op">)</span></span>
-<span><span class="va">metrics</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="co"># Preview first few samples and nodes</span></span>
-<span><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5]</span></span>
-<span><span class="co">#&gt; [1,]    4    0    0    4    1</span></span>
-<span><span class="co">#&gt; [2,]    9    0    0    1    6</span></span>
-<span><span class="co">#&gt; [3,]    7    0    0    6    0</span></span>
-<span><span class="co">#&gt; [4,]   14    0    0    3    6</span></span>
-<span><span class="co">#&gt; [5,]   12    0    3    1    2</span></span>
-<span><span class="co">#&gt; [6,]    8    2    5    0    3</span></span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="va">clustering</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"global_clustering[0.3]"</span>, num_draws <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">clustering</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.5</span>, <span class="fl">0.95</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;        5%       50%       95% </span></span>
+<span><span class="co">#&gt; 0.5593220 0.6705882 0.7756352</span></span></code></pre></div>
 </div>
-<div class="section level4">
-<h4 id="node-closeness">Node closeness<a class="anchor" aria-label="anchor" href="#node-closeness"></a>
-</h4>
+<div class="section level2">
+<h2 id="using-other-network-tools">Using other network tools<a class="anchor" aria-label="anchor" href="#using-other-network-tools"></a>
+</h2>
+<p>For metrics that bisonR does not provide,
+<code><a href="../reference/bison_to_igraph.html">bison_to_igraph()</a></code> returns a list of <code>igraph</code>
+networks, one per posterior draw, with edge weights on the natural
+scale. Calculating a metric for each network gives its posterior
+distribution. For example, the mean shortest path length, using 1/weight
+as the length of each edge:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">metrics</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"node_closeness"</span><span class="op">)</span></span>
-<span><span class="va">metrics</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="co"># Preview first few samples and nodes</span></span>
-<span><span class="co">#&gt;            [,1]       [,2]       [,3]       [,4]       [,5]</span></span>
-<span><span class="co">#&gt; [1,] 0.06313667 0.03415140 0.05568646 0.05583207 0.04863124</span></span>
-<span><span class="co">#&gt; [2,] 0.05638048 0.03776727 0.05059571 0.05298703 0.05238034</span></span>
-<span><span class="co">#&gt; [3,] 0.06271996 0.03884989 0.05684554 0.05761289 0.05130179</span></span>
-<span><span class="co">#&gt; [4,] 0.05566669 0.02823852 0.05793152 0.04768573 0.04804053</span></span>
-<span><span class="co">#&gt; [5,] 0.05791287 0.05182419 0.05418053 0.06348239 0.05845334</span></span>
-<span><span class="co">#&gt; [6,] 0.06342691 0.03999048 0.05167693 0.05367846 0.04884259</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="node-level-clustering-coefficient">Node-level clustering coefficient<a class="anchor" aria-label="anchor" href="#node-level-clustering-coefficient"></a>
-</h4>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">metrics</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"node_clustering[0.2]"</span><span class="op">)</span></span>
-<span><span class="va">metrics</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="co"># Preview first few samples and nodes</span></span>
-<span><span class="co">#&gt;           [,1]      [,2]      [,3]      [,4]      [,5]</span></span>
-<span><span class="co">#&gt; [1,] 0.6111111 0.8333333 0.6666667 0.6666667 0.8000000</span></span>
-<span><span class="co">#&gt; [2,] 0.7857143 0.7142857 0.7619048 0.9047619 0.9333333</span></span>
-<span><span class="co">#&gt; [3,] 0.7142857 0.6071429 0.7333333 0.7333333 0.6666667</span></span>
-<span><span class="co">#&gt; [4,] 0.7142857 0.6000000 0.6190476 0.6666667 0.8000000</span></span>
-<span><span class="co">#&gt; [5,] 0.6428571 0.7000000 0.6666667 0.6785714 0.6666667</span></span>
-<span><span class="co">#&gt; [6,] 0.5833333 0.8000000 0.7619048 0.5714286 0.9000000</span></span></code></pre></div>
-</div>
-</div>
-<div class="section level3">
-<h3 id="global">Global<a class="anchor" aria-label="anchor" href="#global"></a>
-</h3>
-<div class="section level4">
-<h4 id="global-coefficient-of-variation">Global coefficient of variation<a class="anchor" aria-label="anchor" href="#global-coefficient-of-variation"></a>
-</h4>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">metrics</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"global_cv"</span><span class="op">)</span></span>
-<span><span class="va">metrics</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span> <span class="co"># Preview first few samples</span></span>
-<span><span class="co">#&gt; [1] 0.6620834 0.7752250 0.7524315 0.6514228 0.6969299 0.8203320</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="global-density">Global density<a class="anchor" aria-label="anchor" href="#global-density"></a>
-</h4>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">metrics</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"global_density"</span><span class="op">)</span></span>
-<span><span class="va">metrics</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span> <span class="co"># Preview first few samples</span></span>
-<span><span class="co">#&gt; [1] 0.3930515 0.4329158 0.4216413 0.4753094 0.4301271 0.4341689</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="global-standard-deviation-of-edge-weights">Global standard deviation of edge weights<a class="anchor" aria-label="anchor" href="#global-standard-deviation-of-edge-weights"></a>
-</h4>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">metrics</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"global_std"</span><span class="op">)</span></span>
-<span><span class="va">metrics</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span> <span class="co"># Preview first few samples</span></span>
-<span><span class="co">#&gt; [1] 0.3093545 0.3094215 0.3027798 0.3243845 0.3032741 0.3233578</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="global-diameter">Global diameter<a class="anchor" aria-label="anchor" href="#global-diameter"></a>
-</h4>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">metrics</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"global_diameter"</span><span class="op">)</span></span>
-<span><span class="va">metrics</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span> <span class="co"># Preview first few samples</span></span>
-<span><span class="co">#&gt; [1] 0.3318503 0.2553142 0.4628383 0.2985160 0.4401158 0.5826086</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="global-clustering-coefficient">Global clustering coefficient<a class="anchor" aria-label="anchor" href="#global-clustering-coefficient"></a>
-</h4>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">metrics</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"global_clustering[0.2]"</span><span class="op">)</span></span>
-<span><span class="va">metrics</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span> <span class="co"># Preview first few samples</span></span>
-<span><span class="co">#&gt; [1] 0.5827338 0.7288136 0.6580645 0.7853403 0.8000000 0.8111588</span></span></code></pre></div>
-</div>
-</div>
+<code class="sourceCode R"><span><span class="va">nets</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bison_to_igraph.html">bison_to_igraph</a></span><span class="op">(</span><span class="va">fit_edge</span>, num_draws <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span>
+<span><span class="va">mean_path_length</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">nets</span>, <span class="kw">function</span><span class="op">(</span><span class="va">net</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/distances.html" class="external-link">mean_distance</a></span><span class="op">(</span><span class="va">net</span>, weights <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/E.html" class="external-link">E</a></span><span class="op">(</span><span class="va">net</span><span class="op">)</span><span class="op">$</span><span class="va">weight</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">mean_path_length</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.5</span>, <span class="fl">0.95</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       5%      50%      95% </span></span>
+<span><span class="co">#&gt; 1.966829 2.161690 2.411309</span></span></code></pre></div>
+<p>Note that some igraph functions ignore edge weights (for example
+<code><a href="https://r.igraph.org/reference/assortativity.html" class="external-link">igraph::assortativity()</a></code>). Every dyad in the model is an
+edge in every posterior network, so these functions give the same value
+in every draw. Before applying a function to posterior networks, check
+that it uses the <code>weight</code> edge attribute.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -317,7 +327,7 @@ above.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by <a href="https://jordanhart.co.uk/" class="external-link">Jordan Hart</a>.</p>
+  <p>Developed by <a href="https://jordanhart.co.uk/" class="external-link">Jordan Hart</a>, Michael N. Weiss, Daniel W. Franks, Lauren J. N. Brent, Samuel Ellis.</p>
 </div>
 
 <div class="pkgdown-footer-right">

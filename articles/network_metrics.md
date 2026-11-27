@@ -1,221 +1,181 @@
 # Network metrics
 
-Network metrics can be extracted using the function
-`extract_metric(bison_model, metric_name)`. The `metric_name` variable
-is made up of two parts: the network feature and the network metric. For
-example, `node_eigen` will calculate the eigenvector centrality of each
-node.
-
-The following feature/metric pairs are currently supported in bisonR:
-
-- `edge` - Edge-level properties
-  - `weight` - Edge weight
-- `node` - Node-level properties
-  - `degree[t]` - Node degree (where t is the binary threshold for an
-    edge)
-  - `strength` - Node strength
-  - `eigen` - Node eigenvector centrality
-  - `betweenness` - Node betweenness
-  - `closeness` - Node closeness
-  - `clustering` - Node-level clustering coefficient
-- `global` - Network-level properties
-  - `density` - Weighted density
-  - `cv` - Coefficient of variation of edge weights - also known as
-    social differentiation
-  - `std` - Standard deviation of edge weights
-  - `diameter` - Diameter of the network
-  - `clustering` - Clustering coefficient of the network - also known as
-    transitivity
-
-## Examples
-
-See below for examples of how to generate the network metrics listed
-above.
+Network metrics summarise the structure of a network, either for each
+individual (node metrics) or for the whole network (global metrics). The
+edge model gives a posterior distribution for each edge weight, and each
+sample from it (a *posterior draw*) is one possible network that is
+consistent with the data. bisonR calculates a metric for each posterior
+draw, which gives a posterior distribution for the metric.
 
 ``` r
 
 library(bisonR)
-#> Loading required package: cmdstanr
-#> This is cmdstanr version 0.9.0.9002
-#> - CmdStanR documentation and vignettes: mc-stan.org/cmdstanr
-#> - CmdStan path: /home/runner/.cmdstan/cmdstan-2.40.0
-#> - CmdStan version: 2.40.0
-library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
-```
-
-``` r
 
 sim_data <- simulate_bison_model("binary", aggregated = TRUE)
-df <- sim_data$df_sim
-
 fit_edge <- bison_model(
-  (event | duration) ~ dyad(node_1_id, node_2_id),
-  data=df,
-  model_type="binary_conjugate",
-  priors=get_default_priors("binary_conjugate")
+  (event | effort) ~ dyad(node_1_id, node_2_id),
+  data = sim_data$df_sim,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
 )
 ```
 
-### Edge
+## Extracting metrics
 
-#### Edge weight
-
-``` r
-
-metrics <- extract_metric(fit_edge, "edge_weight", num_draws=10)
-metrics[1:6, 1:5] # Preview first few samples and edges
-#>            [,1]      [,2]      [,3]      [,4]      [,5]
-#> [1,] -1.7763303 1.2071965 1.3689566 3.2731301 3.4882468
-#> [2,]  0.9357479 0.9649296 1.0682155 1.1780742 0.8553972
-#> [3,] -3.6258711 1.8834824 2.0402320 0.2606149 2.6947782
-#> [4,] -2.7593545 3.0038231 1.1405372 1.8913551 5.6115489
-#> [5,] -1.8913159 0.9642772 0.8170626 4.0066255 1.8581266
-#> [6,]  0.1826523 1.2889817 1.4426996 0.8583163 2.2183483
-```
-
-### Node
-
-#### Node degree
+Metrics are calculated with `extract_metric(fit, metric_name)`. The name
+has two parts: the *target* (`edge`, `node` or `global`) and the
+*metric*, joined by an underscore, such as `node_strength` or
+`global_cv`.
 
 ``` r
 
-metrics <- extract_metric(fit_edge, "node_degree[0.2]")
-metrics[1:6, 1:5] # Preview first few samples and nodes
-#>      [,1] [,2] [,3] [,4] [,5]
-#> [1,]    8    7    5    6    8
-#> [2,]    8    7    8    8    4
-#> [3,]    8    5    7    8    7
-#> [4,]    9    6    5    8    8
-#> [5,]    7    6    8    7    6
-#> [6,]    8    5    8    7    6
+strength <- extract_metric(fit_edge, "node_strength", num_draws = 1000)
+dim(strength)
+#> [1] 1000   10
 ```
 
-#### Node strength
+The result has one row per posterior draw and one column per target: one
+column per node for node metrics (named after the nodes, in the order of
+the node levels), one per dyad for edge metrics, and a single column for
+global metrics. The columns can be summarised in the same way as any
+other posterior samples:
 
 ``` r
 
-metrics <- extract_metric(fit_edge, "node_strength", num_draws=10)
-metrics[1:6, 1:5] # Preview first few samples and nodes
-#>          [,1]     [,2]     [,3]     [,4]     [,5]
-#> [1,] 5.250600 3.605330 4.044063 4.328342 4.147407
-#> [2,] 6.390623 3.869768 4.278853 5.145356 4.451589
-#> [3,] 6.153401 3.094590 4.164048 4.940242 4.975292
-#> [4,] 6.359865 3.531231 5.004913 5.160148 4.461221
-#> [5,] 5.756916 3.451609 4.778303 4.609269 4.311387
-#> [6,] 5.174642 3.617823 5.412316 4.863402 3.786787
+t(apply(strength, 2, quantile, probs = c(0.05, 0.5, 0.95)))
+#>          5%      50%      95%
+#> 1  3.251381 4.345390 5.363105
+#> 2  3.676587 4.565101 5.447701
+#> 3  3.343305 4.361036 5.367084
+#> 4  3.584986 4.528936 5.450037
+#> 5  2.909792 3.933265 4.889573
+#> 6  2.602736 3.599878 4.664193
+#> 7  3.773139 4.750287 5.680407
+#> 8  2.389676 3.293668 4.268710
+#> 9  3.266363 4.260105 5.171311
+#> 10 2.928467 3.888107 4.977658
 ```
 
-#### Node eigenvector centrality
+[`plot_metric()`](https://bisonr.org/reference/plot_metric.md) plots the
+posterior distribution of a metric. Continuous metrics are shown as
+densities, and discrete metrics, such as degree, as bar charts (see the
+examples below):
 
 ``` r
 
-metrics <- extract_metric(fit_edge, "node_eigen")
-metrics[1:6, 1:5] # Preview first few samples and nodes
-#>      [,1]      [,2]      [,3]      [,4]      [,5]
-#> [1,]    1 0.6998075 0.8274551 0.7619760 0.7679569
-#> [2,]    1 0.5417456 0.8373102 0.8503530 0.8265666
-#> [3,]    1 0.6760519 0.8898821 0.9472859 0.9077447
-#> [4,]    1 0.4732591 0.7720060 0.8812934 0.7572672
-#> [5,]    1 0.4138459 0.8436132 0.9317520 0.8012959
-#> [6,]    1 0.5517734 0.8733358 0.9190946 0.6936717
+plot_metric(strength[, 1:2], "Strength of node")
 ```
 
-#### Node betweenness
+![](network_metrics_files/figure-html/unnamed-chunk-4-1.png)![](network_metrics_files/figure-html/unnamed-chunk-4-2.png)
+
+To use metrics in a regression, use
+[`bison_brm()`](https://bisonr.org/reference/bison_brm.md) (see
+[`vignette("bison_brms")`](https://bisonr.org/articles/bison_brms.md))
+rather than summarising them first (for example as posterior means), so
+that the uncertainty in the metric is included in the regression.
+
+## Weighted and thresholded metrics
+
+Unless stated otherwise, all metrics are calculated on the **weighted**
+network, using edge weights on the natural scale (probabilities for
+binary models, rates for count models). For example, `node_strength` is
+the weighted version of degree.
+
+Some metrics are only defined for networks where edges are either
+present or absent. These take a **threshold** in square brackets, such
+as `node_degree[0.2]`: in each posterior draw, edges with a weight at or
+above the threshold count as present and the rest as absent. For an
+unweighted version of a weighted metric (such as unweighted density),
+threshold the network in the same way. Results can depend on the
+threshold, so check whether conclusions change with different values.
+
+## Available metrics
+
+### Edge metrics
+
+| Name | Definition |
+|----|----|
+| `edge_weight` | The edge weight of each dyad. On the natural scale by default; use `transform = FALSE` for the link scale (logit, or log-odds, for binary models and log for count models). |
+
+### Node metrics
+
+| Name | Definition |
+|----|----|
+| `node_strength` | Sum of the weights of the node’s edges. How much a node associates in total. |
+| `node_degree[t]` | Number of edges with weight at or above `t`. |
+| `node_eigen` | Eigenvector centrality: high when a node has strong edges to nodes that are themselves central. Scaled so the most central node has a value of 1. |
+| `node_betweenness` | Betweenness: the number of shortest paths between other pairs of nodes that pass through the node, using 1/weight as the length of each edge (so strong edges are short). |
+| `node_closeness` | Closeness: the inverse of the sum of shortest-path distances from the node to all other reachable nodes, using 1/weight as edge lengths. |
+| `node_clustering[t]` | Local clustering coefficient of the network thresholded at `t`: the proportion of pairs of the node’s associates that are also associates of each other. Nodes with fewer than two associates get 0. |
+
+### Global metrics
+
+| Name | Definition |
+|----|----|
+| `global_density` | Mean edge weight across all dyads in the model (weighted density). |
+| `global_cv` | Coefficient of variation (SD / mean) of edge weights, also called social differentiation. High values mean relationships vary a lot in strength. |
+| `global_std` | Standard deviation of edge weights. |
+| `global_diameter` | Length of the longest shortest path between any two nodes, using 1/weight as edge lengths. |
+| `global_clustering[t]` | Global clustering coefficient (transitivity) of the network thresholded at `t`: the proportion of connected triples that are closed triangles. |
+
+Global metrics are calculated only from the dyads in the model, so dyads
+that do not appear in the data are not included.
+
+## Examples
 
 ``` r
 
-metrics <- extract_metric(fit_edge, "node_betweenness")
-metrics[1:6, 1:5] # Preview first few samples and nodes
-#>      [,1] [,2] [,3] [,4] [,5]
-#> [1,]    4    0    0    4    1
-#> [2,]    9    0    0    1    6
-#> [3,]    7    0    0    6    0
-#> [4,]   14    0    0    3    6
-#> [5,]   12    0    3    1    2
-#> [6,]    8    2    5    0    3
+degree <- extract_metric(fit_edge, "node_degree[0.5]", num_draws = 500)
+plot_metric(degree[, 1], "Degree (threshold 0.5) of node 1")
 ```
 
-#### Node closeness
+![](network_metrics_files/figure-html/unnamed-chunk-5-1.png)
 
 ``` r
 
-metrics <- extract_metric(fit_edge, "node_closeness")
-metrics[1:6, 1:5] # Preview first few samples and nodes
-#>            [,1]       [,2]       [,3]       [,4]       [,5]
-#> [1,] 0.06313667 0.03415140 0.05568646 0.05583207 0.04863124
-#> [2,] 0.05638048 0.03776727 0.05059571 0.05298703 0.05238034
-#> [3,] 0.06271996 0.03884989 0.05684554 0.05761289 0.05130179
-#> [4,] 0.05566669 0.02823852 0.05793152 0.04768573 0.04804053
-#> [5,] 0.05791287 0.05182419 0.05418053 0.06348239 0.05845334
-#> [6,] 0.06342691 0.03999048 0.05167693 0.05367846 0.04884259
+
+eigen <- extract_metric(fit_edge, "node_eigen", num_draws = 500)
+round(apply(eigen, 2, median), 2)
+#>    1    2    3    4    5    6    7    8    9   10 
+#> 0.87 0.92 0.85 0.88 0.78 0.70 0.93 0.66 0.83 0.78
+
+cv <- extract_metric(fit_edge, "global_cv", num_draws = 1000)
+plot_metric(cv, "Social differentiation (CV)")
 ```
 
-#### Node-level clustering coefficient
+![](network_metrics_files/figure-html/unnamed-chunk-5-2.png)
 
 ``` r
 
-metrics <- extract_metric(fit_edge, "node_clustering[0.2]")
-metrics[1:6, 1:5] # Preview first few samples and nodes
-#>           [,1]      [,2]      [,3]      [,4]      [,5]
-#> [1,] 0.6111111 0.8333333 0.6666667 0.6666667 0.8000000
-#> [2,] 0.7857143 0.7142857 0.7619048 0.9047619 0.9333333
-#> [3,] 0.7142857 0.6071429 0.7333333 0.7333333 0.6666667
-#> [4,] 0.7142857 0.6000000 0.6190476 0.6666667 0.8000000
-#> [5,] 0.6428571 0.7000000 0.6666667 0.6785714 0.6666667
-#> [6,] 0.5833333 0.8000000 0.7619048 0.5714286 0.9000000
+
+clustering <- extract_metric(fit_edge, "global_clustering[0.3]", num_draws = 500)
+quantile(clustering, c(0.05, 0.5, 0.95))
+#>        5%       50%       95% 
+#> 0.5593220 0.6705882 0.7756352
 ```
 
-### Global
+## Using other network tools
 
-#### Global coefficient of variation
+For metrics that bisonR does not provide,
+[`bison_to_igraph()`](https://bisonr.org/reference/bison_to_igraph.md)
+returns a list of `igraph` networks, one per posterior draw, with edge
+weights on the natural scale. Calculating a metric for each network
+gives its posterior distribution. For example, the mean shortest path
+length, using 1/weight as the length of each edge:
 
 ``` r
 
-metrics <- extract_metric(fit_edge, "global_cv")
-metrics[1:6] # Preview first few samples
-#> [1] 0.6620834 0.7752250 0.7524315 0.6514228 0.6969299 0.8203320
+nets <- bison_to_igraph(fit_edge, num_draws = 200)
+mean_path_length <- sapply(nets, function(net) {
+  igraph::mean_distance(net, weights = 1 / igraph::E(net)$weight)
+})
+quantile(mean_path_length, c(0.05, 0.5, 0.95))
+#>       5%      50%      95% 
+#> 1.966829 2.161690 2.411309
 ```
 
-#### Global density
-
-``` r
-
-metrics <- extract_metric(fit_edge, "global_density")
-metrics[1:6] # Preview first few samples
-#> [1] 0.3930515 0.4329158 0.4216413 0.4753094 0.4301271 0.4341689
-```
-
-#### Global standard deviation of edge weights
-
-``` r
-
-metrics <- extract_metric(fit_edge, "global_std")
-metrics[1:6] # Preview first few samples
-#> [1] 0.3093545 0.3094215 0.3027798 0.3243845 0.3032741 0.3233578
-```
-
-#### Global diameter
-
-``` r
-
-metrics <- extract_metric(fit_edge, "global_diameter")
-metrics[1:6] # Preview first few samples
-#> [1] 0.3318503 0.2553142 0.4628383 0.2985160 0.4401158 0.5826086
-```
-
-#### Global clustering coefficient
-
-``` r
-
-metrics <- extract_metric(fit_edge, "global_clustering[0.2]")
-metrics[1:6] # Preview first few samples
-#> [1] 0.5827338 0.7288136 0.6580645 0.7853403 0.8000000 0.8111588
-```
+Note that some igraph functions ignore edge weights (for example
+[`igraph::assortativity()`](https://r.igraph.org/reference/assortativity.html)).
+Every dyad in the model is an edge in every posterior network, so these
+functions give the same value in every draw. Before applying a function
+to posterior networks, check that it uses the `weight` edge attribute.

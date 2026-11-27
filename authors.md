@@ -5,18 +5,34 @@
 - **[Jordan Hart](https://jordanhart.co.uk/)**. Author, maintainer.
   [](https://orcid.org/0000-0002-4636-0760)
 
+- **Michael N. Weiss**. Author.
+
+- **Daniel W. Franks**. Author.
+
+- **Lauren J. N. Brent**. Author.
+
+- **Samuel Ellis**. Author.
+
+- **Joe Wilde**. Contributor.  
+  Windows installation article
+
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/JHart96/bisonR/blob/main/DESCRIPTION)
+[`inst/CITATION`](https://github.com/JHart96/bisonR/blob/main/inst/CITATION)
 
-Hart J (2026). *bisonR: Bayesian Inference of Social Networks in R*. R
-package version 0.4.6, <https://bisonr.org>.
+Hart, J. D. A., Weiss, M. N., Franks, D. W., & Brent, L. J. N. (2023).
+BISoN: A Bayesian framework for inference of social networks. Methods in
+Ecology and Evolution, 14(9), 2411-2420.
+https://doi.org/10.1111/2041-210X.14171
 
-    @Manual{,
-      title = {bisonR: Bayesian Inference of Social Networks in R},
-      author = {Jordan Hart},
-      year = {2026},
-      note = {R package version 0.4.6},
-      url = {https://bisonr.org},
+    @Article{,
+      title = {{BISoN}: A {Bayesian} framework for inference of social networks},
+      author = {Jordan D. A. Hart and Michael N. Weiss and Daniel W. Franks and Lauren J. N. Brent},
+      journal = {Methods in Ecology and Evolution},
+      year = {2023},
+      volume = {14},
+      number = {9},
+      pages = {2411--2420},
+      doi = {10.1111/2041-210X.14171},
     }

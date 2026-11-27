@@ -1,6 +1,11 @@
-# Prior checks
+# Plot prior distributions
 
-Prior checks
+Plots the density of each prior in a list, to check that the priors give
+reasonable weight to plausible values. Edge weight priors are shown on
+the natural scale (probabilities for binary models, rates for count
+models); other priors are shown on the scale on which they are defined.
+To see the data implied by the priors together, use
+[`prior_predictive_check()`](https://bisonr.org/reference/prior_predictive_check.md).
 
 ## Usage
 
@@ -12,23 +17,38 @@ prior_check(priors, model_type, type = "density")
 
 - priors:
 
-  List of priors for a model, can be retrieved using
-  `get_default_prior()`.
+  List of priors for a model, as returned by
+  [`get_default_priors()`](https://bisonr.org/reference/get_default_priors.md).
 
 - model_type:
 
-  Type of model the priors will be used for (same as the argument for
-  `get_default_prior()`).
+  Type of model the priors will be used for, as in
+  [`get_default_priors()`](https://bisonr.org/reference/get_default_priors.md).
 
 - type:
 
-  Type of prior check to run, `"value"` or `"prediction"`. Details
-  below.
+  Type of plot. Only `"density"` is currently available.
+
+## Value
+
+`NULL`. The function is called for its plots.
 
 ## Details
 
-The parameter `type` determines what type of prior check to run.
-`type="value"` will plot the prior probability over the parameter value
-on the original scale. `type="predictive"` will run a prior predictive
-plot, where predictions from the model are generated using only prior
-probabilities (the model when not updated from the data).
+With `partial_pooling = TRUE` in
+[`bison_model()`](https://bisonr.org/reference/bison_model.md), the
+second value of the edge prior is the scale of a half-normal prior on
+the spread of the edge weights, so the edge prior shown here is not the
+implied prior on each edge.
+
+## See also
+
+[`get_default_priors()`](https://bisonr.org/reference/get_default_priors.md),
+[`prior_predictive_check()`](https://bisonr.org/reference/prior_predictive_check.md)
+
+## Examples
+
+``` r
+priors <- get_default_priors("binary")
+prior_check(priors, "binary")
+```

@@ -4,27 +4,35 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Installing cmdstanR on Windows • bisonR</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
-<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
-<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="icon" sizes="any" href="../favicon.ico">
-<link rel="manifest" href="../site.webmanifest">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Installing cmdstanr on Windows • bisonR</title>
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_3-0.5.0/font.css" rel="stylesheet">
+<link href="../deps/JetBrains_Mono-0.5.0/font.css" rel="stylesheet">
+<link href="../deps/Source_Serif_4-0.5.0/font.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Installing cmdstanR on Windows">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><script src="../extra.js"></script><meta property="og:title" content="Installing cmdstanr on Windows">
+<meta name="description" content="Solutions to common problems when installing cmdstanr and CmdStan on Windows.
+">
+<meta property="og:description" content="Solutions to common problems when installing cmdstanr and CmdStan on Windows.
+">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">bisonR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,28 +41,24 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="../articles/getting_started.html">Get started</a></li>
+<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>bisonR</h6></li>
-    <li><a class="dropdown-item" href="../articles/getting_started.html">Getting started</a></li>
-    <li><a class="dropdown-item" href="../articles/bison_brms.html">Using brms with BISoN</a></li>
-    <li><a class="dropdown-item" href="../articles/mixture_models.html">Edge mixture models</a></li>
-    <li><a class="dropdown-item" href="../articles/network_metrics.html">Network metrics</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Help</h6></li>
-    <li><a class="dropdown-item" href="../articles/windows_installation.html">Installing cmdstanR on Windows</a></li>
-  </ul>
-</li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JHart96/bisonR/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JHart96/bisonR" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -68,7 +72,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Installing cmdstanR on Windows</h1>
+      <h1>Installing cmdstanr on Windows</h1>
                         <h4 data-toc-skip class="author">Jordan Hart,
 Joe Wilde</h4>
             
@@ -79,82 +83,79 @@ Joe Wilde</h4>
 
     
     
+<p>bisonR fits models with Stan, through the cmdstanr package and the
+CmdStan program. Installing these on Windows can be more involved than
+on other systems, particularly on managed or networked computers. This
+article lists problems we have encountered and solutions that have
+worked. The general installation instructions are in the <a href="https://mc-stan.org/cmdstanr/articles/cmdstanr.html" class="external-link">cmdstanr
+documentation</a>.</p>
 <div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+<h2 id="before-installing">Before installing<a class="anchor" aria-label="anchor" href="#before-installing"></a>
 </h2>
-<p>The installation of cmdstanR can be troublesome on Windows computers,
-even more so for networked computers. Don’t let this put you off though,
-once you get cmdstanR installed you’ll be able to run bisonR and many
-other packages at speed and with less buggy-ness. In this article we’ve
-compiled a list of problems and fixes that have worked for us. In some
-cases we’ve resorted to editing the registry to fix some of the
-problems, but be careful when doing this and make sure only to make
-changes if you’re confident, as the registry holds a lot of important
-information used by the OS. Don’t change anything if you don’t have a
-complete backup or don’t fully understand what is being changed.</p>
-</div>
-<div class="section level2">
-<h2 id="fixes">Fixes<a class="anchor" aria-label="anchor" href="#fixes"></a>
-</h2>
-<div class="section level3">
-<h3 id="installing-into-a-network-directoryissues-with-tar-exe">Installing into a network directory/issues with tar.exe<a class="anchor" aria-label="anchor" href="#installing-into-a-network-directoryissues-with-tar-exe"></a>
-</h3>
-<p>If you’re using a computer on a network (i.e. in most universities
-and businesses), there’s a good chance that your <code>HOME</code>
-environment variable will be a network location. This will cause many
-problems with installation and even if it did work, would likely be much
-slower too. The easiest solution to this problem is to create a local
-directory (i.e. somewhere in your C drive that isn’t indexed by network
-backups etc) called “cmdstan”. This will be the install location for
-cmdstan, and you can specify this directory when using
-<code><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">install_cmdstan()</a></code>:</p>
+<p>CmdStan compiles models with a C++ toolchain, which on Windows is
+provided by <a href="https://cran.r-project.org/bin/windows/Rtools/" class="external-link">Rtools</a>.
+Install the version of Rtools that matches your version of R, then
+install cmdstanr and check the toolchain:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">install_cmdstan</a></span><span class="op">(</span>dir<span class="op">=</span><span class="st">"C:/path/to/directory/cmdstan"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="rtools-4-x-was-not-found-but-is-required-to-run-cmdstan-with-r-version-4-x-">RTools 4.x was not found but is required to run CmdStan with R
-version 4.x.<a class="anchor" aria-label="anchor" href="#rtools-4-x-was-not-found-but-is-required-to-run-cmdstan-with-r-version-4-x-"></a>
-</h3>
-<p>This problem occurs because an environment variable was not set
-properly when Rtools was installed. This appears to be a common problem,
-but it can be fixed by adding an environment variable
-<code>RTOOLS40_HOME</code> (for Rtools 4.0) or
-<code>RTOOLS42_HOME</code> (for Rtools 4.2). The environment variable
-should point to the location of your Rtools installation.</p>
-</div>
-<div class="section level3">
-<h3 id="supplied-csv-file-is-corrupt">Supplied csv file is corrupt<a class="anchor" aria-label="anchor" href="#supplied-csv-file-is-corrupt"></a>
-</h3>
-<p>This occurs after running the sampler. We don’t know the source of
-this problem, but installing the github version of <code>cmdstanR</code>
-seems to fix the problem. This can be done by running the following
-code:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"stan-dev/cmdstanr"</span><span class="op">)</span></span></code></pre></div>
-<p>If this doesn’t work, make sure you’re using the latest version of R
-(R 4.2.1) at the time of writing.</p>
-</div>
-<div class="section level3">
-<h3 id="error-cmdstan-path-has-not-been-set-yet-">Error: CmdStan path has not been set yet.<a class="anchor" aria-label="anchor" href="#error-cmdstan-path-has-not-been-set-yet-"></a>
-</h3>
-<p>This can happen on the R session following the session in which you
-first installed cmdstanR. For some reason the environment variable
-<code>CMDSTAN</code>, which was set on installation, has been
-overwritten. We think this may be due to the configuration of managed
-computers. The solution to this problem is to set <code>CMDSTAN</code>
-to the path of your cmdstan installation. Specifically, this needs to
-point to the installation version directory
-(e.g. <code>.cmdstan/cmdstan-2.30.0</code>), rather than just the
-<code>.cmdstan/</code> or <code>cmdstan/</code> directory.</p>
-</div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"cmdstanr"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://stan-dev.r-universe.dev"</span>, <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">cmdstanr</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">check_cmdstan_toolchain</a></span><span class="op">(</span>fix <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">cmdstanr</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">install_cmdstan</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="get-in-touch">Get in touch<a class="anchor" aria-label="anchor" href="#get-in-touch"></a>
+<h2 id="installing-on-a-networked-computer">Installing on a networked computer<a class="anchor" aria-label="anchor" href="#installing-on-a-networked-computer"></a>
 </h2>
-<p>Let us know if any of these fixes work or don’t work for you, or if
-there are any more elegant ways to fix these issues. We’ve spent several
-hours trying to fix these issues and we hope the lessons we’ve learned
-will be useful!</p>
+<p>On computers in universities and other organisations, the
+<code>HOME</code> directory is often on a network drive. Installing
+CmdStan there can fail (for example, with errors from
+<code>tar.exe</code>), or be very slow. Instead, create a folder on a
+local drive that isn’t synchronised with the network, and install
+CmdStan there:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">cmdstanr</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">install_cmdstan</a></span><span class="op">(</span>dir <span class="op">=</span> <span class="st">"C:/path/to/local/folder"</span><span class="op">)</span></span></code></pre></div>
+<p>cmdstanr may not find this installation in later sessions. If so, set
+its location at the start of each session (or in your
+<code>.Rprofile</code>), pointing to the folder for the installed
+version:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">cmdstanr</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/set_cmdstan_path.html" class="external-link">set_cmdstan_path</a></span><span class="op">(</span><span class="st">"C:/path/to/local/folder/cmdstan-2.36.0"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="rtools-was-not-found-but-is-required-to-run-cmdstan">“Rtools was not found but is required to run CmdStan”<a class="anchor" aria-label="anchor" href="#rtools-was-not-found-but-is-required-to-run-cmdstan"></a>
+</h2>
+<p>This happens when the environment variable that tells R where Rtools
+is installed hasn’t been set. Check that the installed version of Rtools
+matches your version of R. If it does, set the variable for your version
+of Rtools (for example <code>RTOOLS44_HOME</code> for Rtools 4.4, or
+<code>RTOOLS45_HOME</code> for Rtools 4.5) to the folder where Rtools is
+installed, then restart R.</p>
+</div>
+<div class="section level2">
+<h2 id="supplied-csv-file-is-corrupt">“Supplied CSV file is corrupt”<a class="anchor" aria-label="anchor" href="#supplied-csv-file-is-corrupt"></a>
+</h2>
+<p>This error appears after sampling. We have not identified its cause,
+but updating cmdstanr to the latest version has fixed it for us:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"cmdstanr"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://stan-dev.r-universe.dev"</span>, <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>If the error continues, update R to the latest release.</p>
+</div>
+<div class="section level2">
+<h2 id="cmdstan-path-has-not-been-set-yet">“CmdStan path has not been set yet”<a class="anchor" aria-label="anchor" href="#cmdstan-path-has-not-been-set-yet"></a>
+</h2>
+<p>This can happen in a new R session after CmdStan has been installed,
+usually on managed computers that do not keep the <code>CMDSTAN</code>
+environment variable set during installation. Set the path with
+<code><a href="https://mc-stan.org/cmdstanr/reference/set_cmdstan_path.html" class="external-link">cmdstanr::set_cmdstan_path()</a></code> as shown above, or set the
+<code>CMDSTAN</code> environment variable to the folder for the
+installed version (for example
+<code>C:/Users/you/.cmdstan/cmdstan-2.36.0</code>), rather than to the
+<code>.cmdstan</code> folder that contains it.</p>
+</div>
+<div class="section level2">
+<h2 id="other-problems">Other problems<a class="anchor" aria-label="anchor" href="#other-problems"></a>
+</h2>
+<p>If none of these solutions work, please ask in <a href="https://github.com/JHart96/bisonR/discussions" class="external-link">Discussions</a>,
+including the error message and your versions of R, Rtools and cmdstanr.
+Reports of solutions that work on other systems are also welcome.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -163,7 +164,7 @@ will be useful!</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by <a href="https://jordanhart.co.uk/" class="external-link">Jordan Hart</a>.</p>
+  <p>Developed by <a href="https://jordanhart.co.uk/" class="external-link">Jordan Hart</a>, Michael N. Weiss, Daniel W. Franks, Lauren J. N. Brent, Samuel Ellis.</p>
 </div>
 
 <div class="pkgdown-footer-right">

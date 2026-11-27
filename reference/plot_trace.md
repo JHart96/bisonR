@@ -1,6 +1,11 @@
-# Traceplot of MCMC chains
+# Trace plots of MCMC chains
 
-Traceplot of MCMC chains
+Plots the MCMC chains for some of the edge weights of a fitted model, to
+check that the sampler worked. MCMC (Markov chain Monte Carlo) draws
+samples from the posterior in several independent runs called chains.
+The chains should overlap and show no trends; if they don't, the
+posterior may not be reliable, and running more warmup iterations may
+help.
 
 ## Usage
 
@@ -12,19 +17,48 @@ plot_trace(obj, par_ids = 1:5, ...)
 
 - obj:
 
-  A fitted S3 object for edge weight, dyadic regression, or nodal
-  regression models.
+  A fitted `bison_model` object (fitted with Stan, not a conjugate
+  model).
 
 - par_ids:
 
-  A vector of parameter IDs to be plotted.
+  Indices of the edge weights to plot, in the order of
+  [`get_edgelist()`](https://bisonr.org/reference/get_edgelist.md).
+  Indices beyond the number of edges are ignored.
 
 - ...:
 
-  Additional arguments to be passed to base R plots.
+  Additional arguments passed to
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html).
 
-## Details
+## Value
 
-Plots MCMC chains for a fitted model. If the model has too many
-parameters to plot, only the first 12 will be plotted. To change the
-parameters being plotted, pass the `par_ids` argument
+`NULL`, invisibly. The function is called for its plots.
+
+## See also
+
+[`plot_predictions()`](https://bisonr.org/reference/plot_predictions.md)
+for checking model fit.
+
+## Examples
+
+``` r
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+fit_edge <- bison_model(
+  (event | effort) ~ dyad(node_1_id, node_2_id),
+  data = sim_data$df_sim, model_type = "binary",
+  priors = get_default_priors("binary")
+)
+#> Running MCMC with 4 parallel chains...
+#> 
+#> Chain 1 finished in 0.2 seconds.
+#> Chain 2 finished in 0.3 seconds.
+#> Chain 3 finished in 0.2 seconds.
+#> Chain 4 finished in 0.2 seconds.
+#> 
+#> All 4 chains finished successfully.
+#> Mean chain execution time: 0.2 seconds.
+#> Total execution time: 0.5 seconds.
+#> 
+plot_trace(fit_edge, par_ids = 1:4)
+```

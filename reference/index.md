@@ -1,64 +1,96 @@
 # Package index
 
-## All functions
+## Fitting edge weight models
 
-- [`bisonR-package`](https://bisonr.org/reference/bisonR-package.md)
-  [`bisonR`](https://bisonr.org/reference/bisonR-package.md) : The
-  'bisonR' package.
-- [`bison_brm()`](https://bisonr.org/reference/bison_brm.md) : Fit a
-  brms model on BISoN network data
-- [`bison_brm_get_prior()`](https://bisonr.org/reference/bison_brm_get_prior.md)
-  : Get priors for BISoN brm model
-- [`bison_mice()`](https://bisonr.org/reference/bison_mice.md) :
-  Generate a mice mids object
-- [`bison_mixture()`](https://bisonr.org/reference/bison_mixture.md) :
-  Fit a dyadic mixture model
+Estimate the network, with uncertainty, from observation data.
+
 - [`bison_model()`](https://bisonr.org/reference/bison_model.md) : Fit
-  an edge model to data
-- [`bison_to_igraph()`](https://bisonr.org/reference/bison_to_igraph.md)
-  : Convert bisonR edgemodel posterior to igraph network objects
-- [`convert_duration_to_binary()`](https://bisonr.org/reference/convert_duration_to_binary.md)
-  : Convert duration data to binary
-- [`convert_gbi_to_bison()`](https://bisonr.org/reference/convert_gbi_to_bison.md)
-  : Convert group-by-individual matrix to bisonR format
-- [`draw_edgelist_samples()`](https://bisonr.org/reference/draw_edgelist_samples.md)
-  : Draw samples from edgelist posterior
-- [`extract_metric()`](https://bisonr.org/reference/extract_metric.md) :
-  Extract samples from posterior metrics for a fitted edge weight model
-- [`get_component_means()`](https://bisonr.org/reference/get_component_means.md)
-  : Get component means from edge mixture model
+  an edge weight model
 - [`get_default_priors()`](https://bisonr.org/reference/get_default_priors.md)
-  : Return default priors for a given model
-- [`get_edge_component_probabilities()`](https://bisonr.org/reference/get_edge_component_probabilities.md)
-  : Get probabilities of component membership for each edge
-- [`get_edgelist()`](https://bisonr.org/reference/get_edgelist.md) :
-  Retrieves an edgelist with uncertainty for a fitted edge weight model
-  object
-- [`get_network_component_probabilities()`](https://bisonr.org/reference/get_network_component_probabilities.md)
-  : Get probabilities of component membership for the entire network
-- [`model_comparison()`](https://bisonr.org/reference/model_comparison.md)
-  : Run leave-one-out model comparison
-- [`plot_metric()`](https://bisonr.org/reference/plot_metric.md) : Plot
-  metric samples
-- [`plot_network()`](https://bisonr.org/reference/plot_network.md) :
-  Sociogram plot with uncertainty of a fitted edge weight model object
+  : Get the default priors for an edge model
+- [`prior_check()`](https://bisonr.org/reference/prior_check.md) : Plot
+  prior distributions
+- [`prior_predictive_check()`](https://bisonr.org/reference/prior_predictive_check.md)
+  : Prior predictive check
+
+## Checking models
+
+MCMC diagnostics, predictive checks and model comparison.
+
+- [`plot_trace()`](https://bisonr.org/reference/plot_trace.md) : Trace
+  plots of MCMC chains
 - [`plot_predictions()`](https://bisonr.org/reference/plot_predictions.md)
   : Posterior predictive checks
-- [`plot_trace()`](https://bisonr.org/reference/plot_trace.md) :
-  Traceplot of MCMC chains
-- [`print(`*`<summary.bison_mixture>`*`)`](https://bisonr.org/reference/print.summary.bison_mixture.md)
-  : Print information about an edge mixture model
-- [`print(`*`<summary.bison_model>`*`)`](https://bisonr.org/reference/print.summary.bison_model.md)
-  : Prints out an edge model summary object.
-- [`prior_check()`](https://bisonr.org/reference/prior_check.md) : Prior
-  checks
-- [`prior_predictive_check()`](https://bisonr.org/reference/prior_predictive_check.md)
-  : Run prior predictive check for a model specification
-- [`simulate_bison_model()`](https://bisonr.org/reference/simulate_bison_model.md)
-  : Simulates data
-- [`simulate_bison_model_mixture()`](https://bisonr.org/reference/simulate_bison_model_mixture.md)
-  : Simulate data for an edge model with mixture components
-- [`summary(`*`<bison_mixture>`*`)`](https://bisonr.org/reference/summary.bison_mixture.md)
-  : Summary of a edge mixture model
+- [`model_comparison()`](https://bisonr.org/reference/model_comparison.md)
+  : Compare models with leave-one-out cross-validation
+
+## Exploring the network
+
 - [`summary(`*`<bison_model>`*`)`](https://bisonr.org/reference/summary.bison_model.md)
-  : Generates a summary object for an edge model object
+  : Summarise an edge weight model
+- [`get_edgelist()`](https://bisonr.org/reference/get_edgelist.md) : Get
+  the edge list with uncertainty
+- [`get_effects()`](https://bisonr.org/reference/get_effects.md) : Get
+  the estimates of other effects in an edge model
+- [`draw_edgelist_samples()`](https://bisonr.org/reference/draw_edgelist_samples.md)
+  : Draw samples of the edge list from the posterior
+- [`plot_network()`](https://bisonr.org/reference/plot_network.md) :
+  Plot the network with uncertainty
+- [`bison_to_igraph()`](https://bisonr.org/reference/bison_to_igraph.md)
+  : Convert a fitted edge model into a list of igraph networks
+
+## Network metrics
+
+- [`extract_metric()`](https://bisonr.org/reference/extract_metric.md) :
+  Extract posterior samples of network metrics
+- [`plot_metric()`](https://bisonr.org/reference/plot_metric.md) : Plot
+  the posterior distribution of a network metric
+
+## Regression
+
+Use network quantities in brms models while keeping their uncertainty.
+
+- [`bison_brm()`](https://bisonr.org/reference/bison_brm.md) : Fit a
+  regression with a network metric
+- [`bison_brm_get_prior()`](https://bisonr.org/reference/bison_brm_get_prior.md)
+  : List the priors of a bison_brm() regression
+- [`bison_mice()`](https://bisonr.org/reference/bison_mice.md) : Prepare
+  network data for multiple imputation with the mice package
+
+## Edge mixture models
+
+Look for different types of social relationship.
+
+- [`bison_mixture()`](https://bisonr.org/reference/bison_mixture.md) :
+  Fit an edge mixture model
+- [`summary(`*`<bison_mixture>`*`)`](https://bisonr.org/reference/summary.bison_mixture.md)
+  : Summarise an edge mixture model
+- [`get_network_component_probabilities()`](https://bisonr.org/reference/get_network_component_probabilities.md)
+  : Get the probability of each number of components in the network
+- [`get_edge_component_probabilities()`](https://bisonr.org/reference/get_edge_component_probabilities.md)
+  : Get the probability of each edge belonging to each component
+- [`get_component_means()`](https://bisonr.org/reference/get_component_means.md)
+  : Get the mean edge weight of each mixture component
+- [`plot_mixture()`](https://bisonr.org/reference/plot_mixture.md) :
+  Plot the components of an edge mixture model
+
+## Preparing data
+
+- [`convert_gbi_to_bison()`](https://bisonr.org/reference/convert_gbi_to_bison.md)
+  : Convert a group-by-individual matrix to bisonR format
+- [`convert_duration_to_binary()`](https://bisonr.org/reference/convert_duration_to_binary.md)
+  : Convert duration data to binary
+- [`simulate_bison_model()`](https://bisonr.org/reference/simulate_bison_model.md)
+  : Simulate observation data for an edge model
+- [`simulate_bison_model_mixture()`](https://bisonr.org/reference/simulate_bison_model_mixture.md)
+  : Simulate observation data with several types of edge
+
+## Saving models
+
+- [`bison_save()`](https://bisonr.org/reference/bison_save.md) : Save a
+  fitted bisonR model to disk
+
+- [`bison_load()`](https://bisonr.org/reference/bison_load.md) :
+
+  Load a bisonR model saved with
+  [`bison_save()`](https://bisonr.org/reference/bison_save.md)

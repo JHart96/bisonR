@@ -3,11 +3,21 @@ pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   bison_brms: bison_brms.html
+  comparing_networks: comparing_networks.html
+  count_data: count_data.html
+  diagnostics: diagnostics.html
+  directed_networks: directed_networks.html
+  edge_model_effects: edge_model_effects.html
   getting_started: getting_started.html
+  group_data: group_data.html
   mixture_models: mixture_models.html
   network_metrics: network_metrics.html
+  nodal_regression: nodal_regression.html
+  posterior_networks: posterior_networks.html
+  preparing_data: preparing_data.html
+  priors: priors.html
   windows_installation: windows_installation.html
-last_built: 2026-11-25T15:02Z
+last_built: 2026-11-27T13:49Z
 urls:
   reference: https://bisonr.org/reference
   article: https://bisonr.org/articles

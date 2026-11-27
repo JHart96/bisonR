@@ -1,89 +1,146 @@
-# Using brms with BISoN
+# Regression with brms
 
-bisonR can fully integrate with the popular Bayesian modelling package
-`brms`. This means that any brms model can be fit to network data such
-as edge weights, node centrality, or even global metrics comparing
-networks. This is achieved by treating network posteriors as imputed
-data and running multiple Bayesian models on these imputed data. This
-function is implemented as `bison_brm` and uses largely the same
-arguments as brms. The function returns an object of type
-`brm_multiple`.
+[`bison_brm()`](https://bisonr.org/reference/bison_brm.md) fits
+regression models with the [brms](https://paulbuerkner.com/brms/)
+package in which a network variable, such as an edge weight, a node
+metric or a global metric, is the response or a predictor. The
+uncertainty in the network is included in the results.
 
-bisonR uses a special notation to include network data in a brms
-formula. To specify network data, the wrapper `bison()` is used to tell
-the function that this variable should come from network data with
-uncertainty. Network properties can be calculated at three different
-levels: edge, node, and global. See the `network_metrics` vignette for
-information on available metrics. Depending on the type of analysis, you
-will need to specify node IDs or network IDs to ensure the data in your
-dataframe align with the network properties calculated in bisonR. This
-information is included as arguments to the network property in the
-formula.
+[`bison_brm()`](https://bisonr.org/reference/bison_brm.md) takes a
+number of posterior draws from the edge model (each draw is one possible
+network that is consistent with the data). It calculates the network
+variable for each draw, fits the brms model to each resulting dataset
+and combines the results. This is similar to multiple imputation, a
+method for missing data in which a model is fitted to several plausible
+versions of a dataset and the results are pooled. It takes the same
+arguments as
+[`brms::brm()`](https://paulbuerkner.com/brms/reference/brm.html), as
+well as the edge model(s) and data, and returns a `brmsfit` object.
 
-When running analyses comparing global properties of networks, multiple
-fitted edge models must be provided, corresponding to each network.
-`bisonR` introduces a preserved factor variable `bison_network` that can
-be used to reference the different networks. `bison_network` is an
-integer factor corresponding to the order that fitted edge models were
-provided to `bison_brm`.
+## Formula syntax
 
-This sounds a little complex, but is much easier to understand with
-examples. The table below shows some examples of how the analysis would
-be conducted in brms (or lm/lmer/etc) compared to `bison_brm`.
+Network variables are specified with `bison()` in the formula. Inside
+`bison()`, give the metric name (see
+[`vignette("network_metrics")`](https://bisonr.org/articles/network_metrics.md))
+followed by the column(s) in the data that identify the dyad, node or
+network for each row:
 
-| Standard formula  | bison_brm formula                              |
-|-------------------|------------------------------------------------|
-| `edge_weight ~ x` | `bison(edge_weight(node_1_id, node_2_id)) ~ x` |
-| `y ~ edge_weight` | `y ~ bison(edge_weight(node_1_id, node_2_id))` |
-| `strength ~ x`    | `bison(strength(node_id)) ~ x`                 |
-| `y ~ strength`    | `y ~ bison(strength(node_id))`                 |
-| `cv ~ x`          | `global_cv(bison_network) ~ x`                 |
-| `y ~ cv`          | `y ~ global_cv(bison_network)`                 |
+| Standard formula | [`bison_brm()`](https://bisonr.org/reference/bison_brm.md) formula | Row of the data frame is a… |
+|----|----|----|
+| `edge_weight ~ x` | `bison(edge_weight(node_1_id, node_2_id)) ~ x` | dyad |
+| `y ~ edge_weight` | `y ~ bison(edge_weight(node_1_id, node_2_id))` | dyad |
+| `strength ~ x` | `bison(node_strength(node_id)) ~ x` | node |
+| `y ~ strength` | `y ~ bison(node_strength(node_id))` | node |
+| `degree ~ x` | `bison(node_degree[0.2](node_id)) ~ x` | node |
+| `cv ~ x` | `bison(global_cv(bison_network)) ~ x` | network |
 
-## Examples
+When a list of edge models is given,
+[`bison_brm()`](https://bisonr.org/reference/bison_brm.md) adds a factor
+`bison_network` to the data, giving the position of each edge model in
+the list. It can be used like any other variable, for example to compare
+networks or as a random effect.
 
-### Dyadic regression
+Some notes:
 
-#### Edge weight as response
+- **Scale of edge weights.** In
+  [`bison_brm()`](https://bisonr.org/reference/bison_brm.md), edge
+  weights are on the link scale: log-odds (logit) for binary models and
+  log rates for count models. Node and global metrics are calculated
+  from edge weights on the natural scale.
+- **Scaling.** `scale = "z"` converts the network variable to z-scores
+  within each posterior draw (subtracting the mean and dividing by the
+  standard deviation), and `scale = "centre"` only subtracts the mean.
+  Standardising can make priors easier to set. For edge and node
+  metrics, scaling is done separately within each network. This removes
+  differences in the average level between networks, so use
+  `scale = "none"` to compare levels between networks. For global
+  metrics, scaling is done across networks.
+- **Selecting rows.** `subset` selects rows of the data with a logical
+  expression, e.g. `subset = sex == "F"`. Network metrics are still
+  calculated from the whole network.
+- **Number of draws.** `num_draws` sets the number of posterior draws
+  used. A model is fitted to each, so more draws take longer. We suggest
+  at least 100 for final analyses.
+- **R-hat warnings.** R-hat is a convergence diagnostic that compares
+  the MCMC chains (independent runs of the sampler). Because the results
+  of separate models are combined, brms may warn about high R-hat
+  values. This is expected, and convergence of the individual models can
+  be checked with `fit$rhats`.
+
+## Dyadic regression
+
+``` r
+
+library(bisonR)
+
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+df_edge <- sim_data$df_sim
+fit_edge <- bison_model(
+  (event | effort) ~ dyad(node_1_id, node_2_id),
+  data = df_edge,
+  model_type = "binary",
+  priors = get_default_priors("binary")
+)
+```
+
+### Edge weight as the response
+
+Edges that share a node are not independent. A multi-membership random
+effect, `(1 | mm(node_1_id, node_2_id))`, accounts for this by
+estimating an effect for each node that applies to every dyad the node
+is part of. It should usually be included in dyadic regressions.
+[`bison_brm()`](https://bisonr.org/reference/bison_brm.md) gives a
+warning if it is missing.
+
+``` r
+
+fit_dyadic <- bison_brm(
+  bison(edge_weight(node_1_id, node_2_id)) ~ age_diff + (1 | mm(node_1_id, node_2_id)),
+  fit_edge,
+  df_edge
+)
+summary(fit_dyadic)
+```
+
+### Edge weight as a predictor
 
 ``` r
 
 bison_brm(
-  bison(edge_weight(node_1_id, node_2_id)) ~ age_diff,
+  outcome ~ bison(edge_weight(node_1_id, node_2_id)) + (1 | mm(node_1_id, node_2_id)),
   fit_edge,
   df_edge
 )
 ```
 
-#### Edge weight as predictor
+### Comparing edge weights across networks
+
+Give a list of edge models and a matching list of data frames.
+`bison_network` identifies the network of each row:
 
 ``` r
 
 bison_brm(
-  mass ~ bison(edge_weight(node_1_id, node_2_id)),
-  fit_edge,
-  df_edge
-)
-```
-
-#### Edge weight as response with multiple networks
-
-When analysing multiple networks, we need to provide multiple fitted
-edge models and corresponding dataframes. If the network IDs are to be
-used, we can access them using the preserved variable `bison_network`.
-
-``` r
-
-bison_brm(
-  bison(edge_weight(node_1_id, node_2_id)) ~ bison_network,
+  bison(edge_weight(node_1_id, node_2_id)) ~ bison_network + (1 | mm(node_1_id, node_2_id)),
   list(fit_edge_control, fit_edge_treatment),
   list(df_edge_control, df_edge_treatment)
 )
 ```
 
-### Nodal regression
+## Nodal regression
 
-#### Node metric as a predictor
+The data frame has one row per node, with a column containing the node
+names used in the edge model:
+
+``` r
+
+df_nodal <- data.frame(
+  node = levels(df_edge$node_1_id),
+  trait = rnorm(10)
+)
+```
+
+### Node metric as a predictor
 
 ``` r
 
@@ -94,92 +151,78 @@ bison_brm(
 )
 ```
 
-#### Node metric as a response
+### Node metric as the response
 
 ``` r
 
 bison_brm(
-  bison(node_eigen(node)) ~ trait,
+  bison(node_strength(node)) ~ trait,
   fit_edge,
   df_nodal
 )
 ```
 
-#### Node metric as a response, controlling for network ID
-
-If running an analysis across multiple networks, it might sometimes be
-necessary to control for network ID. This could be done using a random
-effect (varying intercept) as follows:
+### Controlling for the network across several networks
 
 ``` r
 
 bison_brm(
   bison(node_eigen(node)) ~ trait + (1 | bison_network),
-  fit_edge_list,
-  df_nodal_list
+  list(fit_edge_1, fit_edge_2),
+  list(df_nodal_1, df_nodal_2)
 )
 ```
 
-### Global regression
+## Global regression
 
-#### Global metric as a response
-
-When running regression on global metrics, the fitted edge models must
-again be provided as a list. However, the dataframes can be provided
-either as 1) a list where each dataframe has one row, describing its
-corresponding edge model or 2) a dataframe, where each row in the
-dataframe corresponds to an edge model (where ordering is maintained).
+Global metrics need a list of edge models, one per network. The data can
+be a list of one-row data frames, or a single data frame with one row
+per edge model in the same order:
 
 ``` r
 
+df_global <- data.frame(
+  bison_network = factor(1:2),
+  condition = c("before", "after")
+)
 bison_brm(
-  bison(global_cv(bison_network)) ~ bison_network,
-  list(fit_edge_1, fit_edge_2),
+  bison(global_cv(bison_network)) ~ condition,
+  list(fit_edge_before, fit_edge_after),
   df_global
 )
 ```
 
-### Priors
+Each network contributes one observation to a global regression, so with
+only a few networks the results should be interpreted with care.
 
-The prior structure for a model (in the form of a `brmsprior` object)
-can be retrieved using the `bison_brm_get_prior` function:
+## Priors
+
+Priors describe which parameter values are plausible before the data are
+seen.
+[`bison_brm_get_prior()`](https://bisonr.org/reference/bison_brm_get_prior.md)
+returns the default brms priors for a model as a `brmsprior` object,
+which can be modified in the usual way:
 
 ``` r
 
 prior <- bison_brm_get_prior(
-  bison(global_cv(bison_network)) ~ bison_network,
-  list(fit_edge_1, fit_edge_2),
-  df_global
+  bison(edge_weight(node_1_id, node_2_id)) ~ age_diff + (1 | mm(node_1_id, node_2_id)),
+  fit_edge,
+  df_edge
 )
-```
-
-This object is a `brmsprior` object from the brms package, and can be
-modified in exactly the same way. For example, from the brms
-documentation, population-level fixed effects could be set all at once
-using:
-
-``` r
-
-## define a prior on all population-level effects a once
-prior$prior[1] <- "normal(0,10)"
-```
-
-Once priors are set, they can be fed to the `bison_brm` function in the
-`prior=` argument, as follows:
-
-``` r
+prior$prior[1] <- "normal(0, 1)" # Prior on all population-level effects
 
 bison_brm(
-  bison(global_cv(bison_network)) ~ bison_network,
-  list(fit_edge_1, fit_edge_2),
-  df_global,
-  prior=prior
+  bison(edge_weight(node_1_id, node_2_id)) ~ age_diff + (1 | mm(node_1_id, node_2_id)),
+  fit_edge,
+  df_edge,
+  prior = prior
 )
 ```
 
-### Conclusion
+## More
 
-This is just a small subset of all the possible types of model that can
-be fitted using the `bison_brm` function. For more information on the
-wide range of functionality available, check out the [brms
-documentation](https://paul-buerkner.github.io/brms/).
+Other brms features, such as different response families or smooth
+terms, can also be used with
+[`bison_brm()`](https://bisonr.org/reference/bison_brm.md). See the
+[brms documentation](https://paulbuerkner.com/brms/) for details.

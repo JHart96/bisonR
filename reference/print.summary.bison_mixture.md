@@ -22,3 +22,7 @@ print(x, digits = 3, ...)
 - ...:
 
   Additional arguments to be passed to print functions.
+
+## See also
+
+[`summary.bison_mixture()`](https://bisonr.org/reference/summary.bison_mixture.md)

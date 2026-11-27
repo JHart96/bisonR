@@ -5,26 +5,34 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Getting started • bisonR</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
-<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
-<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="icon" sizes="any" href="../favicon.ico">
-<link rel="manifest" href="../site.webmanifest">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_3-0.5.0/font.css" rel="stylesheet">
+<link href="../deps/JetBrains_Mono-0.5.0/font.css" rel="stylesheet">
+<link href="../deps/Source_Serif_4-0.5.0/font.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Getting started">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><script src="../extra.js"></script><meta property="og:title" content="Getting started">
+<meta name="description" content="A first analysis: fitting an edge weight model, checking it, plotting the network, and using it in regressions and network metrics.
+">
+<meta property="og:description" content="A first analysis: fitting an edge weight model, checking it, plotting the network, and using it in regressions and network metrics.
+">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">bisonR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,28 +41,24 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="active nav-item"><a class="nav-link" href="../articles/getting_started.html">Get started</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>bisonR</h6></li>
-    <li><a class="dropdown-item" href="../articles/getting_started.html">Getting started</a></li>
-    <li><a class="dropdown-item" href="../articles/bison_brms.html">Using brms with BISoN</a></li>
-    <li><a class="dropdown-item" href="../articles/mixture_models.html">Edge mixture models</a></li>
-    <li><a class="dropdown-item" href="../articles/network_metrics.html">Network metrics</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Help</h6></li>
-    <li><a class="dropdown-item" href="../articles/windows_installation.html">Installing cmdstanR on Windows</a></li>
-  </ul>
-</li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JHart96/bisonR/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JHart96/bisonR" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -77,31 +81,38 @@
 
     
     
+<p>This article goes through a basic BISoN analysis: fitting an edge
+weight model, checking it, and using the fitted network in regressions
+and network metrics.</p>
 <div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+<h2 id="what-bison-does">What BISoN does<a class="anchor" aria-label="anchor" href="#what-bison-does"></a>
 </h2>
-<p>bisonR is an R package for running social network analyses in the
-BISoN framework. BISoN models consist of two main stages: 1) fitting an
-edge weight model, capturing uncertainty in social network edges; and 2)
-propagating this uncertainty through subsequent analyses such as
-regressions. In this short tutorial we’ll cover how to fit edge weight
-models to a simulated dataset, and show how the fitted edge weight model
-can be used to run dyadic and nodal regression analysis, as well as
-non-random edge weight tests.</p>
-<p>Before beginning, we’ll load in the <code>bisonR</code> package using
-<code><a href="https://bisonr.org">library(bisonR)</a></code>, and we’ll also bring in <code>dplyr</code>
-to help with data wrangling. If you don’t already have
-<code>bisonR</code> installed, you can install it from Github using the
-following code:</p>
+<p>Social network analyses often start by calculating an edge weight for
+each pair of individuals (a <em>dyad</em>), such as the proportion of
+sampling periods in which they were seen together, and then treat these
+values as known. An edge weight calculated from 2 observations is much
+less certain than one calculated from 200, and not accounting for this
+can lead to overconfident conclusions.</p>
+<p>BISoN works in two stages:</p>
+<ol style="list-style-type: decimal">
+<li>An <strong>edge weight model</strong> estimates the edge weight of
+each dyad from the observation data, giving a posterior distribution for
+each edge: the range of plausible edge weights and how probable each one
+is. Dyads that were observed less have wider posteriors.</li>
+<li>
+<strong>Downstream analyses</strong> (regressions, network metrics,
+comparisons between networks) use posterior draws (values sampled from
+these distributions), so the uncertainty in the edge weights is included
+in the results.</li>
+</ol>
+<p>The edge weight model is used to estimate the network, not to test
+hypotheses about it. Hypotheses are tested in the second stage.</p>
+</div>
+<div class="section level2">
+<h2 id="setting-up">Setting up<a class="anchor" aria-label="anchor" href="#setting-up"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JHart96/bisonR"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bisonr.org">bisonR</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: cmdstanr</span></span>
-<span><span class="co">#&gt; This is cmdstanr version 0.9.0.9002</span></span>
-<span><span class="co">#&gt; - CmdStanR documentation and vignettes: mc-stan.org/cmdstanr</span></span>
-<span><span class="co">#&gt; - CmdStan path: /home/runner/.cmdstan/cmdstan-2.40.0</span></span>
-<span><span class="co">#&gt; - CmdStan version: 2.40.0</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
@@ -111,41 +122,106 @@ following code:</p>
 <span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span></code></pre></div>
-<p>We will use the <code><a href="../reference/simulate_bison_model.html">simulate_bison_model()</a></code> function from
-<code>bisonR</code> to simulate some observation data. This dataframe is
-an example of the format that bisonR uses. Each row corresponds to an
-observation (such as an association within a sampling period of a dyad
-or a count of interactions between a dyad). Additional
-observation-level, dyad-level, or node-level factors can also be
-included.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_bison_model.html">simulate_bison_model</a></span><span class="op">(</span><span class="st">"binary"</span>, aggregated <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">sim_data</span><span class="op">$</span><span class="va">df_sim</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   event node_1_id node_2_id age_diff    age_1    age_2 location duration</span></span>
-<span><span class="co">#&gt; 1     0         1         2 1.194657 18.83836 17.64370        4        1</span></span>
-<span><span class="co">#&gt; 2     1         1         3 2.008570 18.83836 16.82979        3        1</span></span>
-<span><span class="co">#&gt; 3     1         1         3 2.008570 18.83836 16.82979        4        1</span></span>
-<span><span class="co">#&gt; 4     1         1         3 2.008570 18.83836 16.82979        3        1</span></span>
-<span><span class="co">#&gt; 5     1         1         4 1.224984 18.83836 17.61338        3        1</span></span>
-<span><span class="co">#&gt; 6     1         1         4 1.224984 18.83836 17.61338        4        1</span></span></code></pre></div>
+<p>If you haven’t installed bisonR yet, see the <a href="https://bisonr.org/#installation">installation
+instructions</a>.</p>
 </div>
 <div class="section level2">
-<h2 id="edge-models">Edge Models<a class="anchor" aria-label="anchor" href="#edge-models"></a>
+<h2 id="the-data">The data<a class="anchor" aria-label="anchor" href="#the-data"></a>
 </h2>
-<p>Depending on the type of data being analysed, different edge models
-should be used. See the <code>BISoN introduction</code> vignette for
-more details on this. In this example we’re using binary data, where
-events can either occur (1) or not occur (0) in a particular sampling
-period. In our dataframe this corresponds to <code>event = 1</code> or
-<code>event = 0</code>.</p>
-<p>The bisonR framework is fully Bayesian, and therefore specifying
-priors is a key part of any analysis. Priors can be tricky to set, and
-techniques for choosing good priors are outside the scope of this
-tutorial. You can see which priors need to be set for a particular model
-using the <code><a href="../reference/get_default_priors.html">get_default_priors()</a></code> function. These are only
-defaults and should almost always be changed.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<p>bisonR works with <em>observation data</em> in a format similar to an
+edge list: each row describes observations of one dyad. The columns you
+need are:</p>
+<ul>
+<li>
+<strong>two node columns</strong> naming the individuals in the dyad
+(here <code>node_1_id</code> and <code>node_2_id</code>);</li>
+<li>an <strong>event</strong> column: the number of social events seen.
+For binary data this is 1 if the dyad was seen together (or interacting)
+in a sampling period and 0 otherwise. For count data it is the number of
+interactions;</li>
+<li>an <strong>effort</strong> column: how much the dyad was observed,
+such as the number of sampling periods or the number of hours of
+observation.</li>
+</ul>
+<p>The rows can be <em>disaggregated</em> (one row per sampling period
+or observation session) or <em>aggregated</em> (one row per dyad, with
+events and effort summed). Any other columns, such as location or
+individual traits, can be included and used as predictors. See
+<code><a href="../articles/preparing_data.html">vignette("preparing_data")</a></code> for converting your own data
+into this format.</p>
+<p>This article uses simulated data from
+<code><a href="../reference/simulate_bison_model.html">simulate_bison_model()</a></code>:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_bison_model.html">simulate_bison_model</a></span><span class="op">(</span><span class="st">"binary"</span>, aggregated <span class="op">=</span> <span class="cn">FALSE</span>, max_obs <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">sim_data</span><span class="op">$</span><span class="va">df_sim</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   node_1_id node_2_id event effort   age_diff   age_1    age_2 location</span></span>
+<span><span class="co">#&gt; 1         1         2     1      1 -1.9874477 18.1389 20.12635        5</span></span>
+<span><span class="co">#&gt; 2         1         2     0      1 -1.9874477 18.1389 20.12635        4</span></span>
+<span><span class="co">#&gt; 3         1         2     1      1 -1.9874477 18.1389 20.12635        4</span></span>
+<span><span class="co">#&gt; 4         1         2     1      1 -1.9874477 18.1389 20.12635        4</span></span>
+<span><span class="co">#&gt; 5         1         2     1      1 -1.9874477 18.1389 20.12635        2</span></span>
+<span><span class="co">#&gt; 6         1         3     0      1  0.8716649 18.1389 17.26724        1</span></span>
+<span><span class="co">#&gt;   duration</span></span>
+<span><span class="co">#&gt; 1        1</span></span>
+<span><span class="co">#&gt; 2        1</span></span>
+<span><span class="co">#&gt; 3        1</span></span>
+<span><span class="co">#&gt; 4        1</span></span>
+<span><span class="co">#&gt; 5        1</span></span>
+<span><span class="co">#&gt; 6        1</span></span></code></pre></div>
+<p>Each row is one sampling period for one dyad: <code>event</code> is 1
+if the pair were seen together, and <code>effort</code> is the
+observation effort for that row (one sampling period). The
+<code>duration</code> column is a copy of <code>effort</code>, kept so
+that older code still works.</p>
+</div>
+<div class="section level2">
+<h2 id="fitting-the-edge-weight-model">Fitting the edge weight model<a class="anchor" aria-label="anchor" href="#fitting-the-edge-weight-model"></a>
+</h2>
+<div class="section level3">
+<h3 id="choosing-the-model-type">Choosing the model type<a class="anchor" aria-label="anchor" href="#choosing-the-model-type"></a>
+</h3>
+<p>The type of edge model depends on the type of data:</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>Data</th>
+<th><code>model_type</code></th>
+<th>Edge weight means</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Seen together / not seen together in each sampling period</td>
+<td><code>"binary"</code></td>
+<td>Probability of being seen together in a sampling period</td>
+</tr>
+<tr class="even">
+<td>Number of interactions in a period of observation</td>
+<td><code>"count"</code></td>
+<td>Rate of interactions per unit of effort</td>
+</tr>
+<tr class="odd">
+<td>As above, but only edge weights are needed (no other effects)</td>
+<td>
+<code>"binary_conjugate"</code>, <code>"count_conjugate"</code>
+</td>
+<td>As above, calculated exactly and almost instantly</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="priors">Priors<a class="anchor" aria-label="anchor" href="#priors"></a>
+</h3>
+<p>BISoN is a Bayesian framework, so each model needs priors:
+distributions that describe what is believed about the parameters before
+seeing the data. <code><a href="../reference/get_default_priors.html">get_default_priors()</a></code> gives a starting
+point:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_default_priors.html">get_default_priors</a></span><span class="op">(</span><span class="st">"binary"</span><span class="op">)</span></span>
 <span><span class="va">priors</span></span>
 <span><span class="co">#&gt; $edge</span></span>
@@ -154,442 +230,370 @@ defaults and should almost always be changed.</p>
 <span><span class="co">#&gt; $fixed</span></span>
 <span><span class="co">#&gt; [1] "normal(0, 2.5)"</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $random_mean</span></span>
-<span><span class="co">#&gt; [1] "normal(0, 1)"</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $random_std</span></span>
 <span><span class="co">#&gt; [1] "half-normal(1)"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $zero_prob</span></span>
 <span><span class="co">#&gt; [1] "beta(1, 1)"</span></span></code></pre></div>
-<p>The priors object gives a list of priors on the parameters for the
-edge model: the edge weights, additional fixed effects, and random
-effect parameters. The <code><a href="../reference/prior_check.html">prior_check()</a></code> function can be used
-to plot the prior distributions, and we’ll use this to check that we’re
-happy with the priors:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<p>Edge weights in binary models are estimated on the logit scale, as
+log-odds, where 0 corresponds to a probability of 0.5. So
+<code>normal(0, 2.5)</code> is a distribution over log-odds.
+<code><a href="../reference/prior_check.html">prior_check()</a></code> shows what the priors imply on the natural
+scale (probabilities):</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/prior_check.html">prior_check</a></span><span class="op">(</span><span class="va">priors</span>, <span class="st">"binary"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="getting_started_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="700"></p>
-<p>The priors should encode our prior beliefs about likely values of the
-parameters. For demonstration purposes let’s say we expect edge weights
-to be concentrated lower, towards zero. We can modify the priors on edge
-weight like this:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">priors</span><span class="op">$</span><span class="va">edge</span> <span class="op">&lt;-</span> <span class="st">"normal(-1, 2.5)"</span></span>
+<p><img src="getting_started_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="100%"></p>
+<p>The default edge prior puts a lot of weight near 0 and 1. If most
+dyads are expected to associate rarely, a prior with more weight on
+lower probabilities may be more appropriate:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">priors</span><span class="op">$</span><span class="va">edge</span> <span class="op">&lt;-</span> <span class="st">"normal(-1, 1.5)"</span></span>
 <span><span class="fu"><a href="../reference/prior_check.html">prior_check</a></span><span class="op">(</span><span class="va">priors</span>, <span class="st">"binary"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="getting_started_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="700"></p>
-<p>Depending on the biology, this might be more like what we want to
-see. Now we’ve set our priors and we’re happy with them, we can fit the
-edge model using the <code><a href="../reference/bison_model.html">bison_model()</a></code> function. This is one of
-the main functions of the <code>bisonR</code> package and has a lot of
-functionality. The main thing to worry about is how to define the edge
-weight model formula. The formula are designed to be familar to those
-who have used <code>lm</code>, <code>lme4</code>, <code>brms</code>, and
-other regression packages. The main difference here is that we need to
-include some measure of observation effort to get accurate estimates of
-edge weight uncertainty.</p>
-<p>In bisonR, the left hand side of the <code>~</code> describes the
-sampling data, and uses the <code>(event | duration)</code> notation. In
-this notation, <code>event</code> corresponds to the name of the column
-in the dataframe that represents the measure of social events, such as 1
-and 0 in the binary model, or frequencies 0, 1, 2, … in the count model.
-If using an unaggregated dataframe, the <code>duration</code>
-corresponds to the durations of each observation. In our case this is
-fixed, but this will depend on the data at hand.</p>
-<p>The right hand side of the <code>~</code> describes the predictors
-that are associated with social events. In the standard BISoN model this
-is primarily the edge weight that we use to build the network, but this
-can also include additional effects such as age, sex, or even
-observation-level factors such as location, time of day, or weather, to
-name a few. Including additional effects will change the interpretation
-of edge weights, but could be useful if interested in the social network
-once some factors have been controlled for. <em>Note</em> the edge
-weights don’t need to be included, and you could use bisonR to estimate
-generative effects in a network. In this example we’ll keep things
-simple and just use edge weight as the only predictor. This is done
-using the <code>dyad(node_1_id, node_2_id)</code> notation.
-<code>node_1_id</code> and <code>node_2_id</code> represent the nodes
-corresponding to each individual in the network, and need to be stored
-as factors in the dataframe. They don’t need to be IDs, and could be
-individual names, as long as they’re stored as factors. Now we
-understand the basics of the formula notation, we can now fit the edge
-weight model:</p>
+<p><img src="getting_started_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="100%"></p>
+<p>Priors should be chosen for the study system, and the defaults
+checked before use.</p>
+</div>
+<div class="section level3">
+<h3 id="the-formula">The formula<a class="anchor" aria-label="anchor" href="#the-formula"></a>
+</h3>
+<p>Edge models are specified with a formula, like those used by
+<code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm()</a></code> and <code>brms</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="va">effort</span><span class="op">)</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span><span class="op">)</span></span></code></pre></div>
+<ul>
+<li>The left-hand side, <code>(event | effort)</code>, gives the event
+and effort columns.</li>
+<li>The right-hand side gives the terms in the model.
+<code>dyad(node_1_id, node_2_id)</code> estimates an edge weight for
+each dyad.</li>
+</ul>
+<p>Other effects can be added to the right-hand side to account for
+factors that affect how often social events are observed. For example,
+<code>+ location</code> adds a fixed effect (a separate estimate for
+each location) and <code>+ (1 | location)</code> adds a random effect
+(location estimates drawn from a shared distribution). With these
+effects included, the edge weights represent each dyad’s tendency to
+associate after controlling for them.</p>
+<p>Fit the model with <code><a href="../reference/bison_model.html">bison_model()</a></code>:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_edge</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bison_model.html">bison_model</a></span><span class="op">(</span></span>
-<span>  <span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="va">duration</span><span class="op">)</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span><span class="op">)</span>, </span>
-<span>  data<span class="op">=</span><span class="va">df</span>, </span>
-<span>  model_type<span class="op">=</span><span class="st">"binary"</span>,</span>
-<span>  priors<span class="op">=</span><span class="va">priors</span></span>
+<span>  <span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="va">effort</span><span class="op">)</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">df</span>,</span>
+<span>  model_type <span class="op">=</span> <span class="st">"binary"</span>,</span>
+<span>  priors <span class="op">=</span> <span class="va">priors</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Running MCMC with 4 parallel chains...</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Chain 1 finished in 0.3 seconds.</span></span>
-<span><span class="co">#&gt; Chain 2 finished in 0.3 seconds.</span></span>
-<span><span class="co">#&gt; Chain 3 finished in 0.3 seconds.</span></span>
-<span><span class="co">#&gt; Chain 4 finished in 0.4 seconds.</span></span>
+<span><span class="co">#&gt; Chain 1 finished in 1.2 seconds.</span></span>
+<span><span class="co">#&gt; Chain 2 finished in 1.3 seconds.</span></span>
+<span><span class="co">#&gt; Chain 3 finished in 1.3 seconds.</span></span>
+<span><span class="co">#&gt; Chain 4 finished in 1.2 seconds.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; All 4 chains finished successfully.</span></span>
-<span><span class="co">#&gt; Mean chain execution time: 0.3 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 0.6 seconds.</span></span></code></pre></div>
-<p>Depending on your dataset this can take anywhere between a few tenths
-of a second and several hours. In particular if you have a large dataset
-and no observation-level predictors, it’s probably a good idea to use
-the aggregated version of the model where all observations per dyad are
-collapsed to a single row. This will speed up model fitting
-considerably.</p>
-<p>Once the model has fitted, we need to check that the MCMC algorithm
-has behaved correctly. Often if there’s a major problem, the
-<code><a href="../reference/bison_model.html">bison_model()</a></code> function itself will have triggered warning
-messages above. But even if everything is silent, it’s still worth
-checking the traceplots to check the MCMC chains have converged. The
-chains should be well-mixed and look something like a fuzzy caterpillar.
-We can check for this using the <code><a href="../reference/plot_trace.html">plot_trace()</a></code> function:</p>
+<span><span class="co">#&gt; Mean chain execution time: 1.2 seconds.</span></span>
+<span><span class="co">#&gt; Total execution time: 1.4 seconds.</span></span></code></pre></div>
+<p>Fitting time depends on the size of the dataset. The Stan models are
+compiled the first time they are used and then cached. If there are no
+observation-level effects, aggregating the data to one row per dyad is
+faster and gives the same edge weights. A conjugate model is faster
+still. It uses a different prior, but gives similar edge weights.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="checking-the-model">Checking the model<a class="anchor" aria-label="anchor" href="#checking-the-model"></a>
+</h2>
+<div class="section level3">
+<h3 id="mcmc-diagnostics">MCMC diagnostics<a class="anchor" aria-label="anchor" href="#mcmc-diagnostics"></a>
+</h3>
+<p><code><a href="../reference/bison_model.html">bison_model()</a></code> fits models with Stan’s MCMC (Markov chain
+Monte Carlo) sampler, an algorithm that draws samples from the
+posterior. Stan gives warnings for problems such as divergent
+transitions, but the trace plots should also be checked. Each line is
+one chain (an independent run of the sampler). The chains should overlap
+and show no trends:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_trace.html">plot_trace</a></span><span class="op">(</span><span class="va">fit_edge</span>, par_ids<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="getting_started_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="700"></p>
-<p>If we’re satisfied that the MCMC algorithm has done its job properly,
-then it’s time to see if the same is true for the model. One way to do
-this, among many others, is to check the predictions from the fitted
-model against the real data. This can be done using the
-<code><a href="../reference/plot_predictions.html">plot_predictions()</a></code> function. If the real data are within
-the ensemble of predictions from the model, then we have a little more
-faith that the model is capturing at least some important properties of
-the data. The statistical model implies a range of predictions that we
-can extract over multiple draws, the number of which can be set using
-the <code>num_draws</code> argument.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_trace.html">plot_trace</a></span><span class="op">(</span><span class="va">fit_edge</span>, par_ids <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span></code></pre></div>
+<p><img src="getting_started_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="100%"></p>
+</div>
+<div class="section level3">
+<h3 id="posterior-predictive-checks">Posterior predictive checks<a class="anchor" aria-label="anchor" href="#posterior-predictive-checks"></a>
+</h3>
+<p>Posterior predictive checks compare data simulated from the fitted
+model with the observed data. With <code>type = "density"</code>,
+<code><a href="../reference/plot_predictions.html">plot_predictions()</a></code> shows the distribution of observed event
+rates across dyads (red) and the same distribution in 20 simulated
+datasets (teal):</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_predictions.html">plot_predictions</a></span><span class="op">(</span><span class="va">fit_edge</span>, num_draws<span class="op">=</span><span class="fl">20</span>, type<span class="op">=</span><span class="st">"density"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="getting_started_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="700"></p>
-<p>The predictions from the model are shown in blue and the real data
-are shown in black. Ideally the blue lines should be distributed around
-the black line, indicating the real data are among the possible
-predictions of the model. It’s usually a good idea to run multiple
-predictive checks to ensure the model has captured various important
-characteristics of the data. Another type of check supported by
-<code>bisonR</code> is a comparison against point estimates of edge
-weights:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_predictions.html">plot_predictions</a></span><span class="op">(</span><span class="va">fit_edge</span>, num_draws <span class="op">=</span> <span class="fl">20</span>, type <span class="op">=</span> <span class="st">"density"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="getting_started_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="100%"></p>
+<p>The observed distribution should fall within the range of the
+simulated ones. <code>type = "stats"</code> compares summary statistics
+of the observed and simulated data. For example, if the observed
+proportion of dyads with no events is much higher than in the simulated
+data, a zero-inflated model (<code>zero_inflated = TRUE</code>) may be
+more appropriate:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_predictions.html">plot_predictions</a></span><span class="op">(</span><span class="va">fit_edge</span>, num_draws<span class="op">=</span><span class="fl">20</span>, type<span class="op">=</span><span class="st">"point"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="getting_started_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="700"></p>
-<p>This plot shows BISoN estimates denoted by an interval, where the 90%
-probability interval is shown by the thin line, and the 50% probability
-interval is shown by the thicker blue line. We should see a roughly
-linear relationship between point estimates and BISoN estimates, though
-at the extremes the BISoN estimates are likely to be less extreme unless
-there are sufficient data. This is by design, as BISoN uses a full
-probabilistic model of social events to generate its estimates, and will
-be sceptical of extreme values without sufficient evidence.</p>
-<p>Now we’ve conducted two basic diagnostic checks of the edge weight
-model, we can start to trust what it’s telling us. To see a summary of
-edge weights and their credible intervals, we can use the
-<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> function:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_predictions.html">plot_predictions</a></span><span class="op">(</span><span class="va">fit_edge</span>, num_draws <span class="op">=</span> <span class="fl">100</span>, type <span class="op">=</span> <span class="st">"stats"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="getting_started_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="100%"></p>
+<p>Passing these checks does not guarantee that the model is
+appropriate, but failing them indicates a problem.</p>
+</div>
+<div class="section level3">
+<h3 id="comparing-with-simple-estimates">Comparing with simple estimates<a class="anchor" aria-label="anchor" href="#comparing-with-simple-estimates"></a>
+</h3>
+<p><code>type = "point"</code> plots the BISoN estimates against simple
+point estimates (events divided by effort):</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_predictions.html">plot_predictions</a></span><span class="op">(</span><span class="va">fit_edge</span>, type <span class="op">=</span> <span class="st">"point"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="getting_started_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="100%"></p>
+<p>Each vertical line is the 90% credible interval for a dyad (the range
+that contains the edge weight with 90% probability), and the thicker
+section is the 50% interval. The estimates should roughly follow the
+dashed line. For dyads with few observations, the estimates are pulled
+towards the prior and are less extreme than the point estimates. For
+example, a dyad seen together in 1 out of 1 sampling periods has a point
+estimate of 1, but there is little evidence that they are always
+together.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="looking-at-the-network">Looking at the network<a class="anchor" aria-label="anchor" href="#looking-at-the-network"></a>
+</h2>
+<p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> shows the estimated edge weight of each
+dyad:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_edge</span><span class="op">)</span></span>
 <span><span class="co">#&gt; === Fitted BISoN edge model ===</span></span>
 <span><span class="co">#&gt; Data type: binary</span></span>
-<span><span class="co">#&gt; Formula: (event | duration) ~ dyad(node_1_id, node_2_id)</span></span>
+<span><span class="co">#&gt; Formula: (event | effort) ~ dyad(node_1_id, node_2_id)</span></span>
 <span><span class="co">#&gt; Number of nodes: 10</span></span>
 <span><span class="co">#&gt; Number of dyads: 45</span></span>
 <span><span class="co">#&gt; Directed: FALSE</span></span>
 <span><span class="co">#&gt; === Edge list summary ===</span></span>
 <span><span class="co">#&gt;          median    5%   95%</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 2   0.105 0.003 0.706</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 3   0.883 0.484 0.992</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 4   0.700 0.315 0.938</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 5   0.907 0.591 0.992</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 6   0.907 0.585 0.992</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 7   0.565 0.232 0.856</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 8   0.415 0.064 0.872</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 9   0.843 0.345 0.990</span></span>
-<span><span class="co">#&gt; 1 &lt;-&gt; 10  0.053 0.002 0.380</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 3   0.430 0.068 0.874</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 4   0.369 0.104 0.715</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 5   0.429 0.070 0.866</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 6   0.073 0.003 0.497</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 7   0.077 0.003 0.500</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 8   0.373 0.096 0.723</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 9   0.181 0.030 0.516</span></span>
-<span><span class="co">#&gt; 2 &lt;-&gt; 10  0.041 0.002 0.268</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 4   0.733 0.145 0.985</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 5   0.920 0.645 0.994</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 6   0.074 0.003 0.490</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 7   0.113 0.004 0.686</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 8   0.293 0.045 0.727</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 9   0.073 0.003 0.491</span></span>
-<span><span class="co">#&gt; 3 &lt;-&gt; 10  0.076 0.003 0.502</span></span>
-<span><span class="co">#&gt; 4 &lt;-&gt; 5   0.920 0.641 0.994</span></span>
-<span><span class="co">#&gt; 4 &lt;-&gt; 6   0.839 0.339 0.989</span></span>
-<span><span class="co">#&gt; 4 &lt;-&gt; 7   0.367 0.104 0.710</span></span>
-<span><span class="co">#&gt; 4 &lt;-&gt; 8   0.071 0.002 0.489</span></span>
-<span><span class="co">#&gt; 4 &lt;-&gt; 9   0.433 0.070 0.865</span></span>
-<span><span class="co">#&gt; 4 &lt;-&gt; 10  0.056 0.002 0.376</span></span>
-<span><span class="co">#&gt; 5 &lt;-&gt; 6   0.041 0.002 0.277</span></span>
-<span><span class="co">#&gt; 5 &lt;-&gt; 7   0.041 0.002 0.272</span></span>
-<span><span class="co">#&gt; 5 &lt;-&gt; 8   0.429 0.074 0.866</span></span>
-<span><span class="co">#&gt; 5 &lt;-&gt; 9   0.040 0.002 0.267</span></span>
-<span><span class="co">#&gt; 5 &lt;-&gt; 10  0.056 0.003 0.376</span></span>
-<span><span class="co">#&gt; 6 &lt;-&gt; 7   0.109 0.004 0.673</span></span>
-<span><span class="co">#&gt; 6 &lt;-&gt; 8   0.111 0.003 0.675</span></span>
-<span><span class="co">#&gt; 6 &lt;-&gt; 9   0.295 0.046 0.746</span></span>
-<span><span class="co">#&gt; 6 &lt;-&gt; 10  0.105 0.003 0.707</span></span>
-<span><span class="co">#&gt; 7 &lt;-&gt; 8   0.734 0.148 0.984</span></span>
-<span><span class="co">#&gt; 7 &lt;-&gt; 9   0.055 0.003 0.378</span></span>
-<span><span class="co">#&gt; 7 &lt;-&gt; 10  0.037 0.002 0.270</span></span>
-<span><span class="co">#&gt; 8 &lt;-&gt; 9   0.105 0.003 0.685</span></span>
-<span><span class="co">#&gt; 8 &lt;-&gt; 10  0.069 0.003 0.471</span></span>
-<span><span class="co">#&gt; 9 &lt;-&gt; 10  0.040 0.002 0.259</span></span></code></pre></div>
-<p>It can be hard to get an intuitive idea for what’s going on looking
-only at a summary table, so this is where it can be useful to visualise
-the network too. The <code><a href="../reference/plot_network.html">plot_network()</a></code> function does this for
-BISoN edge weight models, where uncertainty is shown on edge weights.
-Uncertainty is visualised by showing the lower and upper bounds as
-overlapping edges in the network.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_network.html">plot_network</a></span><span class="op">(</span><span class="va">fit_edge</span>, lwd<span class="op">=</span><span class="fl">5</span><span class="op">)</span></span></code></pre></div>
-<p><img src="getting_started_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="700"></p>
+<span><span class="co">#&gt; 1 &lt;-&gt; 2   0.667 0.353 0.892</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 3   0.292 0.073 0.645</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 4   0.617 0.399 0.812</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 5   0.147 0.033 0.391</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 6   0.228 0.094 0.433</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 7   0.508 0.210 0.796</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 8   0.271 0.091 0.539</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 9   0.260 0.115 0.456</span></span>
+<span><span class="co">#&gt; 1 &lt;-&gt; 10  0.077 0.013 0.272</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 3   0.711 0.420 0.905</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 4   0.418 0.142 0.750</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 5   0.538 0.316 0.754</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 6   0.176 0.069 0.352</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 7   0.292 0.154 0.464</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 8   0.213 0.050 0.518</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 9   0.529 0.344 0.714</span></span>
+<span><span class="co">#&gt; 2 &lt;-&gt; 10  0.240 0.057 0.579</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 4   0.473 0.291 0.665</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 5   0.430 0.262 0.612</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 6   0.433 0.180 0.727</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 7   0.649 0.242 0.923</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 8   0.300 0.098 0.605</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 9   0.622 0.442 0.780</span></span>
+<span><span class="co">#&gt; 3 &lt;-&gt; 10  0.245 0.062 0.575</span></span>
+<span><span class="co">#&gt; 4 &lt;-&gt; 5   0.601 0.421 0.765</span></span>
+<span><span class="co">#&gt; 4 &lt;-&gt; 6   0.151 0.037 0.389</span></span>
+<span><span class="co">#&gt; 4 &lt;-&gt; 7   0.178 0.023 0.626</span></span>
+<span><span class="co">#&gt; 4 &lt;-&gt; 8   0.090 0.016 0.324</span></span>
+<span><span class="co">#&gt; 4 &lt;-&gt; 9   0.103 0.016 0.370</span></span>
+<span><span class="co">#&gt; 4 &lt;-&gt; 10  0.573 0.287 0.828</span></span>
+<span><span class="co">#&gt; 5 &lt;-&gt; 6   0.511 0.214 0.799</span></span>
+<span><span class="co">#&gt; 5 &lt;-&gt; 7   0.052 0.009 0.178</span></span>
+<span><span class="co">#&gt; 5 &lt;-&gt; 8   0.164 0.052 0.352</span></span>
+<span><span class="co">#&gt; 5 &lt;-&gt; 9   0.241 0.059 0.581</span></span>
+<span><span class="co">#&gt; 5 &lt;-&gt; 10  0.465 0.260 0.677</span></span>
+<span><span class="co">#&gt; 6 &lt;-&gt; 7   0.655 0.253 0.923</span></span>
+<span><span class="co">#&gt; 6 &lt;-&gt; 8   0.701 0.458 0.884</span></span>
+<span><span class="co">#&gt; 6 &lt;-&gt; 9   0.650 0.474 0.803</span></span>
+<span><span class="co">#&gt; 6 &lt;-&gt; 10  0.713 0.497 0.873</span></span>
+<span><span class="co">#&gt; 7 &lt;-&gt; 8   0.524 0.126 0.894</span></span>
+<span><span class="co">#&gt; 7 &lt;-&gt; 9   0.730 0.350 0.944</span></span>
+<span><span class="co">#&gt; 7 &lt;-&gt; 10  0.203 0.069 0.424</span></span>
+<span><span class="co">#&gt; 8 &lt;-&gt; 9   0.521 0.121 0.898</span></span>
+<span><span class="co">#&gt; 8 &lt;-&gt; 10  0.181 0.044 0.455</span></span>
+<span><span class="co">#&gt; 9 &lt;-&gt; 10  0.246 0.057 0.597</span></span></code></pre></div>
+<p>For each dyad, <code>median</code> is the posterior median of the
+edge weight (here, the probability that the pair are seen together in a
+sampling period), and <code>5%</code> and <code>95%</code> are the
+bounds of the 90% credible interval. <code><a href="../reference/get_edgelist.html">get_edgelist()</a></code> returns
+the same information as a data frame. The width of the interval can be
+changed with <code>ci</code>, for example <code>ci = 0.95</code>.</p>
+<p><code><a href="../reference/plot_network.html">plot_network()</a></code> draws the network with its
+uncertainty:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_network.html">plot_network</a></span><span class="op">(</span><span class="va">fit_edge</span>, lwd <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<p><img src="getting_started_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="100%"></p>
+<p>Each edge is drawn twice. The width of the dark line is the lower
+bound (5%) of the edge weight, and the width of the light band is the
+upper bound (95%). Edges with a large difference between the two are
+more uncertain. Edges can be hidden with <code>threshold</code>, for
+example <code>threshold = 0.2</code> only shows edges with a median
+weight of at least 0.2.</p>
 </div>
 <div class="section level2">
-<h2 id="non-random-edge-weights">Non-random Edge Weights<a class="anchor" aria-label="anchor" href="#non-random-edge-weights"></a>
+<h2 id="is-the-network-non-random">Is the network non-random?<a class="anchor" aria-label="anchor" href="#is-the-network-non-random"></a>
 </h2>
-<p>Now that we have a fitted edge weight model we’re happy with, we can
-move to downstream analyses. The first of these we’ll consider is the
-non-random edge weight analysis, which is a Bayesian version of the
-Bejder et al. 1998 test for non-random association. In this analysis we
-compare the fitted edge weight model to a null version of the model
-where all edges have the same weight. We then use the
-<code>model_comparison</code> function to estimate the relative
-probabilities of the full edge weight model against the null model:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<p>To test for non-random association, compare the edge model with a
+null model in which every dyad has the same rate (<code>~ 1</code>):</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_null</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bison_model.html">bison_model</a></span><span class="op">(</span></span>
-<span>  <span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="va">duration</span><span class="op">)</span> <span class="op">~</span> <span class="fl">1</span>, </span>
-<span>  data<span class="op">=</span><span class="va">df</span>, </span>
-<span>  model_type<span class="op">=</span><span class="st">"binary"</span>,</span>
-<span>  priors<span class="op">=</span><span class="va">priors</span></span>
+<span>  <span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="va">effort</span><span class="op">)</span> <span class="op">~</span> <span class="fl">1</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">df</span>,</span>
+<span>  model_type <span class="op">=</span> <span class="st">"binary"</span>,</span>
+<span>  priors <span class="op">=</span> <span class="va">priors</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Running MCMC with 4 parallel chains...</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Chain 1 finished in 0.2 seconds.</span></span>
-<span><span class="co">#&gt; Chain 2 finished in 0.2 seconds.</span></span>
-<span><span class="co">#&gt; Chain 3 finished in 0.2 seconds.</span></span>
-<span><span class="co">#&gt; Chain 4 finished in 0.2 seconds.</span></span>
+<span><span class="co">#&gt; Chain 1 finished in 0.8 seconds.</span></span>
+<span><span class="co">#&gt; Chain 2 finished in 0.8 seconds.</span></span>
+<span><span class="co">#&gt; Chain 3 finished in 0.8 seconds.</span></span>
+<span><span class="co">#&gt; Chain 4 finished in 0.8 seconds.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; All 4 chains finished successfully.</span></span>
-<span><span class="co">#&gt; Mean chain execution time: 0.2 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 0.3 seconds.</span></span>
+<span><span class="co">#&gt; Mean chain execution time: 0.8 seconds.</span></span>
+<span><span class="co">#&gt; Total execution time: 1.0 seconds.</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/model_comparison.html">model_comparison</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>non_random_model<span class="op">=</span><span class="va">fit_edge</span>, random_model<span class="op">=</span><span class="va">fit_null</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.</span></span>
+<span><span class="fu"><a href="../reference/model_comparison.html">model_comparison</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>non_random_model <span class="op">=</span> <span class="va">fit_edge</span>, random_model <span class="op">=</span> <span class="va">fit_null</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Method: stacking</span></span>
 <span><span class="co">#&gt; ------</span></span>
 <span><span class="co">#&gt;                  weight</span></span>
-<span><span class="co">#&gt; non_random_model 1.000 </span></span>
-<span><span class="co">#&gt; random_model     0.000</span></span></code></pre></div>
-<p>This shows the relative probabilities of the models in the
-comparison. In our case the results are conclusive, the network seems to
-be non-random. It’s likely that this is the case in almost all networks,
-but you might want to conduct this test anyway.</p>
+<span><span class="co">#&gt; non_random_model 0.789 </span></span>
+<span><span class="co">#&gt; random_model     0.211</span></span></code></pre></div>
+<p>The weights are based on leave-one-out cross-validation, which
+estimates how well each model predicts data it was not fitted to. They
+sum to 1. A weight close to 1 for the non-random model suggests that
+dyads differ in how often they associate. With few observations per dyad
+the comparison may be inconclusive, or may favour the null model,
+because there is not enough information to distinguish between
+dyads.</p>
 </div>
 <div class="section level2">
-<h2 id="regression">Regression<a class="anchor" aria-label="anchor" href="#regression"></a>
+<h2 id="regressions">Regressions<a class="anchor" aria-label="anchor" href="#regressions"></a>
 </h2>
-<p>One of the most common types of analysis is regression. To
-demonstrate how regressions can be conducted in bisonR, we’ll first set
-up a dataframe. For this example let’s use age difference as a predictor
-of edge weight.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<p>Regressions are fitted with <code><a href="../reference/bison_brm.html">bison_brm()</a></code>, which uses the
+<code>brms</code> package. Network variables are specified with
+<code>bison()</code> in the model formula.</p>
+<div class="section level3">
+<h3 id="dyadic-regression">Dyadic regression<a class="anchor" aria-label="anchor" href="#dyadic-regression"></a>
+</h3>
+<p>This example tests whether age difference predicts edge weight. The
+regression needs a data frame with one row per dyad:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df_dyadic</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span>, <span class="va">age_diff</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">df_dyadic</span></span>
-<span><span class="co">#&gt;    node_1_id node_2_id    age_diff</span></span>
-<span><span class="co">#&gt; 1          1         2  1.19465724</span></span>
-<span><span class="co">#&gt; 2          1         3  2.00856988</span></span>
-<span><span class="co">#&gt; 3          1         4  1.22498356</span></span>
-<span><span class="co">#&gt; 4          1         5  4.10718556</span></span>
-<span><span class="co">#&gt; 5          1         6  0.90997296</span></span>
-<span><span class="co">#&gt; 6          1         7  0.51398526</span></span>
-<span><span class="co">#&gt; 7          1         8  0.44834925</span></span>
-<span><span class="co">#&gt; 8          1         9 -1.84302212</span></span>
-<span><span class="co">#&gt; 9          1        10 -4.09700549</span></span>
-<span><span class="co">#&gt; 10         2         3  0.81391263</span></span>
-<span><span class="co">#&gt; 11         2         4  0.03032632</span></span>
-<span><span class="co">#&gt; 12         2         5  2.91252832</span></span>
-<span><span class="co">#&gt; 13         2         6 -0.28468428</span></span>
-<span><span class="co">#&gt; 14         2         7 -0.68067198</span></span>
-<span><span class="co">#&gt; 15         2         8 -0.74630799</span></span>
-<span><span class="co">#&gt; 16         2         9 -3.03767937</span></span>
-<span><span class="co">#&gt; 17         2        10 -5.29166273</span></span>
-<span><span class="co">#&gt; 18         3         4 -0.78358631</span></span>
-<span><span class="co">#&gt; 19         3         5  2.09861568</span></span>
-<span><span class="co">#&gt; 20         3         6 -1.09859691</span></span>
-<span><span class="co">#&gt; 21         3         7 -1.49458462</span></span>
-<span><span class="co">#&gt; 22         3         8 -1.56022062</span></span>
-<span><span class="co">#&gt; 23         3         9 -3.85159200</span></span>
-<span><span class="co">#&gt; 24         3        10 -6.10557536</span></span>
-<span><span class="co">#&gt; 25         4         5  2.88220200</span></span>
-<span><span class="co">#&gt; 26         4         6 -0.31501060</span></span>
-<span><span class="co">#&gt; 27         4         7 -0.71099831</span></span>
-<span><span class="co">#&gt; 28         4         8 -0.77663431</span></span>
-<span><span class="co">#&gt; 29         4         9 -3.06800569</span></span>
-<span><span class="co">#&gt; 30         4        10 -5.32198905</span></span>
-<span><span class="co">#&gt; 31         5         6 -3.19721259</span></span>
-<span><span class="co">#&gt; 32         5         7 -3.59320030</span></span>
-<span><span class="co">#&gt; 33         5         8 -3.65883631</span></span>
-<span><span class="co">#&gt; 34         5         9 -5.95020768</span></span>
-<span><span class="co">#&gt; 35         5        10 -8.20419105</span></span>
-<span><span class="co">#&gt; 36         6         7 -0.39598771</span></span>
-<span><span class="co">#&gt; 37         6         8 -0.46162371</span></span>
-<span><span class="co">#&gt; 38         6         9 -2.75299509</span></span>
-<span><span class="co">#&gt; 39         6        10 -5.00697845</span></span>
-<span><span class="co">#&gt; 40         7         8 -0.06563600</span></span>
-<span><span class="co">#&gt; 41         7         9 -2.35700738</span></span>
-<span><span class="co">#&gt; 42         7        10 -4.61099074</span></span>
-<span><span class="co">#&gt; 43         8         9 -2.29137138</span></span>
-<span><span class="co">#&gt; 44         8        10 -4.54535474</span></span>
-<span><span class="co">#&gt; 45         9        10 -2.25398336</span></span></code></pre></div>
-<p>bisonR uses the popular Bayesian regression framework
-<code>brms</code> to run regressions models inside a wrapper function
-<code><a href="../reference/bison_brm.html">bison_brm()</a></code>. The core syntax and arguments to
-<code><a href="../reference/bison_brm.html">bison_brm()</a></code> are the same as <code>brm</code>, with a few
-key differences. The main difference in the formula specification is
-that network variables are specified using the <code>bison(...)</code>
-keyword. This tells brms to use the bison edge weight model to maintain
-uncertainty in the analysis. In this analysis we want to use age
-difference as a predictor of edge weight, so we can run:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit_dyadic</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bison_brm.html">bison_brm</a></span> <span class="op">(</span></span>
-<span>  <span class="fu">bison</span><span class="op">(</span><span class="fu">edge_weight</span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="va">age_diff</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df_dyadic</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   node_1_id node_2_id   age_diff</span></span>
+<span><span class="co">#&gt; 1         1         2 -1.9874477</span></span>
+<span><span class="co">#&gt; 2         1         3  0.8716649</span></span>
+<span><span class="co">#&gt; 3         1         4 -2.3351863</span></span>
+<span><span class="co">#&gt; 4         1         5  0.1026539</span></span>
+<span><span class="co">#&gt; 5         1         6 -7.1629618</span></span>
+<span><span class="co">#&gt; 6         1         7 -4.0112225</span></span></code></pre></div>
+<p>Edges that share a node are not independent. A multi-membership
+random effect, <code>(1 | mm(node_1_id, node_2_id))</code>, gives each
+dyad a combined effect of its two members. It accounts for this
+non-independence and should usually be included in dyadic
+regressions:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit_dyadic</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bison_brm.html">bison_brm</a></span><span class="op">(</span></span>
+<span>  <span class="fu">bison</span><span class="op">(</span><span class="fu">edge_weight</span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="va">age_diff</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="fu">mm</span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="va">fit_edge</span>,</span>
 <span>  <span class="va">df_dyadic</span>,</span>
-<span>  num_draws<span class="op">=</span><span class="fl">5</span>, <span class="co"># Small sample size for demonstration purposes</span></span>
-<span>  refresh<span class="op">=</span><span class="fl">0</span></span>
+<span>  num_draws <span class="op">=</span> <span class="fl">5</span>, <span class="co"># Small for demonstration; use 100 or more in practice</span></span>
+<span>  refresh <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  silent <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Number of logged events: 1</span></span>
-<span><span class="co">#&gt; Compiling the C++ model</span></span>
-<span><span class="co">#&gt; Running MCMC with 1 chain...</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Chain 1 WARNING: No variance estimation is </span></span>
-<span><span class="co">#&gt; Chain 1          performed for num_warmup &lt; 20 </span></span>
-<span><span class="co">#&gt; Chain 1 finished in 0.0 seconds.</span></span>
-<span><span class="co">#&gt; Warning: E-BFMI not computed because it is undefined for posterior chains of</span></span>
-<span><span class="co">#&gt; length less than 3.</span></span>
-<span><span class="co">#&gt; Running MCMC with 2 chains, at most 4 in parallel...</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Chain 1 finished in 0.0 seconds.</span></span>
-<span><span class="co">#&gt; Chain 2 finished in 0.0 seconds.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Both chains finished successfully.</span></span>
-<span><span class="co">#&gt; Mean chain execution time: 0.0 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 0.2 seconds.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Running MCMC with 2 chains, at most 4 in parallel...</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Chain 1 finished in 0.0 seconds.</span></span>
-<span><span class="co">#&gt; Chain 2 finished in 0.0 seconds.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Both chains finished successfully.</span></span>
-<span><span class="co">#&gt; Mean chain execution time: 0.0 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 0.2 seconds.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Running MCMC with 2 chains, at most 4 in parallel...</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Chain 1 finished in 0.0 seconds.</span></span>
-<span><span class="co">#&gt; Chain 2 finished in 0.0 seconds.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Both chains finished successfully.</span></span>
-<span><span class="co">#&gt; Mean chain execution time: 0.0 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 0.2 seconds.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Running MCMC with 2 chains, at most 4 in parallel...</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Chain 1 finished in 0.0 seconds.</span></span>
-<span><span class="co">#&gt; Chain 2 finished in 0.0 seconds.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Both chains finished successfully.</span></span>
-<span><span class="co">#&gt; Mean chain execution time: 0.0 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 0.2 seconds.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Running MCMC with 2 chains, at most 4 in parallel...</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Chain 1 finished in 0.0 seconds.</span></span>
-<span><span class="co">#&gt; Chain 2 finished in 0.0 seconds.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Both chains finished successfully.</span></span>
-<span><span class="co">#&gt; Mean chain execution time: 0.0 seconds.</span></span>
-<span><span class="co">#&gt; Total execution time: 0.2 seconds.</span></span>
-<span><span class="co">#&gt; Fitting imputed model 1</span></span>
-<span><span class="co">#&gt; Start sampling</span></span>
-<span><span class="co">#&gt; Fitting imputed model 2</span></span>
-<span><span class="co">#&gt; Start sampling</span></span>
-<span><span class="co">#&gt; Fitting imputed model 3</span></span>
-<span><span class="co">#&gt; Start sampling</span></span>
-<span><span class="co">#&gt; Fitting imputed model 4</span></span>
-<span><span class="co">#&gt; Start sampling</span></span>
-<span><span class="co">#&gt; Fitting imputed model 5</span></span>
-<span><span class="co">#&gt; Start sampling</span></span></code></pre></div>
-<p>The default output of <code><a href="../reference/bison_brm.html">bison_brm()</a></code> is a
-<code>brmsfit_multiple</code> object that can be analysed in much the
-same way as any other brms object. We can check the summary as
-follows:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_dyadic</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: 2 of 2000 (0.0%) transitions ended with a divergence.</span></span>
+<span><span class="co">#&gt; See https://mc-stan.org/misc/warnings for details.</span></span>
+<span><span class="co">#&gt; Warning: 1 of 2000 (0.0%) transitions ended with a divergence.</span></span>
+<span><span class="co">#&gt; See https://mc-stan.org/misc/warnings for details.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_dyadic</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: There were 3 divergent transitions after warmup. Increasing</span></span>
+<span><span class="co">#&gt; adapt_delta above 0.8 may help. See</span></span>
+<span><span class="co">#&gt; http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</span></span>
 <span><span class="co">#&gt;  Family: gaussian </span></span>
 <span><span class="co">#&gt;   Links: mu = identity </span></span>
-<span><span class="co">#&gt; Formula: bison_edge_weight ~ age_diff </span></span>
-<span><span class="co">#&gt;    Data: mice_obj (Number of observations: 45) </span></span>
+<span><span class="co">#&gt; Formula: bison_edge_weight ~ age_diff + (1 | mm(node_1_id, node_2_id)) </span></span>
+<span><span class="co">#&gt;    Data: structure(list(data = structure(list(node_1_id = s (Number of observations: 45) </span></span>
 <span><span class="co">#&gt;   Draws: 10 chains, each with iter = 2000; warmup = 1000; thin = 1;</span></span>
 <span><span class="co">#&gt;          total post-warmup draws = 10000</span></span>
 <span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Multilevel Hyperparameters:</span></span>
+<span><span class="co">#&gt; ~mmnode_1_idnode_2_id (Number of levels: 10) </span></span>
+<span><span class="co">#&gt;               Estimate Est.Error l-95% CI u-95% CI</span></span>
+<span><span class="co">#&gt; sd(Intercept)     0.42      0.34     0.02     1.26</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Regression Coefficients:</span></span>
 <span><span class="co">#&gt;           Estimate Est.Error l-95% CI u-95% CI</span></span>
-<span><span class="co">#&gt; Intercept    -0.30      0.40    -1.10     0.49</span></span>
-<span><span class="co">#&gt; age_diff      0.50      0.13     0.24     0.75</span></span>
+<span><span class="co">#&gt; Intercept    -0.21      0.30    -0.78     0.40</span></span>
+<span><span class="co">#&gt; age_diff      0.15      0.06     0.02     0.28</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Further Distributional Parameters:</span></span>
 <span><span class="co">#&gt;       Estimate Est.Error l-95% CI u-95% CI</span></span>
-<span><span class="co">#&gt; sigma     2.07      0.27     1.64     2.68</span></span>
+<span><span class="co">#&gt; sigma     1.27      0.21     0.89     1.72</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Draws were sampled using sample(hmc). Overall Rhat and ESS estimates</span></span>
 <span><span class="co">#&gt; are not informative for brm_multiple models and are hence not displayed.</span></span>
 <span><span class="co">#&gt; Please see ?brm_multiple for how to assess convergence of such models.</span></span></code></pre></div>
+<p>In <code><a href="../reference/bison_brm.html">bison_brm()</a></code>, edge weights are on the logit scale for
+binary models and the log scale for count models. A model is fitted to
+each of <code>num_draws</code> networks drawn from the posterior, and
+the results are combined, as in multiple imputation. Because of this,
+brms may give convergence warnings for the combined fit, and doesn’t
+report R-hat values (a convergence diagnostic). See
+<code><a href="../articles/bison_brms.html">vignette("bison_brms")</a></code> for other types of regression.</p>
+</div>
 </div>
 <div class="section level2">
-<h2 id="network-metrics">Network Metrics<a class="anchor" aria-label="anchor" href="#network-metrics"></a>
+<h2 id="network-metrics">Network metrics<a class="anchor" aria-label="anchor" href="#network-metrics"></a>
 </h2>
-<p>As well as the types of statistical analysis we’ve already covered,
-network metrics can also be extracted for use in other quantitative or
-qualitative analyses. This can be done with the
-<code>draw_network_metric_samples()</code> function for network-level
-metrics (also known as global metrics) or
-<code>draw_node_metric_samples()</code> for node-level metrics. Let’s
-try this out for the coefficient of variation (CV) in edge weights, also
-known as social differentiation:</p>
+<p>Posterior distributions of network metrics can be calculated with
+<code><a href="../reference/extract_metric.html">extract_metric()</a></code>. For example, the coefficient of variation
+of edge weights (social differentiation):</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv_samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"global_cv"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cv_samples</span><span class="op">)</span></span>
-<span><span class="co">#&gt;           [,1]</span></span>
-<span><span class="co">#&gt; [1,] 0.9488460</span></span>
-<span><span class="co">#&gt; [2,] 0.8926184</span></span>
-<span><span class="co">#&gt; [3,] 0.9364639</span></span>
-<span><span class="co">#&gt; [4,] 0.9092763</span></span>
-<span><span class="co">#&gt; [5,] 0.9280470</span></span>
-<span><span class="co">#&gt; [6,] 0.9037567</span></span></code></pre></div>
-<p>We can visualise the posterior distribution of social differentiation
-by</p>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">cv_samples</span>, probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.5</span>, <span class="fl">0.95</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;        5%       50%       95% </span></span>
+<span><span class="co">#&gt; 0.5363388 0.6064157 0.6772147</span></span>
+<span><span class="fu"><a href="../reference/plot_metric.html">plot_metric</a></span><span class="op">(</span><span class="va">cv_samples</span>, <span class="st">"Social differentiation"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="getting_started_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="" width="100%"></p>
+<p>Node-level metrics return one column per individual:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/density.html" class="external-link">density</a></span><span class="op">(</span><span class="va">cv_samples</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="getting_started_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" alt="" width="700"></p>
-<p>The posterior samples can now be used descriptively, to compare
-networks, or in other downstream analyses.</p>
+<code class="sourceCode R"><span><span class="va">strength</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"node_strength"</span>, num_draws <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">strength</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt;             1        2        3        4        5</span></span>
+<span><span class="co">#&gt; [1,] 2.809894 3.835981 3.997909 3.551164 3.175747</span></span>
+<span><span class="co">#&gt; [2,] 2.515065 5.038261 3.683923 2.969983 3.136046</span></span>
+<span><span class="co">#&gt; [3,] 3.251071 4.708750 3.959189 3.132340 3.696384</span></span>
+<span><span class="co">#&gt; [4,] 2.422419 3.743923 4.515736 3.727881 3.108168</span></span>
+<span><span class="co">#&gt; [5,] 3.217601 3.689660 3.977704 3.197678 2.670254</span></span>
+<span><span class="co">#&gt; [6,] 3.853166 3.292933 4.081171 3.461256 2.917773</span></span></code></pre></div>
+<p>See <code><a href="../articles/network_metrics.html">vignette("network_metrics")</a></code> for the full list of
+metrics and how they’re defined.</p>
 </div>
 <div class="section level2">
-<h2 id="conclusion">Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"></a>
+<h2 id="next-steps">Next steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
 </h2>
-<p>This was a very brief introduction to the <code>bisonR</code>
-package, and we hope it was useful. The R package has many more features
-than were shown here, and the package is under constant development. We
-welcome any and all feedback and criticism. We hope you find this
-package useful, happy social network analysis!</p>
+<ul>
+<li>
+<code><a href="../articles/preparing_data.html">vignette("preparing_data")</a></code>: converting your own data,
+directed networks, group-based observations.</li>
+<li>
+<code><a href="../articles/bison_brms.html">vignette("bison_brms")</a></code>: more types of regression,
+including comparing networks.</li>
+<li>
+<code><a href="../articles/network_metrics.html">vignette("network_metrics")</a></code>: definitions of the
+available metrics.</li>
+<li>
+<code><a href="../articles/mixture_models.html">vignette("mixture_models")</a></code>: looking for different types
+of social relationship.</li>
+</ul>
+<p>Questions can be asked in <a href="https://github.com/JHart96/bisonR/discussions" class="external-link">Discussions</a>,
+and bugs reported in <a href="https://github.com/JHart96/bisonR/issues" class="external-link">Issues</a>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -598,7 +602,7 @@ package useful, happy social network analysis!</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by <a href="https://jordanhart.co.uk/" class="external-link">Jordan Hart</a>.</p>
+  <p>Developed by <a href="https://jordanhart.co.uk/" class="external-link">Jordan Hart</a>, Michael N. Weiss, Daniel W. Franks, Lauren J. N. Brent, Samuel Ellis.</p>
 </div>
 
 <div class="pkgdown-footer-right">

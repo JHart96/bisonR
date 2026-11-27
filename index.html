@@ -4,29 +4,35 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>BISoN R Package • bisonR</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
-<link rel="icon" type="”image/svg+xml”" href="favicon.svg">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" sizes="any" href="favicon.ico">
-<link rel="manifest" href="site.webmanifest">
-<script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>bisonR: Bayesian Inference of Social Networks • bisonR</title>
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/Source_Sans_3-0.5.0/font.css" rel="stylesheet">
+<link href="deps/JetBrains_Mono-0.5.0/font.css" rel="stylesheet">
+<link href="deps/Source_Serif_4-0.5.0/font.css" rel="stylesheet">
+<link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="BISoN R Package">
-<meta name="description" content="bisonR is an R package implementing the BISoN framework for conducting Bayesian analysis of social networks. BISoN estimates uncertainty over edge weights in social networks from empirical data (such as observations) and builds networks with uncertainty. The networks can then be visualised *with* uncertainty, and can also be analysed with a fully Bayesian methodology using standard tools such as regression.">
-<meta property="og:description" content="bisonR is an R package implementing the BISoN framework for conducting Bayesian analysis of social networks. BISoN estimates uncertainty over edge weights in social networks from empirical data (such as observations) and builds networks with uncertainty. The networks can then be visualised *with* uncertainty, and can also be analysed with a fully Bayesian methodology using standard tools such as regression.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><script src="extra.js"></script><meta property="og:title" content="bisonR: Bayesian Inference of Social Networks">
+<meta name="description" content="Estimate animal social networks with uncertainty, and carry that uncertainty through to plots, network metrics and regressions.
+">
+<meta property="og:description" content="Estimate animal social networks with uncertainty, and carry that uncertainty through to plots, network metrics and regressions.
+">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="index.html">bisonR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,28 +41,24 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="articles/getting_started.html">Get started</a></li>
+<li class="nav-item"><a class="nav-link" href="articles/index.html">Articles</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
-<li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>bisonR</h6></li>
-    <li><a class="dropdown-item" href="articles/getting_started.html">Getting started</a></li>
-    <li><a class="dropdown-item" href="articles/bison_brms.html">Using brms with BISoN</a></li>
-    <li><a class="dropdown-item" href="articles/mixture_models.html">Edge mixture models</a></li>
-    <li><a class="dropdown-item" href="articles/network_metrics.html">Network metrics</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Help</h6></li>
-    <li><a class="dropdown-item" href="articles/windows_installation.html">Installing cmdstanR on Windows</a></li>
-  </ul>
-</li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JHart96/bisonR/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JHart96/bisonR" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -64,80 +66,101 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="bisonr---an-r-package-for-bayesian-inference-of-social-networks">bisonR - An R package for Bayesian Inference of Social Networks<a class="anchor" aria-label="anchor" href="#bisonr---an-r-package-for-bayesian-inference-of-social-networks"></a>
-</h1></div>
-<p><img src="reference/figures/hex.svg" width="160" align="right"></p>
-<!-- badges: start -->
-
-<p><strong>This package is still in continuous development and has not yet been fully tested. Please let us know if you encounter any unexpected behaviour.</strong></p>
-<p>bisonR is an R package implementing the BISoN framework for conducting Bayesian analysis of social networks. BISoN estimates uncertainty over edge weights in social networks from empirical data (such as observations) and builds networks with uncertainty. The networks can then be visualised <em>with</em> uncertainty and analysed with a fully Bayesian methodology.</p>
-<div class="section level2">
-<h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
+  <main id="main" class="col-md-9"><div class="bison-hero">
+<div class="bison-hero-text">
+<h2 class="bison-title">
+bisonR
 </h2>
-<p>To get started with the package use the code below:</p>
+<p class="bison-subtitle">
+Bayesian inference of animal social networks in R
+</p>
+<p class="bison-lead">
+bisonR implements the BISoN framework (Hart et al. 2023). It estimates each edge weight from observation data as a posterior distribution (the range of plausible values given the data and prior), so the precision of each estimate reflects how much that dyad was sampled. These posteriors can then be used to calculate network metrics, fit regression models and compare networks.
+</p>
+<div class="bison-actions">
+<p><a class="btn btn-primary" href="articles/getting_started.html">Getting started</a> <a class="btn btn-outline-primary" href="reference/index.html">Function reference</a></p>
+</div>
+</div>
+<div class="bison-hero-figure">
+<p><img src="hero-network.png" alt="A social network plotted with plot_network(), in which the width of each edge shows the uncertainty in its weight."></p>
+</div>
+</div>
+<div class="bison-features">
+<div class="bison-feature">
+<h3>
+Edge weight models
+</h3>
+<p>
+Binary and count models of social events that account for observation effort, with optional fixed and random effects, partial pooling and zero inflation. Faster conjugate models, fitted without MCMC (the sampling method that Stan uses), are available for simple cases.
+</p>
+<p><a href="articles/preparing_data.html">Preparing data</a></p>
+</div>
+<div class="bison-feature">
+<h3>
+Diagnostics and plots
+</h3>
+<p>
+Trace plots of the MCMC sampler, prior and posterior predictive checks, and network plots that show the credible interval of each edge.
+</p>
+<p><a href="reference/plot_predictions.html">Predictive checks</a></p>
+</div>
+<div class="bison-feature">
+<h3>
+Downstream analyses
+</h3>
+<p>
+Posterior distributions of node and network metrics, dyadic and nodal regression with brms, edge mixture models and non-random association tests.
+</p>
+<p><a href="articles/bison_brms.html">Regression with brms</a></p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="a-first-model">A first model<a class="anchor" aria-label="anchor" href="#a-first-model"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bisonr.org">bisonR</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">sim_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_bison_model.html">simulate_bison_model</a></span><span class="op">(</span><span class="st">"binary"</span>, aggregated <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">sim_data</span><span class="op">$</span><span class="va">df_sim</span></span>
-<span></span>
-<span><span class="va">priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_default_priors.html">get_default_priors</a></span><span class="op">(</span><span class="st">"binary"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fit_edge</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bison_model.html">bison_model</a></span><span class="op">(</span></span>
-<span>  <span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="va">duration</span><span class="op">)</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span><span class="op">)</span>, </span>
-<span>  data<span class="op">=</span><span class="va">df</span>, </span>
-<span>  model_type<span class="op">=</span><span class="st">"binary"</span>,</span>
-<span>  priors<span class="op">=</span><span class="va">priors</span></span>
+<span>  <span class="op">(</span><span class="va">event</span> <span class="op">|</span> <span class="va">effort</span><span class="op">)</span> <span class="op">~</span> <span class="fu">dyad</span><span class="op">(</span><span class="va">node_1_id</span>, <span class="va">node_2_id</span><span class="op">)</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">sim_data</span><span class="op">$</span><span class="va">df_sim</span>,</span>
+<span>  model_type <span class="op">=</span> <span class="st">"binary"</span>,</span>
+<span>  priors <span class="op">=</span> <span class="fu"><a href="reference/get_default_priors.html">get_default_priors</a></span><span class="op">(</span><span class="st">"binary"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_edge</span><span class="op">)</span></span></code></pre></div>
-<p>This will fit a basic edge model model to simulated data and generate an output like this below:</p>
-<pre><code>=== Fitted BISoN edge model ===
-Data type: binary
-Formula: (event | duration) ~ dyad(node_1_id, node_2_id)
-Number of nodes: 10
-Number of dyads: 45
-Directed: FALSE
-=== Edge list summary ===
-         median    5%   95%
-1 &lt;-&gt; 2   0.156 0.014 0.530
-1 &lt;-&gt; 3   0.702 0.219 0.973
-2 &lt;-&gt; 3   0.793 0.356 0.982
-...</code></pre>
-<p>For a more detailed example check out the <em>Getting Started</em> page here: <a href="https://bisonr.org/articles/getting_started.html" class="uri">https://bisonr.org/articles/getting_started.html</a>.</p>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_edge</span><span class="op">)</span>                                <span class="co"># Edge weights with credible intervals</span></span>
+<span><span class="fu"><a href="reference/plot_network.html">plot_network</a></span><span class="op">(</span><span class="va">fit_edge</span>, lwd <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>                  <span class="co"># Sociogram showing uncertainty</span></span>
+<span><span class="fu"><a href="reference/extract_metric.html">extract_metric</a></span><span class="op">(</span><span class="va">fit_edge</span>, <span class="st">"node_strength"</span><span class="op">)</span>        <span class="co"># Posterior of each node's strength</span></span></code></pre></div>
+<p>The left-hand side of the formula, <code>(event | effort)</code>, gives the number of social events seen and how much each dyad was observed. The right-hand side, <code>dyad(node_1_id, node_2_id)</code>, estimates an edge weight for each dyad (pair of individuals). The <a href="articles/getting_started.html">Getting started</a> article explains each step.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<div class="section level3">
-<h3 id="installing-cmdstanr">Installing CmdStanR<a class="anchor" aria-label="anchor" href="#installing-cmdstanr"></a>
-</h3>
-<p>The bisonR package is written in R, but uses the Stan programming language to fit Bayesian models. Stan is a separate program, and interfaces with bisonR using an R package called cmdstanR. Stan and cmdstanR are installed in a different way to standard R packages, so require a specific series of installation steps.</p>
-<p>On Windows, before proceeding you may need to install the version of Rtools appropriate for your version of R. Rtools can be found here: <a href="https://cran.r-project.org/bin/windows/Rtools/" class="external-link uri">https://cran.r-project.org/bin/windows/Rtools/</a>.</p>
-<p>The full instructions to install cmdstanR can be found at <a href="https://mc-stan.org/cmdstanr/" class="external-link uri">https://mc-stan.org/cmdstanr/</a>. We’ve found that the following steps often work, but depending on your operating system and version of R, the process may be more involved.</p>
+<p>bisonR fits models with <a href="https://mc-stan.org/" class="external-link">Stan</a> through the <a href="https://mc-stan.org/cmdstanr/" class="external-link">cmdstanr</a> package, so install cmdstanr and CmdStan first:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"cmdstanr"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://stan-dev.r-universe.dev"</span>, <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">cmdstanr</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">check_cmdstan_toolchain</a></span><span class="op">(</span>fix <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">cmdstanr</span><span class="fu">::</span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">install_cmdstan</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>Then install bisonR from GitHub:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"cmdstanr"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://mc-stan.org/r-packages/"</span>, <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/cmdstanr/" class="external-link">cmdstanr</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">check_cmdstan_toolchain</a></span><span class="op">(</span>fix <span class="op">=</span> <span class="cn">TRUE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://mc-stan.org/cmdstanr/reference/install_cmdstan.html" class="external-link">install_cmdstan</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># On networked PCs, specify a local directory here with the argument dir=path_to_local_directory</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JHart96/bisonR"</span><span class="op">)</span></span></code></pre></div>
+<p>On Windows you may need to install <a href="https://cran.r-project.org/bin/windows/Rtools/" class="external-link">Rtools</a> first. The <a href="articles/windows_installation.html">Windows installation</a> article covers common problems. Upcoming releases are developed on <code>release/&lt;version&gt;</code> branches. To install one, use, for example, <code>remotes::install_github("JHart96/bisonR@release/1.1.0")</code>.</p>
 </div>
-<div class="section level3">
-<h3 id="installing-bisonr">Installing bisonR<a class="anchor" aria-label="anchor" href="#installing-bisonr"></a>
-</h3>
-<p>bisonR isn’t currently on CRAN, but it can be installed from GitHub. To do this, make sure you have the <code>remotes</code> package installed. Then run the following command:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JHart96/bisonR"</span><span class="op">)</span></span></code></pre></div>
-<div class="section level4">
-<h4 id="development-version">Development version<a class="anchor" aria-label="anchor" href="#development-version"></a>
-</h4>
-<p>If you want to install the latest development version, bugs and all, you can install from the development branch. This option is not recommended for standard users.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JHart96/bisonR@dev"</span><span class="op">)</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="citing-bisonr">Citing bisonR<a class="anchor" aria-label="anchor" href="#citing-bisonr"></a>
+</h2>
+<blockquote>
+<p>Hart, J. D. A., Weiss, M. N., Franks, D. W., &amp; Brent, L. J. N. (2023). BISoN: A Bayesian framework for inference of social networks. <em>Methods in Ecology and Evolution</em>, 14(9), 2411–2420. <a href="https://doi.org/10.1111/2041-210X.14171" class="external-link uri">https://doi.org/10.1111/2041-210X.14171</a></p>
+</blockquote>
 </div>
+<div class="section level2">
+<h2 id="getting-help">Getting help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
+</h2>
+<p>Ask questions in <a href="https://github.com/JHart96/bisonR/discussions" class="external-link">Discussions</a> and report bugs in <a href="https://github.com/JHart96/bisonR/issues" class="external-link">Issues</a>. Contributions are welcome; see the <a href="https://github.com/JHart96/bisonR/blob/main/.github/CONTRIBUTING.md" class="external-link">contributing guide</a>.</p>
 </div>
-</div>
-</div>
+
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
@@ -154,7 +177,6 @@ Directed: FALSE
 </ul>
 </div>
 
-
 <div class="citation">
 <h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
@@ -167,24 +189,22 @@ Directed: FALSE
 <ul class="list-unstyled">
 <li>
 <a href="https://jordanhart.co.uk/" class="external-link">Jordan Hart</a> <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-4636-0760" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Michael N. Weiss <br><small class="roles"> Author </small>   </li>
+<li>Daniel W. Franks <br><small class="roles"> Author </small>   </li>
+<li>Lauren J. N. Brent <br><small class="roles"> Author </small>   </li>
+<li>Samuel Ellis <br><small class="roles"> Author </small>   </li>
+<li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
 
-<div class="dev-status">
-<h2 data-toc-skip>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="https://github.com/JHart96/bisonR/actions" class="external-link"><img src="https://github.com/JHart96/bisonR/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://github.com/JHart96/bisonR/actions" class="external-link"><img src="https://github.com/JHart96/bisonR/workflows/pkgdown/badge.svg" alt="pkgdown"></a></li>
-<li><a href="https://app.codecov.io/gh/JHart96/bisonR?branch=main" class="external-link"><img src="https://codecov.io/gh/JHart96/bisonR/branch/main/graph/badge.svg" alt="Codecov test coverage"></a></li>
-</ul>
-</div>
+
 
   </aside>
 </div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by <a href="https://jordanhart.co.uk/" class="external-link">Jordan Hart</a>.</p>
+  <p>Developed by <a href="https://jordanhart.co.uk/" class="external-link">Jordan Hart</a>, Michael N. Weiss, Daniel W. Franks, Lauren J. N. Brent, Samuel Ellis.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -1,6 +1,6 @@
-# Prints out an edge model summary object.
+# Print an edge model summary
 
-Prints out an edge model summary object.
+Print an edge model summary
 
 ## Usage
 
@@ -13,8 +13,13 @@ print(x, ...)
 
 - x:
 
-  An S3 edge model object.
+  A `summary.bison_model` object.
 
 - ...:
 
-  Additional parameters to be passed to print function.
+  Additional arguments passed to
+  [`print()`](https://rdrr.io/r/base/print.html).
+
+## See also
+
+[`summary.bison_model()`](https://bisonr.org/reference/summary.bison_model.md)

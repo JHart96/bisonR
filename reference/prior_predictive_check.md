@@ -1,6 +1,13 @@
-# Run prior predictive check for a model specification
+# Prior predictive check
 
-Run prior predictive check for a model specification
+Fits the model using only the priors (ignoring the observed events) and
+plots the data the model would predict. This shows whether the priors
+imply plausible data before any data are seen. A prior describes which
+values of a parameter are plausible before seeing the data. Use it
+before fitting with
+[`bison_model()`](https://bisonr.org/reference/bison_model.md): if the
+predicted rates are implausible for the species and sampling method,
+change the priors.
 
 ## Usage
 
@@ -11,33 +18,64 @@ prior_predictive_check(
   model_type,
   plot_type = "density",
   options = NULL,
-  priors = NULL
+  priors = NULL,
+  directed = isTRUE(options$directed),
+  num_draws = 50,
+  ...
 )
 ```
 
 ## Arguments
 
-- formula:
+- formula, data, model_type, priors:
 
-  Formula for the model
-
-- data:
-
-  Data for the model
-
-- model_type:
-
-  Type of model to fit
+  As for [`bison_model()`](https://bisonr.org/reference/bison_model.md).
+  The data are used for the structure of the model (dyads and
+  observation effort), not for the events.
 
 - plot_type:
 
-  Type of predictive plot to show ("density" or "marginal")
+  Type of predictive plot, passed to
+  [`plot_predictions()`](https://bisonr.org/reference/plot_predictions.md)
+  as `type`: `"density"` or `"stats"`.
 
 - options:
 
-  List of additional information needed for the predictive plot. Check
-  the examples for full details.
+  A list of extra options. Currently only `directed` (`TRUE`/`FALSE`) is
+  used; prefer the `directed` argument.
 
-- priors:
+- directed:
 
-  List of priors for the model
+  Whether the network is directed.
+
+- num_draws:
+
+  Number of datasets to simulate from the priors.
+
+- ...:
+
+  Further arguments passed to
+  [`bison_model()`](https://bisonr.org/reference/bison_model.md).
+
+## Value
+
+The prior-only model, invisibly.
+
+## See also
+
+[`prior_check()`](https://bisonr.org/reference/prior_check.md) to plot
+the priors themselves,
+[`get_default_priors()`](https://bisonr.org/reference/get_default_priors.md),
+[`plot_predictions()`](https://bisonr.org/reference/plot_predictions.md)
+
+## Examples
+
+``` r
+sim_data <- simulate_bison_model("binary", aggregated = TRUE)
+prior_predictive_check(
+  (event | effort) ~ dyad(node_1_id, node_2_id),
+  data = sim_data$df_sim,
+  model_type = "binary_conjugate",
+  priors = get_default_priors("binary_conjugate")
+)
+```
