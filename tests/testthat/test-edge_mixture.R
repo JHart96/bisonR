@@ -25,7 +25,9 @@ for (model_type in c("binary", "count")) {
     expect_equal(unname(rowSums(edge_probs[, 3:4])), rep(1, nrow(edge_probs)))
 
     expect_output(print(summary(fit_mixture)), "Maximum number of components: 3")
-    expect_error(get_edge_component_probabilities(fit_mixture, 4), "does not exist")
+    expect_error(get_edge_component_probabilities(fit_mixture, 4), "between 1 and 3")
+    expect_error(get_edge_component_probabilities(fit_mixture, 0), "between 1 and 3")
+    expect_error(get_component_means(fit_mixture, 4), "between 1 and 3")
   })
 }
 

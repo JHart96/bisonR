@@ -41,3 +41,8 @@ test_that("true values are in the right columns", {
   expect_named(mix$df_true, c("node_1_id", "node_2_id", "edge_weight"))
   expect_true(all(mix$df_sim$effort > 0))
 })
+
+test_that("simulate_bison_model() checks model_type", {
+  expect_error(simulate_bison_model("binary_conjugate", aggregated = TRUE), "must be")
+  expect_false(dplyr::is_grouped_df(simulate_bison_model("count", aggregated = TRUE)$df_sim))
+})

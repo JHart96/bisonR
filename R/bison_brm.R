@@ -1,16 +1,64 @@
 
 utils::globalVariables(c(".imp"))
 
-#' Fit a brms model on BISoN network data
+#' Fit a regression with a network metric
 #'
-#' @param formula A formula compatible with a brms model
-#' @param edgemodel_list A bisonR edge model (or a list of them)
-#' @param data_list A dataframe of regression variables compatible with a brms model (or a list of them)
-#' @param num_draws Number of draws from the network posterior to use when fitting model
-#' @param z_score Whether to standardise the network variable within each
+#' Fits a Bayesian regression with the brms package in which a network metric,
+#' such as node strength or edge weight, is a response or predictor. The
+#' uncertainty in the metric, estimated by the edge model, is carried into the
+#' regression by multiple imputation. Use it after [bison_model()] to test
+#' hypotheses about edges, nodes or whole networks, for example whether age
+#' predicts node strength.
+#'
+#' @details
+#' The network metric is written in the formula as a `bison()` term containing
+#' the metric and the data columns that identify its targets:
+#' * `bison(edge_weight(node_1_id, node_2_id))` for dyadic regression;
+#' * `bison(node_strength(node_id))`, `bison(node_degree[0.2](node_id))` and so
+#'   on for nodal regression;
+#' * `bison(global_cv(bison_network))` and so on for global metrics, with one
+#'   row of data per network.
+#'
+#' The `bison()` term can be on either side of the formula, and the rest of the
+#' formula uses ordinary brms syntax, including random effects such as
+#' `(1 | mm(node_1_id, node_2_id))`. In the fitted model, the network variable is
+#' named after the metric, such as `bison_node_strength`. See [extract_metric()]
+#' for the metrics available.
+#'
+#' Multiple imputation repeats an analysis on several plausible versions of the
+#' data and combines the results. Here, each version uses one posterior draw of
+#' the network metric (see [bison_mice()]). [brms::brm_multiple()] fits the
+#' regression to each version and combines the posterior draws of all the fits,
+#' so `num_draws` regressions are fitted and fitting time grows with
+#' `num_draws`. Models are fitted with the cmdstanr backend unless `backend` is
+#' given in `...`.
+#'
+#' Edge weights are used on the link scale (log-odds for binary models, log
+#' rates for count models). Node and global metrics are calculated from edge
+#' weights on the natural scale.
+#'
+#' With a list of edge models, a factor `bison_network` is added to the data,
+#' giving the position of each edge model in the list. It can be used as a
+#' predictor or random effect to compare networks.
+#'
+#' @param formula A brms formula containing one `bison()` term (see *Details*).
+#' @param edgemodel_list A fitted `bison_model` object, or a list of them for
+#'   an analysis of several networks.
+#' @param data_list A data frame of regression variables, or a list of data
+#'   frames with one per edge model, in the same order. For edge and node
+#'   metrics, each row refers to a dyad or node, and the columns named in the
+#'   `bison()` term must hold node names that match the edge model. For global
+#'   metrics, give one data frame with one row per edge model.
+#' @param num_draws Number of posterior draws of the network metric to use,
+#'   which is the number of regressions fitted. 100 is a reasonable value for
+#'   a final analysis; smaller values (such as 5 or 10) are useful while
+#'   developing a model.
+#' @param z_score If `TRUE`, standardise the network variable within each
 #'   posterior draw. Equivalent to `scale = "z"`.
-#' @param cores Number of computational cores to use.
-#' @param chains Number of chains to run per model.
+#' @param cores Number of processor cores to use.
+#' @param chains Number of MCMC chains to run for each regression. MCMC (Markov
+#'   chain Monte Carlo) draws samples from the posterior; a chain is one
+#'   independent run of the sampler.
 #' @param scale How to transform the network variable within each posterior
 #'   draw: `"none"` (default), `"centre"` (subtract the mean) or `"z"` (subtract
 #'   the mean and divide by the standard deviation). For edge and node metrics,
@@ -22,9 +70,15 @@ utils::globalVariables(c(".imp"))
 #'   selecting the rows to use, e.g. `subset = sex == "F"`. Network metrics are
 #'   still calculated from the whole network; only the rows of the regression
 #'   are selected. Not available for global metrics.
-#' @param ... Additional arguments to be passed to brm(), such as `family` or `prior`.
+#' @param ... Additional arguments passed to [brms::brm_multiple()], such as
+#'   `family` or `prior`.
 #'
-#' @return A fitted brms model
+#' @return A fitted brms model (a `brmsfit` object) combining the fits to all
+#'   imputed datasets. Use `summary()`, [brms::conditional_effects()] or
+#'   [brms::hypothesis()] on it as for any brms model.
+#'
+#' @seealso [bison_brm_get_prior()] to see and set the priors of the
+#'   regression, [bison_mice()] for the imputed data, and [extract_metric()].
 #' @examplesIf requireNamespace("brms", quietly = TRUE) && requireNamespace("mice", quietly = TRUE) && !identical(Sys.getenv("BISONR_TEST_BRMS"), "false")
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
 #' df <- sim_data$df_sim
@@ -80,27 +134,39 @@ bison_brm <- function(formula, edgemodel_list, data_list, num_draws=100, z_score
 
   # Run brms imputation. brm_multiple() warns that E-BFMI can't be computed for
   # the combined fit; that warning isn't informative here, so it is muffled.
+  brm_args <- list(...)
+  if (is.null(brm_args$backend)) brm_args$backend <- "cmdstanr"
   withCallingHandlers(
-    brms::brm_multiple(brms_formula, mice_obj, backend = "cmdstanr", cores = cores, chains = chains, ...),
+    do.call(brms::brm_multiple, c(list(brms_formula, mice_obj, cores = cores, chains = chains), brm_args)),
     warning = function(w) {
       if (grepl("E-BFMI not computed", conditionMessage(w), fixed = TRUE)) invokeRestart("muffleWarning")
     }
   )
 }
 
-#' Get priors for BISoN brm model
+#' List the priors of a bison_brm() regression
 #'
-#' Wrapper for brms::get_prior() for use with bison_brm.
+#' Shows the parameters of a [bison_brm()] regression that can be given priors,
+#' and their default priors, using [brms::get_prior()]. Use it before fitting
+#' to choose priors, which can then be set with the `prior` argument of
+#' [bison_brm()]. A prior is the distribution that describes what is plausible
+#' for a parameter before seeing the data.
 #'
-#' @param formula A formula compatible with a brms model
-#' @param edgemodel_list A bisonR edge model (or a list of them)
-#' @param data_list A dataframe of regression variables compatible with a brms model (or a list of them)
+#' @param formula A brms formula containing one `bison()` term, as for
+#'   [bison_brm()].
+#' @param edgemodel_list A fitted `bison_model` object, or a list of them.
+#' @param data_list A data frame of regression variables, or a list of them,
+#'   as for [bison_brm()].
 #' @param scale,subset,z_score As for [bison_brm()]. The scale of the network
 #'   variable affects the default priors, so use the same values as in
 #'   [bison_brm()].
-#' @param ... Additional parameters to be passed to brms::get_prior()
+#' @param ... Additional arguments passed to [brms::get_prior()], such as
+#'   `family`.
 #'
-#' @return The output from brms::get_prior()
+#' @return A data frame of priors (a `brmsprior` object) from
+#'   [brms::get_prior()], with one row per parameter or class of parameters.
+#'
+#' @seealso [bison_brm()], [brms::set_prior()]
 #'
 #' @examplesIf requireNamespace("brms", quietly = TRUE) && requireNamespace("mice", quietly = TRUE) && !identical(Sys.getenv("BISONR_TEST_BRMS"), "false")
 #' sim_data <- simulate_bison_model("binary", aggregated = TRUE)
